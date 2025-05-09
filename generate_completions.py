@@ -164,7 +164,7 @@ GPT4O_API_KEY = os.getenv("GPT4O_API_KEY")
 
 # Add to DEPLOYMENTS list
 DEPLOYMENTS = [
-    {"name": "4omini_sft39_spm_fix2_5", "type": MODEL_TYPE_AZURE_OPENAI},
+    # {"name": "4omini_sft39_spm_fix2_5", "type": MODEL_TYPE_AZURE_OPENAI},
     {"name": "o1-mini", "type": MODEL_TYPE_O1MINI},
     {"name": "o1-preview", "type": MODEL_TYPE_O1PREVIEW},
     {"name": "o3-mini", "type": MODEL_TYPE_O3MINI},
@@ -1122,9 +1122,3 @@ if __name__ == "__main__":
 # python generate_completions.py --output_dir new_completions
 # python generate_completions.py --temperature 0.2 --output_dir new_completions_02_1
 # python generate_completions.py --temperature 0.8 --output_dir new_completions_08_1
-# python generate_completions.py --temperature 0.2 --output_dir new_completions_02_3 --num_completions 3
-# python generate_completions.py --temperature 0.8 --output_dir new_completions_08_3 --num_completions 3
-# python generate_completions.py --temperature 0.2 --output_dir new_completions_02_5 --num_completions 5
-# python generate_completions.py --temperature 0.8 --output_dir new_completions_08_5 --num_completions 5
-
-# python generate_completions.py --temperature 0.2 --output_dir new_completions_02_1_v5_v7

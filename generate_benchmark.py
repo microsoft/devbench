@@ -578,19 +578,17 @@ def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="comp
                     # Use immediate parent directory as category
                     category = path_parts[i-1]
                     
-                    # Handle nested categories if needed
-                    if i >= 2:
-                        # Check if we need to use a hierarchical category path
-                        parent_dir = path_parts[i-2]
-                        if parent_dir not in ["python", "javascript", "cpp", "java", "c_sharp", "typescript"]:
-                            # Use hierarchical category path
-                            category = f"{parent_dir}/{category}"
+                    # Skip the "benchmark" and language directories in the category path
+                    # Just use the actual category name (like "api_usage")
                     break
             
             if not category:
                 if verbose:
                     print(f"Could not determine category from {benchmark_file}, skipping...")
                 continue
+            
+            if verbose:
+                print(f"Extracted category: {category}")
             
             # Initialize category tracking in results if not already present
             if category not in results["categories"]:
@@ -605,8 +603,12 @@ def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="comp
             
             # For api_usage/api_usage.jsonl, we want to find api_usage/api_usage-*.jsonl
             base_name = os.path.basename(benchmark_file).replace('.jsonl', '')
-            completion_dir = os.path.join(models_dir, *category.split('/'))
+            completion_dir = os.path.join(models_dir, category)
             os.makedirs(completion_dir, exist_ok=True)
+            
+            if verbose:
+                print(f"Looking for model completions in directory: {completion_dir}")
+                print(f"Base name for completion files: {base_name}")
             
             # Find all model completion files for this category
             model_files = {}
@@ -1037,7 +1039,6 @@ def main():
     
     # Create the argument parser
     parser = argparse.ArgumentParser(description='Generate or execute benchmark test cases')
-    parser.add_argument('--benchmark-dir', type=str, default='benchmark/', help='Directory containing benchmark files')
     parser.add_argument('--execute', action='store_true', help='Execute test cases')
     parser.add_argument('--verbose', action='store_true', help='Print detailed information during execution')
     parser.add_argument('--categories', type=str, help='Comma-separated list of test categories to execute (e.g., api_usage,code_purpose_understanding)')
@@ -1277,20 +1278,20 @@ if __name__ == "__main__":
     main()
 
 # Example usage:
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --categories api_usage --verbose
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models gpt-4o-mini,gpt-35-turbo,DeepSeek-R1,gpt-4.5-preview,Ministral-3B
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models gpt-35-turbo-completions
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --json-output benchmark_results_pass_1.json
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir completions/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_oai_41_mini/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_oai_41_nano/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_1_v4_v7/python
+# python generate_benchmark.py --execute --model-eval --categories api_usage --verbose
+# python generate_benchmark.py --execute --model-eval --verbose
+# python generate_benchmark.py --execute --model-eval --verbose --models gpt-4o-mini,gpt-35-turbo,DeepSeek-R1,gpt-4.5-preview,Ministral-3B
+# python generate_benchmark.py --execute --model-eval --verbose --models gpt-35-turbo-completions
+# python generate_benchmark.py --execute --model-eval --verbose --json-output benchmark_results_pass_1.json
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir completions/python
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_oai_41_mini/python
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_oai_41_nano/python
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_1_v4_v7/python
 
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_1/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_1/python --models DeepSeek-R1
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_3/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_5/python
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_1/python
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_1/python --models DeepSeek-R1
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_3/python
+# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_5/python
 
 # Examples for generating benchmark test cases:
 # python generate_benchmark.py --generate --completions 10 --language python --prompt-type api_usage
