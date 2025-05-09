@@ -1117,8 +1117,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Example usage:
-# python generate_completions.py --output_dir new_completions
-# python generate_completions.py --temperature 0.2 --output_dir new_completions_02_1
-# python generate_completions.py --temperature 0.8 --output_dir new_completions_08_1

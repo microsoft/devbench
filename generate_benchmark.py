@@ -1276,23 +1276,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Example usage:
-# python generate_benchmark.py --execute --model-eval --categories api_usage --verbose
-# python generate_benchmark.py --execute --model-eval --verbose
-# python generate_benchmark.py --execute --model-eval --verbose --models gpt-4o-mini,gpt-35-turbo,DeepSeek-R1,gpt-4.5-preview,Ministral-3B
-# python generate_benchmark.py --execute --model-eval --verbose --models gpt-35-turbo-completions
-# python generate_benchmark.py --execute --model-eval --verbose --json-output benchmark_results_pass_1.json
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir completions/python
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_oai_41_mini/python
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_oai_41_nano/python
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_1_v4_v7/python
-
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_1/python
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_1/python --models DeepSeek-R1
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_3/python
-# python generate_benchmark.py --execute --model-eval --verbose --models-dir new_completions_02_5/python
-
-# Examples for generating benchmark test cases:
-# python generate_benchmark.py --generate --completions 10 --language python --prompt-type api_usage
-# python generate_benchmark.py --generate --completions 1 --language javascript --prompt-type code_purpose_understanding
