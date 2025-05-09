@@ -530,7 +530,7 @@ def validate_benchmark_files(benchmark_dir="benchmark/", verbose=True):
                 results["total_files"] += 1
                 
                 # Determine language from directory structure
-                # Assuming path like benchmark/v0/python/...
+                # Assuming path like benchmark/python/...
                 path_parts = file_path.split(os.sep)
                 language = None
                 for lang in ["python", "javascript", "cpp", "java", "c_sharp", "typescript"]:
@@ -625,7 +625,7 @@ def find_jsonl_files(directory):
                 jsonl_files.append(os.path.join(root, file))
     return jsonl_files
 
-def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="completions/v1/python", 
+def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="completions/python", 
                              verbose=True, report_file=None, models_filter=None, json_output_file=None) -> Dict:
     """
     Execute Python test cases using model completions instead of golden completions.
@@ -1125,7 +1125,7 @@ def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="comp
     
     return results
 
-def execute_multi_completion_model_tests(benchmark_jsonl_files: List[str], models_dir="completions/v1/python", 
+def execute_multi_completion_model_tests(benchmark_jsonl_files: List[str], models_dir="completions/python", 
                              verbose=True, report_file=None, models_filter=None, json_output_file=None,
                              num_completions=3, show_diff=False) -> Dict:
     """
@@ -1824,8 +1824,8 @@ def main():
     parser.add_argument('--model-eval', action='store_true', help='Evaluate model completions against benchmark test cases')
     parser.add_argument('--models', type=str, help='Comma-separated list of model names to evaluate (e.g., 4o_mini,gpt_3.5_turbo)')
     parser.add_argument('--json-output', type=str, help='Path to output JSON file for detailed test results')
-    parser.add_argument('--models-dir', type=str, default='completions/v1/python', 
-                       help='Directory containing model completions (default: completions/v1/python)')
+    parser.add_argument('--models-dir', type=str, default='completions/python', 
+                       help='Directory containing model completions (default: completions/python)')
     parser.add_argument('--multi-completions', action='store_true', 
                        help='Execute multiple completions per test case (when available)')
     parser.add_argument('--num-completions', type=int, default=3, 
@@ -1847,7 +1847,7 @@ def main():
             print("available to the test cases during execution.\n")
         
         # Find all Python JSONL files in the benchmark directory
-        jsonl_files = find_jsonl_files("benchmark/v1/python")
+        jsonl_files = find_jsonl_files("benchmark/python")
         print(f"Found {len(jsonl_files)} JSONL files for execution.")
         
         # Filter files by category if specified
@@ -1959,55 +1959,55 @@ def main():
     valid_completions = 0
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/code2NL_NL2code/code2NL_NL2code.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/code2NL_NL2code/code2NL_NL2code.jsonl"
     # SYSTEM_PROMPT = python_prompts.NL2CODE_CODE2NL_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.NL2CODE_CODE2NL_USER_PROMPT
 
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/dogfood/idiomatic/dogfood_idiomatic.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/dogfood/idiomatic/dogfood_idiomatic.jsonl"
     # SYSTEM_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_USER_PROMPT
 
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/dogfood/nl2code/dogfood_nl2code.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/dogfood/nl2code/dogfood_nl2code.jsonl"
     # SYSTEM_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_USER_PROMPT
 
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/dogfood/organization/dogfood_organization.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/dogfood/organization/dogfood_organization.jsonl"
     # SYSTEM_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_USER_PROMPT
 
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/low_context/low_context.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/low_context/low_context.jsonl"
     # SYSTEM_PROMPT = python_prompts.LOW_CONTEXT_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.LOW_CONTEXT_USER_PROMPT
 
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/pattern_matching/pattern_matching.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/pattern_matching/pattern_matching.jsonl"
     # SYSTEM_PROMPT = python_prompts.PATTERN_MATCHING_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.PATTERN_MATCHING_USER_PROMPT
 
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/syntax_completion/syntax_completion.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/syntax_completion/syntax_completion.jsonl"
     # SYSTEM_PROMPT = python_prompts.SYNTAX_COMPLETION_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.SYNTAX_COMPLETION_USER_PROMPT
 
     # total_completions = 0
     # LANGUAGE = "python"
-    # output_file = f"benchmark/v1/{LANGUAGE}/code_purpose_understanding/code_purpose_understanding.jsonl"
+    # output_file = f"benchmark/{LANGUAGE}/code_purpose_understanding/code_purpose_understanding.jsonl"
     # SYSTEM_PROMPT = python_prompts.CODE_PURPOSE_UNDERSTANDING_SYSTEM_PROMPT
     # USER_PROMPT = python_prompts.CODE_PURPOSE_UNDERSTANDING_USER_PROMPT
 
-    total_completions = 0
+    total_completions = 1
     LANGUAGE = "python"
-    output_file = f"benchmark/v1/{LANGUAGE}/api_usage/api_usage.jsonl"
+    output_file = f"benchmark/{LANGUAGE}/api_usage/api_usage.jsonl"
     SYSTEM_PROMPT = python_prompts.API_USAGE_SYSTEM_PROMPT
     USER_PROMPT = python_prompts.API_USAGE_USER_PROMPT
 
@@ -2075,19 +2075,20 @@ if __name__ == "__main__":
     main()
 
 # Example usage:
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --categories api_usage --verbose
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models gpt-4o-mini,gpt-35-turbo,DeepSeek-R1,gpt-4.5-preview,Ministral-3B
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models gpt-35-turbo-completions
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --json-output benchmark_results_pass_1.json
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_oai_41_mini/v1/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_oai_41_nano/v1/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_02_1_v4_v7/v1/python
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --categories api_usage --verbose
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models gpt-4o-mini,gpt-35-turbo,DeepSeek-R1,gpt-4.5-preview,Ministral-3B
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models gpt-35-turbo-completions
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --json-output benchmark_results_pass_1.json
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir completions/python
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_oai_41_mini/python
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_oai_41_nano/python
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_1_v4_v7/python
 
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_02_1/v1/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_02_1/v1/python --models DeepSeek-R1
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_02_3/v1/python
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_02_5/v1/python
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_1/python
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_1/python --models DeepSeek-R1
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_3/python
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_5/python
 
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_02_3/v1/python --multi-completions --num-completions 3 --show-diff
-# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/v1/python --verbose --models-dir new_completions_02_3/v1/python --multi-completions --num-completions 3 --show-diff --models gpt-4o-mini --categories api_usage
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_3/python --multi-completions --num-completions 3 --show-diff
+# python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_3/python --multi-completions --num-completions 3 --show-diff --models gpt-4o-mini --categories api_usage
