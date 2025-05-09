@@ -1,25 +1,51 @@
-# TODO: The maintainer of this repo has not yet edited this file
+# Support for DataSynthCodeBench
 
-**REPO OWNER**: Do you want Customer Service & Support (CSS) support for this product/project?
+## How to file issues and get help
 
-- **No CSS support:** Fill out this template with information about how to file issues and get help.
-- **Yes CSS support:** Fill out an intake form at [aka.ms/onboardsupport](https://aka.ms/onboardsupport). CSS will work with/help you to determine next steps.
-- **Not sure?** Fill out an intake as though the answer were "Yes". CSS will help you decide.
+This project uses GitHub Issues to track bugs, feature requests, and questions. Please follow these guidelines when filing issues:
 
-*Then remove this first heading from this SUPPORT.MD file before publishing your repo.*
+1. Search existing issues before creating a new one to avoid duplicates
+2. Use descriptive titles that clearly summarize the issue
+3. Include relevant details such as:
+   - Steps to reproduce the issue
+   - Expected vs. actual behavior
+   - Error messages or logs
+   - Environment details (OS, Python version, etc.)
+   - Code samples if applicable
 
-# Support
+For bugs related to model completions or benchmark execution, please specify:
+- The model(s) being used
+- The programming language(s) affected
+- The benchmark category where the issue occurs
 
-## How to file issues and get help  
+## Community Support
 
-This project uses GitHub Issues to track bugs and feature requests. Please search the existing 
-issues before filing new issues to avoid duplicates.  For new issues, file your bug or 
-feature request as a new Issue.
+For questions and discussions about the project:
 
-For help and questions about using this project, please **REPO MAINTAINER: INSERT INSTRUCTIONS HERE 
-FOR HOW TO ENGAGE REPO OWNERS OR COMMUNITY FOR HELP. COULD BE A STACK OVERFLOW TAG OR OTHER
-CHANNEL. WHERE WILL YOU HELP PEOPLE?**.
+- Create a GitHub Issue with the `question` label
+- Start a GitHub Discussion in the repository (when available)
 
-## Microsoft Support Policy  
+## Security Issues
 
-Support for this **PROJECT or PRODUCT** is limited to the resources listed above.
+For security-related concerns, especially regarding the execution of LLM-generated code or API key handling:
+
+- Do **NOT** file public GitHub issues
+- Follow responsible disclosure practices
+- Email the project maintainers directly
+
+## Feature Requests
+
+Feature requests are welcome! When submitting a feature request:
+- Clearly describe the problem the feature would solve
+- Suggest a solution if possible
+- Explain how the feature would benefit the broader community
+
+## Support Policy
+
+Support for DataSynthCodeBench is provided on a best-effort basis by the project maintainers and community. This is an open-source project, and there is no guarantee of immediate responses or fixes.
+
+The code in this repository is provided as a reference implementation for research purposes. Users should expect to adapt the code to their specific needs and environments.
+
+## Contributing Fixes
+
+If you've found a bug and would like to contribute a fix, please read our [Contributing Guidelines](CONTRIBUTING.md) and consider submitting a pull request with your changes.
