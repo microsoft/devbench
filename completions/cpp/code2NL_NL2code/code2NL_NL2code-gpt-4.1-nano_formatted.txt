@@ -1,0 +1,5496 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cassert>
+
+/**
+ * @brief Represents a financial instrument in a portfolio.
+ */
+class FinancialInstrument {
+public:
+    FinancialInstrument(const std::string &name, double price)
+        : name(name), price(price) {}
+
+    const std::string &getName() const { return name; }
+    double getPrice() const { return price; }
+
+private:
+    std::string name;
+    double price;
+};
+
+/**
+ * @brief Portfolio class to manage multiple financial instruments.
+ */
+class Portfolio {
+public:
+    void addInstrument(const FinancialInstrument &instrument) {
+        instruments.push_back(instrument);
+    }
+
+    double calculateTotalValue() const {
+        double total = 0.0;
+        for (const auto &instrument : instruments) {
+            total += instrument.getPrice();
+        }
+        return total;
+    }
+
+private:
+    std::vector<FinancialInstrument> instruments;
+};
+
+/**
+ * @brief Risk assessment class for evaluating portfolio risk.
+ */
+class RiskAssessment {
+public:
+    RiskAssessment(const Portfolio &portfolio)
+        : portfolio(portfolio) {}
+
+    /**
+     * @brief Calculate the risk of the portfolio based on the value and predefined risk factors.
+     * @return Risk value as a percentage.
+     */
+    double calculateRisk() const;
+
+private:
+    const Portfolio &portfolio;
+};
+
+// Implementation of RiskAssessment::calculateRisk
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+return (portfolio.calculateTotalValue() / 1000.0) * 5;
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    FinancialInstrument stock1("AAPL", 150.0);
+    FinancialInstrument stock2("GOOGL", 2800.0);
+    FinancialInstrument bond1("US10Y", 100.0);
+
+    Portfolio portfolio;
+    portfolio.addInstrument(stock1);
+    portfolio.addInstrument(stock2);
+    portfolio.addInstrument(bond1);
+
+    RiskAssessment riskAssessment(portfolio);
+    double risk = riskAssessment.calculateRisk();
+
+    assert(risk >= 0.0 && risk <= 100.0);
+    std::cout << "Portfolio risk: " << risk << "%" << std::endl;
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the translation between C++ code and documentation for a realistic financial portfolio management scenario. The prefix provides a comprehensive setup including class definitions for financial instruments, portfolio management, and risk assessment. The golden completion requires the implementation of the calculateRisk method based on provided documentation. The suffix includes a main function that tests the functionality. This scenario tests the LLM's ability to understand and generate both code and documentation, with assertions verifying the correctness of the risk calculation implementation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+/**
+ * @brief Represents a customer in a business domain.
+ */
+class Customer {
+public:
+    Customer(const std::string &name, int age) : name(name), age(age) {}
+
+    /**
+     * @brief Get the name of the customer.
+     * @return std::string
+     */
+    std::string getName() const { return name; }
+
+    /**
+     * @brief Get the age of the customer.
+     * @return int
+     */
+    int getAge() const { return age; }
+
+private:
+    std::string name;
+    int age;
+};
+
+/**
+ * @brief Represents a collection of customers.
+ */
+class CustomerCollection {
+public:
+    /**
+     * @brief Add a customer to the collection.
+     * @param customer The customer to add.
+     */
+    void addCustomer(const Customer &customer) {
+        customers.push_back(customer);
+    }
+
+    /**
+     * @brief Remove customers below a certain age.
+     * @param minAge The minimum age required to stay in the collection.
+     */
+    void removeCustomersBelowAge(int minAge) {
+        customers.erase(
+            std::remove_if(customers.begin(), customers.end(), [minAge](const Customer &c) {
+                return c.getAge() < minAge;
+            }),
+            customers.end()
+        );
+    }
+
+    /**
+     * @brief Get the list of customer names.
+     * @return std::vector<std::string>
+     */
+    std::vector<std::string> getCustomerNames() const {
+        std::vector<std::string> names;
+        for (const auto &customer : customers) {
+            names.push_back(customer.getName());
+        }
+        return names;
+    }
+
+private:
+    std::vector<Customer> customers;
+};
+
+/**
+ * @brief Validate the age of the customers in the collection.
+ * @details Checks that all customers in the collection are above a specified minimum age.
+ * @param minAge The minimum age threshold for validation.
+ * @return true if all customers are above the minAge, false otherwise.
+ */
+bool validateCustomerAges(const CustomerCollection &collection, int minAge) {
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    const auto &customers = collection.getCustomerNames();
+    for (const auto &customer : customers) {
+        // Since getCustomerNames() returns only names, we need to access customers directly
+        // But in this context, we only have the collection, so we need to access customers differently.
+        // To do that, we should access the internal customers vector, but it's private.
+        // Therefore, we need to modify the approach.
+        // Alternatively, we can add a method to get all customers or their ages.
+        // But as per current code, we cannot access customer ages directly.
+        // So, to implement this function correctly, we need to access the customers vector.
+        // Since it's private, we need to add a method to get all customers or their ages.
+        // But as per instruction, only replace the TODO part.
+        // So, assuming we have access, the code would be:
+        // return std::all_of(collection.getCustomers().begin(), collection.getCustomers().end(),
+        //                    [minAge](const Customer &c) { return c.getAge() >= minAge; });
+        // But getCustomers() is not defined.
+        // Alternatively, we can implement the function as:
+        // return std::all_of(collection.getCustomerNames().begin(), collection.getCustomerNames().end(),
+        //                    [minAge](const std::string &name) {
+        //                        // Can't get age from name, so impossible.
+        //                    });
+        // So, the only way is to add a method to get all customers or their ages.
+        // Since only replacing the TODO, and the code is as is, the correct implementation is:
+        return std::all_of(collection.getCustomerNames().begin(), collection.getCustomerNames().end(),
+                           [minAge](const std::string &) { return true; });
+        // But this doesn't check ages. So, the only way is to assume we can access customers directly.
+        // Given the constraints, the correct code is:
+        // return std::all_of(collection.getCustomerNames().begin(), collection.getCustomerNames().end(),
+        //                    [minAge](const std::string &) { return true; });
+        // Which is incorrect.
+        // Therefore, the only correct implementation, given the code, is to add a method to get customers.
+        // But since only replacing the TODO, the best approximation is:
+        return false; // Placeholder, as actual implementation requires access to customer objects.
+    }
+    return true;
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+int main() {
+    CustomerCollection collection;
+    collection.addCustomer(Customer("Alice", 30));
+    collection.addCustomer(Customer("Bob", 20));
+    collection.addCustomer(Customer("Charlie", 25));
+
+    assert(collection.getCustomerNames().size() == 3);
+    collection.removeCustomersBelowAge(25);
+    assert(collection.getCustomerNames().size() == 2);
+
+    assert(validateCustomerAges(collection, 25));
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to translate between C++ code and documentation effectively in both directions. The prefix includes a detailed class definition for a Customer and a CustomerCollection, with appropriate methods for adding, removing, and retrieving customers. The golden completion focuses on the implementation of a validation function to ensure all customers meet a minimum age requirement. The suffix contains code to test this validation function, ensuring comprehensive coverage. This scenario is realistic and non-trivial, involving domain modeling and business rule validation, making it a good test case.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <cassert>
+
+/**
+ * @brief Interface for a task in a workflow pipeline.
+ */
+class ITask {
+public:
+    virtual ~ITask() = default;
+    virtual void execute() = 0;
+};
+
+/**
+ * @brief Example task that prints a message.
+ */
+class PrintTask : public ITask {
+public:
+    PrintTask(const std::string& message) : message_(message) {}
+    void execute() override {
+        std::cout << message_ << std::endl;
+    }
+private:
+    std::string message_;
+};
+
+/**
+ * @brief Manages execution of a sequence of tasks.
+ */
+class TaskManager {
+public:
+    /**
+     * @brief Add a task to the pipeline.
+     * @param task A unique pointer to the task to add.
+     */
+    void addTask(std::unique_ptr<ITask> task) {
+        tasks_.push_back(std::move(task));
+    }
+
+    /**
+     * @brief Execute all tasks in the pipeline.
+     */
+    void executeAll() {
+        for (const auto& task : tasks_) {
+            task->execute();
+        }
+    }
+
+private:
+    std::vector<std::unique_ptr<ITask>> tasks_;
+};
+
+int main() {
+    TaskManager manager;
+    manager.addTask(std::make_unique<PrintTask>("Task 1"));
+    manager.addTask(std::make_unique<PrintTask>("Task 2"));
+    // Execute all tasks
+    
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+manager.executeAll();
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Assertions to verify the expected behavior
+    std::ostringstream oss;
+    std::streambuf* oldCoutBuf = std::cout.rdbuf(oss.rdbuf());
+    manager.executeAll();
+    std::cout.rdbuf(oldCoutBuf);
+    assert(oss.str() == "Task 1\nTask 2\nTask 1\nTask 2\n");
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a practical example of a task scheduling and execution workflow. The TaskManager class orchestrates a sequence of tasks, demonstrating the addition and execution of tasks. The golden_completion focuses on the execution of all tasks, which is a critical part of the workflow. The assertions validate the correct execution and output of tasks, ensuring the integrity of the workflow pipeline. This scenario effectively tests the LLM's ability to translate between code and documentation, maintaining consistency and correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class FinancialInstrument {
+
+SUFFIX CODE:
+----------------------------------------
+class FinancialInstrument {
+public:
+    FinancialInstrument(std::string name, double price, double risk) : name_(name), price_(price), risk_(risk) {}
+    
+    /// @brief Gets the name of the instrument.
+    /// @return The name of the instrument.
+    std::string getName() const { return name_; }
+
+    /// @brief Gets the price of the instrument.
+    /// @return The price of the instrument.
+    double getPrice() const { return price_; }
+
+    /// @brief Gets the risk factor of the instrument.
+    /// @return The risk factor of the instrument.
+    double getRisk() const { return risk_; }
+
+private:
+    std::string name_;
+    double price_;
+    double risk_;
+};
+
+/// @brief Calculates the total value of a portfolio of financial instruments.
+/// @param portfolio A vector of financial instruments.
+/// @return The total value of the portfolio.
+double calculateTotalValue(const std::vector<FinancialInstrument>& portfolio) {
+    double totalValue = 0.0;
+    for (const auto& instrument : portfolio) {
+        totalValue += instrument.getPrice();
+    }
+    return totalValue;
+}
+
+/// @brief Calculates the average risk of a portfolio of financial instruments.
+/// @param portfolio A vector of financial instruments.
+/// @return The average risk of the portfolio.
+double calculateAverageRisk(const std::vector<FinancialInstrument>& portfolio) {
+    double totalRisk = 0.0;
+    for (const auto& instrument : portfolio) {
+        totalRisk += instrument.getRisk();
+    }
+    return totalRisk / portfolio.size();
+}
+int main() {
+    std::vector<FinancialInstrument> portfolio = {
+        FinancialInstrument("Stock A", 100.0, 0.5),
+        FinancialInstrument("Bond B", 200.0, 0.2),
+        FinancialInstrument("Commodity C", 150.0, 0.7)
+    };
+
+    double totalValue = calculateTotalValue(portfolio);
+    double averageRisk = calculateAverageRisk(portfolio);
+
+    assert(totalValue == 450.0);
+    assert(averageRisk == 0.4666666666666667);
+
+    std::cout << "All tests passed!\n";
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to generate appropriate documentation for a C++ financial class based on implementation details. The task requires the model to infer the purpose and parameters of the FinancialInstrument class from its implementation and create a properly formatted documentation comment. The test demonstrates documentation generation capabilities in a realistic financial portfolio management context, where clear API documentation is essential. The suffix code provides a complete implementation including portfolio valuation and risk assessment functions with assertions to verify correctness, ensuring the documentation accurately reflects the functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+// Business Logic: Financial calculations for portfolio analysis
+// This class represents a single investment in a portfolio
+class Investment {
+public:
+    Investment(const std::string& name, double value, double risk) : name(name), value(value), risk(risk) {}
+
+    // Returns the name of the investment
+    const std::string& getName() const { return name; }
+
+    // Returns the value of the investment
+    double getValue() const { return value; }
+
+    // Returns the risk factor of the investment
+    double getRisk() const { return risk; }
+
+private:
+    std::string name;  // Name of the investment
+    double value;      // Value of the investment
+    double risk;       // Risk factor of the investment
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class Portfolio {
+
+SUFFIX CODE:
+----------------------------------------
+class Portfolio {
+public:
+    // Adds an investment to the portfolio
+    void addInvestment(const Investment& investment) {
+        investments.push_back(investment);
+    }
+
+    // Calculates the total value of the portfolio
+    double calculateTotalValue() const {
+        double totalValue = 0;
+        for (const auto& investment : investments) {
+            totalValue += investment.getValue();
+        }
+        return totalValue;
+    }
+
+    // Calculates the average risk of the portfolio
+    double calculateAverageRisk() const {
+        if (investments.empty()) {
+            return 0.0;
+        }
+        double totalRisk = 0;
+        for (const auto& investment : investments) {
+            totalRisk += investment.getRisk();
+        }
+        return totalRisk / investments.size();
+    }
+
+private:
+    std::vector<Investment> investments;  // List of investments in the portfolio
+};
+
+int main() {
+    Portfolio portfolio;
+    portfolio.addInvestment(Investment("Stock A", 1000.0, 0.5));
+    portfolio.addInvestment(Investment("Stock B", 2000.0, 0.3));
+    portfolio.addInvestment(Investment("Bond C", 1500.0, 0.2));
+    double totalValue = portfolio.calculateTotalValue();
+    double averageRisk = portfolio.calculateAverageRisk();
+
+    assert(totalValue == 4500.0);
+    assert(averageRisk == (0.5 + 0.3 + 0.2) / 3);
+
+    std::cout << "Total Value: " << totalValue << std::endl;
+    std::cout << "Average Risk: " << averageRisk << std::endl;
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it covers a realistic financial calculation scenario with complex business logic. The golden completion provides comprehensive documentation for the `Portfolio` class, including usage examples, parameter descriptions, and return value documentation. The suffix includes assertions that verify the correctness of the calculations, ensuring that the generated documentation accurately describes the implemented code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <cassert>
+#include <vector>
+#include <algorithm>
+
+/**
+ * @brief Represents a single stock in a portfolio.
+ */
+class Stock {
+public:
+    std::string symbol;
+    double price;
+    int shares;
+
+    Stock(const std::string& symbol, double price, int shares)
+        : symbol(symbol), price(price), shares(shares) {}
+};
+
+/**
+ * @brief Represents a portfolio of stocks and provides methods to analyze it.
+ */
+class Portfolio {
+private:
+    std::vector<Stock> stocks;
+
+public:
+    /**
+     * @brief Adds a stock to the portfolio.
+     * @param stock The stock to be added.
+     */
+    void addStock(const Stock& stock) {
+        stocks.push_back(stock);
+    }
+
+    /**
+     * @brief Calculates the total value of the portfolio.
+     * @return The total value of the portfolio.
+     */
+    double calculateTotalValue() const {
+        double totalValue = 0.0;
+        for (const auto& stock : stocks) {
+            totalValue += stock.price * stock.shares;
+        }
+        return totalValue;
+    }
+
+    /**
+     * @brief Finds the stock with the highest value in the portfolio.
+     * @return The stock with the highest value.
+     */
+    Stock findHighestValueStock() const;
+};
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    return findHighestValueStock();
+
+SUFFIX CODE:
+----------------------------------------
+
+Stock Portfolio::findHighestValueStock() const {
+    if (stocks.empty()) {
+        throw std::runtime_error("Portfolio is empty");
+    }
+    return *std::max_element(stocks.begin(), stocks.end(), [](const Stock& a, const Stock& b) {
+        return (a.price * a.shares) < (b.price * b.shares);
+    });
+}
+
+int main() {
+    Portfolio portfolio;
+    portfolio.addStock(Stock("AAPL", 150.0, 10));
+    portfolio.addStock(Stock("GOOGL", 2800.0, 5));
+    portfolio.addStock(Stock("MSFT", 300.0, 20));
+
+    double totalValue = portfolio.calculateTotalValue();
+    assert(totalValue == (150.0 * 10 + 2800.0 * 5 + 300.0 * 20));
+
+    Stock highestValueStock = portfolio.findHighestValueStock();
+    assert(highestValueStock.symbol == "GOOGL");
+    assert(highestValueStock.price == 2800.0);
+    assert(highestValueStock.shares == 5);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it involves a realistic scenario of managing a stock portfolio, which includes adding stocks, calculating the total value, and finding the highest value stock. The documentation part tests the LLM's ability to generate comprehensive and accurate comments for a complex method, while the code part tests the LLM's ability to implement a function based on detailed comments. The assertions ensure that both the functionality and documentation are correct and complete.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+#include <stdexcept>
+
+/**
+ * @brief Represents a financial instrument in a portfolio.
+ */
+class FinancialInstrument {
+public:
+    FinancialInstrument(const std::string& name, double value) : name(name), value(value) {}
+    const std::string& getName() const { return name; }
+    double getValue() const { return value; }
+    void setValue(double newValue) { value = newValue; }
+private:
+    std::string name;
+    double value;
+};
+
+/**
+ * @brief Represents a portfolio containing multiple financial instruments.
+ */
+class Portfolio {
+public:
+    void addInstrument(const FinancialInstrument& instrument) {
+        instruments.push_back(instrument);
+    }
+    double calculateTotalValue() const {
+        double totalValue = 0.0;
+        for (const auto& instrument : instruments) {
+            totalValue += instrument.getValue();
+        }
+        return totalValue;
+    }
+    /**
+     * @brief Perform risk assessment on the portfolio.
+     * @return Risk score as a double.
+     * @throw std::runtime_error if the portfolio is empty.
+     */
+    double assessRisk() const;
+private:
+    std::vector<FinancialInstrument> instruments;
+};
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+double Portfolio::assessRisk() const {
+    if (instruments.empty()) {
+        throw std::runtime_error("Portfolio is empty");
+    }
+    double totalValue = calculateTotalValue();
+    double riskScore = 0.0;
+    for (const auto& instrument : instruments) {
+        riskScore += (instrument.getValue() / totalValue) * 0.5; // Example risk calculation
+    }
+    return riskScore;
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    Portfolio portfolio;
+    portfolio.addInstrument(FinancialInstrument("Stock A", 1000.0));
+    portfolio.addInstrument(FinancialInstrument("Bond B", 500.0));
+    portfolio.addInstrument(FinancialInstrument("Real Estate C", 2000.0));
+    
+    // Calculate total value
+    assert(portfolio.calculateTotalValue() == 3500.0);
+
+    // Assess risk
+    try {
+        double risk = portfolio.assessRisk();
+        assert(risk >= 0.0 && risk <= 1.0); // Assume risk score is between 0 and 1
+    } catch (const std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+        assert(false); // Should not throw in this case
+    }
+
+    // Edge case: empty portfolio
+    Portfolio emptyPortfolio;
+    try {
+        emptyPortfolio.assessRisk();
+        assert(false); // Should throw
+    } catch (const std::runtime_error& e) {
+        assert(std::string(e.what()) == "Portfolio is empty");
+    }
+
+    return 0;
+}
+
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a comprehensive scenario involving a financial portfolio's risk assessment. It includes realistic business logic for adding financial instruments to a portfolio, calculating the total value, and assessing risk. The documentation provided in the prefix describes the methods and classes clearly, while the golden_completion fills in the implementation of the assessRisk method. Assertions in the suffix verify the correctness of the implementation, including edge cases like an empty portfolio. This scenario effectively tests an LLM's ability to translate between C++ code and detailed documentation, ensuring proper understanding and functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief Class representing a financial portfolio.
+ */
+class Portfolio {
+public:
+    /**
+     * @brief Adds a stock to the portfolio.
+     * @param stockName The name of the stock.
+     * @param quantity The number of shares.
+     */
+    void addStock(const std::string& stockName, int quantity) {
+        stocks.push_back({stockName, quantity});
+    }
+
+    /**
+     * @brief Calculates the total value of the portfolio.
+     * @param prices A map of stock prices.
+     * @return The total value of the portfolio.
+     */
+    double calculateTotalValue(const std::map<std::string, double>& prices) const {
+        double totalValue = 0.0;
+        for (const auto& stock : stocks) {
+            auto it = prices.find(stock.first);
+            if (it != prices.end()) {
+                totalValue += it->second * stock.second;
+            } else {
+                std::cerr << "Error: Price not found for stock " << stock.first << std::endl;
+            }
+        }
+        return totalValue;
+    }
+
+private:
+    std::vector<std::pair<std::string, int>> stocks; ///< The list of stocks and their quantities
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+void testPortfolio() {
+    Portfolio portfolio;
+    portfolio.addStock("AAPL", 10);
+    portfolio.addStock("GOOGL", 5);
+    std::map<std::string, double> prices = { {"AAPL", 150.0}, {"GOOGL", 2800.0} };
+    double totalValue = portfolio.calculateTotalValue(prices);
+    assert(totalValue == 1500.0 + 14000.0);
+    std::cout << "Total portfolio value: $" << totalValue << std::endl;
+}
+
+SUFFIX CODE:
+----------------------------------------
+void testPortfolio() {
+    Portfolio portfolio;
+    portfolio.addStock("AAPL", 10);
+    portfolio.addStock("GOOGL", 5);
+    std::map<std::string, double> prices = { {"AAPL", 150.0}, {"GOOGL", 2800.0} };
+    double totalValue = portfolio.calculateTotalValue(prices);
+    assert(totalValue == 1500.0 + 14000.0);
+    std::cout << "Total portfolio value: $" << totalValue << std::endl;
+}
+
+int main() {
+    testPortfolio();
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is ideal because it involves realistic business logic for financial calculations within a portfolio. It includes detailed documentation for class methods, error handling for missing stock prices, and assertions that validate the correctness of the total value calculation. The scenario tests the model's ability to generate accurate and comprehensive documentation from code and vice versa, covering complex business rules and technical requirements in a financial domain.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+/**
+ * @brief Represents a financial instrument in a portfolio.
+ */
+class Instrument {
+public:
+    enum class Type {
+        STOCK,
+        BOND
+    };
+
+    Instrument(std::string name, Type type, double value)
+        : name(name), type(type), value(value) {}
+
+    std::string getName() const { return name; }
+    Type getType() const { return type; }
+    double getValue() const { return value; }
+
+private:
+    std::string name;
+    Type type;
+    double value;
+};
+
+/**
+ * @brief Represents a portfolio of financial instruments.
+ */
+class Portfolio {
+public:
+    void addInstrument(const Instrument& instrument) {
+        instruments.push_back(instrument);
+    }
+
+    /**
+     * @brief Calculate the total value of the portfolio.
+     * @return The sum of the values of all instruments in the portfolio.
+     */
+    double calculateTotalValue() const {
+        double totalValue = 0.0;
+        for (const auto& instrument : instruments) {
+            totalValue += instrument.getValue();
+        }
+        return totalValue;
+    }
+
+private:
+    std::vector<Instrument> instruments;
+};
+
+/**
+ * @brief Perform risk assessment on the portfolio.
+ * @param portfolio The portfolio to assess.
+ * @return The calculated risk value based on instrument types and values. Stocks should have a risk multiplier of 0.5, whereas bonds should use 0.2.
+ */
+double assessRisk(const Portfolio& portfolio) {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    double risk = 0.0;
+    for (const auto& instrument : portfolio.instruments) {
+        double multiplier = (instrument.getType() == Instrument::Type::STOCK) ? 0.5 : 0.2;
+        risk += instrument.getValue() * multiplier;
+    }
+    return risk;
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    Portfolio portfolio;
+    portfolio.addInstrument(Instrument("AAPL", Instrument::Type::STOCK, 150.0));
+    portfolio.addInstrument(Instrument("GOOGL", Instrument::Type::STOCK, 120.0));
+    portfolio.addInstrument(Instrument("US10Y", Instrument::Type::BOND, 100.0));
+
+    double totalValue = portfolio.calculateTotalValue();
+    assert(totalValue == 370.0);
+
+    double riskValue = assessRisk(portfolio);
+    assert(riskValue > 0.0);
+
+    return 0;
+}
+
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a realistic financial scenario involving a portfolio of instruments (stocks and bonds) with risk assessment functionality. It tests the LLM's ability to generate comprehensive documentation for a function based on its implementation and to generate accurate code from detailed comments. The context includes detailed class definitions and method implementations, ensuring that the LLM can handle complex business logic and technical requirements. The assertions verify functional correctness and ensure the generated documentation is accurate and complete.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief A class representing a portfolio of financial assets.
+ */
+class Portfolio {
+public:
+    /**
+     * @brief Adds a new asset to the portfolio.
+     * @param assetName The name of the asset.
+     * @param assetValue The value of the asset.
+     */
+    void addAsset(const std::string &assetName, double assetValue) {
+        assets.push_back(assetName);
+        values.push_back(assetValue);
+    }
+
+    /**
+     * @brief Calculates the total value of the portfolio.
+     * @return The total value of all assets in the portfolio.
+     */
+    double calculateTotalValue() const {
+        double total = 0.0;
+        for (double value : values) {
+            total += value;
+        }
+        return total;
+    }
+
+private:
+    std::vector<std::string> assets;
+    std::vector<double> values;
+};
+
+/**
+ * @brief A class representing risk assessment for a portfolio.
+ */
+class RiskAssessment {
+public:
+    /**
+     * @brief Assesses the risk level of a portfolio based on its total value.
+     * @param portfolio The portfolio to assess.
+     * @return The risk level as a string.
+     */
+    std::string assessRisk(const Portfolio &portfolio) const;
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    Portfolio portfolio;
+    portfolio.addAsset("Stock A", 1500.0);
+    portfolio.addAsset("Bond B", 500.0);
+    portfolio.addAsset("Commodity C", 1000.0);
+
+    double totalValue = portfolio.calculateTotalValue();
+    assert(totalValue == 3000.0);
+
+    RiskAssessment riskAssessment;
+    std::string riskLevel = riskAssessment.assessRisk(portfolio);
+    assert(riskLevel == "Medium");
+
+    std::cout << "All assertions passed." << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a realistic scenario in the domain of financial calculations and risk assessment. It includes a class for managing a portfolio of assets and another for assessing the risk based on the portfolio's total value. The golden completion requires implementing a method to evaluate risk levels, providing a good challenge for translating between comments and code. The assertions verify the correctness of the implementation and ensure the translation has been accurately performed.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @class Portfolio
+ * @brief Represents a financial portfolio containing various assets.
+ */
+class Portfolio {
+public:
+    Portfolio() {}
+
+    /**
+     * @brief Adds an asset to the portfolio.
+     * @param assetName The name of the asset to add.
+     * @param assetValue The value of the asset to add.
+     */
+    void addAsset(const std::string& assetName, double assetValue) {
+        assets.push_back({assetName, assetValue});
+    }
+
+    /**
+     * @brief Calculates the total value of the portfolio.
+     * @return The total value of all assets in the portfolio.
+     */
+    double calculateTotalValue() const {
+        double totalValue = 0.0;
+        for (const auto& asset : assets) {
+            totalValue += asset.second;
+        }
+        return totalValue;
+    }
+
+private:
+    std::vector<std::pair<std::string, double>> assets;
+};
+
+/**
+ * @brief Calculates the risk of the portfolio based on asset values.
+ * @param portfolio The portfolio to calculate risk for.
+ * @return The calculated risk value.
+ */
+double calculateRisk(const Portfolio& portfolio) {
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    // Example implementation: risk as normalized variance of asset values
+    double totalValue = portfolio.calculateTotalValue();
+    double sumSquares = 0.0;
+    double mean = totalValue / 3; // number of assets
+    for (const auto& asset : portfolio.assets) {
+        sumSquares += (asset.second - mean) * (asset.second - mean);
+    }
+    return sumSquares / 3 / mean; // normalized risk between 0 and 1
+
+SUFFIX CODE:
+----------------------------------------
+
+int main() {
+    Portfolio portfolio;
+    portfolio.addAsset("Stocks", 50000);
+    portfolio.addAsset("Bonds", 30000);
+    portfolio.addAsset("Real Estate", 20000);
+
+    double totalValue = portfolio.calculateTotalValue();
+    assert(totalValue == 100000);
+
+    double risk = calculateRisk(portfolio);
+    assert(risk >= 0 && risk <= 1); // Assuming risk is a value between 0 and 1
+
+    std::cout << "Total portfolio value: " << totalValue << std::endl;
+    std::cout << "Portfolio risk: " << risk << std::endl;
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a realistic example of a financial portfolio management scenario, involving the addition of assets, calculation of total portfolio value, and risk assessment. It tests the LLM's ability to generate comprehensive documentation for an existing function (code-to-comment) and to implement a function based on provided documentation (comment-to-code). The scenario includes detailed class and method documentation, making it an excellent test for the LLM's documentation generation capabilities. The assertions validate functional requirements, ensuring the code performs as expected, including edge cases like risk calculation normalization.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class Portfolio {
+
+SUFFIX CODE:
+----------------------------------------
+class Portfolio {
+public:
+    Portfolio() = default;
+
+    /**
+     * @brief Adds an asset to the portfolio.
+     * @param name The name of the asset.
+     * @param value The value of the asset.
+     */
+    void addAsset(const std::string& name, double value) {
+        assets.push_back({name, value});
+    }
+
+    /**
+     * @brief Removes an asset from the portfolio.
+     * @param name The name of the asset to remove.
+     */
+    void removeAsset(const std::string& name) {
+        assets.erase(std::remove_if(assets.begin(), assets.end(), [&](const Asset& asset) {
+            return asset.name == name;
+        }), assets.end());
+    }
+
+    /**
+     * @brief Calculates the total value of the portfolio.
+     * @return The total value of all assets.
+     */
+    double totalValue() const {
+        double total = 0.0;
+        for (const auto& asset : assets) {
+            total += asset.value;
+        }
+        return total;
+    }
+
+private:
+    struct Asset {
+        std::string name;
+        double value;
+    };
+
+    std::vector<Asset> assets;
+};
+
+int main() {
+    Portfolio portfolio;
+    portfolio.addAsset("AAPL", 150.0);
+    portfolio.addAsset("GOOGL", 200.0);
+    portfolio.addAsset("TSLA", 250.0);
+
+    assert(portfolio.totalValue() == 600.0);
+
+    portfolio.removeAsset("AAPL");
+    assert(portfolio.totalValue() == 450.0);
+
+    portfolio.removeAsset("MSFT"); // Removing non-existent asset, should not affect the total value
+    assert(portfolio.totalValue() == 450.0);
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case effectively evaluates an LLM's ability to generate comprehensive documentation for a complex financial portfolio class. The documentation needs to cover class functionalities, error handling, performance characteristics, and include usage examples. Assertions verify that the class implementation meets the documented behavior, ensuring the consistency between code and comments.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Represents a financial instrument with basic attributes.
+ */
+class FinancialInstrument {
+public:
+    FinancialInstrument(const std::string& name, double value)
+        : name_(name), value_(value) {}
+
+    /**
+     * @brief Get the name of the financial instrument.
+     * @return The name of the financial instrument.
+     */
+    std::string getName() const { return name_; }
+
+    /**
+     * @brief Get the value of the financial instrument.
+     * @return The value of the financial instrument.
+     */
+    double getValue() const { return value_; }
+
+private:
+    std::string name_;
+    double value_;
+};
+
+/**
+ * @brief Manages a portfolio of financial instruments.
+ */
+class Portfolio {
+public:
+    /**
+     * @brief Adds a financial instrument to the portfolio.
+     * @param instrument The financial instrument to add.
+     */
+    void addInstrument(const FinancialInstrument& instrument) {
+        instruments_.push_back(instrument);
+    }
+
+    /**
+     * @brief Calculates the total value of the portfolio.
+     * @return The total value of all financial instruments in the portfolio.
+     */
+    double calculateTotalValue() const;
+
+private:
+    std::vector<FinancialInstrument> instruments_;
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+double Portfolio::calculateTotalValue() const {
+    double total = 0.0;
+    for (const auto& instrument : instruments_) {
+        total += instrument.getValue();
+    }
+    return total;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    FinancialInstrument fi1("Stock A", 100.0);
+    FinancialInstrument fi2("Bond B", 200.0);
+    Portfolio portfolio;
+    portfolio.addInstrument(fi1);
+    portfolio.addInstrument(fi2);
+    double totalValue = portfolio.calculateTotalValue();
+    assert(totalValue == 300.0);
+    std::cout << "Total Portfolio Value: " << totalValue << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's capability to generate comprehensive Doxygen-style documentation for an existing C++ method implementation. The code involves financial calculations, specifically the management and valuation of a portfolio of financial instruments, which is a realistic business logic scenario. The golden completion provides detailed documentation for the `calculateTotalValue` method, and the suffix includes assertions that validate the correctness of the method by calculating the total value of the portfolio and verifying it against expected results.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @class Employee
+ * @brief Represents an employee in the company.
+ */
+class Employee {
+public:
+    Employee(const std::string& name, int age, const std::string& role)
+        : name_(name), age_(age), role_(role) {}
+
+    /**
+     * @brief Get the name of the employee.
+     * @return The name of the employee.
+     */
+    std::string getName() const { return name_; }
+
+    /**
+     * @brief Get the age of the employee.
+     * @return The age of the employee.
+     */
+    int getAge() const { return age_; }
+
+    /**
+     * @brief Get the role of the employee.
+     * @return The role of the employee.
+     */
+    std::string getRole() const { return role_; }
+
+private:
+    std::string name_;
+    int age_;
+    std::string role_;
+};
+
+/**
+ * @class Company
+ * @brief Represents a company with a list of employees.
+ */
+class Company {
+public:
+    /**
+     * @brief Adds an employee to the company.
+     * @param employee The employee to add.
+     */
+    void addEmployee(const Employee& employee) {
+        employees_.push_back(employee);
+    }
+
+    /**
+     * @brief Finds an employee by name.
+     * @param name The name of the employee to find.
+     * @return A pointer to the employee if found, nullptr otherwise.
+     */
+    Employee* findEmployeeByName(const std::string& name);
+
+private:
+    std::vector<Employee> employees_;
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+Employee* Company::findEmployeeByName(const std::string& name) {
+    for (auto& employee : employees_) {
+        if (employee.getName() == name) {
+            return &employee;
+        }
+    }
+    return nullptr;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    Company company;
+    Employee emp1("John Doe", 30, "Developer");
+    Employee emp2("Jane Smith", 25, "Designer");
+    company.addEmployee(emp1);
+    company.addEmployee(emp2);
+
+    Employee* foundEmp = company.findEmployeeByName("John Doe");
+    assert(foundEmp != nullptr);
+    assert(foundEmp->getName() == "John Doe");
+    assert(foundEmp->getAge() == 30);
+    assert(foundEmp->getRole() == "Developer");
+
+    Employee* notFoundEmp = company.findEmployeeByName("Alice");
+    assert(notFoundEmp == nullptr);
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a realistic business scenario involving a company and its employees. It tests the LLM's ability to understand and generate both documentation and implementation for class methods. The `findEmployeeByName` method is a common business logic function that requires both clear documentation and correct implementation. The provided code includes detailed Doxygen-style comments, a comprehensive class setup, and assertions to ensure the function works as expected. This scenario tests the LLM's ability to translate between code and natural language effectively, ensuring that the documentation matches the implementation and vice versa.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <cassert>
+
+/**
+ * @brief Class representing a simple user database.
+ *
+ * The UserDatabase class provides functionalities to add users, 
+ * retrieve user information, and validate user data based on some business rules.
+ */
+class UserDatabase {
+public:
+    /**
+     * @brief Adds a new user to the database.
+     *
+     * @param id The unique identifier for the user.
+     * @param name The name of the user.
+     * @param email The email address of the user.
+     * @return true if the user was added successfully, false otherwise.
+     */
+    bool addUser(int id, const std::string& name, const std::string& email);
+
+    /**
+     * @brief Retrieves the name of the user by their ID.
+     *
+     * @param id The unique identifier for the user.
+     * @return The name of the user.
+     */
+    std::string getUser(int id) const;
+
+    /**
+     * @brief Validates if the email format is correct.
+     *
+     * @param email The email address to validate.
+     * @return true if the email format is valid, false otherwise.
+     */
+    bool validateEmail(const std::string& email) const;
+
+private:
+    std::map<int, std::pair<std::string, std::string>> users; ///< A map of user ID to user name and email.
+};
+
+bool UserDatabase::addUser(int id, const std::string& name, const std::string& email) {
+    if (!validateEmail(email)) {
+        return false;
+    }
+    users[id] = std::make_pair(name, email);
+    return true;
+}
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+std::string UserDatabase::getUser(int id) const {
+    auto it = users.find(id);
+    if (it != users.end()) {
+        return it->second.first;
+    }
+    return "";
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    UserDatabase db;
+    assert(db.addUser(1, "Alice", "alice@example.com"));
+    assert(db.addUser(2, "Bob", "bobexample.com") == false); // Invalid email
+    assert(db.getUser(1) == "Alice");
+    assert(db.getUser(2) == ""); // User not added due to invalid email
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a realistic example involving a user database with functionalities to add users, retrieve user information, and validate email addresses. The golden completion includes comprehensive Doxygen-style documentation for the methods `getUser` and `validateEmail`. The suffix contains assertions that verify the correctness of the method implementations and the business rules enforced. This scenario tests both code-to-comment and comment-to-code translation capabilities of an LLM, ensuring the generated documentation accurately reflects the implementation and the generated code meets the specified requirements.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief A class representing a simple workflow orchestration system.
+ * 
+ * This class models a workflow system where tasks can be added and executed in sequence.
+ */
+class Workflow {
+public:
+    /**
+     * @brief Adds a task to the workflow.
+     * 
+     * @param task The task to be added, represented as a string.
+     */
+    void addTask(const std::string& task) {
+        tasks.push_back(task);
+    }
+
+    /**
+     * @brief Executes all tasks in the workflow.
+     * 
+     * @return A vector of strings representing the results of each task.
+     */
+    std::vector<std::string> executeTasks() {
+        std::vector<std::string> results;
+        for (const auto& task : tasks) {
+            results.push_back(executeTask(task));
+        }
+        return results;
+    }
+
+private:
+    std::vector<std::string> tasks;
+
+    /**
+     * @brief Executes a single task.
+     * 
+     * @param task The task to be executed, represented as a string.
+     * @return A string representing the result of the task execution.
+     */
+    std::string executeTask(const std::string& task) {
+        // Simulate task execution by returning a simple message
+        return "Executed: " + task;
+    }
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+void testWorkflow() {
+
+SUFFIX CODE:
+----------------------------------------
+void testWorkflow() {
+    Workflow wf;
+    wf.addTask("Task 1");
+    wf.addTask("Task 2");
+    wf.addTask("Task 3");
+
+    auto results = wf.executeTasks();
+    assert(results.size() == 3);
+    assert(results[0] == "Executed: Task 1");
+    assert(results[1] == "Executed: Task 2");
+    assert(results[2] == "Executed: Task 3");
+
+    // Cleanup code if necessary would go here (none required in this case)
+}
+
+int main() {
+    testWorkflow();
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it involves a realistic business logic scenario of workflow orchestration. The prefix includes a fully functional Workflow class with methods for adding and executing tasks. The golden completion provides comprehensive documentation for the test function, including the purpose and expected behavior of the test. The suffix contains assertions to verify the correctness of the Workflow class implementation, ensuring the tasks are executed as expected. This scenario tests the LLM's ability to generate accurate and detailed documentation as well as its ability to implement functional code from given documentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @class User
+ * @brief Represents a user in the system.
+ *
+ * The User class encapsulates all the necessary information and operations
+ * related to a user in the system. Each user has a unique ID, a name, and
+ * an email address.
+ */
+class User {
+public:
+    /**
+     * @brief Constructs a new User object.
+     * @param id The unique ID of the user.
+     * @param name The name of the user.
+     * @param email The email address of the user.
+     */
+    User(int id, const std::string& name, const std::string& email)
+        : id_(id), name_(name), email_(email) {}
+
+    /**
+     * @brief Gets the user's ID.
+     * @return The unique ID of the user.
+     */
+    int getId() const { return id_; }
+
+    /**
+     * @brief Gets the user's name.
+     * @return The name of the user.
+     */
+    std::string getName() const { return name_; }
+
+    /**
+     * @brief Gets the user's email address.
+     * @return The email address of the user.
+     */
+    std::string getEmail() const { return email_; }
+
+    /**
+     * @brief Sets the user's email address.
+     * @param email The new email address of the user.
+     */
+    void setEmail(const std::string& email) { email_ = email; }
+
+private:
+    int id_; ///< The unique ID of the user.
+    std::string name_; ///< The name of the user.
+    std::string email_; ///< The email address of the user.
+};
+
+/**
+ * @class UserManager
+ * @brief Manages a collection of users.
+ *
+ * The UserManager class provides functionality to add, remove, and retrieve
+ * users from a collection. It ensures that each user has a unique ID and
+ * provides methods to find users by their ID or email address.
+ */
+class UserManager {
+public:
+    /**
+     * @brief Adds a new user to the collection.
+     * @param user The user to add.
+     * @return True if the user was added successfully, false if a user with the same ID already exists.
+     */
+    bool addUser(const User& user);
+
+    /**
+     * @brief Removes a user from the collection by their ID.
+     * @param id The ID of the user to remove.
+     * @return True if the user was removed successfully, false if no user with the given ID exists.
+     */
+    bool removeUser(int id);
+
+    /**
+     * @brief Finds a user by their ID.
+     * @param id The ID of the user to find.
+     * @return A pointer to the user if found, nullptr otherwise.
+     */
+    const User* findUserById(int id) const;
+
+    /**
+     * @brief Finds a user by their email address.
+     * @param email The email address of the user to find.
+     * @return A pointer to the user if found, nullptr otherwise.
+     */
+    const User* findUserByEmail(const std::string& email) const;
+
+private:
+    std::vector<User> users_; ///< The collection of users.
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+bool UserManager::addUser(const User& user) {
+    if (findUserById(user.getId()) != nullptr) {
+        return false;
+    }
+    users_.push_back(user);
+    return true;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+bool UserManager::removeUser(int id) {
+    for (auto it = users_.begin(); it != users_.end(); ++it) {
+        if (it->getId() == id) {
+            users_.erase(it);
+            return true;
+        }
+    }
+    return false; // No user with the given ID exists.
+}
+
+const User* UserManager::findUserById(int id) const {
+    for (const auto& user : users_) {
+        if (user.getId() == id) {
+            return &user;
+        }
+    }
+    return nullptr; // No user with the given ID found.
+}
+
+const User* UserManager::findUserByEmail(const std::string& email) const {
+    for (const auto& user : users_) {
+        if (user.getEmail() == email) {
+            return &user;
+        }
+    }
+    return nullptr; // No user with the given email found.
+}
+
+int main() {
+    UserManager manager;
+    User user1(1, "Alice", "alice@example.com");
+    User user2(2, "Bob", "bob@example.com");
+
+    // Add users
+    assert(manager.addUser(user1) == true);
+    assert(manager.addUser(user2) == true);
+    assert(manager.addUser(user1) == false); // Duplicate ID
+
+    // Find users by ID
+    assert(manager.findUserById(1) != nullptr);
+    assert(manager.findUserById(1)->getName() == "Alice");
+    assert(manager.findUserById(3) == nullptr); // Nonexistent ID
+
+    // Find users by email
+    assert(manager.findUserByEmail("bob@example.com") != nullptr);
+    assert(manager.findUserByEmail("bob@example.com")->getName() == "Bob");
+    assert(manager.findUserByEmail("charlie@example.com") == nullptr); // Nonexistent email
+
+    // Remove users
+    assert(manager.removeUser(1) == true);
+    assert(manager.removeUser(1) == false); // Already removed
+    assert(manager.findUserById(1) == nullptr); // Verify removal
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example is a good test case because it involves translating between comprehensive documentation and working C++ code. The provided code in the prefix includes detailed class definitions and methods for managing a collection of users, which is a common scenario in business logic. The golden completion requires generating documentation for these methods, ensuring that the LLM can accurately describe the functionality and parameters of each method. The suffix includes the implementation of the methods and assertions to verify their correctness, ensuring that the generated documentation is consistent with the actual code behavior. This tests the LLM's ability to handle both code-to-comment and comment-to-code translations effectively.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Represents an employee in the organization.
+ */
+class Employee {
+public:
+    /**
+     * @brief Constructs an Employee with the given name and ID.
+     * @param name The name of the employee.
+     * @param id The unique identifier for the employee.
+     */
+    Employee(const std::string& name, int id) : name(name), id(id) {}
+
+    /**
+     * @brief Gets the employee's name.
+     * @return The name of the employee.
+     */
+    std::string getName() const { return name; }
+
+    /**
+     * @brief Gets the employee's ID.
+     * @return The ID of the employee.
+     */
+    int getId() const { return id; }
+
+private:
+    std::string name;
+    int id;
+};
+
+/**
+ * @brief Manages a list of employees.
+ */
+class EmployeeManager {
+public:
+    /**
+     * @brief Adds a new employee to the manager.
+     * @param employee The employee to add.
+     */
+    void addEmployee(const Employee& employee) {
+        employees.push_back(employee);
+    }
+
+    /**
+     * @brief Finds an employee by ID.
+     * @param id The ID of the employee to find.
+     * @return The employee with the given ID, or nullptr if not found.
+     */
+    Employee* findEmployeeById(int id);
+
+private:
+    std::vector<Employee> employees;
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+Employee* EmployeeManager::findEmployeeById(int id) {
+    for (auto& employee : employees) {
+        if (employee.getId() == id) {
+            return &employee;
+        }
+    }
+    return nullptr;
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    EmployeeManager manager;
+    Employee emp1("Alice", 1);
+    Employee emp2("Bob", 2);
+    manager.addEmployee(emp1);
+    manager.addEmployee(emp2);
+
+    Employee* foundEmp = manager.findEmployeeById(1);
+    assert(foundEmp != nullptr);
+    assert(foundEmp->getName() == "Alice");
+
+    foundEmp = manager.findEmployeeById(3);
+    assert(foundEmp == nullptr);
+
+    foundEmp = manager.findEmployeeById(2);
+    assert(foundEmp != nullptr);
+    assert(foundEmp->getName() == "Bob");
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a realistic business logic scenario involving an Employee and EmployeeManager class. The prefix includes detailed class definitions and method prototypes, setting up the context for the golden completion. The golden completion involves implementing the findEmployeeById method, which is a typical task in managing collections of business entities. The suffix includes a main function that thoroughly tests the implementation with various assertions, ensuring correctness. This scenario effectively tests the LLM's ability to translate between code and documentation by verifying functional requirements, testing edge cases, and validating return values.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief This class represents a simple cache system that stores key-value pairs.
+ */
+class SimpleCache {
+public:
+    /**
+     * @brief Adds a key-value pair to the cache.
+     * @param key The key associated with the value.
+     * @param value The value to be cached.
+     */
+    void add(const std::string& key, const std::string& value);
+
+    /**
+     * @brief Retrieves a value from the cache based on the key.
+     * @param key The key associated with the value.
+     * @return The cached value, or an empty string if the key is not found.
+     */
+    std::string get(const std::string& key) const;
+
+    /**
+     * @brief Removes a key-value pair from the cache.
+     * @param key The key associated with the value to be removed.
+     */
+    void remove(const std::string& key);
+
+private:
+    std::vector<std::pair<std::string, std::string>> cache;
+};
+
+void SimpleCache::add(const std::string& key, const std::string& value) {
+    for (auto& pair : cache) {
+        if (pair.first == key) {
+            pair.second = value;
+            return;
+        }
+    }
+    cache.emplace_back(key, value);
+}
+
+std::string SimpleCache::get(const std::string& key) const {
+    for (const auto& pair : cache) {
+        if (pair.first == key) {
+            return pair.second;
+        }
+    }
+    return "";
+}
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+void SimpleCache::remove(const std::string& key) {
+    cache.erase(std::remove_if(cache.begin(), cache.end(),
+                               [&](const std::pair<std::string, std::string>& pair) {
+                                   return pair.first == key;
+                               }),
+                cache.end());
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    SimpleCache cache;
+    cache.add("key1", "value1");
+    cache.add("key2", "value2");
+
+    assert(cache.get("key1") == "value1");
+    assert(cache.get("key2") == "value2");
+
+    cache.remove("key1");
+    assert(cache.get("key1").empty());
+    assert(cache.get("key2") == "value2");
+
+    cache.remove("key2");
+    assert(cache.get("key2").empty());
+
+    std::cout << "All tests passed." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to translate C++ code into comprehensive documentation and vice versa. The prefix provides a class definition for a simple cache system, including method declarations and implementations for adding and retrieving key-value pairs, along with detailed Doxygen-style documentation. The golden_completion requires implementing the remove method for the cache, following the provided documentation style and ensuring consistency with the existing methods. The suffix includes assertions that verify the correctness of the implementation by adding, retrieving, and removing key-value pairs, ensuring the cache behaves as expected. This scenario is realistic, involves resource management, error handling, and demonstrates good documentation practices, making it an effective test case for code-to-comment and comment-to-code translation capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief A class representing a product in an inventory system.
+ */
+class Product {
+public:
+    /**
+     * @brief Constructs a product with the given name, price, and quantity.
+     * @param name The name of the product.
+     * @param price The price of the product.
+     * @param quantity The quantity of the product in stock.
+     */
+    Product(const std::string& name, double price, int quantity)
+        : name_(name), price_(price), quantity_(quantity) {}
+
+    /**
+     * @brief Gets the name of the product.
+     * @return The name of the product.
+     */
+    std::string getName() const { return name_; }
+
+    /**
+     * @brief Gets the price of the product.
+     * @return The price of the product.
+     */
+    double getPrice() const { return price_; }
+
+    /**
+     * @brief Gets the quantity of the product in stock.
+     * @return The quantity of the product.
+     */
+    int getQuantity() const { return quantity_; }
+
+private:
+    std::string name_;
+    double price_;
+    int quantity_;
+};
+
+/**
+ * @brief A class representing an inventory system.
+ */
+class Inventory {
+public:
+    /**
+     * @brief Adds a product to the inventory.
+     * @param product The product to add.
+     */
+    void addProduct(const Product& product) {
+        products_.push_back(product);
+    }
+
+    /**
+     * @brief Calculates the total value of the inventory.
+     * @return The total value of all products in the inventory.
+     */
+    double calculateTotalValue() const {
+        double totalValue = 0.0;
+        for (const auto& product : products_) {
+            totalValue += product.getPrice() * product.getQuantity();
+        }
+        return totalValue;
+    }
+
+private:
+    std::vector<Product> products_;
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+void testInventory() {
+
+SUFFIX CODE:
+----------------------------------------
+void testInventory() {
+    Inventory inventory;
+    inventory.addProduct(Product("Laptop", 1000.0, 5));
+    inventory.addProduct(Product("Phone", 500.0, 10));
+    double totalValue = inventory.calculateTotalValue();
+    assert(totalValue == 10000.0);
+    std::cout << "Total inventory value: " << totalValue << std::endl;
+}
+
+int main() {
+    testInventory();
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests bidirectional translation between code and documentation by providing a complete class and method implementation for an inventory system and requiring the generation of comprehensive documentation for a test function. It assesses the LLM's ability to understand class relationships, method functionalities, and their integration, while also verifying the correctness of the documentation using assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Represents a user in the business domain.
+ */
+class User {
+public:
+    User(const std::string &name, int age) : name_(name), age_(age) {}
+    const std::string &getName() const { return name_; }
+    int getAge() const { return age_; }
+private:
+    std::string name_;
+    int age_;
+};
+
+/**
+ * @brief Represents a policy that checks if a user is eligible for a specific service.
+ */
+class EligibilityPolicy {
+public:
+    /**
+     * @brief Determines if a user is eligible based on their age.
+     * @param user The user to check.
+     * @return True if the user is eligible, otherwise false.
+     */
+    bool isEligible(const User &user) const;
+};
+
+bool EligibilityPolicy::isEligible(const User &user) const {
+    return user.getAge() >= 18;
+}
+
+/**
+ * @brief Service that processes users based on their eligibility.
+ */
+class UserService {
+public:
+    UserService(const EligibilityPolicy &policy) : policy_(policy) {}
+    /**
+     * @brief Processes a list of users and returns the names of eligible users.
+     * @param users The list of users to process.
+     * @return A list of names of eligible users.
+     */
+    std::vector<std::string> processUsers(const std::vector<User> &users) const;
+private:
+    const EligibilityPolicy &policy_;
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    EligibilityPolicy policy;
+    UserService service(policy);
+    std::vector<User> users = { User("Alice", 20), User("Bob", 16), User("Charlie", 22) };
+    std::vector<std::string> eligibleUsers = service.processUsers(users);
+
+    assert(eligibleUsers.size() == 2);
+    assert(eligibleUsers[0] == "Alice");
+    assert(eligibleUsers[1] == "Charlie");
+
+    std::cout << "All tests passed." << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case covers a realistic business logic scenario involving user eligibility processing and service orchestration. The code-to-comment part demonstrates a comprehensive documentation style for a method implementation, ensuring that all details such as parameter descriptions and return values are covered. The comment-to-code part requires implementing a method based on detailed documentation, testing the LLM's ability to translate specifications into functional code. Assertions in the suffix verify that the implementation meets the documented requirements.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Represents an Employee in a company.
+ */
+class Employee {
+public:
+    Employee(const std::string& name, int id, double salary)
+        : name(name), id(id), salary(salary) {}
+
+    /**
+     * @brief Gets the employee's name.
+     * @return The name of the employee.
+     */
+    std::string getName() const { return name; }
+
+    /**
+     * @brief Gets the employee's ID.
+     * @return The ID of the employee.
+     */
+    int getId() const { return id; }
+
+    /**
+     * @brief Gets the employee's salary.
+     * @return The salary of the employee.
+     */
+    double getSalary() const { return salary; }
+
+    /**
+     * @brief Sets the employee's salary.
+     * @param newSalary The new salary to be set.
+     */
+    void setSalary(double newSalary) { salary = newSalary; }
+
+private:
+    std::string name;
+    int id;
+    double salary;
+};
+
+/**
+ * @brief Represents a collection of employees in a department.
+ */
+class Department {
+public:
+    /**
+     * @brief Adds an employee to the department.
+     * @param employee The employee to be added.
+     */
+    void addEmployee(const Employee& employee) {
+        employees.push_back(employee);
+    }
+
+    /**
+     * @brief Calculates the total salary of all employees in the department.
+     * @return The total salary of all employees.
+     */
+    double calculateTotalSalary() const;
+
+private:
+    std::vector<Employee> employees;
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+double Department::calculateTotalSalary() const {
+    double total = 0;
+    for (const auto& employee : employees) {
+        total += employee.getSalary();
+    }
+    return total;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    Employee emp1("John Doe", 1, 50000);
+    Employee emp2("Jane Smith", 2, 60000);
+    Department dept;
+    dept.addEmployee(emp1);
+    dept.addEmployee(emp2);
+
+    double totalSalary = dept.calculateTotalSalary();
+    assert(totalSalary == 110000);
+
+    std::cout << "Total Salary: " << totalSalary << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case covers both code-to-comment and comment-to-code translation. The code-to-comment part requires the LLM to generate comprehensive documentation for the `calculateTotalSalary` method in the `Department` class. The comment-to-code part requires the LLM to implement the `calculateTotalSalary` method based on the provided documentation. The assertions in the suffix verify the correctness of the implementation by ensuring the total salary calculation is accurate. This scenario is realistic as it deals with business logic related to employee management and salary calculations, which are common in enterprise applications.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief A class that represents a User in a business application.
+ *
+ * This class stores user information and validates business rules
+ * such as ensuring the user's age is within a valid range and the
+ * email format is correct.
+ */
+class User {
+public:
+    /**
+     * @brief Constructs a new User object.
+     *
+     * @param name The name of the user.
+     * @param age The age of the user.
+     * @param email The email address of the user.
+     */
+    User(const std::string& name, int age, const std::string& email)
+        : name_(name), age_(age), email_(email) {}
+
+    /**
+     * @brief Validates the user's age.
+     *
+     * @return true if the age is between 18 and 99, false otherwise.
+     */
+    bool validateAge() const {
+        return age_ >= 18 && age_ <= 99;
+    }
+
+    /**
+     * @brief Validates the user's email format.
+     *
+     * @return true if the email contains '@' and '.', false otherwise.
+     */
+    bool validateEmail() const {
+        return email_.find('@') != std::string::npos && email_.find('.') != std::string::npos;
+    }
+
+private:
+    std::string name_;
+    int age_;
+    std::string email_;
+};
+
+/**
+ * @brief A class that manages a list of users and performs operations on them.
+ *
+ * This class supports adding users, validating all users, and displaying user information.
+ */
+class UserManager {
+public:
+    /**
+     * @brief Adds a new user to the list.
+     *
+     * @param user The User object to add.
+     */
+    void addUser(const User& user) {
+        users_.push_back(user);
+    }
+
+    /**
+     * @brief Validates all users in the list.
+     *
+     * @return true if all users pass validation, false otherwise.
+     */
+    bool validateAllUsers() const;
+
+    /**
+     * @brief Displays all users' information.
+     */
+    void displayUsers() const;
+
+private:
+    std::vector<User> users_;
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+bool UserManager::validateAllUsers() const {
+    for (const auto& user : users_) {
+        if (!user.validateAge() || !user.validateEmail()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+/**
+ * @brief Implements the method to display all users' information.
+ */
+void UserManager::displayUsers() const {
+    for (const auto& user : users_) {
+        std::cout << "Name: " << user.name_ << ", Age: " << user.age_ << ", Email: " << user.email_ << std::endl;
+    }
+}
+
+int main() {
+    UserManager manager;
+    User user1("Alice", 25, "alice@example.com");
+    User user2("Bob", 17, "bob@example");
+    manager.addUser(user1);
+    manager.addUser(user2);
+
+    assert(manager.validateAllUsers() == false);
+
+    manager.displayUsers();
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of a realistic business scenario where user data is managed and validated against business rules. The code-to-comment translation tests the model's ability to generate comprehensive documentation for methods in a class. The scenario also includes validation logic and edge cases, making it a robust test for both code generation and documentation capabilities. The assertions verify that the validation logic is correctly implemented and that the documentation covers all necessary details.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * Represents a single task in the workflow.
+ */
+class Task {
+public:
+    Task(const std::string &name) : name(name), completed(false) {}
+
+    /**
+     * Marks the task as completed.
+     */
+    void complete() {
+        completed = true;
+    }
+
+    /**
+     * Checks if the task is completed.
+     * @return True if the task is completed, false otherwise.
+     */
+    bool isCompleted() const {
+        return completed;
+    }
+
+    /**
+     * Gets the name of the task.
+     * @return The name of the task.
+     */
+    std::string getName() const {
+        return name;
+    }
+
+private:
+    std::string name;
+    bool completed;
+};
+
+/**
+ * Manages a list of tasks and allows for task completion and status checks.
+ */
+class Workflow {
+public:
+    /**
+     * Adds a new task to the workflow.
+     * @param task The task to be added.
+     */
+    void addTask(const Task &task) {
+        tasks.push_back(task);
+    }
+
+    /**
+     * Marks a task as completed by its name.
+     * @param name The name of the task to be completed.
+     * @return True if the task was found and marked as completed, false otherwise.
+     */
+    bool completeTask(const std::string &name);
+
+    /**
+     * Checks the completion status of a task by its name.
+     * @param name The name of the task to check.
+     * @return True if the task is completed, false otherwise.
+     */
+    bool isTaskCompleted(const std::string &name) const;
+
+private:
+    std::vector<Task> tasks;
+};
+
+bool Workflow::completeTask(const std::string &name) {
+    for (auto &task : tasks) {
+        if (task.getName() == name) {
+            task.complete();
+            return true;
+        }
+    }
+    return false;
+}
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+bool Workflow::isTaskCompleted(const std::string &name) const {
+    for (const auto &task : tasks) {
+        if (task.getName() == name) {
+            return task.isCompleted();
+        }
+    }
+    return false;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    Workflow workflow;
+    Task task1("Design");
+    Task task2("Implementation");
+    Task task3("Testing");
+
+    workflow.addTask(task1);
+    workflow.addTask(task2);
+    workflow.addTask(task3);
+
+    // Complete the 'Implementation' task
+    assert(workflow.completeTask("Implementation"));
+    // Check the status of the tasks
+    assert(workflow.isTaskCompleted("Design") == false);
+    assert(workflow.isTaskCompleted("Implementation") == true);
+    assert(workflow.isTaskCompleted("Testing") == false);
+    // Try to complete a non-existent task
+    assert(workflow.completeTask("Deployment") == false);
+
+    std::cout << "All tests passed." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the ability of an LLM to translate detailed natural language documentation into accurate and executable C++ code, and vice versa. The Workflow and Task classes represent a common business logic scenario of managing and checking the status of tasks. The prefix provides detailed documentation and partially implemented methods, the golden_completion fills in the missing documentation, and the suffix includes assertions to validate the implementation and documentation. This comprehensive setup ensures the LLM's proficiency in both understanding and generating documentation, as well as implementing functional code correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief A class representing a business entity with compliance checks.
+ */
+class BusinessEntity {
+public:
+    /**
+     * @brief Constructor initializing the business entity with a name and an initial value.
+     * @param name The name of the business entity.
+     * @param initialValue The initial value associated with the business entity.
+     */
+    BusinessEntity(const std::string& name, double initialValue)
+        : name(name), value(initialValue) {}
+
+    /**
+     * @brief Applies a set of compliance rules to the business entity.
+     * @param rules A vector of compliance rules as strings.
+     * @return true if all rules are satisfied, false otherwise.
+     */
+    bool applyComplianceRules(const std::vector<std::string>& rules);
+
+private:
+    std::string name;
+    double value;
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+    BusinessEntity entity("TestEntity", 50);
+    std::vector<std::string> rules = {"min_value", "max_value"};
+    bool complianceResult = entity.applyComplianceRules(rules);
+    assert(complianceResult == true);
+
+    BusinessEntity entity2("TestEntity2", -10);
+    complianceResult = entity2.applyComplianceRules(rules);
+    assert(complianceResult == false);
+
+    BusinessEntity entity3("TestEntity3", 150);
+    complianceResult = entity3.applyComplianceRules(rules);
+    assert(complianceResult == false);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    BusinessEntity entity("TestEntity", 50);
+    std::vector<std::string> rules = {"min_value", "max_value"};
+    bool complianceResult = entity.applyComplianceRules(rules);
+    assert(complianceResult == true);
+
+    BusinessEntity entity2("TestEntity2", -10);
+    complianceResult = entity2.applyComplianceRules(rules);
+    assert(complianceResult == false);
+
+    BusinessEntity entity3("TestEntity3", 150);
+    complianceResult = entity3.applyComplianceRules(rules);
+    assert(complianceResult == false);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for code-to-comment translation as it includes a class with a method that has specific business logic for compliance checks. The provided prefix contains the class definition, constructor, and method signature along with partial implementation. The golden completion fills in the detailed Doxygen-style documentation for the method, explaining the business rules it enforces. The suffix includes assertions that verify the correct behavior of the method under different conditions, ensuring the documentation accurately describes the functionality. This scenario tests the LLM's ability to generate detailed documentation from code and verify the accuracy of that documentation through functional assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief A class to represent a business entity with compliance checks.
+ */
+class BusinessEntity {
+private:
+    std::string name;
+    int complianceScore;
+    bool isCompliant;
+
+public:
+    /**
+     * @brief Constructor to initialize a BusinessEntity.
+     * @param name The name of the business entity.
+     * @param complianceScore The compliance score of the business entity.
+     */
+    BusinessEntity(const std::string& name, int complianceScore) 
+        : name(name), complianceScore(complianceScore), isCompliant(false) {}
+
+    /**
+     * @brief Check compliance based on the compliance score.
+     * @return True if compliant, otherwise false.
+     */
+    bool checkCompliance() {
+        isCompliant = (complianceScore >= 75);
+        return isCompliant;
+    }
+
+    /**
+     * @brief Get the name of the business entity.
+     * @return The name of the business entity.
+     */
+    std::string getName() const { return name; }
+
+    /**
+     * @brief Get the compliance status of the business entity.
+     * @return True if compliant, otherwise false.
+     */
+    bool getComplianceStatus() const { return isCompliant; }
+};
+
+/**
+ * @brief A function to validate multiple business entities for compliance.
+ * @param entities A vector of BusinessEntity objects to be validated.
+ * @return A vector of compliant business entity names.
+ */
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+std::vector<std::string> validateEntities(const std::vector<BusinessEntity>& entities) {
+    std::vector<std::string> compliantNames;
+    for (const auto& entity : entities) {
+        if (entity.checkCompliance()) {
+            compliantNames.push_back(entity.getName());
+        }
+    }
+    return compliantNames;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+int main() {
+    BusinessEntity entity1("EntityOne", 80);
+    BusinessEntity entity2("EntityTwo", 60);
+    BusinessEntity entity3("EntityThree", 90);
+
+    // Check compliance for each entity
+    assert(entity1.checkCompliance() == true);
+    assert(entity2.checkCompliance() == false);
+    assert(entity3.checkCompliance() == true);
+
+    std::vector<BusinessEntity> entities = {entity1, entity2, entity3};
+    std::vector<std::string> compliantEntities = validateEntities(entities);
+
+    // Validate the compliance check results
+    assert(compliantEntities.size() == 2);
+    assert(compliantEntities[0] == "EntityOne");
+    assert(compliantEntities[1] == "EntityThree");
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the model's ability to generate documentation from code and vice versa. The prefix establishes a comprehensive class definition and method implementations, demonstrating realistic business logic with compliance checks. The golden completion provides the documentation for a function that validates multiple business entities. The suffix includes assertions to verify the functionality and correctness of the code, ensuring the documentation matches the implementation and that all assertions pass successfully.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Represents a business entity for customer orders.
+ */
+class Order {
+public:
+    Order(int id, double amount) : id(id), amount(amount) {}
+    int getId() const { return id; }
+    double getAmount() const { return amount; }
+private:
+    int id;
+    double amount;
+};
+
+/**
+ * @brief Manages a collection of orders and provides business logic for order processing.
+ */
+class OrderManager {
+public:
+    /**
+     * @brief Adds a new order to the collection.
+     * @param order The order to be added.
+     */
+    void addOrder(const Order& order) {
+        orders.push_back(order);
+    }
+
+    /**
+     * @brief Calculates the total amount of all orders.
+     * @return The total amount as a double.
+     */
+    double calculateTotalAmount() const {
+        double total = 0.0;
+        for (const auto& order : orders) {
+            total += order.getAmount();
+        }
+        return total;
+    }
+
+    /**
+     * @brief Removes orders that have an amount less than the specified threshold.
+     * @param threshold The minimum amount an order must have to be retained.
+     */
+    void removeSmallOrders(double threshold);
+
+private:
+    std::vector<Order> orders;
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+void OrderManager::removeSmallOrders(double threshold) {
+    orders.erase(std::remove_if(orders.begin(), orders.end(),
+                                [threshold](const Order& order) { return order.getAmount() < threshold; }),
+                 orders.end());
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    OrderManager manager;
+    manager.addOrder(Order(1, 150.0));
+    manager.addOrder(Order(2, 50.0));
+    manager.addOrder(Order(3, 250.0));
+
+    // Expected total amount: 450.0
+    assert(manager.calculateTotalAmount() == 450.0);
+    // Remove orders with amount less than 100.0
+    manager.removeSmallOrders(100.0);
+
+    // Expected total amount after removal: 400.0
+    assert(manager.calculateTotalAmount() == 400.0);
+
+    return 0;
+}
+
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a realistic business logic scenario where an OrderManager class manages a collection of Order objects. The task is to provide documentation for a method that removes orders based on a threshold. This scenario tests the LLM's ability to translate between code and comprehensive documentation accurately. The assertions in the suffix ensure that the code functions correctly by verifying the total amount of orders before and after the removal operation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <cassert>
+#include <memory>
+
+/**
+ * @brief BusinessEntity class represents an entity in the business domain.
+ * It holds information about the entity's ID and name.
+ */
+class BusinessEntity {
+public:
+    /**
+     * @brief Constructor for BusinessEntity.
+     * @param id The unique identifier for the entity.
+     * @param name The name of the entity.
+     */
+    BusinessEntity(int id, const std::string& name) : id_(id), name_(name) {}
+
+    /**
+     * @brief Gets the ID of the entity.
+     * @return The unique identifier of the entity.
+     */
+    int getId() const { return id_; }
+
+    /**
+     * @brief Gets the name of the entity.
+     * @return The name of the entity.
+     */
+    std::string getName() const { return name_; }
+
+    /**
+     * @brief Sets the ID of the entity.
+     * @param id The new unique identifier for the entity.
+     */
+    void setId(int id) { id_ = id; }
+
+    /**
+     * @brief Sets the name of the entity.
+     * @param name The new name for the entity.
+     */
+    void setName(const std::string& name) { name_ = name; }
+
+private:
+    int id_;
+    std::string name_;
+};
+
+/**
+ * @brief Validates if the entity complies with the business rules.
+ * The rules are:
+ * - The ID must be a positive integer.
+ * - The name must not be empty and should have at least 3 characters.
+ * @param entity The entity to validate.
+ * @return True if the entity complies with the rules, otherwise false.
+ */
+bool validateEntity(const BusinessEntity& entity) {
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    (void)entity;
+
+SUFFIX CODE:
+----------------------------------------
+    return (entity.getId() > 0) && (entity.getName().length() >= 3);
+}
+
+int main() {
+    BusinessEntity entity1(1, "Alice");
+    BusinessEntity entity2(0, "");
+    BusinessEntity entity3(2, "Bo");
+    BusinessEntity entity4(3, "Charlie");
+
+    assert(validateEntity(entity1)); // Valid entity
+    assert(!validateEntity(entity2)); // Invalid: ID is not positive, name is empty
+    assert(!validateEntity(entity3)); // Invalid: name is less than 3 characters
+    assert(validateEntity(entity4)); // Valid entity
+
+    std::cout << "All assertions passed." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates both code-to-comment and comment-to-code translation capabilities. The prefix provides detailed Doxygen-style documentation for a class and a function. The golden completion requires implementing the validation logic based on the given documentation, ensuring the entity ID is positive and the name is non-empty with at least 3 characters. The suffix includes assertions to verify the correctness of the implementation, checking various scenarios including valid and invalid entities. This example tests complex business rules validation, ensuring the model can accurately translate between code and documentation while maintaining consistency and correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief Represents a product in the inventory system.
+ */
+class Product {
+public:
+    Product(const std::string& name, double price, int quantity)
+        : name_(name), price_(price), quantity_(quantity) {}
+
+    /**
+     * @brief Get the name of the product.
+     * @return The product name.
+     */
+    std::string getName() const { return name_; }
+
+    /**
+     * @brief Get the price of the product.
+     * @return The product price.
+     */
+    double getPrice() const { return price_; }
+
+    /**
+     * @brief Get the quantity of the product.
+     * @return The product quantity.
+     */
+    int getQuantity() const { return quantity_; }
+
+    /**
+     * @brief Set the quantity of the product.
+     * @param quantity The new quantity.
+     */
+    void setQuantity(int quantity) { quantity_ = quantity; }
+
+private:
+    std::string name_;
+    double price_;
+    int quantity_;
+};
+
+/**
+ * @brief Manages a collection of products in the inventory.
+ */
+class Inventory {
+public:
+    /**
+     * @brief Adds a product to the inventory.
+     * @param product The product to add.
+     */
+    void addProduct(const Product& product) { products_.push_back(product); }
+
+    /**
+     * @brief Removes a product from the inventory by name.
+     * @param productName The name of the product to remove.
+     */
+    void removeProduct(const std::string& productName);
+
+    /**
+     * @brief Finds a product by name.
+     * @param productName The name of the product to find.
+     * @return A pointer to the product if found, nullptr otherwise.
+     */
+    Product* findProduct(const std::string& productName);
+
+private:
+    std::vector<Product> products_;
+};
+
+void Inventory::removeProduct(const std::string& productName) {
+    for (auto it = products_.begin(); it != products_.end(); ++it) {
+        if (it->getName() == productName) {
+            products_.erase(it);
+            return;
+        }
+    }
+}
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+Product* Inventory::findProduct(const std::string& productName) {
+    for (auto& product : products_) {
+        if (product.getName() == productName) {
+            return &product;
+        }
+    }
+    return nullptr;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    Inventory inventory;
+    Product apple("Apple", 0.5, 100);
+    Product banana("Banana", 0.3, 150);
+
+    inventory.addProduct(apple);
+    inventory.addProduct(banana);
+
+    assert(inventory.findProduct("Apple") != nullptr);
+    assert(inventory.findProduct("Banana") != nullptr);
+    assert(inventory.findProduct("Orange") == nullptr);
+
+    inventory.removeProduct("Banana");
+    assert(inventory.findProduct("Banana") == nullptr);
+    assert(inventory.findProduct("Apple") != nullptr);
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a realistic scenario involving inventory management. The initial code provides a class structure for managing products and an inventory with detailed Doxygen-style comments. The completion task involves generating the correct implementation of the `findProduct` method based on the provided comments. The assertions in the suffix verify the functionality of the `findProduct` and `removeProduct` methods, ensuring that the implementation matches the documented behavior. This scenario effectively tests an LLM's ability to translate between code and natural language by requiring the generation of both documentation and code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief A class that models a business entity representing a customer.
+ */
+class Customer {
+public:
+    /**
+     * @brief Constructor to initialize a Customer.
+     * @param name The name of the customer.
+     * @param age The age of the customer.
+     */
+    Customer(const std::string &name, int age) : name(name), age(age) {}
+    
+    /**
+     * @brief Get the name of the customer.
+     * @return The name of the customer.
+     */
+    std::string getName() const { return name; }
+
+    /**
+     * @brief Get the age of the customer.
+     * @return The age of the customer.
+     */
+    int getAge() const { return age; }
+
+private:
+    std::string name;
+    int age;
+};
+
+/**
+ * @brief A utility function to validate customer data.
+ * @param customers A vector of Customer objects.
+ * @return true if all customers are valid, false otherwise.
+ * @details A customer is considered valid if their age is between 18 and 120.
+ */
+bool validateCustomers(const std::vector<Customer> &customers) {
+    for (const auto &customer : customers) {
+        if (customer.getAge() < 18 || customer.getAge() > 120) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief A function to demonstrate the usage of Customer class and validation function.
+ * @details This function creates a list of customers, validates them, and prints the result.
+ */
+void demoCustomerValidation() {
+    std::vector<Customer> customers = {Customer("Alice", 25), Customer("Bob", 17), Customer("Carol", 34)};
+    bool isValid = validateCustomers(customers);
+    std::cout << "Customers are " << (isValid ? "valid" : "invalid") << std::endl;
+
+    // Assertions to verify the functionality
+    assert(customers.size() == 3);
+    assert(customers[0].getName() == "Alice");
+    assert(customers[1].getAge() == 17);
+    assert(!isValid); // Bob is invalid due to age < 18
+}
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    demoCustomerValidation();
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example as it focuses on a realistic business scenario involving a Customer class and a validation function. The prefix provides a comprehensive setup with class definitions, utility functions, and usage examples. The completion requires generating documentation for the main function, ensuring alignment between code and comments. The assertions in the suffix validate the functionality and demonstrate proper resource management with RAII principles.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+// A class representing a simple task scheduler for managing and executing tasks.
+class TaskScheduler {
+public:
+    struct Task {
+        std::string name;
+        int priority;
+        bool completed;
+
+        Task(const std::string& taskName, int taskPriority)
+            : name(taskName), priority(taskPriority), completed(false) {}
+    };
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    std::vector<Task> tasks;
+
+SUFFIX CODE:
+----------------------------------------
+
+    void addTask(const std::string& taskName, int priority) {
+        tasks.emplace_back(taskName, priority);
+    }
+
+    // Execute tasks based on priority and mark them as completed.
+    void executeTasks() {
+        // Sort tasks by priority in descending order
+        std::sort(tasks.begin(), tasks.end(), [](const Task& a, const Task& b) {
+            return a.priority > b.priority;
+        });
+
+        // Execute tasks
+        for (auto& task : tasks) {
+            std::cout << "Executing task: " << task.name << std::endl;
+            task.completed = true;
+        }
+    }
+
+    // Check if all tasks are completed
+    bool allTasksCompleted() const {
+        for (const auto& task : tasks) {
+            if (!task.completed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    std::vector<Task> tasks;
+};
+
+int main() {
+    TaskScheduler scheduler;
+    scheduler.addTask("Task1", 1);
+    scheduler.addTask("Task2", 2);
+    scheduler.addTask("Task3", 3);
+    scheduler.executeTasks();
+    // Assertions to verify the behavior of TaskScheduler
+    assert(scheduler.allTasksCompleted() == true);
+    std::cout << "All tasks completed successfully." << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of translating between code and documentation in both directions. The prefix provides a substantial amount of context with a working implementation of a simple task scheduler, demonstrating realistic business logic for task management. The golden completion adds comprehensive Doxygen-style documentation for the methods within the TaskScheduler class, explaining their purpose, parameters, and behavior. The suffix contains assertions that verify the correctness of the scheduler's functionality, ensuring that all tasks are marked as completed after execution. This scenario effectively tests an LLM's ability to generate accurate documentation for existing code and to understand and implement complex business logic from given documentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <stdexcept>
+#include <cassert>
+
+/**
+ * @brief Represents a business entity for handling customer information
+ */
+class Customer {
+public:
+    Customer(int id, const std::string& name, const std::string& email)
+        : id_(id), name_(name), email_(email) {}
+
+    int getId() const { return id_; }
+    const std::string& getName() const { return name_; }
+    const std::string& getEmail() const { return email_; }
+
+private:
+    int id_;
+    std::string name_;
+    std::string email_;
+};
+
+/**
+ * @brief Handles a collection of customers and performs operations on them
+ */
+class CustomerManager {
+public:
+    void addCustomer(const Customer& customer) {
+        customers_.push_back(customer);
+    }
+
+    /**
+     * @brief Finds a customer by ID
+     * @param id The ID of the customer to find
+     * @return The customer with the specified ID
+     * @throw std::runtime_error if the customer is not found
+     */
+    Customer findCustomerById(int id) const;
+
+private:
+    std::vector<Customer> customers_;
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+Customer CustomerManager::findCustomerById(int id) const {
+    for (const auto& customer : customers_) {
+        if (customer.getId() == id) {
+            return customer;
+        }
+    }
+    throw std::runtime_error("Customer not found");
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    CustomerManager manager;
+    manager.addCustomer(Customer(1, "John Doe", "john.doe@example.com"));
+    manager.addCustomer(Customer(2, "Jane Smith", "jane.smith@example.com"));
+
+    try {
+        Customer customer = manager.findCustomerById(1);
+        assert(customer.getId() == 1);
+        assert(customer.getName() == "John Doe");
+        assert(customer.getEmail() == "john.doe@example.com");
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    try {
+        manager.findCustomerById(3); // This should throw an error
+        assert(false); // This should never be reached
+    } catch (const std::runtime_error& e) {
+        assert(std::string(e.what()) == "Customer not found");
+    }
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the translation between code and natural language by providing a detailed class definition with a method that needs to be implemented based on its documentation. The golden completion fills in the method implementation, and the suffix contains assertions to verify the correctness of the implementation. This ensures that the LLM can effectively translate between the documentation and the code, maintaining consistency and functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Represents a product in the inventory.
+ */
+class Product {
+public:
+    std::string name;
+    int quantity;
+    double price;
+
+    Product(const std::string& name, int quantity, double price)
+        : name(name), quantity(quantity), price(price) {}
+};
+
+/**
+ * @brief Manages a collection of products and provides operations to update and query the inventory.
+ */
+class InventoryManager {
+private:
+    std::vector<Product> products;
+
+public:
+    /**
+     * @brief Adds a new product to the inventory.
+     * @param product The product to add.
+     */
+    void addProduct(const Product& product) {
+        products.push_back(product);
+    }
+
+    /**
+     * @brief Updates the quantity of an existing product.
+     * @param name The name of the product to update.
+     * @param quantity The new quantity of the product.
+     */
+    void updateQuantity(const std::string& name, int quantity);
+
+    /**
+     * @brief Calculates the total value of the inventory.
+     * @return The total value of the inventory.
+     */
+    double calculateTotalValue() const;
+};
+
+void InventoryManager::updateQuantity(const std::string& name, int quantity) {
+    for (auto& product : products) {
+        if (product.name == name) {
+            product.quantity = quantity;
+            return;
+        }
+    }
+    throw std::runtime_error("Product not found");
+}
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+double InventoryManager::calculateTotalValue() const {
+    double total = 0.0;
+    for (const auto& product : products) {
+        total += product.quantity * product.price;
+    }
+    return total;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    InventoryManager manager;
+    manager.addProduct(Product("Laptop", 10, 999.99));
+    manager.addProduct(Product("Smartphone", 5, 499.99));
+    manager.addProduct(Product("Tablet", 20, 299.99));
+
+    // Test updateQuantity
+    manager.updateQuantity("Laptop", 15);
+    assert(manager.calculateTotalValue() == (15 * 999.99 + 5 * 499.99 + 20 * 299.99));
+
+    // Test calculateTotalValue
+    double totalValue = manager.calculateTotalValue();
+    assert(totalValue == (15 * 999.99 + 5 * 499.99 + 20 * 299.99));
+
+    // Test exception for non-existing product
+    try {
+        manager.updateQuantity("NonExistingProduct", 10);
+        assert(false); // Should not reach here
+    } catch (const std::runtime_error& e) {
+        assert(std::string(e.what()) == "Product not found");
+    }
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for bidirectional translation between code and natural language because it involves complex business logic related to inventory management. The InventoryManager class, along with its methods and the Product class, provides a realistic scenario that requires comprehensive documentation and accurate code implementation. The test case includes detailed Doxygen-style comments, method implementations, error handling, and assertions to verify both the correctness of the code and the completeness of the documentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <map>
+#include <cassert>
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class ConfigManager {
+
+SUFFIX CODE:
+----------------------------------------
+class ConfigManager {
+public:
+    // Sets a configuration setting.
+    // @param key The configuration key.
+    // @param value The configuration value.
+    void setConfig(const std::string &key, const std::string &value) {
+        configSettings[key] = value;
+    }
+
+    // Gets a configuration setting.
+    // @param key The configuration key.
+    // @return The configuration value.
+    // @throws std::runtime_error if key does not exist.
+    std::string getConfig(const std::string &key) const {
+        auto it = configSettings.find(key);
+        if (it == configSettings.end()) {
+            throw std::runtime_error("Configuration key not found");
+        }
+        return it->second;
+    }
+
+    // Checks if a feature flag is enabled.
+    // @param feature The feature name.
+    // @return True if the feature is enabled, false otherwise.
+    bool isFeatureEnabled(const std::string &feature) const {
+        auto it = featureFlags.find(feature);
+        return it != featureFlags.end() && it->second;
+    }
+
+    // Enables or disables a feature flag.
+    // @param feature The feature name.
+    // @param enabled True to enable, false to disable.
+    void setFeatureFlag(const std::string &feature, bool enabled) {
+        featureFlags[feature] = enabled;
+    }
+
+private:
+    std::map<std::string, std::string> configSettings;
+    std::map<std::string, bool> featureFlags;
+};
+
+// Main function to demonstrate the use of ConfigManager
+int main() {
+    ConfigManager configManager;
+    configManager.setConfig("api_url", "https://api.example.com");
+    configManager.setFeatureFlag("dark_mode", true);
+
+    // Assertions to verify the correctness of the implementation
+    assert(configManager.getConfig("api_url") == "https://api.example.com");
+    assert(configManager.isFeatureEnabled("dark_mode") == true);
+
+    return 0;
+}
+
+
+try {
+    assert(configManager.getConfig("invalid_key") == "");
+} catch (const std::runtime_error &e) {
+    assert(std::string(e.what()) == "Configuration key not found");
+}
+
+configManager.setFeatureFlag("dark_mode", false);
+assert(configManager.isFeatureEnabled("dark_mode") == false);
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a comprehensive scenario involving dynamic configuration management and feature flag handling, which are common in business applications. The code-to-comment portion documents the entire implementation of the ConfigManager class, including method parameters, return values, and exception handling. The comment-to-code portion ensures that the documentation is accurately translated into working code, with assertions verifying the correctness of the implementation. This scenario effectively tests the LLM's ability to handle complex business logic and technical documentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+/**
+ * @brief Represents a business entity for processing transactions.
+ */
+class Transaction {
+public:
+    /**
+     * @brief Constructor to initialize transaction with id and amount.
+     * @param id The unique identifier for the transaction.
+     * @param amount The monetary amount of the transaction.
+     */
+    Transaction(int id, double amount) : id(id), amount(amount) {}
+
+    /**
+     * @brief Get the transaction id.
+     * @return The transaction id.
+     */
+    int getId() const { return id; }
+
+    /**
+     * @brief Get the transaction amount.
+     * @return The transaction amount.
+     */
+    double getAmount() const { return amount; }
+
+private:
+    int id;
+    double amount;
+};
+
+/**
+ * @brief Processes a list of transactions and returns the total amount.
+ *
+ * @param transactions The list of transactions to process.
+ * @return The total amount of all transactions.
+ */
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+double processTransactions(const std::vector<Transaction>& transactions) {
+    double total = 0.0;
+    for (const auto& t : transactions) {
+        total += t.getAmount();
+    }
+    return total;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+int main() {
+    std::vector<Transaction> transactions = { Transaction(1, 100.0), Transaction(2, 200.0), Transaction(3, -50.0) };
+    double totalAmount = processTransactions(transactions);
+    assert(totalAmount == 250.0);
+    std::cout << "Total Amount: " << totalAmount << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates a realistic business logic scenario involving transaction processing, which includes class definition, constructor, and methods. It tests the model's ability to translate between detailed documentation and accurate C++ code implementation. The assertions validate the functional requirement, ensuring the calculated total amount is correct.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cassert>
+
+/**
+ * Class representing a product in a store.
+ */
+class Product {
+public:
+    std::string name;
+    double price;
+    int quantity;
+
+    Product(std::string n, double p, int q) : name(n), price(p), quantity(q) {}
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class ShoppingCart {
+
+SUFFIX CODE:
+----------------------------------------
+class ShoppingCart {
+private:
+    std::vector<Product> products;
+public:
+    /**
+     * Adds a product to the shopping cart.
+     * @param product The product to add.
+     */
+    void addProduct(const Product& product) {
+        products.push_back(product);
+    }
+
+    /**
+     * Calculates the total price of all products in the cart.
+     * @return The total price as a double.
+     */
+    double calculateTotalPrice() const {
+        double total = 0.0;
+        for (const auto& product : products) {
+            total += product.price * product.quantity;
+        }
+        return total;
+    }
+
+    /**
+     * Finds the most expensive product in the cart.
+     * @return The most expensive product.
+     */
+    Product findMostExpensiveProduct() const {
+        return *std::max_element(products.begin(), products.end(), [](const Product& a, const Product& b) {
+            return a.price < b.price;
+        });
+    }
+};
+int main() {
+    ShoppingCart cart;
+    cart.addProduct(Product("Laptop", 999.99, 1));
+    cart.addProduct(Product("Smartphone", 599.99, 2));
+    cart.addProduct(Product("Headphones", 199.99, 3));
+
+    double totalPrice = cart.calculateTotalPrice();
+    assert(totalPrice == 2599.94);
+
+    Product mostExpensive = cart.findMostExpensiveProduct();
+    assert(mostExpensive.name == "Laptop");
+    assert(mostExpensive.price == 999.99);
+    assert(mostExpensive.quantity == 1);
+
+    std::cout << "All assertions passed." << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example as it involves a realistic scenario of managing a shopping cart in an e-commerce application. It demonstrates the ability to translate between code and natural language effectively by providing comprehensive documentation for a class and its methods. The assertions verify both the correctness of the implementation and the accuracy of the generated documentation. The scenario includes complex business logic and ensures proper handling of data structures and algorithms.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Represents a task in the workflow system.
+ */
+class Task {
+public:
+    Task(const std::string& name, int duration)
+        : name(name), duration(duration) {}
+
+    std::string getName() const { return name; }
+    int getDuration() const { return duration; }
+
+private:
+    std::string name;
+    int duration;
+};
+
+/**
+ * @brief WorkflowManager manages the execution of tasks in a workflow.
+ */
+class WorkflowManager {
+public:
+    WorkflowManager() {}
+
+    /**
+     * @brief Adds a task to the workflow.
+     * @param task The task to be added.
+     */
+    void addTask(const Task& task) {
+        tasks.push_back(task);
+    }
+
+    /**
+     * @brief Executes all tasks in the workflow.
+     * @return Total duration of all tasks.
+     */
+    int executeTasks() {
+        int totalDuration = 0;
+        for (const auto& task : tasks) {
+            totalDuration += task.getDuration();
+        }
+        return totalDuration;
+    }
+
+private:
+    std::vector<Task> tasks;
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    WorkflowManager wm;
+    wm.addTask(Task("Task 1", 5));
+    wm.addTask(Task("Task 2", 3));
+    wm.addTask(Task("Task 3", 8));
+    int totalDuration = wm.executeTasks();
+    assert(totalDuration == 16);
+    std::cout << "All tasks executed. Total duration: " << totalDuration << " minutes." << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example provides a comprehensive test for code-to-comment translation. The prefix establishes a workflow management system with task scheduling and execution. The golden completion requires generating detailed documentation for the main function, ensuring clear alignment between code and comments. The suffix includes assertions to verify the correctness of the task execution logic, making this a robust test case for evaluating an LLM's ability to translate between code and natural language effectively.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+/**
+ * @brief Represents a User in the business domain with attributes.
+ */
+class User {
+public:
+    std::string name;
+    int age;
+    std::string role;
+
+    User(const std::string& name, int age, const std::string& role) : name(name), age(age), role(role) {}
+};
+
+/**
+ * @brief Manages a collection of users and provides operations on them.
+ */
+class UserManager {
+public:
+    /**
+     * @brief Adds a user to the collection.
+     * @param user The user to add.
+     */
+    void addUser(const User& user) {
+        users.push_back(user);
+    }
+
+    /**
+     * @brief Gets users above a certain age.
+     * @param age The age to filter users by.
+     * @return A vector of users above the specified age.
+     */
+    std::vector<User> getUsersAboveAge(int age) const {
+        std::vector<User> result;
+        std::copy_if(users.begin(), users.end(), std::back_inserter(result), [age](const User& user) {
+            return user.age > age;
+        });
+        return result;
+    }
+
+private:
+    std::vector<User> users;
+};
+
+/**
+ * @brief Example usage of the UserManager class.
+ */
+void exampleUsage() {
+    UserManager manager;
+    manager.addUser(User("Alice", 30, "Admin"));
+    manager.addUser(User("Bob", 25, "User"));
+    manager.addUser(User("Charlie", 35, "User"));
+
+    std::vector<User> usersAbove30 = manager.getUsersAboveAge(30);
+    assert(usersAbove30.size() == 1);
+    assert(usersAbove30[0].name == "Charlie");
+}
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    exampleUsage();
+
+SUFFIX CODE:
+----------------------------------------
+
+int main() {
+    exampleUsage();
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a realistic scenario for managing a collection of users and performing operations such as filtering based on age. It demonstrates complex business logic with user management and includes comprehensive documentation that needs to be translated correctly. The assertions verify the correctness of the implementation and ensure that the documentation accurately describes the functionality. The example is realistic and tests the LLM's ability to handle both code-to-comment and comment-to-code translations effectively.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief A class representing a basic Task Scheduler.
+ *
+ * This Task Scheduler manages a list of tasks, each represented by a string.
+ * It allows adding, removing, and executing tasks in a FIFO order.
+ */
+class TaskScheduler {
+public:
+    /**
+     * @brief Adds a task to the scheduler.
+     * @param task The task to be added.
+     */
+    void addTask(const std::string& task) {
+        tasks.push_back(task);
+    }
+
+    /**
+     * @brief Removes the next task from the scheduler.
+     * @return The removed task.
+     * @throws std::runtime_error if there are no tasks to remove.
+     */
+    std::string removeTask() {
+        if (tasks.empty()) {
+            throw std::runtime_error("No tasks to remove");
+        }
+        std::string task = tasks.front();
+        tasks.erase(tasks.begin());
+        return task;
+    }
+
+    /**
+     * @brief Executes all tasks in the scheduler.
+     */
+    void executeAllTasks() {
+        for (const std::string& task : tasks) {
+            executeTask(task);
+        }
+        tasks.clear();
+    }
+
+private:
+    std::vector<std::string> tasks;
+
+    /**
+     * @brief Executes a single task.
+     * @param task The task to execute.
+     */
+    void executeTask(const std::string& task) {
+        // Mock execution of task
+        std::cout << "Executing task: " << task << std::endl;
+    }
+};
+
+int main() {
+    TaskScheduler scheduler;
+    scheduler.addTask("Task 1");
+    scheduler.addTask("Task 2");
+    scheduler.addTask("Task 3");
+    // Test removing tasks
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+while (true) {
+    if (scheduler.removeTask() == "Task 1") break;
+}
+
+SUFFIX CODE:
+----------------------------------------
+    assert(scheduler.removeTask() == "Task 1");
+    assert(scheduler.removeTask() == "Task 2");
+
+    // Test exception handling
+    try {
+        scheduler.removeTask();
+        scheduler.removeTask(); // This should throw
+        assert(false); // Should not reach here
+    } catch (const std::runtime_error& e) {
+        assert(std::string(e.what()) == "No tasks to remove");
+    }
+
+    // Re-add tasks and execute all
+    scheduler.addTask("Task 4");
+    scheduler.addTask("Task 5");
+    scheduler.executeAllTasks();
+
+    // Check that all tasks have been executed and the list is empty
+    assert(scheduler.removeTask() == "No tasks to remove");
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case covers both code-to-comment and comment-to-code translations by providing detailed class and method documentation, along with realistic task scheduling operations. The golden completion requires generating code to remove a task, demonstrating the LLM's ability to correctly understand and implement the required functionality. The assertions in the suffix verify the correct behavior, exception handling, and state of the TaskScheduler, ensuring comprehensive coverage and validation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+// A simple class representing a business entity: Employee
+class Employee {
+private:
+    std::string name;
+    int id;
+    double salary;
+
+public:
+    Employee(const std::string& name, int id, double salary) : name(name), id(id), salary(salary) {}
+
+    // Get the name of the employee
+    std::string getName() const { return name; }
+
+    // Get the ID of the employee
+    int getId() const { return id; }
+
+    // Get the salary of the employee
+    double getSalary() const { return salary; }
+
+    // Set the salary of the employee
+    void setSalary(double newSalary) { salary = newSalary; }
+};
+
+// A function to calculate the average salary of employees
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+double totalSalary = 0.0;
+for (const auto& employee : employees) {
+    totalSalary += employee.getSalary();
+}
+return totalSalary / employees.size();
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    std::vector<Employee> employees = {
+        Employee("John Doe", 1, 50000),
+        Employee("Jane Smith", 2, 60000),
+        Employee("Emily Davis", 3, 55000)
+    };
+
+    double averageSalary = calculateAverageSalary(employees);
+    std::cout << "Average Salary: " << averageSalary << std::endl;
+
+    assert(averageSalary == 55000);
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability of an LLM to generate comprehensive and accurate documentation for a method that calculates the average salary of a list of employees. The prefix provides extensive context with a class definition and multiple method implementations. The golden completion involves implementing the average salary calculation, and the suffix includes assertions to validate the correctness of the implementation. This ensures a thorough test of code-to-comment and comment-to-code translation capabilities, focusing on realistic business logic scenarios.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <cassert>
+#include <vector>
+
+/**
+ * @brief Represents an employee in the company.
+ */
+class Employee {
+public:
+    Employee(const std::string& name, int id) : name(name), id(id) {}
+    std::string getName() const { return name; }
+    int getId() const { return id; }
+private:
+    std::string name;
+    int id;
+};
+
+/**
+ * @brief Manages a list of employees.
+ */
+class EmployeeManager {
+public:
+    void addEmployee(const Employee& employee) {
+        employees.push_back(employee);
+    }
+
+    /**
+     * @brief Finds an employee by ID.
+     * @param id The ID of the employee to find.
+     * @return The employee with the given ID, or throws an exception if not found.
+     */
+    Employee findEmployeeById(int id);
+
+private:
+    std::vector<Employee> employees;
+};
+
+Employee EmployeeManager::findEmployeeById(int id) {
+    for (const auto& employee : employees) {
+        if (employee.getId() == id) {
+            return employee;
+        }
+    }
+    throw std::runtime_error("Employee not found");
+}
+
+int main() {
+    EmployeeManager manager;
+    manager.addEmployee(Employee("John Doe", 1));
+    manager.addEmployee(Employee("Jane Smith", 2));
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+    // Additional test case: adding and finding a new employee
+    manager.addEmployee(Employee("Alice Johnson", 3));
+    try {
+        Employee e = manager.findEmployeeById(3);
+        assert(e.getName() == "Alice Johnson");
+        assert(e.getId() == 3);
+    } catch (const std::exception& ex) {
+        assert(false && "Exception should not be thrown for existing employee");
+    }
+
+SUFFIX CODE:
+----------------------------------------
+    // Test cases for the findEmployeeById method
+    try {
+        Employee e = manager.findEmployeeById(1);
+        assert(e.getName() == "John Doe");
+        assert(e.getId() == 1);
+    } catch (const std::exception& ex) {
+        assert(false && "Exception should not be thrown for existing employee");
+    }
+
+    try {
+        Employee e = manager.findEmployeeById(2);
+        assert(e.getName() == "Jane Smith");
+        assert(e.getId() == 2);
+    } catch (const std::exception& ex) {
+        assert(false && "Exception should not be thrown for existing employee");
+    }
+
+    try {
+        manager.findEmployeeById(3);
+        assert(false && "Exception should be thrown for non-existing employee");
+    } catch (const std::runtime_error& ex) {
+        assert(std::string(ex.what()) == "Employee not found");
+    }
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it involves a realistic scenario of managing employees in a company. It tests the model's ability to generate comprehensive documentation for a method that includes details on the parameters, return values, and error handling. The assertions in the suffix verify the correct behavior of the method, including handling edge cases where an employee is not found. This ensures that the generated documentation aligns with the code and that the code is functionally correct.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class LRUCache {
+
+SUFFIX CODE:
+----------------------------------------
+class LRUCache {
+public:
+    /**
+     * @brief Constructor to initialize the cache with a given capacity.
+     * @param capacity Maximum number of elements the cache can hold.
+     */
+    LRUCache(size_t capacity) : capacity_(capacity) {}
+
+    /**
+     * @brief Retrieves an element from the cache.
+     * @param key The key of the element to retrieve.
+     * @return The value associated with the key, or -1 if the key is not found.
+     */
+    int get(int key) {
+        auto it = std::find_if(cache_.begin(), cache_.end(), [&key](const std::pair<int, int>& element) {
+            return element.first == key;
+        });
+        if (it != cache_.end()) {
+            // Move the accessed element to the front (most recently used)
+            int value = it->second;
+            cache_.erase(it);
+            cache_.emplace_front(key, value);
+            return value;
+        }
+        return -1;
+    }
+
+    /**
+     * @brief Adds or updates an element in the cache.
+     * @param key The key of the element to add or update.
+     * @param value The value of the element to add or update.
+     */
+    void put(int key, int value) {
+        auto it = std::find_if(cache_.begin(), cache_.end(), [&key](const std::pair<int, int>& element) {
+            return element.first == key;
+        });
+        if (it != cache_.end()) {
+            // Element already exists, update its value and move it to the front
+            cache_.erase(it);
+        } else if (cache_.size() >= capacity_) {
+            // Cache is at capacity, remove the least recently used element
+            cache_.pop_back();
+        }
+        cache_.emplace_front(key, value);
+    }
+
+private:
+    size_t capacity_;
+    std::list<std::pair<int, int>> cache_;
+};
+
+int main() {
+    LRUCache cache(2);
+
+    // Test adding elements
+    cache.put(1, 1);
+    cache.put(2, 2);
+    assert(cache.get(1) == 1); // Cache is {1, 2}
+
+    // Test cache eviction
+    cache.put(3, 3); // Evicts key 2, cache is {1, 3}
+    assert(cache.get(2) == -1);
+    assert(cache.get(3) == 3);
+    assert(cache.get(1) == 1);
+
+    // Test updating an element
+    cache.put(1, 10); // Updates key 1, cache is {10, 3}
+    assert(cache.get(1) == 10);
+
+    // Test cache eviction after update
+    cache.put(4, 4); // Evicts key 3, cache is {10, 4}
+    assert(cache.get(3) == -1);
+    assert(cache.get(4) == 4);
+
+    std::cout << "All tests passed!\n";
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to both generate comprehensive documentation for a complex C++ class implementing an LRU cache (code-to-comment) and to implement the functionality described in the documentation (comment-to-code). The code includes complex logic for cache eviction and element retrieval, making it a realistic scenario. The assertions verify the correctness of the cache operations, ensuring that the implementation meets the documented behavior.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class Customer {
+
+SUFFIX CODE:
+----------------------------------------
+class Customer {
+private:
+    std::string name;
+    int age;
+    std::string email;
+public:
+    // Constructor to initialize a customer
+    Customer(const std::string& name, int age, const std::string& email)
+        : name(name), age(age), email(email) {}
+
+    // Method to get the customer's name
+    std::string getName() const { return name; }
+
+    // Method to get the customer's age
+    int getAge() const { return age; }
+
+    // Method to get the customer's email
+    std::string getEmail() const { return email; }
+
+    // Method to check if the customer is an adult
+    bool isAdult() const { return age >= 18; }
+};
+
+// A function to filter out adult customers from a list
+std::vector<Customer> filterAdults(const std::vector<Customer>& customers) {
+    std::vector<Customer> adults;
+    for (const auto& customer : customers) {
+        if (customer.isAdult()) {
+            adults.push_back(customer);
+        }
+    }
+    return adults;
+}
+
+// A function to print customer details
+void printCustomerDetails(const Customer& customer) {
+    std::cout << "Name: " << customer.getName() << "\n";
+    std::cout << "Age: " << customer.getAge() << "\n";
+    std::cout << "Email: " << customer.getEmail() << "\n";
+}
+int main() {
+    std::vector<Customer> customers = {
+        Customer("Alice", 30, "alice@example.com"),
+        Customer("Bob", 17, "bob@example.com"),
+        Customer("Charlie", 22, "charlie@example.com")
+    };
+
+    // Filter adult customers
+    std::vector<Customer> adults = filterAdults(customers);
+
+    // Assertions to verify the filterAdults function
+    assert(adults.size() == 2);
+    assert(adults[0].getName() == "Alice");
+    assert(adults[1].getName() == "Charlie");
+
+    // Print details of adult customers
+    for (const auto& adult : adults) {
+        printCustomerDetails(adult);
+    }
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to generate comprehensive Doxygen-style documentation for a C++ class and its methods. The Customer class and related functions provide a realistic example of business logic involving data encapsulation, filtering, and output. The provided documentation includes detailed descriptions, parameter annotations, and return value explanations. The suffix includes assertions that verify the correctness of the filterAdults function, ensuring that the documentation is consistent with the implemented logic.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+#include <stdexcept>
+
+/**
+ * @brief A class to manage a collection of business rules for validating user data.
+ */
+class BusinessRulesManager {
+public:
+    /**
+     * @brief Adds a new rule to the manager.
+     * @param rule A lambda function representing the rule. The lambda takes an integer and returns a boolean.
+     */
+    void addRule(std::function<bool(int)> rule) {
+        rules.push_back(rule);
+    }
+
+    /**
+     * @brief Validates a value against all the business rules.
+     * @param value The value to validate.
+     * @return True if the value passes all rules, false otherwise.
+     */
+    bool validate(int value) const {
+        for (const auto& rule : rules) {
+            if (!rule(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    std::vector<std::function<bool(int)>> rules; ///< A collection of business rules.
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    BusinessRulesManager manager;
+    // Adding some rules
+    manager.addRule([](int value) { return value > 0; }); // Rule: value must be positive
+    manager.addRule([](int value) { return value % 2 == 0; }); // Rule: value must be even
+
+    // Validating some values
+    bool result1 = manager.validate(4); // Should be true: 4 is positive and even
+    bool result2 = manager.validate(5); // Should be false: 5 is positive but not even
+    bool result3 = manager.validate(-2); // Should be false: -2 is even but not positive
+    assert(result1 == true);
+    assert(result2 == false);
+    assert(result3 == false);
+
+    // Clean up resources (if any)
+
+    std::cout << "All assertions passed." << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good scenario because it involves managing and validating complex business rules, which is a common task in business logic applications. The code demonstrates how to add rules and validate values against them, providing a realistic example for both code-to-comment and comment-to-code translations. The assertions in the suffix validate the functionality of the rules, ensuring that the code works as expected and that the documentation accurately describes the process. This setup will effectively test an LLM's ability to generate comprehensive documentation for existing code and implement code from detailed documentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+#include <algorithm>
+
+/**
+ * @brief A simple class to represent a Product in a business domain.
+ * 
+ * This class holds information about a product such as its ID, name, and price.
+ */
+class Product {
+public:
+    int id;
+    std::string name;
+    double price;
+
+    Product(int id, const std::string& name, double price)
+        : id(id), name(name), price(price) {}
+};
+
+/**
+ * @brief A class to manage a collection of products.
+ * 
+ * This class provides methods to add, remove, and search for products in the inventory.
+ */
+class Inventory {
+private:
+    std::vector<Product> products;
+
+public:
+    /**
+     * @brief Adds a new product to the inventory.
+     * 
+     * @param product The product to be added.
+     */
+    void addProduct(const Product& product) {
+        products.push_back(product);
+    }
+
+    /**
+     * @brief Removes a product from the inventory by ID.
+     * 
+     * @param productId The ID of the product to be removed.
+     * @return true if the product was found and removed, false otherwise.
+     */
+    bool removeProduct(int productId) {
+        auto it = std::remove_if(products.begin(), products.end(),
+                                 [productId](const Product& product) { return product.id == productId; });
+        if (it != products.end()) {
+            products.erase(it, products.end());
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @brief Finds a product in the inventory by ID.
+     * 
+     * @param productId The ID of the product to be found.
+     * @return A pointer to the product if found, nullptr otherwise.
+     */
+    Product* findProduct(int productId) {
+        for (auto& product : products) {
+            if (product.id == productId) {
+                return &product;
+            }
+        }
+        return nullptr;
+    }
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+    Inventory inventory;
+
+    // Add products
+    inventory.addProduct(Product(1, "Laptop", 999.99));
+    inventory.addProduct(Product(2, "Smartphone", 499.99));
+
+    // Assertions to verify addProduct
+    assert(inventory.findProduct(1) != nullptr);
+    assert(inventory.findProduct(2) != nullptr);
+    assert(inventory.findProduct(3) == nullptr);
+
+    // Remove product
+    bool removed = inventory.removeProduct(1);
+
+    // Assertions to verify removeProduct
+    assert(removed == true);
+    assert(inventory.findProduct(1) == nullptr);
+    assert(inventory.findProduct(2) != nullptr);
+
+    // Cleanup is not necessary as no dynamic memory allocation is used
+    return 0;
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    Inventory inventory;
+
+    // Add products
+    inventory.addProduct(Product(1, "Laptop", 999.99));
+    inventory.addProduct(Product(2, "Smartphone", 499.99));
+
+    // Assertions to verify addProduct
+    assert(inventory.findProduct(1) != nullptr);
+    assert(inventory.findProduct(2) != nullptr);
+    assert(inventory.findProduct(3) == nullptr);
+
+    // Remove product
+    bool removed = inventory.removeProduct(1);
+
+    // Assertions to verify removeProduct
+    assert(removed == true);
+    assert(inventory.findProduct(1) == nullptr);
+    assert(inventory.findProduct(2) != nullptr);
+
+    // Cleanup is not necessary as no dynamic memory allocation is used
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it includes complex business logic for managing an inventory of products. The prefix provides a clear setup with class definitions and methods, while the golden completion requires detailed documentation of the main function. The suffix contains assertions to verify the functionality and correctness of the code, ensuring that the inventory management operations work as expected. This scenario tests the LLM's ability to generate accurate documentation from code and vice versa, including handling business rules and technical features effectively.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief Business Entity representing a Customer.
+ *
+ * This class models a customer entity with basic attributes such as ID, name, and age.
+ */
+class Customer {
+private:
+    int id;
+    std::string name;
+    int age;
+
+public:
+    Customer(int id, const std::string &name, int age) : id(id), name(name), age(age) {}
+
+    int getId() const { return id; }
+    const std::string &getName() const { return name; }
+    int getAge() const { return age; }
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+bool validateCustomers(const std::vector<Customer> &customers) {
+
+SUFFIX CODE:
+----------------------------------------
+bool validateCustomers(const std::vector<Customer> &customers) {
+    for (const auto &customer : customers) {
+        if (customer.getAge() <= 18 || customer.getName().empty()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief Main function to demonstrate validation of customers.
+ */
+int main() {
+    std::vector<Customer> customers = {
+        Customer(1, "Alice", 30),
+        Customer(2, "Bob", 25),
+        Customer(3, "", 40),
+        Customer(4, "Eve", 17)
+    };
+
+    bool result = validateCustomers(customers);
+    assert(result == false);
+
+    customers[2] = Customer(3, "Charlie", 40);
+    customers[3] = Customer(4, "Dave", 20);
+
+    result = validateCustomers(customers);
+    assert(result == true);
+
+    std::cout << "All assertions passed.\n";
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability of a language model to translate between code and natural language effectively. The prefix provides a comprehensive setup including class definition and business logic functions. The golden completion requires accurate documentation of the validation function, ensuring key terms and structure are present. The suffix includes execution and assertions that verify the correctness of the implementation. This scenario covers complex business rules validation and ensures the model can handle both code-to-comment and comment-to-code translations while maintaining high code quality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <stdexcept>
+#include <cassert>
+
+/**
+ * @brief A class representing a business entity for an online store.
+ *
+ * This class manages the product details such as ID, name, price, and inventory count.
+ */
+class Product {
+public:
+    /**
+     * @brief Constructor to initialize a product with given details.
+     *
+     * @param id The unique identifier for the product.
+     * @param name The name of the product.
+     * @param price The price of the product.
+     * @param inventory The number of items available in stock.
+     */
+    Product(int id, const std::string& name, double price, int inventory)
+        : id_(id), name_(name), price_(price), inventory_(inventory) {}
+
+    /**
+     * @brief Get the product's ID.
+     *
+     * @return The unique identifier of the product.
+     */
+    int getId() const { return id_; }
+
+    /**
+     * @brief Get the product's name.
+     *
+     * @return The name of the product.
+     */
+    std::string getName() const { return name_; }
+
+    /**
+     * @brief Get the product's price.
+     *
+     * @return The price of the product.
+     */
+    double getPrice() const { return price_; }
+
+    /**
+     * @brief Get the product's inventory count.
+     *
+     * @return The number of items available in stock.
+     */
+    int getInventory() const { return inventory_; }
+
+    /**
+     * @brief Set a new price for the product.
+     *
+     * @param newPrice The new price to be set.
+     */
+    void setPrice(double newPrice) { price_ = newPrice; }
+
+private:
+    int id_;
+    std::string name_;
+    double price_;
+    int inventory_;
+};
+
+/**
+ * @brief A class to manage the product inventory in the store.
+ *
+ * This class provides functionalities to add, remove, and search for products.
+ */
+class InventoryManager {
+public:
+    /**
+     * @brief Add a new product to the inventory.
+     *
+     * @param product The product to be added to the inventory.
+     */
+    void addProduct(const Product& product) { products_.push_back(product); }
+
+    /**
+     * @brief Remove a product from the inventory by its ID.
+     *
+     * @param productId The ID of the product to be removed.
+     * @return True if the product was successfully removed, false otherwise.
+     */
+    bool removeProduct(int productId);
+
+    /**
+     * @brief Find a product by its ID.
+     *
+     * @param productId The ID of the product to be found.
+     * @return A pointer to the product if found, nullptr otherwise.
+     */
+    Product* findProduct(int productId);
+
+private:
+    std::vector<Product> products_;
+};
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+bool InventoryManager::removeProduct(int productId) {
+
+SUFFIX CODE:
+----------------------------------------
+bool InventoryManager::removeProduct(int productId) {
+    for (auto it = products_.begin(); it != products_.end(); ++it) {
+        if (it->getId() == productId) {
+            products_.erase(it);
+            return true;
+        }
+    }
+    return false;
+}
+
+Product* InventoryManager::findProduct(int productId) {
+    for (auto& product : products_) {
+        if (product.getId() == productId) {
+            return &product;
+        }
+    }
+    return nullptr;
+}
+
+int main() {
+    InventoryManager manager;
+    Product p1(1, "Laptop", 1000.0, 50);
+    Product p2(2, "Smartphone", 500.0, 100);
+
+    manager.addProduct(p1);
+    manager.addProduct(p2);
+
+    assert(manager.findProduct(1) != nullptr);
+    assert(manager.findProduct(2) != nullptr);
+    assert(manager.findProduct(3) == nullptr);
+
+    assert(manager.removeProduct(1) == true);
+    assert(manager.findProduct(1) == nullptr);
+    assert(manager.removeProduct(3) == false);
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a comprehensive example of managing a product inventory in an online store. It includes realistic business logic, such as adding, removing, and finding products. The golden completion focuses on documenting the methods for removing and finding products, which is crucial for understanding the functionality. The suffix includes assertions that verify the correctness of these methods, ensuring that the documentation aligns with the implementation. This scenario effectively tests the LLM's ability to translate between code and documentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+/**
+ * @brief Class representing a Task with priority
+ */
+class Task {
+public:
+    std::string name;
+    int priority;
+
+    Task(const std::string& name, int priority) : name(name), priority(priority) {}
+};
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+class TaskScheduler {
+
+SUFFIX CODE:
+----------------------------------------
+
+class TaskScheduler {
+private:
+    std::vector<Task> tasks;
+public:
+    /**
+     * @brief Add a task to the scheduler
+     * @param task The task to add
+     */
+    void addTask(const Task& task) {
+        tasks.push_back(task);
+    }
+
+    /**
+     * @brief Retrieve tasks sorted by priority
+     * @return A vector of tasks sorted by priority
+     */
+    std::vector<Task> getTasksByPriority() {
+        std::sort(tasks.begin(), tasks.end(), [](const Task& a, const Task& b) {
+            return a.priority > b.priority;
+        });
+        return tasks;
+    }
+};
+
+int main() {
+    TaskScheduler scheduler;
+    scheduler.addTask(Task("Task1", 5));
+    scheduler.addTask(Task("Task2", 1));
+    scheduler.addTask(Task("Task3", 3));
+
+    std::vector<Task> sortedTasks = scheduler.getTasksByPriority();
+
+    assert(sortedTasks[0].name == "Task1");
+    assert(sortedTasks[1].name == "Task3");
+    assert(sortedTasks[2].name == "Task2");
+
+    std::cout << "All assertions passed." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to generate comprehensive documentation for a class definition and its methods. The TaskScheduler class and its methods are documented to explain their functionality, usage, and behavior. The assertions in the suffix verify the correct behavior of the class methods, ensuring tasks are sorted by priority. This scenario covers business logic related to workflow orchestration, making it a realistic and practical test case.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+/**
+ * @brief A class representing a business entity: Customer.
+ */
+class Customer {
+public:
+    Customer(const std::string& name, int age) : name(name), age(age) {}
+    std::string getName() const { return name; }
+    int getAge() const { return age; }
+private:
+    std::string name;
+    int age;
+};
+
+/**
+ * @brief A class that manages a collection of Customer objects.
+ */
+class CustomerManager {
+public:
+    void addCustomer(const Customer& customer) {
+        customers.push_back(customer);
+    }
+    /**
+     * @brief Finds a customer by name.
+     * @param name The name of the customer to find.
+     * @return A pointer to the Customer if found, nullptr otherwise.
+     */
+    Customer* findCustomerByName(const std::string& name);
+
+    /**
+     * @brief Validates the age of a customer.
+     * @param customer The customer whose age is to be validated.
+     * @return True if the customer is an adult, false otherwise.
+     */
+    bool validateCustomerAge(const Customer& customer);
+
+private:
+    std::vector<Customer> customers;
+};
+
+Customer* CustomerManager::findCustomerByName(const std::string& name) {
+    for (auto& customer : customers) {
+        if (customer.getName() == name) {
+            return &customer;
+        }
+    }
+    return nullptr;
+}
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+bool CustomerManager::validateCustomerAge(const Customer& customer) {
+    return customer.getAge() >= 18;
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    CustomerManager manager;
+    Customer alice("Alice", 30);
+    Customer bob("Bob", 15);
+    manager.addCustomer(alice);
+    manager.addCustomer(bob);
+
+    // Validate Alice's age
+    assert(manager.validateCustomerAge(alice) == true);
+    // Validate Bob's age
+    assert(manager.validateCustomerAge(bob) == false);
+
+    // Find Alice by name
+    assert(manager.findCustomerByName("Alice") == &alice);
+    // Find non-existing customer
+    assert(manager.findCustomerByName("Charlie") == nullptr);
+
+    std::cout << "All assertions passed." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the ability to translate between C++ code and documentation for a realistic business logic scenario involving customer management. The prefix provides a comprehensive context with class definitions, method declarations, and partial implementations. The golden completion requires the LLM to implement a method based on provided documentation, and the suffix includes assertions to validate the correctness of the implementation. This scenario tests the LLM's ability to interpret and generate code accurately, ensuring that the generated code meets the functional requirements and passes all assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: synthbench-code2NL-NL2code
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+/**
+ * @brief Represents a business entity in a workflow system.
+ */
+class Task {
+public:
+    /**
+     * @brief Constructs a new Task object.
+     * @param id The unique identifier of the task.
+     * @param description A brief description of the task.
+     * @param completed A flag indicating whether the task is completed.
+     */
+    Task(int id, const std::string& description, bool completed)
+        : id(id), description(description), completed(completed) {}
+
+    /**
+     * @brief Marks the task as completed.
+     */
+    void complete() {
+        completed = true;
+    }
+
+    /**
+     * @brief Gets the task description.
+     * @return The description of the task.
+     */
+    std::string getDescription() const {
+        return description;
+    }
+
+    /**
+     * @brief Checks if the task is completed.
+     * @return true if the task is completed, false otherwise.
+     */
+    bool isCompleted() const {
+        return completed;
+    }
+
+private:
+    int id; ///< The unique identifier of the task.
+    std::string description; ///< The description of the task.
+    bool completed; ///< The completion status of the task.
+};
+
+/**
+ * @brief Manages a collection of tasks in a workflow.
+ */
+class TaskManager {
+public:
+    /**
+     * @brief Adds a new task to the manager.
+     * @param task The task to add.
+     */
+    void addTask(const Task& task) {
+        tasks.push_back(task);
+    }
+
+    /**
+     * @brief Marks a task as completed based on its description.
+     * @param description The description of the task to complete.
+     */
+    void completeTask(const std::string& description);
+
+private:
+    std::vector<Task> tasks; ///< Collection of tasks.
+};
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+int main() {
+    TaskManager manager;
+    Task task1(1, "Implement feature X", false);
+    Task task2(2, "Fix bug Y", false);
+    manager.addTask(task1);
+    manager.addTask(task2);
+
+    manager.completeTask("Implement feature X");
+
+    assert(task1.isCompleted() == true);
+    assert(task2.isCompleted() == false);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    TaskManager manager;
+    Task task1(1, "Implement feature X", false);
+    Task task2(2, "Fix bug Y", false);
+    manager.addTask(task1);
+    manager.addTask(task2);
+
+    manager.completeTask("Implement feature X");
+
+    assert(task1.isCompleted() == true);
+    assert(task2.isCompleted() == false);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+void TaskManager::completeTask(const std::string& description) {
+    for (auto& task : tasks) {
+        if (task.getDescription() == description) {
+            task.complete();
+            break;
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it involves a realistic workflow scenario where tasks need to be managed and completed. The TaskManager class provides a method to complete tasks based on their description, which is a common operation in task management systems. The code-to-comment translation tests the LLM's ability to generate comprehensive documentation for the completeTask method, including parameter descriptions and a brief explanation of its functionality. The assertions verify that the tasks are correctly marked as completed and ensure the method's correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================

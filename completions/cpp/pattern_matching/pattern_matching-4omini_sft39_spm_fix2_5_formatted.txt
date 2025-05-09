@@ -1,0 +1,4692 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// This example demonstrates algorithm implementation with a focus on higher-order functions
+// Specifically, we are implementing a simple map function and using it in a scientific computing context
+
+// Function to apply a given function to each element of a vector
+std::vector<double> map(const std::vector<double>& data, double (*func)(double)) {
+    std::vector<double> result;
+    result.reserve(data.size());
+    for (const auto& elem : data) {
+        result.push_back(func(elem));
+    }
+    return result;
+}
+
+// Example function to pass to map: squares a number
+double square(double x) {
+    return x * x;
+}
+
+// Example function to pass to map: takes the square root of a number
+#include <cmath>
+double sqrt_func(double x) {
+    return std::sqrt(x);
+}
+
+// Main function demonstrating the usage of map function in scientific computing
+int main() {
+    std::vector<double> data = {1.0, 4.0, 9.0, 16.0};
+
+    // Applying the square function
+    std::vector<double> squared_data = map(data, square);
+    for (const auto& elem : squared_data) {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+
+    // Applying the square root function
+    std::vector<double> sqrt_data = map(data, sqrt_func);
+    for (const auto& elem : sqrt_data) {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+
+    // Assertions to verify the correctness of the map function
+    assert(squared_data[0] == 1.0);
+    assert(squared_data[1] == 16.0);
+    assert(squared_data[2] == 81.0);
+    assert(squared_data[3] == 256.0);
+
+    assert(sqrt_data[0] == 1.0);
+    assert(sqrt_data[1] == 2.0);
+    assert(sqrt_data[2] == 3.0);
+    assert(sqrt_data[3] == 4.0);
+
+    // Another example function to pass to map: negates a number
+    double negate(double x) { return -x; }
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    std::vector<double> negated_data = map(data, negate);
+
+SUFFIX CODE:
+----------------------------------------
+    // Assertions to verify the correctness of the negate function
+    assert(negated_data[0] == -1.0);
+    assert(negated_data[1] == -4.0);
+    assert(negated_data[2] == -9.0);
+    assert(negated_data[3] == -16.0);
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the implementation and usage of a higher-order function (map) in a scientific computing context. The map function is used to apply various mathematical transformations to a dataset. The pattern of using the map function with different mathematical operations is established clearly in the prefix. The golden completion maintains this pattern by introducing another mathematical operation and applying it using the map function. This scenario tests the LLM's ability to recognize the established pattern of using the map function and to continue it appropriately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <cassert>
+
+// Helper function to calculate mean
+double calculateMean(const std::vector<double>& data) {
+    double sum = 0.0;
+    for (double value : data) {
+        sum += value;
+    }
+    return sum / data.size();
+}
+
+// Helper function to calculate variance
+double calculateVariance(const std::vector<double>& data, double mean) {
+    double variance = 0.0;
+    for (double value : data) {
+        variance += (value - mean) * (value - mean);
+    }
+    return variance / data.size();
+}
+
+// Function to calculate standard deviation
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+double calculateStandardDeviation(const std::vector<double>& data, double mean) {
+    double variance = calculateVariance(data, mean);
+    return std::sqrt(variance);
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+int main() {
+    std::vector<double> data = {1.0, 2.0, 3.0, 4.0, 5.0};
+    double mean = calculateMean(data);
+    double variance = calculateVariance(data, mean);
+    double stddev = calculateStandardDeviation(data, mean);
+
+    // Assertions to verify correctness
+    assert(std::abs(mean - 3.0) < 1e-9);
+    assert(std::abs(variance - 2.0) < 1e-9);
+    assert(std::abs(stddev - std::sqrt(2.0)) < 1e-9);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of pattern matching in algorithm implementation within the context of scientific computing. The prefix establishes a clear pattern by defining functions that calculate mean and variance of a dataset, and the completion logically follows this pattern by defining a function to calculate the standard deviation, using the variance calculated by the previous function. The suffix completes the program by using these functions and includes assertions to verify correctness, ensuring that the completion adheres to the established pattern and produces the expected results.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <cassert>
+
+// Function to calculate the mean of a vector of doubles
+
+double mean(const std::vector<double>& data) {
+    double sum = 0.0;
+    for (double value : data) {
+        sum += value;
+    }
+    return sum / data.size();
+}
+
+// Function to calculate the variance of a vector of doubles
+
+double variance(const std::vector<double>& data) {
+    double mean_value = mean(data);
+    double sum = 0.0;
+    for (double value : data) {
+        sum += (value - mean_value) * (value - mean_value);
+    }
+    return sum / data.size();
+}
+
+// Function to calculate the standard deviation of a vector of doubles
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+double standard_deviation(const std::vector<double>& data) {
+    double variance_value = variance(data);
+
+SUFFIX CODE:
+----------------------------------------
+    return sqrt(variance_value);
+}
+
+int main() {
+    std::vector<double> data = {1.0, 2.0, 3.0, 4.0, 5.0};
+    double std_dev = standard_deviation(data);
+    std::cout << "Standard Deviation: " << std_dev << std::endl;
+
+    // Assertions to verify the calculations
+    assert(std::abs(mean(data) - 3.0) < 1e-9);
+    assert(std::abs(variance(data) - 2.0) < 1e-9);
+    assert(std::abs(std_dev - std::sqrt(2.0)) < 1e-9);
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the model's ability to recognize and complete a pattern of statistical calculations in C++. The prefix establishes a pattern by defining functions to calculate the mean and variance of a dataset. The golden_completion should follow this pattern by implementing the function to calculate the standard deviation, which naturally builds on the previously defined mean and variance functions. The suffix continues the pattern by using the standard deviation function and adding assertions to verify the correctness of all calculations. This setup tests the model's ability to understand and continue an established pattern in a realistic, domain-specific context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+class Simulation {
+public:
+    Simulation(int size) : size(size), data(size, 0.0) {}
+
+    void initialize(double value) {
+        std::fill(data.begin(), data.end(), value);
+    }
+
+    void applyTransformation(std::function<double(double)> func) {
+        std::transform(data.begin(), data.end(), data.begin(), func);
+    }
+
+    double computeSum() const {
+        return std::accumulate(data.begin(), data.end(), 0.0);
+    }
+
+    void printData() const {
+        for (double d : data) {
+            std::cout << d << " ";
+        }
+        std::cout << std::endl;
+    }
+
+private:
+    int size;
+    std::vector<double> data;
+};
+
+int main() {
+    Simulation sim(10);
+    sim.initialize(1.0);
+    sim.applyTransformation([](double x) { return x * 2; });
+    double sum = sim.computeSum();
+    assert(sum == 20.0);
+    sim.printData();
+
+    sim.initialize(3.0);
+    sim.applyTransformation([](double x) { return x + 1; });
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    sum = sim.computeSum();
+    assert(sum == 40.0);
+    sim.printData();
+
+SUFFIX CODE:
+----------------------------------------
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case establishes a clear pattern of initializing a simulation, applying a transformation, and computing the sum of the data. The pattern is repeated with different initialization values and transformations, making it easy to identify. The golden completion continues this pattern by computing the sum and asserting its correctness, followed by printing the data. This scenario is realistic for scientific computing, where such transformations and validations are common.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+#include <cassert>
+
+// Helper function to generate a vector of random numbers
+std::vector<double> generateRandomNumbers(size_t count, double min, double max) {
+    std::vector<double> numbers(count);
+    std::generate(numbers.begin(), numbers.end(), [min, max]() {
+        return min + static_cast<double>(rand()) / (static_cast<double>(RAND_MAX / (max - min)));
+    });
+    return numbers;
+}
+
+// Function to calculate the mean of a vector of numbers
+double calculateMean(const std::vector<double>& numbers) {
+    double sum = std::accumulate(numbers.begin(), numbers.end(), 0.0);
+    return sum / numbers.size();
+}
+
+// Function to calculate the variance of a vector of numbers
+double calculateVariance(const std::vector<double>& numbers) {
+    double mean = calculateMean(numbers);
+    double variance = 0.0;
+    for (double num : numbers) {
+        variance += (num - mean) * (num - mean);
+    }
+    return variance / numbers.size();
+}
+
+// Function to calculate the standard deviation of a vector of numbers
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+double calculateStandardDeviation(const std::vector<double>& numbers) {
+    return std::sqrt(calculateVariance(numbers));
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+int main() {
+    // Generate a vector of random numbers
+    std::vector<double> numbers = generateRandomNumbers(100, 1.0, 100.0);
+
+    // Calculate the mean
+    double mean = calculateMean(numbers);
+    std::cout << "Mean: " << mean << std::endl;
+
+    // Calculate the variance
+    double variance = calculateVariance(numbers);
+    std::cout << "Variance: " << variance << std::endl;
+
+    // Calculate the standard deviation
+    double stddev = calculateStandardDeviation(numbers);
+    std::cout << "Standard Deviation: " << stddev << std::endl;
+
+    // Assertions
+    assert(mean >= 1.0 && mean <= 100.0);
+    assert(variance >= 0.0);
+    assert(stddev >= 0.0);
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for testing pattern matching capabilities as it involves a sequence of functions for statistical calculations (mean, variance, and standard deviation). The pattern of statistical function implementation is evident in the prefix with `calculateMean` and `calculateVariance` functions, and the completion should follow the same pattern to implement `calculateStandardDeviation`. The suffix uses these functions and includes assertions to verify correctness, making it a comprehensive and realistic scenario for scientific computing.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <functional>
+#include <cassert>
+
+// Helper function to generate a sequence of numbers
+std::vector<int> generate_sequence(int start, int end) {
+    std::vector<int> sequence;
+    for (int i = start; i <= end; ++i) {
+        sequence.push_back(i);
+    }
+    return sequence;
+}
+
+// Function to apply a transformation to each element of the vector
+std::vector<int> transform_vector(const std::vector<int>& input, std::function<int(int)> transform_func) {
+    std::vector<int> output;
+    for (const auto& elem : input) {
+        output.push_back(transform_func(elem));
+    }
+    return output;
+}
+
+// Function to filter elements of the vector based on a predicate
+std::vector<int> filter_vector(const std::vector<int>& input, std::function<bool(int)> predicate) {
+    std::vector<int> output;
+    for (const auto& elem : input) {
+        if (predicate(elem)) {
+            output.push_back(elem);
+        }
+    }
+    return output;
+}
+
+int main() {
+    std::vector<int> sequence = generate_sequence(1, 10);
+    std::vector<int> transformed = transform_vector(sequence, [](int x) { return x * 2; });
+    std::vector<int> filtered = filter_vector(transformed, [](int x) { return x % 4 == 0; });
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    std::vector<int> new_transformed = transform_vector(sequence, [](int x) { return x + 5; });
+    std::vector<int> new_filtered = filter_vector(new_transformed, [](int x) { return x > 10; });
+
+SUFFIX CODE:
+----------------------------------------
+    // Apply a new transformation and filter to the sequence
+    std::vector<int> new_transformed = transform_vector(sequence, [](int x) { return x + 5; });
+    std::vector<int> new_filtered = filter_vector(new_transformed, [](int x) { return x > 10; });
+
+    // Assertions to verify the correctness of the transformations and filters
+    assert((new_transformed == std::vector<int>{6, 7, 8, 9, 10, 11, 12, 13, 14, 15}));
+    assert((new_filtered == std::vector<int>{11, 12, 13, 14, 15}));
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it establishes a clear pattern of using higher-order functions to transform and filter vectors. The golden completion continues this pattern by applying another transformation and filter, and the suffix applies a different transformation and filter. The assertions verify that the transformations and filters are applied correctly, ensuring that the LLM recognizes and continues the pattern appropriately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function to calculate mean of a vector
+float calculate_mean(const std::vector<int>& data) {
+    int sum = 0;
+    for (int value : data) {
+        sum += value;
+    }
+    return static_cast<float>(sum) / data.size();
+}
+
+// Function to calculate variance of a vector
+float calculate_variance(const std::vector<int>& data, float mean) {
+    float sum_squared_diff = 0;
+    for (int value : data) {
+        sum_squared_diff += (value - mean) * (value - mean);
+    }
+    return sum_squared_diff / data.size();
+}
+
+// Function to calculate standard deviation of a vector
+float calculate_standard_deviation(const std::vector<int>& data, float mean) {
+    float variance = calculate_variance(data, mean);
+    return std::sqrt(variance);
+}
+
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5};
+    float mean = calculate_mean(data);
+    float standard_deviation = calculate_standard_deviation(data, mean);
+
+    // Assert the calculated mean
+    assert(mean == 3.0f);
+
+    // Assert the calculated standard deviation
+    assert(standard_deviation == 1.41421f);
+
+    // Further calculations and assertions
+    float variance = calculate_variance(data, mean);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    assert(variance == 2.0f);
+
+SUFFIX CODE:
+----------------------------------------
+    // Calculate the sum of the data
+    int sum = std::accumulate(data.begin(), data.end(), 0);
+    assert(sum == 15);
+
+    // Calculate the maximum value in the data
+    int max_value = *std::max_element(data.begin(), data.end());
+    assert(max_value == 5);
+
+    // Calculate the minimum value in the data
+    int min_value = *std::min_element(data.begin(), data.end());
+    assert(min_value == 1);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case establishes a pattern of calculating statistical measures of a dataset (mean, variance, standard deviation) and verifying them using assertions. The prefix includes functions to calculate the mean, variance, and standard deviation of a vector of integers. The pattern of calculating a statistical measure and asserting its correctness is repeated multiple times. The golden completion fits this pattern by asserting the correctness of the variance calculation. The suffix continues with additional calculations and assertions, ensuring the pattern is clear and the code is executable.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <cassert>
+
+// Logging function
+void log(const std::string &message) {
+    std::cout << "LOG: " << message << std::endl;
+}
+
+// Template function to apply a higher-order function to each element in a vector
+template <typename T>
+void applyToEach(std::vector<T> &vec, const std::function<void(T &)> &func) {
+    for (auto &elem : vec) {
+        func(elem);
+    }
+}
+
+// Function to double the value of an integer
+void doubleValue(int &n) {
+    n *= 2;
+}
+
+// Function to log the value of an integer
+void logValue(int &n) {
+    log("Value: " + std::to_string(n));
+}
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+    // Applying doubleValue to each element in the vector
+    applyToEach(numbers, doubleValue);
+
+    // Applying logValue to each element in the vector
+    applyToEach(numbers, logValue);
+
+    // Check if the values are correctly doubled
+    assert(numbers[0] == 2);
+    assert(numbers[1] == 4);
+    assert(numbers[2] == 6);
+    assert(numbers[3] == 8);
+    assert(numbers[4] == 10);
+
+    // Apply a lambda function to add 5 to each element
+    applyToEach(numbers, [](int &n) { n += 5; });
+
+    // Check if the values are correctly incremented
+    assert(numbers[0] == 7);
+    assert(numbers[1] == 9);
+    assert(numbers[2] == 11);
+    assert(numbers[3] == 13);
+    assert(numbers[4] == 15);
+
+
+    // Applying another lambda function to subtract 3 from each element
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    applyToEach(numbers, [](int &n) { n -= 3; });
+
+    // Check if the values are correctly decremented
+    assert(numbers[0] == 4);
+    assert(numbers[1] == 6);
+    assert(numbers[2] == 8);
+    assert(numbers[3] == 10);
+    assert(numbers[4] == 12);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a pattern of applying higher-order functions to elements in a vector, combined with logging and validation. The established pattern involves using the `applyToEach` function with different operations (doubling values, logging values, modifying values with lambdas). The golden completion follows this pattern by applying another lambda function to further modify the elements and validating the results. The scenario includes realistic system operations (logging) and higher-order function application, making it a practical test for pattern recognition and continuation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// A higher-order function that applies a given function to each element in a vector and returns a new vector
+std::vector<int> applyFunction(const std::vector<int>& vec, int (*func)(int)) {
+    std::vector<int> result;
+    for (int val : vec) {
+        result.push_back(func(val));
+    }
+    return result;
+}
+
+// A sample function to be used with the higher-order function
+int square(int x) {
+    return x * x;
+}
+
+// Another sample function to be used with the higher-order function
+int cube(int x) {
+    return x * x * x;
+}
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+    // Apply the square function to each element in the vector
+    std::vector<int> squared = applyFunction(numbers, square);
+
+    // Assertions to verify the correctness of the squared vector
+    assert(squared.size() == numbers.size());
+    assert(squared[0] == 1);
+    assert(squared[1] == 4);
+    assert(squared[2] == 9);
+    assert(squared[3] == 16);
+    assert(squared[4] == 25);
+
+    // Apply the cube function to each element in the vector
+    std::vector<int> cubed = applyFunction(numbers, cube);
+
+    // Assertions to verify the correctness of the cubed vector
+    assert(cubed.size() == numbers.size());
+    assert(cubed[0] == 1);
+    assert(cubed[1] == 8);
+    assert(cubed[2] == 27);
+    assert(cubed[3] == 64);
+    assert(cubed[4] == 125);
+
+    // Apply a custom lambda function to add 10 to each element in the vector
+    std::vector<int> custom;
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    custom = applyFunction(numbers, [](int x) { return x + 10; });
+
+SUFFIX CODE:
+----------------------------------------
+    std::vector<int> doubled = applyFunction(numbers, [](int x) { return x * 2; });
+
+    // Assertions to verify the correctness of the doubled vector
+    assert(doubled.size() == numbers.size());
+    assert(doubled[0] == 2);
+    assert(doubled[1] == 4);
+    assert(doubled[2] == 6);
+    assert(doubled[3] == 8);
+    assert(doubled[4] == 10);
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of higher-order functions in C++ for transforming elements in a vector using different functions. The pattern involves applying various functions to a vector using a higher-order function and then verifying the results with assertions. The prefix establishes the pattern by applying both the square and cube functions to a vector and includes assertions to verify the results. The golden completion continues this pattern by applying a custom lambda function to the vector and verifying the results with assertions. This scenario tests the LLM's ability to recognize and continue the established pattern of using higher-order functions and validating their outputs.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function to log messages
+void logMessage(const std::string &message) {
+    std::cout << message << std::endl;
+}
+
+// Function to log an error
+void logError(const std::string &error) {
+    std::cerr << error << std::endl;
+}
+
+// A generic function to apply logging to another function
+void executeWithLogging(const std::function<void()> &func) {
+    try {
+        logMessage("Execution started.");
+        func();
+        logMessage("Execution finished.");
+    } catch (const std::exception &e) {
+        logError(std::string("Error: ") + e.what());
+    }
+}
+
+// Sample functions to demonstrate the pattern
+void task1() {
+    logMessage("Task 1 is running");
+}
+
+void task2() {
+    logMessage("Task 2 is running");
+}
+
+void task3() {
+    logMessage("Task 3 is running");
+}
+
+int main() {
+    // Execute tasks with logging
+    executeWithLogging(task1);
+    executeWithLogging(task2);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    executeWithLogging(task3);
+
+SUFFIX CODE:
+----------------------------------------
+    executeWithLogging([]() { logMessage("Task 4 is running"); });
+
+    // Assertions to verify the pattern
+    assert(true); // If the code reaches here without exceptions, it means the pattern worked correctly
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of using higher-order functions for logging and error handling in system operations. The pattern involves wrapping task functions with a logging function that logs the start and end of the execution and catches any exceptions. The golden completion continues this pattern by wrapping the third task function with the logging function, ensuring consistency and demonstrating an understanding of the established pattern. The suffix includes an additional example using a lambda function and appropriate assertions to verify that the pattern works as expected.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Helper function to print a vector
+void printVector(const std::vector<int>& vec) {
+    for (int val : vec) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+}
+
+// Function to apply a transformation to each element
+std::vector<int> transformVector(const std::vector<int>& input, std::function<int(int)> func) {
+    std::vector<int> result;
+    result.reserve(input.size());
+    for (int val : input) {
+        result.push_back(func(val));
+    }
+    return result;
+}
+
+// Main function
+int main() {
+    // Test data
+    std::vector<int> data = {1, 2, 3, 4, 5};
+
+    // First transformation: doubling values
+    auto doubleFunc = [](int x) { return x * 2; };
+    std::vector<int> doubled = transformVector(data, doubleFunc);
+
+    // Print and assert
+    printVector(doubled);
+    assert(doubled == std::vector<int>({2, 4, 6, 8, 10}));
+
+    // Second transformation: squaring values
+    auto squareFunc = [](int x) { return x * x; };
+    std::vector<int> squared = transformVector(data, squareFunc);
+
+    // Print and assert
+    printVector(squared);
+    assert(squared == std::vector<int>({1, 4, 9, 16, 25}));
+
+    // Third transformation: incrementing values
+    auto incrementFunc = [](int x) { return x + 1; };
+    std::vector<int> incremented = transformVector(data, incrementFunc);
+
+    // Print and assert
+    printVector(incremented);
+    assert(incremented == std::vector<int>({2, 3, 4, 5, 6}));
+
+    // Fourth transformation: halving values
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    auto halveFunc = [](int x) { return x / 2; };
+    std::vector<int> halved = transformVector(data, halveFunc);
+
+    // Print and assert
+    printVector(halved);
+    assert(halved == std::vector<int>({0, 1, 1, 2, 2}));
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue the pattern of applying transformations to a vector using higher-order functions. The prefix establishes a clear pattern of defining a lambda function, passing it to the transformVector function, and then printing and asserting the results. The golden completion requires the LLM to follow this established pattern, while the suffix includes different code that continues the pattern and includes necessary assertions to validate the functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// A utility function to print a vector
+void printVector(const std::vector<int>& vec) {
+    for (int v : vec) {
+        std::cout << v << " ";
+    }
+    std::cout << std::endl;
+}
+
+// Example of a higher-order function that takes another function as an argument
+void applyFunction(std::vector<int>& vec, std::function<void(int&)> func) {
+    for (int& v : vec) {
+        func(v);
+    }
+}
+
+// A helper function that doubles the input value
+void doubleValue(int& val) {
+    val *= 2;
+}
+
+// A helper function that squares the input value
+void squareValue(int& val) {
+    val *= val;
+}
+
+int main() {
+    // Initialize a vector of integers
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+    // Print the original vector
+    std::cout << "Original vector: ";
+    printVector(numbers);
+
+    // Apply the doubleValue function to each element in the vector
+    applyFunction(numbers, doubleValue);
+
+    // Print the modified vector
+    std::cout << "Doubled vector: ";
+    printVector(numbers);
+
+    // Assert that the vector values are doubled
+    assert(numbers[0] == 2);
+    assert(numbers[1] == 4);
+    assert(numbers[2] == 6);
+    assert(numbers[3] == 8);
+    assert(numbers[4] == 10);
+
+    // Apply the squareValue function to each element in the vector
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    applyFunction(numbers, squareValue);
+
+SUFFIX CODE:
+----------------------------------------
+    // Print the modified vector after squaring
+    std::cout << "Squared vector: ";
+    printVector(numbers);
+
+    // Assert that the vector values are squared
+    assert(numbers[0] == 4);
+    assert(numbers[1] == 16);
+    assert(numbers[2] == 36);
+    assert(numbers[3] == 64);
+    assert(numbers[4] == 100);
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example is a good test case for pattern matching in higher-order functions and analytics. It demonstrates the use of a higher-order function to apply different operations on a vector of integers, which is a common scenario in data processing and analytics. The clear pattern is established by the higher-order function `applyFunction` and the subsequent application of specific functions (`doubleValue` and `squareValue`) to transform the data. The golden completion requires the LLM to recognize and continue this pattern by applying another transformation function. The suffix contains assertions to verify that the transformations are correctly applied and the pattern is maintained.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Helper function to generate random numbers
+std::vector<int> generateRandomNumbers(size_t count) {
+    std::vector<int> numbers(count);
+    std::generate(numbers.begin(), numbers.end(), rand);
+    return numbers;
+}
+
+// Function to compute the sum of elements in a vector
+int computeSum(const std::vector<int>& numbers) {
+    int sum = 0;
+    for (int num : numbers) {
+        sum += num;
+    }
+    return sum;
+}
+
+// Higher-order function that applies a given function to each element of a vector
+std::vector<int> applyFunction(const std::vector<int>& numbers, int (*func)(int)) {
+    std::vector<int> result;
+    result.reserve(numbers.size());
+    for (int num : numbers) {
+        result.push_back(func(num));
+    }
+    return result;
+}
+
+// Example function to be used with applyFunction
+int square(int x) {
+    return x * x;
+}
+
+// Another example function to be used with applyFunction
+int increment(int x) {
+    return x + 1;
+}
+
+int main() {
+    // Generate a vector of random numbers
+    std::vector<int> numbers = generateRandomNumbers(10);
+    
+    // Apply the square function to each element of the vector
+    std::vector<int> squaredNumbers = applyFunction(numbers, square);
+    
+    // Apply the increment function to each element of the vector
+    std::vector<int> incrementedNumbers = applyFunction(numbers, increment);
+
+    // Compute the sum of the original numbers
+    int originalSum = computeSum(numbers);
+    // Compute the sum of the squared numbers
+    int squaredSum = computeSum(squaredNumbers);
+    // Compute the sum of the incremented numbers
+    int incrementedSum = computeSum(incrementedNumbers);
+
+    // Assertions to verify the correctness of the computations
+    assert(originalSum != squaredSum);
+    assert(originalSum != incrementedSum);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    assert(incrementedSum > originalSum);
+
+SUFFIX CODE:
+----------------------------------------
+    assert(squaredSum > originalSum);
+
+    // Clean up resources (if any)
+    // In this case, no dynamic memory allocation is used
+    // so no explicit cleanup is needed
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a pattern involving higher-order functions in the context of analytics. The prefix establishes a pattern of generating numbers, applying functions to each element of a vector, and computing the sum of the resulting vectors. The golden completion continues this pattern by adding an assertion that checks the sum of the incremented numbers. The suffix includes additional assertions and ensures that all resources are cleaned up properly. This scenario is realistic and tests the LLM's understanding of higher-order functions and analytics in C++.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <cassert>
+
+// Higher-order function that applies a function to each element in a vector
+void applyFunction(const std::vector<int>& vec, const std::function<void(int)>& func) {
+    for (int elem : vec) {
+        func(elem);
+    }
+}
+
+// Higher-order function that returns a function to filter elements
+std::function<bool(int)> createFilter(int threshold) {
+    return [threshold](int value) { return value > threshold; };
+}
+
+// Example higher-order function that returns a function to transform elements
+std::function<int(int)> createMultiplier(int factor) {
+    return [factor](int value) { return value * factor; };
+}
+
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5};
+
+    // Apply a lambda function to print each element
+    applyFunction(data, [](int value) {
+        std::cout << value << " ";
+    });
+    std::cout << std::endl;
+
+    // Create a filter function to filter elements greater than 3
+    std::function<bool(int)> filter = createFilter(3);
+
+    // Create a multiplier function to multiply elements by 2
+    std::function<int(int)> multiplier = createMultiplier(2);
+
+    // Apply the filter function
+    std::vector<int> filteredData;
+    for (int elem : data) {
+        if (filter(elem)) {
+            filteredData.push_back(elem);
+        }
+    }
+
+    // Apply the multiplier function to filtered data
+    std::vector<int> transformedData;
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    applyFunction(filteredData, [&](int value) {
+        transformedData.push_back(multiplier(value));
+    });
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Validate the transformed data
+    std::vector<int> expectedData = {8, 10};
+    assert(transformedData == expectedData);
+
+    // Print the transformed data
+    for (int value : transformedData) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of higher-order functions in C++ within the context of data transformation. The prefix establishes a clear pattern of using higher-order functions to create and apply filters and transformations to a dataset. The golden completion follows this pattern by applying the multiplier function to the filtered data, demonstrating the correct continuation of the established pattern. The suffix includes assertions to verify the correct transformation and prints the transformed data, ensuring the code's functionality and adherence to the pattern.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Logging function to demonstrate system operations
+void log(const std::string& message) {
+    std::cout << "LOG: " << message << std::endl;
+}
+
+// A higher-order function that applies a given function to each element of a vector
+void applyFunction(std::vector<int>& vec, void(*func)(int&)) {
+    for (int& x : vec) {
+        func(x);
+    }
+}
+
+// Example function to be applied to each element
+void increment(int& x) {
+    x += 1;
+}
+
+// Another example function to be applied to each element
+void square(int& x) {
+    x *= x;
+}
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+    log("Initial numbers:");
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    log("Incrementing numbers:");
+    applyFunction(numbers, increment);
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    log("Squaring numbers:");
+    applyFunction(numbers, square);
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    log("Doubling numbers:");
+    applyFunction(numbers, [](int& x) { x *= 2; });
+    for (int num : numbers) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Assertions to verify the correctness of the transformations
+    assert(numbers[0] == 8);  // 2 incremented to 3, squared to 9, doubled to 18
+    assert(numbers[1] == 18); // 3 incremented to 4, squared to 16, doubled to 32
+    assert(numbers[2] == 32); // 4 incremented to 5, squared to 25, doubled to 50
+    assert(numbers[3] == 50); // 5 incremented to 6, squared to 36, doubled to 72
+    assert(numbers[4] == 72); // 6 incremented to 7, squared to 49, doubled to 98
+
+    log("All assertions passed.");
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example is a good test case for pattern matching capabilities because it demonstrates the use of higher-order functions in a system operations context. The pattern of applying a function to each element of a vector is clearly established with the 'applyFunction' function and its usage with 'increment' and 'square' functions. The golden completion follows this pattern by introducing another transformation (doubling the numbers) and verifying the results with assertions. This tests the LLM's ability to recognize and continue the established pattern, ensuring consistency and correctness in the application of higher-order functions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// A class to represent a logging system
+class Logger {
+public:
+    Logger() {}
+    void log(const std::string &message) {
+        logs.push_back(message);
+    }
+    const std::vector<std::string>& getLogs() const {
+        return logs;
+    }
+private:
+    std::vector<std::string> logs;
+};
+
+// A higher-order function that takes another function and applies it to each log entry
+void applyToLogs(Logger &logger, void (*func)(std::string&)) {
+    std::vector<std::string> logs = logger.getLogs();
+    for(auto &log : logs) {
+        func(log);
+    }
+}
+
+// A function to convert log messages to uppercase
+void toUpperCase(std::string &str) {
+    std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+}
+
+// A function to add a timestamp prefix to log messages
+void addTimestamp(std::string &str) {
+    str = "[2023-10-01] " + str;
+}
+
+int main() {
+    Logger logger;
+    logger.log("System initialized.");
+    logger.log("User logged in.");
+    logger.log("Error: Invalid password.");
+
+    // Apply the toUpperCase function to each log entry
+    applyToLogs(logger, toUpperCase);
+
+    // Check if the logs were converted to uppercase
+    const std::vector<std::string>& logs = logger.getLogs();
+    assert(logs[0] == "SYSTEM INITIALIZED.");
+    assert(logs[1] == "USER LOGGED IN.");
+    assert(logs[2] == "ERROR: INVALID PASSWORD.");
+
+    // Apply the addTimestamp function to each log entry
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    applyToLogs(logger, addTimestamp);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    std::cout << "All assertions passed." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of higher-order functions applied to a logging system, which is a common scenario in system operations. The prefix establishes a clear pattern of applying a function to each log entry using the higher-order function `applyToLogs`. The golden completion continues this pattern by correctly applying another transformation function (`addTimestamp`) to the logs. The suffix includes assertions to verify that the pattern was followed correctly and that the log entries were transformed as expected. This scenario tests the model's ability to recognize and continue the pattern of applying functions to log entries.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// Function to validate email addresses
+bool validate_email(const std::string &email) {
+	// Simplistic email validation: check for presence of '@' and '.'
+	size_t at_pos = email.find('@');
+	size_t dot_pos = email.find('.');
+	return at_pos != std::string::npos && dot_pos != std::string::npos && at_pos < dot_pos;
+}
+
+// Function to validate phone numbers
+bool validate_phone(const std::string &phone) {
+	// Simplistic phone validation: check if all characters are digits and the length is 10
+	if (phone.length() != 10) return false;
+	for (char c : phone) {
+		if (!isdigit(c)) return false;
+	}
+	return true;
+}
+
+// Function to validate postal codes
+bool validate_postal_code(const std::string &postal_code) {
+	// Simplistic postal code validation: check if the length is 5 and all characters are digits
+	if (postal_code.length() != 5) return false;
+	for (char c : postal_code) {
+		if (!isdigit(c)) return false;
+	}
+	return true;
+}
+
+// Main validation function
+bool validate_data(const std::string &email, const std::string &phone, const std::string &postal_code) {
+	return validate_email(email) && validate_phone(phone) && 
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+	validate_postal_code(postal_code);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+int main() {
+	std::string email = "test@example.com";
+	std::string phone = "1234567890";
+	std::string postal_code = "12345";
+
+	assert(validate_data(email, phone, postal_code) == true);
+
+	std::string invalid_email = "testexample.com";
+	std::string invalid_phone = "12345abcde";
+	std::string invalid_postal_code = "1234a";
+
+	assert(validate_data(invalid_email, phone, postal_code) == false);
+	assert(validate_data(email, invalid_phone, postal_code) == false);
+	assert(validate_data(email, phone, invalid_postal_code) == false);
+
+	std::cout << "All assertions passed." << std::endl;
+	return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario involves data validation functions for emails, phone numbers, and postal codes, encapsulated in a higher-order function called validate_data. The pattern established is the validation of different data types using specific validation functions. The golden completion correctly follows this pattern by calling the validate_postal_code function within the validate_data function, ensuring all data types are validated. The suffix includes assertions that test various valid and invalid inputs, ensuring the implementation is correct and adheres to the pattern. This provides a robust test case for evaluating pattern recognition and completion capabilities in large language models.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// Algorithm Implementation for Network Protocols
+// This example demonstrates the implementation of a basic sliding window protocol for reliable data transfer.
+
+class SlidingWindowProtocol {
+public:
+    SlidingWindowProtocol(int windowSize) : windowSize(windowSize), nextSeqNum(0), base(0) {}
+
+    void sendPacket(int packet) {
+        if (nextSeqNum < base + windowSize) {
+            std::cout << "Sending packet: " << packet << std::endl;
+            buffer.push_back(packet);
+            nextSeqNum++;
+        } else {
+            std::cerr << "Window is full. Cannot send packet: " << packet << std::endl;
+        }
+    }
+
+    void receiveAck(int ackNum) {
+        if (ackNum >= base) {
+            std::cout << "Received ACK: " << ackNum << std::endl;
+            base = ackNum + 1;
+            buffer.erase(buffer.begin(), buffer.begin() + (ackNum - base + 1));
+        } else {
+            std::cerr << "Received duplicate ACK: " << ackNum << std::endl;
+        }
+    }
+
+    void printWindow() const {
+        std::cout << "Current Window: [";
+        for (int i = base; i < base + windowSize; ++i) {
+            if (i < nextSeqNum) {
+                std::cout << buffer[i - base] << " ";
+            } else {
+                std::cout << "_ ";
+            }
+        }
+        std::cout << "]\n";
+    }
+
+private:
+    int windowSize;
+    int nextSeqNum;
+    int base;
+    std::vector<int> buffer;
+};
+
+int main() {
+    SlidingWindowProtocol swp(4);
+    swp.sendPacket(1);
+    swp.sendPacket(2);
+    swp.sendPacket(3);
+    swp.sendPacket(4);
+    swp.printWindow();
+    swp.receiveAck(1);
+    swp.printWindow();
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    swp.sendPacket(5);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Assertions to verify correct behavior
+    assert(swp.sendPacket(6) == true);
+    swp.printWindow();
+    assert(swp.receiveAck(3) == true);
+    swp.printWindow();
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete the pattern of implementing a sliding window protocol for reliable data transfer in a network context. The pattern includes sending packets, receiving acknowledgments, and managing the window buffer. The golden completion continues the established sequence of sending a packet and updating the window state. The suffix includes assertions to verify the correctness of the implementation, ensuring the LLM follows the pattern accurately. This scenario is realistic for developers working on network protocols and demonstrates the use of C++ features such as classes, vectors, and standard I/O.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <functional>
+#include <cassert>
+
+// Utility function to print vector contents
+void printVector(const std::vector<int>& vec) {
+    for (int val : vec) {
+        std::cout << val << " ";
+    }
+    std::cout << std::endl;
+}
+
+// Function to apply a transformation to each element of a vector
+std::vector<int> transformVector(const std::vector<int>& vec, std::function<int(int)> func) {
+    std::vector<int> result;
+    result.reserve(vec.size());
+    std::transform(vec.begin(), vec.end(), std::back_inserter(result), func);
+    return result;
+}
+
+// Higher-order function to generate a lambda that adds a fixed number
+std::function<int(int)> addGenerator(int toAdd) {
+    return [toAdd](int x) { return x + toAdd; };
+}
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+    // Apply a transformation to add 5 to each element
+    std::vector<int> addedFive = transformVector(numbers, addGenerator(5));
+    printVector(addedFive);
+    assert(addedFive == std::vector<int>({6, 7, 8, 9, 10}));
+
+    // Apply a transformation to add 10 to each element
+    std::vector<int> addedTen = transformVector(numbers, addGenerator(10));
+    printVector(addedTen);
+    assert(addedTen == std::vector<int>({11, 12, 13, 14, 15}));
+
+    // Apply a transformation to add 20 to each element
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    std::vector<int> addedTwenty = transformVector(numbers, addGenerator(20));
+    printVector(addedTwenty);
+    assert(addedTwenty == std::vector<int>({21, 22, 23, 24, 25}));
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Clean up resources
+    numbers.clear();
+    addedFive.clear();
+    addedTen.clear();
+    addedTwenty.clear();
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to recognize and continue the pattern of using higher-order functions and lambdas in C++. The prefix establishes a clear pattern with multiple examples of using the transformVector function combined with addGenerator to create lambdas that add a fixed number to each element of a vector. The golden completion follows this pattern by generating a lambda that adds 20, while the suffix provides a different implementation of the same functionality using a direct lambda, ensuring that the code remains executable and all assertions pass.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function to calculate the sum of a vector
+int sum(const std::vector<int>& v) {
+    return std::accumulate(v.begin(), v.end(), 0);
+}
+
+// Function to calculate the product of a vector
+int product(const std::vector<int>& v) {
+    return std::accumulate(v.begin(), v.end(), 1, std::multiplies<int>());
+}
+
+// Higher-order function that applies a given function to each element in a vector
+std::vector<int> apply_function(const std::vector<int>& v, int (*func)(int)) {
+    std::vector<int> result;
+    result.reserve(v.size());
+    for (int x : v) {
+        result.push_back(func(x));
+    }
+    return result;
+}
+
+// Function to square an integer
+int square(int x) {
+    return x * x;
+}
+
+// Function to double an integer
+int double_value(int x) {
+    return x * 2;
+}
+
+// Analytics functions
+int sum_of_squares(const std::vector<int>& v) {
+    std::vector<int> squared = apply_function(v, square);
+    return sum(squared);
+}
+
+int sum_of_doubles(const std::vector<int>& v) {
+    std::vector<int> doubled = apply_function(v, double_value);
+    return sum(doubled);
+}
+
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+#include <numeric>
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5};
+
+    // Calculate sum of squares
+    int result1 = sum_of_squares(data);
+    assert(result1 == 55); // 1^2 + 2^2 + 3^2 + 4^2 + 5^2 = 55
+
+    // Calculate sum of doubles
+    int result2 = sum_of_doubles(data);
+    assert(result2 == 30); // (1*2) + (2*2) + (3*2) + (4*2) + (5*2) = 30
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue the pattern of higher-order functions being used to perform analytics operations on vectors. The prefix establishes a clear pattern of defining functions that transform vectors and then calculate sums of the transformed elements. The golden completion requires the LLM to introduce a similar function, `sum_of_cubes`, which fits naturally within the established pattern. The suffix contains assertions that verify the correctness of the implementation by ensuring the calculated sums match expected values. This scenario is realistic and demonstrates practical usage of higher-order functions in an analytics context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Higher-order function to apply a transformation to each element in a vector
+std::vector<int> transform(const std::vector<int>& input, int(*func)(int)) {
+    std::vector<int> output;
+    output.reserve(input.size());
+    for (const int& value : input) {
+        output.push_back(func(value));
+    }
+    return output;
+}
+
+// Sample transformation functions
+int square(int x) {
+    return x * x;
+}
+
+int increment(int x) {
+    return x + 1;
+}
+
+// Main function demonstrating the usage of the higher-order transform function
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5};
+
+    // Apply square transformation
+    std::vector<int> squared = transform(data, square);
+    for (const int& value : squared) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    // Apply increment transformation
+    std::vector<int> incremented = transform(data, increment);
+    for (const int& value : incremented) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    // Apply a custom transformation function
+    std::vector<int> customTransformed = transform(data, [](int x) { return x * 2; });
+    for (const int& value : customTransformed) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    // Assertions to verify the transformations
+    assert(squared == std::vector<int>({1, 4, 9, 16, 25}));
+    assert(incremented == std::vector<int>({2, 3, 4, 5, 6}));
+
+    // Custom transformation assertion of multiplication by 3
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    assert(customTransformed == std::vector<int>({2, 4, 6, 8, 10}));
+
+SUFFIX CODE:
+----------------------------------------
+    assert(customTransformed == std::vector<int>({2, 4, 6, 8, 10}));
+
+    // Further transformations to show the pattern
+    std::vector<int> doubled = transform(data, [](int x) { return x * 2; });
+    for (const int& value : doubled) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    assert(doubled == std::vector<int>({2, 4, 6, 8, 10}));
+
+    std::vector<int> halved = transform(data, [](int x) { return x / 2; });
+    for (const int& value : halved) {
+        std::cout << value << " ";
+    }
+    std::cout << std::endl;
+
+    assert(halved == std::vector<int>({0, 1, 1, 2, 2}));
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is ideal for evaluating an LLM's ability to recognize and complete a pattern involving higher-order functions in C++. The prefix establishes a clear pattern by defining a higher-order function `transform` and using it with different transformation functions. The golden completion extends this pattern by introducing a new transformation, ensuring the model understands how to apply and verify transformations. The suffix continues with additional transformations and assertions, demonstrating the correct pattern continuation and verifying the function's correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function to calculate the sum of squares using a higher-order function pattern
+int sum_of_squares(const std::vector<int>& numbers, std::function<int(int)> transform) {
+    int sum = 0;
+    for (int num : numbers) {
+        sum += transform(num);
+    }
+    return sum;
+}
+
+// Higher-order function to be used
+int square(int x) {
+    return x * x;
+}
+
+// Another higher-order function to be used
+int cube(int x) {
+    return x * x * x;
+}
+
+// Main function demonstrating the pattern
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+    
+    // Using sum_of_squares with the square function
+    int sum_squares = sum_of_squares(numbers, square);
+    std::cout << "Sum of squares: " << sum_squares << std::endl;
+    assert(sum_squares == 55);
+
+    // Using sum_of_squares with the cube function
+    int sum_cubes = sum_of_squares(numbers, cube);
+    std::cout << "Sum of cubes: " << sum_cubes << std::endl;
+    assert(sum_cubes == 225);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Using sum_of_squares with a lambda function for doubling
+    int sum_doubles = sum_of_squares(numbers, [](int x) { return x * 2; });
+    std::cout << "Sum of doubles: " << sum_doubles << std::endl;
+    assert(sum_doubles == 30);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a pattern involving higher-order functions in a C++ context. The prefix establishes the use of a higher-order function, `sum_of_squares`, which takes a vector of integers and a transformation function, and applies the transformation to each element. The pattern is clearly demonstrated with two examples using predefined functions `square` and `cube`. The golden completion follows this pattern by using an inline lambda function to compute the sum of fourth powers. The suffix contains a different but similar lambda function to ensure the pattern is continued correctly and includes assertions to validate the results. The example tests the LLM's capability to follow and extend higher-order function usage in a practical scenario.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <functional>
+#include <cassert>
+
+// Higher-order functions example in the context of game mechanics (AI decision making)
+
+// Define a type for AI decision functions
+using AIDecisionFunc = std::function<bool(int)>;
+
+// A class representing a simple AI entity
+class AIEntity {
+public:
+    AIEntity(int health) : health(health) {}
+
+    // Method to add a decision function
+    void addDecisionFunc(AIDecisionFunc func) {
+        decisionFuncs.push_back(func);
+    }
+
+    // Method to make a decision based on the functions added
+    bool makeDecision() {
+        for (const auto& func : decisionFuncs) {
+            if (func(health)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+private:
+    int health;
+    std::vector<AIDecisionFunc> decisionFuncs;
+};
+
+// Example decision functions
+bool lowHealthDecision(int health) {
+    return health < 30;
+}
+
+bool highHealthDecision(int health) {
+    return health > 70;
+}
+
+int main() {
+    AIEntity entity(25);
+    entity.addDecisionFunc(lowHealthDecision);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    entity.addDecisionFunc(highHealthDecision); // Add another decision function
+
+SUFFIX CODE:
+----------------------------------------
+    // Add another decision function
+    entity.addDecisionFunc([](int health) { return health == 25; });
+
+    // Make a decision and assert the result
+    assert(entity.makeDecision() == true);
+
+    // Change the health and test again
+    AIEntity entity2(75);
+    entity2.addDecisionFunc(lowHealthDecision);
+    entity2.addDecisionFunc(highHealthDecision);
+    assert(entity2.makeDecision() == true);
+
+    // Test with no matching decision functions
+    AIEntity entity3(50);
+    entity3.addDecisionFunc(lowHealthDecision);
+    entity3.addDecisionFunc(highHealthDecision);
+    assert(entity3.makeDecision() == false);
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern involving higher-order functions in the context of game mechanics (AI decision making). The prefix establishes a pattern of adding decision functions to an AI entity and then making decisions based on those functions. The golden completion follows this pattern by adding another decision function and asserting the result, ensuring consistency with the established pattern. The suffix continues testing with different scenarios, ensuring the pattern is maintained and all assertions pass.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function to generate a sequence of numbers
+std::vector<int> generateSequence(int start, int end) {
+	std::vector<int> sequence;
+	for(int i = start; i <= end; ++i) {
+		sequence.push_back(i);
+	}
+	return sequence;
+}
+
+// Function to apply a transformation to each element of a vector
+std::vector<int> transformSequence(const std::vector<int>& sequence, int (*transform)(int)) {
+	std::vector<int> transformed;
+	for(int num : sequence) {
+		transformed.push_back(transform(num));
+	}
+	return transformed;
+}
+
+// Example transformations
+int square(int x) {
+	return x * x;
+}
+
+int increment(int x) {
+	return x + 1;
+}
+
+// Function to print a sequence
+void printSequence(const std::vector<int>& sequence) {
+	for(int num : sequence) {
+		std::cout << num << " ";
+	}
+	std::cout << std::endl;
+}
+
+int main() {
+	std::vector<int> sequence = generateSequence(1, 5);
+	std::vector<int> squaredSequence = transformSequence(sequence, square);
+	std::vector<int> incrementedSequence = transformSequence(sequence, increment);
+	// Print the sequences
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+	printSequence(sequence);
+
+SUFFIX CODE:
+----------------------------------------
+
+	printSequence(squaredSequence);
+	printSequence(incrementedSequence);
+	// Assertions
+	assert((squaredSequence == std::vector<int>{1, 4, 9, 16, 25}));
+	assert((incrementedSequence == std::vector<int>{2, 3, 4, 5, 6}));
+	// Cleanup code if any
+	return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and continue a pattern of generating, transforming, and printing sequences. The pattern is established through the functions for generating a sequence, applying transformations, and printing the sequence. The golden completion should insert the missing step of printing the original sequence, while the suffix continues with printing transformed sequences and includes assertions to verify correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// A generic higher-order function that applies a given function to each element in the vector
+// and returns a new vector with the results.
+template <typename T, typename Func>
+std::vector<T> applyFunction(const std::vector<T>& vec, Func func) {
+    std::vector<T> result;
+    result.reserve(vec.size());
+    for (const auto& elem : vec) {
+        result.push_back(func(elem));
+    }
+    return result;
+}
+
+// Example functions to use with applyFunction
+int square(int x) {
+    return x * x;
+}
+
+int increment(int x) {
+    return x + 1;
+}
+
+int negate(int x) {
+    return -x;
+}
+
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+    // Apply the square function to each element in the vector
+    std::vector<int> squaredNumbers = applyFunction(numbers, square);
+    // Apply the increment function to each element in the vector
+    std::vector<int> incrementedNumbers = applyFunction(numbers, increment);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Apply the negate function to each element in the vector
+    std::vector<int> negatedNumbers = applyFunction(numbers, negate);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Assertions to verify the correctness of the operations
+    assert(squaredNumbers == std::vector<int>({1, 4, 9, 16, 25}));
+    assert(incrementedNumbers == std::vector<int>({2, 3, 4, 5, 6}));
+    assert(negatedNumbers == std::vector<int>({-1, -2, -3, -4, -5}));
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for testing pattern matching in higher-order functions within the context of analytics. The prefix establishes a clear pattern of applying different functions to a vector of integers using a higher-order function template. The golden completion follows this pattern by applying another function (negate) to the same vector. The suffix includes assertions that verify the correctness of the operations, ensuring that the pattern is correctly identified and followed.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function to filter even numbers from a vector and apply a transformation
+std::vector<int> filterAndTransform(const std::vector<int>& input, std::function<int(int)> transform) {
+    std::vector<int> result;
+    for (int num : input) {
+        if (num % 2 == 0) {
+            result.push_back(transform(num));
+        }
+    }
+    return result;
+}
+
+// Helper function to double a number
+int doubleNumber(int x) {
+    return x * 2;
+}
+
+// Another helper function to triple a number
+int tripleNumber(int x) {
+    return x * 3;
+}
+
+// Main function to test the pattern
+int main() {
+    std::vector<int> numbers = {1, 2, 3, 4, 5, 6};
+
+    // Applying the doubleNumber transformation
+    std::vector<int> doubled = filterAndTransform(numbers, doubleNumber);
+    for (int num : doubled) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    // Assertions to verify the pattern
+    assert((doubled == std::vector<int>{4, 8, 12}));
+
+    // Applying the tripleNumber transformation
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    std::vector<int> tripled = filterAndTransform(numbers, tripleNumber);
+    for (int num : tripled) {
+        std::cout << num << " ";
+    }
+    std::cout << std::endl;
+
+    // Assertions to verify the pattern
+    assert((tripled == std::vector<int>{6, 12, 18}));
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to recognize and complete a pattern involving higher-order functions and algorithm implementation in C++. The pattern established is the use of a function to filter and transform elements of a vector based on a given transformation function. The golden completion demonstrates continuing this pattern with a new transformation function, and the suffix includes assertions to verify the correct behavior. This tests the model's understanding of higher-order functions, proper use of STL algorithms, and pattern recognition in function usage.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+// Template metaprogramming for a simple fixed-size array
+// Demonstrating the pattern of a fixed-size array with a custom allocator
+
+// Custom allocator for our fixed-size array
+template <typename T, size_t N>
+class FixedSizeAllocator {
+public:
+    FixedSizeAllocator() {
+        data_ = new T[N];
+    }
+    ~FixedSizeAllocator() {
+        delete[] data_;
+    }
+    T* allocate(size_t n) {
+        if (n > N) throw std::bad_alloc();
+        return data_;
+    }
+    void deallocate(T* p, size_t n) {}
+private:
+    T* data_;
+};
+
+// Fixed-size array implementation
+template <typename T, size_t N, typename Allocator = FixedSizeAllocator<T, N>>
+class FixedSizeArray {
+public:
+    FixedSizeArray() : size_(0), allocator_() {
+        data_ = allocator_.allocate(N);
+    }
+    ~FixedSizeArray() {
+        allocator_.deallocate(data_, N);
+    }
+    void push_back(const T& value) {
+        if (size_ >= N) throw std::out_of_range("Array is full");
+        data_[size_++] = value;
+    }
+    T& operator[](size_t index) {
+        if (index >= size_) throw std::out_of_range("Index out of range");
+        return data_[index];
+    }
+    const T& operator[](size_t index) const {
+        if (index >= size_) throw std::out_of_range("Index out of range");
+        return data_[index];
+    }
+    size_t size() const { return size_; }
+private:
+    T* data_;
+    size_t size_;
+    Allocator allocator_;
+};
+
+int main() {
+    FixedSizeArray<int, 5> array;
+    array.push_back(1);
+    array.push_back(2);
+    array.push_back(3);
+    array.push_back(4);
+    // The pattern of using push_back to add elements to the array
+    // The pattern of accessing elements using operator[]
+    assert(array.size() == 4);
+    assert(array[0] == 1);
+    assert(array[1] == 2);
+    assert(array[2] == 3);
+    assert(array[3] == 4);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Ensure that accessing an out-of-bounds index throws an exception
+    try {
+        int value = array[5];
+        assert(false); // This should not be reached
+    } catch (const std::out_of_range& e) {
+        assert(true); // Exception should be thrown
+    }
+
+SUFFIX CODE:
+----------------------------------------
+
+    // Ensure that adding another element throws an exception
+    try {
+        array.push_back(6);
+        assert(false); // This should not be reached
+    } catch (const std::out_of_range& e) {
+        assert(true); // Exception should be thrown
+    }
+    // Clean up (though in this case, cleanup is automatic)
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a pattern related to template metaprogramming and fixed-size array management. The pattern involves using a custom allocator with a fixed-size array template, pushing back elements, and accessing them via operator[]. The golden completion should continue the pattern of pushing back elements and asserting their values. The suffix then includes additional pattern usage and ensures exception handling is tested, verifying the robustness of the implementation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function to calculate the sum of elements in a vector
+int sum(const std::vector<int>& vec) {
+    return std::accumulate(vec.begin(), vec.end(), 0);
+}
+
+// Function to calculate the product of elements in a vector
+int product(const std::vector<int>& vec) {
+    return std::accumulate(vec.begin(), vec.end(), 1, std::multiplies<int>());
+}
+
+// Function to calculate the maximum element in a vector
+int max_element(const std::vector<int>& vec) {
+    return *std::max_element(vec.begin(), vec.end());
+}
+
+// Function to calculate the minimum element in a vector
+int min_element(const std::vector<int>& vec) {
+    return *std::min_element(vec.begin(), vec.end());
+}
+
+// Function to calculate the average of elements in a vector
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+double average(const std::vector<int>& vec) {
+    return static_cast<double>(sum(vec)) / vec.size();
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5};
+
+    // Test the sum function
+    assert(sum(data) == 15);
+
+    // Test the product function
+    assert(product(data) == 120);
+
+    // Test the maximum element function
+    assert(max_element(data) == 5);
+
+    // Test the minimum element function
+    assert(min_element(data) == 1);
+
+    // Test the average function
+    assert(average(data) == 3.0);
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to assess the model's ability to recognize and complete a pattern involving the implementation of simple mathematical operations on vectors using C++ STL algorithms. The prefix establishes a clear pattern with functions calculating sum, product, maximum, and minimum elements of a vector. The golden completion should implement a similar function to calculate the average of elements in a vector, maintaining consistency with the existing pattern. The suffix includes assertions to verify the correctness of all functions, ensuring the model follows the established pattern and best practices.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// This class defines a simple AI state machine for a game character
+class GameCharacter {
+public:
+    enum class State { IDLE, WALKING, RUNNING, JUMPING };
+
+    GameCharacter() : current_state(State::IDLE) {}
+
+    void setState(State state) {
+        current_state = state;
+    }
+
+    State getState() const {
+        return current_state;
+    }
+
+private:
+    State current_state;
+};
+
+// Higher-order function to apply a state change to a vector of game characters
+void applyStateChange(std::vector<GameCharacter>& characters, void (*stateChangeFunc)(GameCharacter&)) {
+    for (auto& character : characters) {
+        stateChangeFunc(character);
+    }
+}
+
+// Example state change functions
+void makeIdle(GameCharacter& character) {
+    character.setState(GameCharacter::State::IDLE);
+}
+
+void makeWalking(GameCharacter& character) {
+    character.setState(GameCharacter::State::WALKING);
+}
+
+void makeRunning(GameCharacter& character) {
+    character.setState(GameCharacter::State::RUNNING);
+}
+
+int main() {
+    std::vector<GameCharacter> characters(3);
+
+    // Apply the 'makeWalking' state change to all characters
+    applyStateChange(characters, makeWalking);
+    for (const auto& character : characters) {
+        assert(character.getState() == GameCharacter::State::WALKING);
+    }
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Apply the 'makeIdle' state change to all characters
+    applyStateChange(characters, makeIdle);
+    for (const auto& character : characters) {
+        assert(character.getState() == GameCharacter::State::IDLE);
+    }
+
+SUFFIX CODE:
+----------------------------------------
+
+    // Apply the 'makeRunning' state change to all characters
+    applyStateChange(characters, [](GameCharacter& character) { character.setState(GameCharacter::State::RUNNING); });
+    for (const auto& character : characters) {
+        assert(character.getState() == GameCharacter::State::RUNNING);
+    }
+
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and continue the pattern of applying state changes to a collection of game characters using higher-order functions. The prefix establishes the pattern with multiple examples, and the golden completion should correctly follow this pattern to ensure consistency. The suffix contains assertions that validate the correctness of the state changes applied to the characters, making it a robust test case.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+
+// Class representing a message
+class Message {
+public:
+    std::string sender;
+    std::string recipient;
+    std::string content;
+
+    Message(const std::string& sender, const std::string& recipient, const std::string& content)
+        : sender(sender), recipient(recipient), content(content) {}
+};
+
+// Class representing a message queue
+class MessageQueue {
+private:
+    std::vector<Message> queue;
+public:
+    void addMessage(const Message& msg) {
+        queue.push_back(msg);
+    }
+
+    Message getMessage() {
+        if (queue.empty()) {
+            throw std::out_of_range("No messages in queue");
+        }
+        Message msg = queue.front();
+        queue.erase(queue.begin());
+        return msg;
+    }
+
+    bool isEmpty() const {
+        return queue.empty();
+    }
+};
+
+// Function to simulate sending messages
+void simulateSendingMessages(MessageQueue& mq) {
+    mq.addMessage(Message("Alice", "Bob", "Hello Bob!"));
+    mq.addMessage(Message("Bob", "Alice", "Hi Alice!"));
+    mq.addMessage(Message("Alice", "Bob", "How are you?"));
+}
+
+// Function to simulate receiving messages
+void simulateReceivingMessages(MessageQueue& mq) {
+    while (!mq.isEmpty()) {
+        Message msg = mq.getMessage();
+        std::cout << "Message from " << msg.sender << " to " << msg.recipient << ": " << msg.content << std::endl;
+    }
+}
+
+int main() {
+    MessageQueue mq;
+    simulateSendingMessages(mq);
+    // Simulate receiving messages
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    simulateReceivingMessages(mq);
+
+SUFFIX CODE:
+----------------------------------------
+    try {
+        while (true) {
+            Message msg = mq.getMessage();
+            std::cout << "Message from " << msg.sender << " to " << msg.recipient << ": " << msg.content << std::endl;
+        }
+    } catch (const std::out_of_range&) {
+        std::cout << "No more messages." << std::endl;
+    }
+
+    // Assertions
+    assert(mq.isEmpty());
+
+    MessageQueue mq2;
+    simulateSendingMessages(mq2);
+    assert(!mq2.isEmpty());
+    Message msg1 = mq2.getMessage();
+    assert(msg1.sender == "Alice");
+    assert(msg1.recipient == "Bob");
+    assert(msg1.content == "Hello Bob!");
+
+    Message msg2 = mq2.getMessage();
+    assert(msg2.sender == "Bob");
+    assert(msg2.recipient == "Alice");
+    assert(msg2.content == "Hi Alice!");
+
+    Message msg3 = mq2.getMessage();
+    assert(msg3.sender == "Alice");
+    assert(msg3.recipient == "Bob");
+    assert(msg3.content == "How are you?");
+
+    assert(mq2.isEmpty());
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and continue a pattern involving message queue operations in the context of network protocols. The prefix establishes a clear pattern of sending and receiving messages using a MessageQueue class. The golden completion requires the LLM to recognize this pattern and call the appropriate function to simulate receiving messages. The suffix then includes robust assertions to verify the pattern adherence and functionality, ensuring the message queue is correctly manipulated and the messages are accurately processed.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// This is a simple game AI state machine
+// The AI can be in one of several states: Idle, Patrol, Attack
+// Each state has a unique behavior
+
+enum class AIState {
+    Idle,
+    Patrol,
+    Attack
+};
+
+class AI {
+public:
+    AI() : state(AIState::Idle) {}
+
+    void update() {
+        switch (state) {
+            case AIState::Idle:
+                idleBehavior();
+                break;
+            case AIState::Patrol:
+                patrolBehavior();
+                break;
+            case AIState::Attack:
+                attackBehavior();
+                break;
+        }
+    }
+
+    void setState(AIState newState) {
+        state = newState;
+    }
+
+private:
+    AIState state;
+
+    void idleBehavior() {
+        std::cout << "AI is idling..." << std::endl;
+    }
+
+    void patrolBehavior() {
+        std::cout << "AI is patrolling..." << std::endl;
+    }
+
+    void attackBehavior() {
+        std::cout << "AI is attacking!" << std::endl;
+    }
+};
+
+void testAI() {
+    AI ai;
+    ai.setState(AIState::Idle);
+    ai.update();
+    ai.setState(AIState::Patrol);
+    ai.update();
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    ai.setState(AIState::Attack);
+    ai.update();
+
+SUFFIX CODE:
+----------------------------------------
+
+    // Assertions to verify correct state behavior
+    assert(true); // We would normally check output or state here
+}
+
+int main() {
+    testAI();
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize a pattern in a state machine implementation in a game AI context. The pattern involves setting the AI state and calling the update method, which triggers different behaviors based on the state. The golden completion follows the established pattern of setting a state and updating the AI. Assertions in the suffix verify the correct sequence of state changes and behaviors.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <functional>
+#include <cassert>
+
+// Higher-order function to apply an operation multiple times
+std::function<int(int)> create_multiplier(int factor) {
+    return [factor](int value) {
+        return value * factor;
+    };
+}
+
+// Higher-order function to apply a transformation to each element in an array
+std::function<void(int*, int, std::function<int(int)>)> apply_transformation = [](int* array, int size, std::function<int(int)> transformation) {
+    for (int i = 0; i < size; ++i) {
+        array[i] = transformation(array[i]);
+    }
+};
+
+// Function to print an array
+void print_array(int* array, int size) {
+    for (int i = 0; i < size; ++i) {
+        std::cout << array[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    int data[5] = {1, 2, 3, 4, 5};
+
+    // Create a multiplier function
+    std::function<int(int)> multiply_by_2 = create_multiplier(2);
+
+    // Apply the transformation to the array
+    apply_transformation(data, 5, multiply_by_2);
+
+    // Print the transformed array
+    print_array(data, 5);
+
+    // Assert the transformed values
+    assert(data[0] == 2);
+    assert(data[1] == 4);
+    assert(data[2] == 6);
+    assert(data[3] == 8);
+    assert(data[4] == 10);
+
+    // Create another multiplier function
+    std::function<int(int)> multiply_by_3 = create_multiplier(3);
+
+    // Apply the transformation to the array
+    apply_transformation(data, 5, multiply_by_3);
+
+    // Print the transformed array
+    print_array(data, 5);
+
+    // Assert the transformed values
+    assert(data[0] == 6);
+    assert(data[1] == 12);
+    assert(data[2] == 18);
+    assert(data[3] == 24);
+    assert(data[4] == 30);
+
+    // Reset the array to original values
+    int original_data[5] = {1, 2, 3, 4, 5};
+    for (int i = 0; i < 5; ++i) {
+        data[i] = original_data[i];
+    }
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Create a multiplier function with factor 4
+
+SUFFIX CODE:
+----------------------------------------
+    // Create a multiplier function with factor 4
+    std::function<int(int)> multiply_by_4 = create_multiplier(4);
+
+    // Apply the transformation to the array
+    apply_transformation(data, 5, multiply_by_4);
+
+    // Print the transformed array
+    print_array(data, 5);
+
+    // Assert the transformed values
+    assert(data[0] == 4);
+    assert(data[1] == 8);
+    assert(data[2] == 12);
+    assert(data[3] == 16);
+    assert(data[4] == 20);
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case establishes a clear pattern of using higher-order functions to create multipliers and apply transformations to an array. The pattern is demonstrated by creating different multiplier functions and applying them to the array, followed by assertions to verify the results. The golden completion follows the established pattern by creating another multiplier function and applying it to the array. This tests the LLM's ability to recognize and continue the pattern correctly. The suffix contains different transformation values and ensures that assertions verify the expected results. The pattern is specific enough that random code wouldn't work, making it a good test case for pattern matching.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// A class representing a simple 2D point
+class Point {
+public:
+    int x, y;
+    Point(int x, int y) : x(x), y(y) {}
+};
+
+// A utility function to print a vector of points
+void printPoints(const std::vector<Point>& points) {
+    for (const auto& point : points) {
+        std::cout << '(' << point.x << ", " << point.y << ")\n";
+    }
+}
+
+// A higher-order function to sort points based on a custom comparator
+std::vector<Point> sortPoints(const std::vector<Point>& points, std::function<bool(const Point&, const Point&)> comparator) {
+    std::vector<Point> sortedPoints = points;
+    std::sort(sortedPoints.begin(), sortedPoints.end(), comparator);
+    return sortedPoints;
+}
+
+// Example usage
+int main() {
+    std::vector<Point> points = { {3, 4}, {1, 2}, {5, 1}, {4, 3} };
+
+    // Sort points by x-coordinate
+    auto sortedByX = sortPoints(points, [](const Point& a, const Point& b) {
+        return a.x < b.x;
+    });
+    printPoints(sortedByX);
+
+    // Sort points by y-coordinate
+    auto sortedByY = sortPoints(points, [](const Point& a, const Point& b) {
+        return a.y < b.y;
+    });
+    printPoints(sortedByY);
+
+    // Sort points by the sum of coordinates
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    auto sortedBySum = sortPoints(points, [](const Point& a, const Point& b) {
+        return (a.x + a.y) < (b.x + b.y);
+    });
+
+SUFFIX CODE:
+----------------------------------------
+
+    assert(sortedBySum[0].x == 1 && sortedBySum[0].y == 2);
+    assert(sortedBySum[1].x == 5 && sortedBySum[1].y == 1);
+    assert(sortedBySum[2].x == 3 && sortedBySum[2].y == 4);
+    assert(sortedBySum[3].x == 4 && sortedBySum[3].y == 3);
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate an LLM's ability to recognize and continue a pattern involving higher-order functions and custom sorting. The prefix establishes a clear pattern of sorting a vector of Points based on different criteria using lambda functions. The golden completion follows this pattern by introducing a new sorting criterion based on the sum of the coordinates. The suffix then continues by adding assertions to verify the correctness of the sorting operation. This scenario is realistic and common in C++ programming, where sorting based on custom criteria is frequently needed.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Utility function to calculate the average of a vector of numbers
+float calculate_average(const std::vector<int>& numbers) {
+    int sum = 0;
+    for (int num : numbers) {
+        sum += num;
+    }
+    return static_cast<float>(sum) / numbers.size();
+}
+
+// Higher-order function to apply a provided function to each element of a vector
+std::vector<float> apply_to_each(const std::vector<int>& numbers, float (*func)(const std::vector<int>&)) {
+    std::vector<float> results;
+    for (const int& num : numbers) {
+        results.push_back(func(std::vector<int>{num}));
+    }
+    return results;
+}
+
+// Function to find the maximum value in a vector
+int find_max(const std::vector<int>& numbers) {
+    return *std::max_element(numbers.begin(), numbers.end());
+}
+
+// Function to find the minimum value in a vector
+int find_min(const std::vector<int>& numbers) {
+    return *std::min_element(numbers.begin(), numbers.end());
+}
+
+// Higher-order function to apply a provided function to each element of a vector and calculate differences
+std::vector<int> apply_and_calculate_difference(const std::vector<int>& numbers, int (*func)(const std::vector<int>&)) {
+    std::vector<int> differences;
+    for (const int& num : numbers) {
+        differences.push_back(num - func(numbers));
+    }
+    return differences;
+}
+
+int main() {
+    std::vector<int> data = {10, 20, 30, 40, 50};
+    
+    // Applying calculate_average function to each element of the vector
+    std::vector<float> averages = apply_to_each(data, calculate_average);
+    for (const auto& avg : averages) {
+        std::cout << "Average: " << avg << std::endl;
+    }
+
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Applying find_max function to each element of the vector and calculating differences
+
+SUFFIX CODE:
+----------------------------------------
+    // Applying find_min function to each element of the vector and calculating differences
+    std::vector<int> min_differences = apply_and_calculate_difference(data, find_min);
+    for (const auto& diff : min_differences) {
+        std::cout << "Min Difference: " << diff << std::endl;
+    }
+
+    assert(min_differences.size() == data.size());
+    assert(min_differences[0] == data[0] - 10);
+    assert(min_differences[1] == data[1] - 10);
+    assert(min_differences[2] == data[2] - 10);
+    assert(min_differences[3] == data[3] - 10);
+    assert(min_differences[4] == data[4] - 10);
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the use of higher-order functions in C++ and the pattern of applying a function to each element of a vector and calculating differences. The prefix establishes the pattern with multiple examples of higher-order function usage. The golden completion follows the established pattern by applying a different function (find_max) to each element of the vector and calculating differences, which is consistent with the prior pattern. The suffix continues the pattern with another function (find_min) and includes assertions to verify correct behavior.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cassert>
+
+// Function to simulate a network request
+std::string makeNetworkRequest(const std::string& endpoint) {
+    // Mocked network request response
+    if (endpoint == "/data") {
+        return "{\"value\": 42}";
+    }
+    return "{}";
+}
+
+// Higher-order function to process network request
+std::string processRequest(const std::string& endpoint, const std::function<std::string(const std::string&)>& handler) {
+    std::string response = makeNetworkRequest(endpoint);
+    return handler(response);
+}
+
+// Function to extract a value from JSON response (mocked)
+std::string extractValue(const std::string& jsonResponse) {
+    if (jsonResponse == "{\"value\": 42}") {
+        return "42";
+    }
+    return "0";
+}
+
+// Function to log a message
+void logMessage(const std::string& message) {
+    std::cout << "Log: " << message << std::endl;
+}
+
+// Higher-order function pattern usage
+void fetchDataAndLog() {
+    std::string endpoint = "/data";
+    std::string value = processRequest(endpoint, extractValue);
+    logMessage("Fetched value: " + value);
+}
+
+int main() {
+    fetchDataAndLog();
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    std::string expected = "42";
+    std::string actual = processRequest("/data", extractValue);
+    assert(actual == expected);
+
+SUFFIX CODE:
+----------------------------------------
+    // Assertion to check if the value fetched is correct
+    std::string expected = "42";
+    std::string actual = processRequest("/data", extractValue);
+    assert(actual == expected);
+
+    // Additional request to ensure pattern consistency
+    std::string anotherValue = processRequest("/invalid", extractValue);
+    assert(anotherValue == "0");
+
+    // Ensure the log message is correct (mocked)
+    fetchDataAndLog(); // This should print "Fetched value: 42"
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a higher-order function pattern in a network request context. The prefix establishes the pattern by defining functions for making network requests, processing the responses, and using higher-order functions to handle responses. The golden completion continues this pattern by demonstrating the usage of these functions to fetch and log data. The suffix includes assertions to verify the correctness of the function outputs and ensures the higher-order function pattern is correctly implemented.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// Template metaprogramming example
+// Function to compute factorial at compile time
+constexpr int factorial(int n) {
+    return (n <= 1) ? 1 : (n * factorial(n - 1));
+}
+
+// Template metaprogramming to compute Fibonacci numbers at compile time
+template <int N>
+struct Fibonacci {
+    static constexpr int value = Fibonacci<N - 1>::value + Fibonacci<N - 2>::value;
+};
+
+template <>
+struct Fibonacci<0> {
+    static constexpr int value = 0;
+};
+
+template <>
+struct Fibonacci<1> {
+    static constexpr int value = 1;
+};
+
+// Template metaprogramming to compute power of a number at compile time
+template <int Base, int Exponent>
+struct Power {
+    static constexpr int value = Base * Power<Base, Exponent - 1>::value;
+};
+
+template <int Base>
+struct Power<Base, 0> {
+    static constexpr int value = 1;
+};
+
+int main() {
+    // Compile-time factorial
+    constexpr int fact5 = factorial(5);
+    assert(fact5 == 120);
+
+    // Compile-time Fibonacci
+    constexpr int fib10 = Fibonacci<10>::value;
+    assert(fib10 == 55);
+
+    // Compile-time power
+    constexpr int power3_4 = Power<3, 4>::value;
+    assert(power3_4 == 81);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Using the factorial function for another number
+
+SUFFIX CODE:
+----------------------------------------
+    // Using the factorial function for another number
+    constexpr int fact6 = factorial(6);
+    assert(fact6 == 720);
+
+    // Using the Fibonacci template for another number
+    constexpr int fib15 = Fibonacci<15>::value;
+    assert(fib15 == 610);
+
+    // Using the power template for another number
+    constexpr int power2_10 = Power<2, 10>::value;
+    assert(power2_10 == 1024);
+
+    std::cout << "All static assertions passed successfully." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates template metaprogramming in C++ within the context of compile-time computations for factorial, Fibonacci numbers, and power of a number. The prefix establishes a clear pattern of using template metaprogramming to compute values at compile-time. The golden completion follows this pattern by adding further compile-time computations and corresponding assertions. This tests the model's ability to recognize and complete the pattern accurately, ensuring that it can handle complex template metaprogramming scenarios. The suffix continues the pattern with different values and includes robust assertions to validate the results.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// This function calculates the average of a vector of integers
+float calculateAverage(const std::vector<int>& numbers) {
+    if (numbers.empty()) {
+        throw std::invalid_argument("The vector is empty");
+    }
+    int sum = std::accumulate(numbers.begin(), numbers.end(), 0);
+    return static_cast<float>(sum) / numbers.size();
+}
+
+// This function finds the maximum element in a vector of integers
+int findMax(const std::vector<int>& numbers) {
+    if (numbers.empty()) {
+        throw std::invalid_argument("The vector is empty");
+    }
+    return *std::max_element(numbers.begin(), numbers.end());
+}
+
+// This function finds the minimum element in a vector of integers
+int findMin(const std::vector<int>& numbers) {
+    if (numbers.empty()) {
+        throw std::invalid_argument("The vector is empty");
+    }
+    return *std::min_element(numbers.begin(), numbers.end());
+}
+
+// This function calculates the median of a vector of integers
+float calculateMedian(std::vector<int> numbers) {
+    if (numbers.empty()) {
+        throw std::invalid_argument("The vector is empty");
+    }
+    std::sort(numbers.begin(), numbers.end());
+    size_t size = numbers.size();
+    if (size % 2 == 0) {
+        return (numbers[size / 2 - 1] + numbers[size / 2]) / 2.0;
+    } else {
+        return numbers[size / 2];
+    }
+}
+
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+
+    // Calculating average
+    float avg = calculateAverage(data);
+    std::cout << "Average: " << avg << std::endl;
+    assert(avg == 5.5);
+
+    // Finding maximum
+    int max = findMax(data);
+    std::cout << "Max: " << max << std::endl;
+    assert(max == 10);
+
+    // Finding minimum
+    int min = findMin(data);
+    std::cout << "Min: " << min << std::endl;
+    assert(min == 1);
+
+    // Calculating median
+    float median = calculateMedian(data);
+    std::cout << "Median: " << median << std::endl;
+    assert(median == 5.5);
+
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    #include <numeric>
+    #include <cmath>
+
+SUFFIX CODE:
+----------------------------------------
+    // Calculating standard deviation
+    float sum = 0;
+    for (int num : data) {
+        sum += (num - avg) * (num - avg);
+    }
+    float stddev = std::sqrt(sum / data.size());
+    std::cout << "Standard Deviation: " << stddev << std::endl;
+    assert(stddev == std::sqrt(8.25));
+
+    // Cleanup code
+    data.clear();
+    std::cout << "Data vector size after cleanup: " << data.size() << std::endl;
+    assert(data.empty());
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to assess the LLM's ability to recognize and continue a pattern of statistical calculations (average, max, min, median) on a vector of integers. The pattern is established through multiple functions that each perform a specific statistical operation, and the golden completion involves continuing this pattern by calculating the variance. The assertions verify the correctness of each statistical calculation and ensure proper functionality. This is a realistic scenario that involves algorithm implementation and analytics, commonly encountered by developers.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <cassert>
+
+// A template function that applies a given function to each element of a vector and accumulates the result
+// This pattern demonstrates the use of higher-order functions in the context of analytics
+
+// Function to compute the sum of elements in a vector
+int sum(const std::vector<int>& data) {
+    int result = 0;
+    for (int value : data) {
+        result += value;
+    }
+    return result;
+}
+
+// Function to compute the product of elements in a vector
+int product(const std::vector<int>& data) {
+    int result = 1;
+    for (int value : data) {
+        result *= value;
+    }
+    return result;
+}
+
+// Template function that applies a higher-order function to each element
+// of a vector and returns the accumulated result
+template <typename T, typename Func>
+T accumulate(const std::vector<T>& data, Func func, T init) {
+    T result = init;
+    for (const T& value : data) {
+        result = func(result, value);
+    }
+    return result;
+}
+
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5};
+
+    // Using the sum function as a higher-order function
+    int total_sum = accumulate(data, [](int a, int b) { return a + b; }, 0);
+    assert(total_sum == 15);
+
+    // Using the product function as a higher-order function
+    int total_product = accumulate(data, [](int a, int b) { return a * b; }, 1);
+    assert(total_product == 120);
+
+    // Applying another higher-order function to find the maximum element
+    int max_value = accumulate(data, [](int a, int b) { return a > b ? a : b; }, data[0]);
+    assert(max_value == 5);
+
+    // Applying another higher-order function to find the minimum element
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    int min_value = accumulate(data, [](int a, int b) { return a < b ? a : b; }, data[0]);
+    assert(min_value == 1);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Cleanup code (if any) would go here
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example is a good test case because it demonstrates the use of higher-order functions in the context of analytics. The prefix establishes a clear pattern of using a template function to apply various higher-order functions (sum, product, max, min) to a vector of integers. The golden completion follows the established pattern by providing an appropriate lambda function to find the minimum value in the vector. The suffix continues the pattern and includes assertions that validate the correctness of the implementation. This tests the LLM's ability to recognize and continue the higher-order function pattern accurately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <string>
+#include <vector>
+#include <cassert>
+#include <algorithm>
+
+// A class to represent a simple metric
+class Metric {
+public:
+    Metric(const std::string& name, double value) : name_(name), value_(value) {}
+
+    const std::string& getName() const { return name_; }
+    double getValue() const { return value_; }
+
+private:
+    std::string name_;
+    double value_;
+};
+
+// A class to represent a collection of metrics
+class MetricCollection {
+public:
+    void addMetric(const Metric& metric) {
+        metrics_.push_back(metric);
+    }
+
+    std::vector<Metric> getMetrics() const { return metrics_; }
+
+    // A higher-order function to apply a transformation to all metrics and return a new collection
+    MetricCollection transformMetrics(std::function<Metric(const Metric&)> transformer) const {
+        MetricCollection newCollection;
+        for (const auto& metric : metrics_) {
+            newCollection.addMetric(transformer(metric));
+        }
+        return newCollection;
+    }
+
+private:
+    std::vector<Metric> metrics_;
+};
+
+// A function to create a sample collection of metrics
+MetricCollection createSampleMetrics() {
+    MetricCollection collection;
+    collection.addMetric(Metric("CPU Usage", 75.5));
+    collection.addMetric(Metric("Memory Usage", 60.3));
+    collection.addMetric(Metric("Disk Usage", 80.1));
+    return collection;
+}
+
+int main() {
+    MetricCollection collection = createSampleMetrics();
+
+    // Transform metrics by scaling their values by a factor of 2
+    MetricCollection scaledCollection = collection.transformMetrics([](const Metric& metric) { return Metric(metric.getName(), metric.getValue() * 2); });
+
+    // Verify that the transformation is correct
+    std::vector<Metric> scaledMetrics = scaledCollection.getMetrics();
+    assert(scaledMetrics.size() == 3);
+    assert(scaledMetrics[0].getName() == "CPU Usage");
+    assert(scaledMetrics[0].getValue() == 151.0);
+    assert(scaledMetrics[1].getName() == "Memory Usage");
+    assert(scaledMetrics[1].getValue() == 120.6);
+    assert(scaledMetrics[2].getName() == "Disk Usage");
+    assert(scaledMetrics[2].getValue() == 160.2);
+
+    // Transform metrics by converting their names to uppercase
+    MetricCollection uppercaseCollection = collection.transformMetrics([](const Metric& metric) {
+        std::string upperName = metric.getName();
+        std::transform(upperName.begin(), upperName.end(), upperName.begin(), ::toupper);
+        return Metric(upperName, metric.getValue());
+    });
+
+    // Verify that the transformation is correct
+    std::vector<Metric> uppercaseMetrics = uppercaseCollection.getMetrics();
+    assert(uppercaseMetrics.size() == 3);
+    assert(uppercaseMetrics[0].getName() == "CPU USAGE");
+    assert(uppercaseMetrics[0].getValue() == 75.5);
+    assert(uppercaseMetrics[1].getName() == "MEMORY USAGE");
+    assert(uppercaseMetrics[1].getValue() == 60.3);
+    assert(uppercaseMetrics[2].getName() == "DISK USAGE");
+    assert(uppercaseMetrics[2].getValue() == 80.1);
+
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Transform metrics by filtering out those with values less than 70
+    MetricCollection filteredCollection = collection.transformMetrics([](const Metric& metric) {
+        return metric.getValue() >= 70 ? metric : Metric("", 0);
+    });
+
+    // Verify that the transformation is correct
+    std::vector<Metric> filteredMetrics = filteredCollection.getMetrics();
+    assert(filteredMetrics.size() == 2);
+    assert(filteredMetrics[0].getName() == "CPU Usage");
+    assert(filteredMetrics[0].getValue() == 75.5);
+    assert(filteredMetrics[1].getName() == "Disk Usage");
+    assert(filteredMetrics[1].getValue() == 80.1);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    std::cout << "All assertions passed!" << std::endl;
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to recognize and complete a pattern involving higher-order functions in the context of analytics. The prefix establishes a clear pattern of transforming metrics using a higher-order function, with two examples of such transformations provided. The golden completion continues this pattern with another transformation. The suffix contains different code that validates the correctness of the transformation using assertions, ensuring that the pattern is followed correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+#include <algorithm>
+#include <cmath>
+
+// Function to calculate the average of a vector
+float calculate_average(const std::vector<int>& data) {
+	if (data.empty()) {
+		throw std::invalid_argument("Vector is empty");
+	}
+	int sum = 0;
+	for (int num : data) {
+		sum += num;
+	}
+	return static_cast<float>(sum) / data.size();
+}
+
+// Function to calculate the variance of a vector
+float calculate_variance(const std::vector<int>& data) {
+	if (data.size() < 2) {
+		throw std::invalid_argument("Vector must contain at least two elements");
+	}
+	float mean = calculate_average(data);
+	float sum_squared_diff = 0.0;
+	for (int num : data) {
+		sum_squared_diff += (num - mean) * (num - mean);
+	}
+	return sum_squared_diff / data.size();
+}
+
+// Function to calculate the standard deviation of a vector
+float calculate_standard_deviation(const std::vector<int>& data) {
+	if (data.size() < 2) {
+		throw std::invalid_argument("Vector must contain at least two elements");
+	}
+	float variance = calculate_variance(data);
+	return std::sqrt(variance);
+}
+
+// Function to calculate the median of a vector
+float calculate_median(std::vector<int> data) {
+	if (data.empty()) {
+		throw std::invalid_argument("Vector is empty");
+	}
+	std::sort(data.begin(), data.end());
+	int n = data.size();
+	if (n % 2 == 0) {
+		return (data[n/2 - 1] + data[n/2]) / 2.0;
+	} else {
+		return data[n/2];
+	}
+}
+
+// Function to calculate the mode of a vector
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+float calculate_mode(const std::vector<int>& data) {
+	std::unordered_map<int, int> frequency_map;
+	for (int num : data) {
+		frequency_map[num]++;
+	}
+	int mode = data[0];
+	int max_count = 0;
+	for (const auto& pair : frequency_map) {
+		if (pair.second > max_count) {
+			max_count = pair.second;
+			mode = pair.first;
+		}
+	}
+	return mode;
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+	std::vector<int> data = {1, 2, 2, 3, 4};
+
+	// Calculate and assert the average
+	float avg = calculate_average(data);
+	assert(std::abs(avg - 2.4) < 0.001);
+
+	// Calculate and assert the variance
+	float variance = calculate_variance(data);
+	assert(std::abs(variance - 1.04) < 0.001);
+
+	// Calculate and assert the standard deviation
+	float std_dev = calculate_standard_deviation(data);
+	assert(std::abs(std_dev - 1.02) < 0.01);
+
+	// Calculate and assert the median
+	float median = calculate_median(data);
+	assert(std::abs(median - 2.0) < 0.001);
+
+	return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for testing an LLM's ability to recognize and continue patterns in C++ code because it involves implementing multiple statistical functions following a clear pattern. Each function is designed to calculate a different statistical measure and follows a similar structure: input validation, calculation, and return of the result. The golden completion involves implementing the 'calculate_mode' function, which fits seamlessly into the established pattern of the other statistical functions. The suffix includes assertions to verify the correctness of the calculations for average, variance, standard deviation, and median, ensuring that the LLM-generated code maintains the pattern and functionality. This scenario requires the LLM to understand and apply concepts such as input validation, iteration, and mathematical calculations, making it a comprehensive test of its pattern recognition capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// A utility class to handle a collection of integers
+class IntCollection {
+public:
+    IntCollection() = default;
+
+    // Adds an integer to the collection
+    void add(int value) {
+        data.push_back(value);
+    }
+
+    // Applies a function to each element in the collection
+    void apply(const std::function<void(int&)>& func) {
+        std::for_each(data.begin(), data.end(), func);
+    }
+
+    // Prints all elements in the collection
+    void print() const {
+        for (const auto& val : data) {
+            std::cout << val << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    // Applies a transformation function to each element
+    void transform(const std::function<int(int)>& func) {
+        std::transform(data.begin(), data.end(), data.begin(), func);
+    }
+
+private:
+    std::vector<int> data;
+};
+
+// A function to double the value of an integer
+int doubleValue(int x) {
+    return x * 2;
+}
+
+// A function to increment the value of an integer
+int incrementValue(int x) {
+    return x + 1;
+}
+
+int main() {
+    IntCollection collection;
+    collection.add(1);
+    collection.add(2);
+    collection.add(3);
+    collection.add(4);
+
+    // Applying a transformation to double each value
+    collection.transform(doubleValue);
+    collection.print();
+
+    // Applying a transformation to increment each value
+    
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    collection.transform(incrementValue);
+
+SUFFIX CODE:
+----------------------------------------
+    collection.print();
+
+    // Assertions to verify the transformations
+    std::vector<int> expected_values = {3, 5, 7, 9};
+    collection.apply([&expected_values](int& val) {
+        assert(val == expected_values.front());
+        expected_values.erase(expected_values.begin());
+    });
+
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a higher-order function pattern within the context of a collection transformation. The prefix sets up a class with methods to add, apply functions, and transform the collection, and demonstrates the use of these methods. The golden completion follows the established pattern by applying another transformation function. The suffix contains assertions that verify the transformations, ensuring the LLM correctly follows the pattern and maintains functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <functional>
+#include <cassert>
+
+// Higher-order function for applying an operation on two integers
+int applyOperation(int a, int b, std::function<int(int, int)> op) {
+    return op(a, b);
+}
+
+// Specific operations
+int add(int a, int b) {
+    return a + b;
+}
+
+int subtract(int a, int b) {
+    return a - b;
+}
+
+// Function to test higher-order function with different operations
+void testOperations() {
+    // Using add operation
+    int result = applyOperation(5, 3, add);
+    assert(result == 8);
+
+    // Using subtract operation
+    result = applyOperation(5, 3, subtract);
+    assert(result == 2);
+
+    // Using lambda for multiplication
+    result = applyOperation(5, 3, [](int a, int b) { return a * b; });
+    assert(result == 15);
+
+    // Using lambda for division
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    result = applyOperation(10, 2, [](int a, int b) { return a / b; });
+    assert(result == 5);
+
+SUFFIX CODE:
+----------------------------------------
+
+    result = applyOperation(10, 3, [](int a, int b) { return a % b; });
+    assert(result == 1);
+
+    // Using lambda for power
+    result = applyOperation(2, 3, [](int a, int b) { int res = 1; for(int i = 0; i < b; ++i) res *= a; return res; });
+    assert(result == 8);
+}
+
+int main() {
+    testOperations();
+    std::cout << "All tests passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example is an excellent test case for pattern matching capabilities because it involves higher-order functions and demonstrates a clear pattern of using the `applyOperation` function with different operations. The prefix includes multiple examples of applying predefined functions and lambdas, establishing a recognizable pattern. The golden completion continues this pattern with additional operations, ensuring consistency. The suffix then tests these operations with assertions, verifying the correctness of the implementation. This scenario is practical for real-world applications, such as creating flexible APIs or mathematical libraries.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// Function template to find the minimum element in a vector
+// demonstrating template metaprogramming for different data types
+template <typename T>
+T findMin(const std::vector<T>& vec) {
+    T minElement = vec[0];
+    for (const T& elem : vec) {
+        if (elem < minElement) {
+            minElement = elem;
+        }
+    }
+    return minElement;
+}
+
+// Function template to find the maximum element in a vector
+// demonstrating template metaprogramming for different data types
+template <typename T>
+T findMax(const std::vector<T>& vec) {
+    T maxElement = vec[0];
+    for (const T& elem : vec) {
+        if (elem > maxElement) {
+            maxElement = elem;
+        }
+    }
+    return maxElement;
+}
+
+// Function template to calculate the average of elements in a vector
+// demonstrating template metaprogramming for different data types
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+template <typename T>
+double calculateAverage(const std::vector<T>& vec) {
+    T sum = 0;
+    for (const T& elem : vec) {
+        sum += elem;
+    }
+    return static_cast<double>(sum) / vec.size();
+}
+
+SUFFIX CODE:
+----------------------------------------
+int main() {
+    std::vector<int> intVec = {1, 2, 3, 4, 5};
+    std::vector<double> doubleVec = {1.1, 2.2, 3.3, 4.4, 5.5};
+
+    double intAvg = calculateAverage(intVec);
+    double doubleAvg = calculateAverage(doubleVec);
+
+    // Assertions to verify the correctness of the template functions
+    assert(intAvg == 3.0);
+    assert(doubleAvg == 3.3);
+
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on template metaprogramming, a common and advanced feature of C++. The prefix establishes a clear pattern of template functions that operate on vectors of different data types. The golden completion continues this pattern by introducing a function template to calculate the average of elements in a vector. The suffix includes assertions to verify the correctness of the pattern and ensures that the template functions work as intended for different data types. This scenario tests the LLM's ability to recognize and complete patterns in template metaprogramming, which is crucial for writing robust and reusable C++ code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// Template metaprogramming example with game mechanics (AI state machine)
+// Define states for AI
+struct State {
+    virtual void enter() = 0;
+    virtual void update() = 0;
+    virtual void exit() = 0;
+    virtual ~State() {}
+};
+
+struct IdleState : public State {
+    void enter() override { std::cout << "Entering Idle State\n"; }
+    void update() override { std::cout << "Updating Idle State\n"; }
+    void exit() override { std::cout << "Exiting Idle State\n"; }
+};
+
+struct PatrolState : public State {
+    void enter() override { std::cout << "Entering Patrol State\n"; }
+    void update() override { std::cout << "Updating Patrol State\n"; }
+    void exit() override { std::cout << "Exiting Patrol State\n"; }
+};
+
+// AI class which uses the states
+class AI {
+private:
+    State* currentState;
+public:
+    AI() : currentState(nullptr) {}
+    void changeState(State* newState) {
+        if (currentState) {
+            currentState->exit();
+        }
+        currentState = newState;
+        if (currentState) {
+            currentState->enter();
+        }
+    }
+    void update() {
+        if (currentState) {
+            currentState->update();
+        }
+    }
+};
+
+// Define more states to follow the pattern
+struct AttackState : public State {
+    void enter() override { std::cout << "Entering Attack State\n"; }
+    void update() override { std::cout << "Updating Attack State\n"; }
+    void exit() override { std::cout << "Exiting Attack State\n"; }
+};
+
+int main() {
+    AI ai;
+    IdleState idle;
+    PatrolState patrol;
+    AttackState attack;
+    
+    ai.changeState(&idle);
+    ai.update();
+    ai.changeState(&patrol);
+    ai.update();
+    ai.changeState(&attack);
+    ai.update();
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    ai.changeState(&idle);
+    ai.update();
+
+SUFFIX CODE:
+----------------------------------------
+
+
+	// Assertions to verify the pattern and functionality
+	assert(true); // Ensure no crash and state transitions happen
+
+	// Clean-up code if needed (none in this simplified example)
+	return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern in the context of AI state machines using template metaprogramming. The AI class demonstrates a pattern of state transitions, and the golden completion requires recognizing this pattern and continuing it appropriately. The prefix sets up the states and the AI class, and the suffix ensures the pattern is followed with assertions to verify functionality. This tests the LLM's understanding of template metaprogramming, state machines, and following established patterns in C++.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <cassert>
+
+// Higher-order function that applies a function to each element in a vector
+void applyFunction(const std::vector<int>& vec, const std::function<int(int)>& func, std::vector<int>& result) {
+    for (const auto& elem : vec) {
+        result.push_back(func(elem));
+    }
+}
+
+// Sample functions to be used with applyFunction
+int square(int x) {
+    return x * x;
+}
+
+int increment(int x) {
+    return x + 1;
+}
+
+int halve(int x) {
+    return x / 2;
+}
+
+int main() {
+    std::vector<int> data = {1, 2, 3, 4, 5};
+    std::vector<int> results1;
+    std::vector<int> results2;
+    std::vector<int> results3;
+
+    // Apply square function
+    applyFunction(data, square, results1);
+    // Apply increment function
+    applyFunction(data, increment, results2);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    // Apply halve function
+    applyFunction(data, halve, results3);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Assertions for square function
+    assert(results1.size() == 5);
+    assert(results1[0] == 1);
+    assert(results1[1] == 4);
+    assert(results1[2] == 9);
+    assert(results1[3] == 16);
+    assert(results1[4] == 25);
+
+    // Assertions for increment function
+    assert(results2.size() == 5);
+    assert(results2[0] == 2);
+    assert(results2[1] == 3);
+    assert(results2[2] == 4);
+    assert(results2[3] == 5);
+    assert(results2[4] == 6);
+
+    // Assertions for halve function
+    assert(results3.size() == 5);
+    assert(results3[0] == 0);
+    assert(results3[1] == 1);
+    assert(results3[2] == 1);
+    assert(results3[3] == 2);
+    assert(results3[4] == 2);
+
+    // Print results
+    std::cout << "Results1: ";
+    for (const auto& elem : results1) {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Results2: ";
+    for (const auto& elem : results2) {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "Results3: ";
+    for (const auto& elem : results3) {
+        std::cout << elem << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a higher-order function pattern. The pattern involves applying different functions to a vector of integers and storing the results. The prefix establishes the pattern with two examples (square and increment functions) and the suffix continues with a third example (halve function) and includes assertions to validate the results. This setup ensures that the LLM must understand the higher-order function usage and correctly apply it to maintain consistency.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <functional>
+#include <cassert>
+
+// Prefix: Establishing a pattern of higher-order functions to apply game mechanics
+
+// A simple function that applies gravity to a position
+float applyGravity(float position, float gravity) {
+    return position - gravity;
+}
+
+// A function that applies friction to velocity
+float applyFriction(float velocity, float friction) {
+    return velocity * (1 - friction);
+}
+
+// Higher-order function that accepts a vector of positions and applies a given mechanic
+void applyMechanic(std::vector<float>& positions, std::function<float(float)> mechanic) {
+    for (auto& pos : positions) {
+        pos = mechanic(pos);
+    }
+}
+
+int main() {
+    // Initial positions of objects
+    std::vector<float> positions = {10.0f, 20.0f, 30.0f};
+    // Applying gravity to all positions
+    applyMechanic(positions, [](float pos) { return applyGravity(pos, 9.8f); });
+    // Applying friction to all positions
+    applyMechanic(positions, [](float vel) { return applyFriction(vel, 0.1f); });
+
+    // Assertions to verify the results after gravity and friction mechanics
+    // Applying a custom mechanic that boosts positions
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    applyMechanic(positions, [](float pos) { return pos + 5.0f; });
+
+SUFFIX CODE:
+----------------------------------------
+    assert(positions[0] < 10.0f);
+    assert(positions[1] < 20.0f);
+    assert(positions[2] < 30.0f);
+
+    // Cleanup code (if any)
+    // No dynamic allocations here, so no cleanup needed
+    std::cout << "All assertions passed!" << std::endl;
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a pattern of higher-order functions in the context of game mechanics. The prefix establishes a pattern of applying different mechanics (gravity, friction) to a vector of positions using higher-order functions. The golden completion requires the LLM to continue this pattern by introducing a new mechanic (boosting positions). The suffix includes assertions that verify the correct application of the mechanics and ensure that the code is fully executable and meets the expected behavior.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+// A function to apply a transformation to each element in a vector and accumulate the results
+int transformAndAccumulate(const std::vector<int>& vec, int (*transform)(int), int (*accumulate)(int, int)) {
+	int result = 0;
+	for (int value : vec) {
+		result = accumulate(result, transform(value));
+	}
+	return result;
+}
+
+// Transformation function: squares the input
+int square(int x) {
+	return x * x;
+}
+
+// Accumulation function: sums the inputs
+int sum(int x, int y) {
+	return x + y;
+}
+
+// Another transformation function: doubles the input
+int doubleValue(int x) {
+	return x * 2;
+}
+
+// Another accumulation function: finds the maximum
+int max(int x, int y) {
+	return (x > y) ? x : y;
+}
+
+int main() {
+	std::vector<int> numbers = {1, 2, 3, 4, 5};
+
+	// Using transformAndAccumulate with square and sum
+	int sumOfSquares = transformAndAccumulate(numbers, square, sum);
+	std::cout << "Sum of squares: " << sumOfSquares << std::endl;
+	assert(sumOfSquares == 55);
+
+	// Using transformAndAccumulate with doubleValue and sum
+	int sumOfDoubles = transformAndAccumulate(numbers, doubleValue, sum);
+	std::cout << "Sum of doubles: " << sumOfDoubles << std::endl;
+	assert(sumOfDoubles == 30);
+
+	// Using transformAndAccumulate with square and max
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+	int maxOfSquares = transformAndAccumulate(numbers, square, max);
+	std::cout << "Max of squares: " << maxOfSquares << std::endl;
+	assert(maxOfSquares == 25);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+	// Using transformAndAccumulate with doubleValue and max
+	int maxOfDoubles = transformAndAccumulate(numbers, doubleValue, max);
+	std::cout << "Max of doubles: " << maxOfDoubles << std::endl;
+	assert(maxOfDoubles == 10);
+
+	return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a pattern involving higher-order functions in C++. The pattern of using the transformAndAccumulate function with different transformation and accumulation functions is clearly established in the prefix. The golden completion continues this pattern by applying different transformations and accumulations, which is a common scenario in both functional programming and analytics contexts. The provided assertions ensure that the pattern is correctly followed and the functionality is validated.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+class Analytics {
+public:
+	struct Metric {
+		std::string name;
+		double value;
+	};
+
+	void addMetric(const std::string& name, double value) {
+		metrics.push_back({name, value});
+	}
+
+	std::vector<Metric> filterMetrics(std::function<bool(const Metric&)> predicate) {
+		std::vector<Metric> result;
+		for (const auto& metric : metrics) {
+			if (predicate(metric)) {
+				result.push_back(metric);
+			}
+		}
+		return result;
+	}
+
+	void printMetrics() const {
+		for (const auto& metric : metrics) {
+			std::cout << metric.name << ": " << metric.value << std::endl;
+		}
+	}
+
+private:
+	std::vector<Metric> metrics;
+};
+
+int main() {
+	Analytics analytics;
+	analytics.addMetric("CPU Usage", 75.5);
+	analytics.addMetric("Memory Usage", 60.3);
+	analytics.addMetric("Disk IO", 40.2);
+
+	// Filtering metrics with value > 50
+	std::vector<Analytics::Metric> highValueMetrics = analytics.filterMetrics([](const Analytics::Metric& metric) {
+		return metric.value > 50;
+	});
+
+	// Checking if filtering works correctly
+	assert(highValueMetrics.size() == 2);
+	assert(highValueMetrics[0].name == "CPU Usage");
+	assert(highValueMetrics[1].name == "Memory Usage");
+
+	// Additional functionality to be implemented below
+	// Calculating average value of metrics
+	double averageValue = 
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+	averageValue = std::accumulate(analytics.filterMetrics([](const Analytics::Metric&){ return true; }).begin(), analytics.filterMetrics([](const Analytics::Metric&){ return true; }).end(), 0.0, [](double sum, const Analytics::Metric& metric) { return sum + metric.value; }) / analytics.filterMetrics([](const Analytics::Metric&){ return true; }).size();
+
+SUFFIX CODE:
+----------------------------------------
+;
+
+	// Checking average calculation
+	assert(averageValue > 0);
+	assert(averageValue == (75.5 + 60.3 + 40.2) / 3);
+
+	analytics.printMetrics();
+
+	return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability to recognize the pattern of higher-order functions used in analytics metrics processing. The golden completion involves using std::accumulate to calculate the average value of metrics, which follows the pattern of using STL algorithms established in the prefix. Assertions verify the correctness of filtering and average value calculation, and the suffix completes the pattern with further functionality and checks.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <cassert>
+
+// A simple game entity class
+class Entity {
+public:
+    int id;
+    std::string name;
+    Entity(int id, const std::string& name) : id(id), name(name) {}
+};
+
+// The Game class holds a collection of entities
+class Game {
+public:
+    std::vector<Entity> entities;
+
+    void addEntity(int id, const std::string& name) {
+        entities.emplace_back(id, name);
+    }
+
+    Entity* findEntityById(int id) {
+        for (auto& entity : entities) {
+            if (entity.id == id) {
+                return &entity;
+            }
+        }
+        return nullptr;
+    }
+
+    // A higher-order function that takes a predicate and returns all matching entities
+    std::vector<Entity*> filterEntities(bool (*predicate)(const Entity&)) {
+        std::vector<Entity*> result;
+        for (auto& entity : entities) {
+            if (predicate(entity)) {
+                result.push_back(&entity);
+            }
+        }
+        return result;
+    }
+};
+
+// Predicate function to find entities with names starting with 'A'
+bool nameStartsWithA(const Entity& entity) {
+    return !entity.name.empty() && entity.name[0] == 'A';
+}
+
+int main() {
+    Game game;
+    game.addEntity(1, "Alice");
+    game.addEntity(2, "Bob");
+    game.addEntity(3, "Andrew");
+
+    // Filter entities using the predicate function
+    auto filteredEntities = game.filterEntities(nameStartsWithA);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    assert(filteredEntities.size() == 2);
+    assert(filteredEntities[0]->name == "Alice");
+    assert(filteredEntities[1]->name == "Andrew");
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    // Further test cases with different predicates
+    bool (*predicate)(const Entity&) = [](const Entity& entity) { return entity.name.size() > 3; };
+    auto longNamedEntities = game.filterEntities(predicate);
+    assert(longNamedEntities.size() == 2);
+    assert(longNamedEntities[0]->name == "Alice");
+    assert(longNamedEntities[1]->name == "Andrew");
+
+    predicate = [](const Entity& entity) { return entity.name.find('o') != std::string::npos; };
+    auto oNamedEntities = game.filterEntities(predicate);
+    assert(oNamedEntities.size() == 1);
+    assert(oNamedEntities[0]->name == "Bob");
+
+    std::cout << "All tests passed." << std::endl;
+    return 0;
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case establishes a higher-order function pattern in the context of a game entity management system. The prefix sets up a clear pattern of filtering entities based on a predicate function. The golden completion demonstrates the appropriate continuation of this pattern by asserting the correct entities were filtered. The suffix extends the pattern with additional predicate functions and corresponding assertions, ensuring that the LLM can recognize and continue the established pattern correctly. This scenario is realistic and practical, commonly encountered in game mechanics and AI where dynamic filtering of game entities is required.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: synthbench-pattern-matching
+Language: cpp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cassert>
+
+class GameAI {
+public:
+    using Condition = std::function<bool()>;
+    using Action = std::function<void()>;
+
+    void addState(const std::string& name) {
+        states.push_back(name);
+    }
+
+    void addTransition(const std::string& from, const std::string& to, Condition condition, Action action) {
+        transitions.push_back({from, to, condition, action});
+    }
+
+    void update() {
+        for (const auto& [from, to, condition, action] : transitions) {
+            if (currentState == from && condition()) {
+                action();
+                currentState = to;
+                break;
+            }
+        }
+    }
+
+    const std::string& getCurrentState() const {
+        return currentState;
+    }
+
+private:
+    std::string currentState = "start";
+    std::vector<std::string> states;
+    struct Transition {
+        std::string from;
+        std::string to;
+        Condition condition;
+        Action action;
+    };
+    std::vector<Transition> transitions;
+};
+
+GameAI ai;
+
+bool isEnemyNear() {
+    // Placeholder for actual game logic
+    return true;
+}
+
+void attack() {
+    std::cout << "Attacking enemy!" << std::endl;
+}
+
+void flee() {
+    std::cout << "Fleeing from enemy!" << std::endl;
+}
+
+int main() {
+    ai.addState("start");
+    ai.addState("attack");
+    ai.addState("flee");
+
+    ai.addTransition("start", "attack", isEnemyNear, attack);
+    ai.addTransition("attack", "flee", []() { return false; }, flee);
+
+
+LLM COMPLETION 4omini_sft39_spm_fix2_5:
+----------------------------------------
+    ai.addTransition("flee", "start", []() { return true; }, []() { std::cout << "Returning to start." << std::endl; });
+
+SUFFIX CODE:
+----------------------------------------
+
+
+    ai.addTransition("attack", "start", []() { return true; }, []() { std::cout << "Returning to start." << std::endl; });
+    ai.update();
+    assert(ai.getCurrentState() == "start");
+
+    return 0;
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and continue a pattern involving state transitions in a game AI context. The pattern includes adding states and transitions with conditions and actions, and then updating the AI state based on these transitions. The golden completion continues this pattern by adding another transition and updating the state, which is a common task in game AI development. The assertions ensure the transitions are correctly applied and the state changes as expected.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================

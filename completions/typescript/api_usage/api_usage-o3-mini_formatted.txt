@@ -1,0 +1,5708 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Sequelize, DataTypes, Model } from 'sequelize';
+import assert from 'assert';
+
+// Setting up a Sequelize instance and defining models
+const sequelize = new Sequelize('sqlite::memory:');
+
+class User extends Model {}
+User.init({
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  birthday: {
+    type: DataTypes.DATE,
+    allowNull: false
+  }
+}, {
+  sequelize,
+  modelName: 'User'
+});
+
+class Post extends Model {}
+Post.init({
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  content: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  }
+}, {
+  sequelize,
+  modelName: 'Post'
+});
+
+// Helper function to create users
+async function createUser(username: string, birthday: Date) {
+  return await User.create({ username, birthday });
+}
+
+// Helper function to create posts
+async function createPost(title: string, content: string) {
+  return await Post.create({ title, content });
+}
+
+// Establishing associations between models
+User.hasMany(Post, { as: 'posts' });
+Post.belongsTo(User, { as: 'user' });
+
+async function main() {
+  await sequelize.sync({ force: true });
+
+  // Creating a user and a post
+  const user = await createUser('johndoe', new Date('1990-01-01'));
+  const post = await createPost('My First Post', 'This is the content of my first post.');
+
+  // Associating the post with the user
+  await user['addPost'](post);
+
+  // Fetching the user with associated posts
+  const fetchedUser = await User.findByPk(user.id, { include: [{ model: Post, as: 'posts' }] });
+
+  assert(fetchedUser !== null, 'Fetched user should not be null');
+  assert(fetchedUser.posts.length === 1, 'User should have one post');
+  assert(fetchedUser.posts[0].title === 'My First Post', 'Post title should match');
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+  console.log("All tests passed");
+
+SUFFIX CODE:
+----------------------------------------
+
+  // Clean up resources
+  await sequelize.close();
+}
+
+main().catch(error => console.error('Error in main function:', error));
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of Sequelize ORM with TypeScript, focusing on model associations and fetching related data. It tests the LLM's ability to recognize and complete patterns in a real-world scenario involving less common Sequelize functions like 'addPost' and fetching associated models. The completion includes a specific assertion to verify the content of the post, showcasing the correct usage of Sequelize's querying and association methods.
+
+ASSERTIONS:
+----------------------------------------
+assert(fetchedUser.posts[0].content === 'This is the content of my first post.', 'Post content should match');
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Sequelize, Model, DataTypes } from 'sequelize';
+import assert from 'assert';
+
+// Initialize a Sequelize instance for SQLite
+const sequelize = new Sequelize('sqlite::memory:');
+
+// Define a User model
+class User extends Model {
+  public id!: number;
+  public name!: string;
+  public age!: number;
+}
+
+User.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  age: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+}, { sequelize, modelName: 'User' });
+
+// Sync the database
+await sequelize.sync({ force: true });
+
+// Create a new user instance
+const newUser = await User.create({ name: 'Alice', age: 30 });
+
+// Define a function to update user age
+async function updateUserAge(userId: number, newAge: number): Promise<User | null> {
+  try {
+    const user = await User.findByPk(userId);
+    if (user) {
+      user.age = newAge;
+      await user.save();
+      return user;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error updating user age:', error);
+    return null;
+  }
+}
+
+// Update the user age and retrieve the updated user
+const updatedUser = await updateUserAge(newUser.id, 35);
+
+// Assert the updated user's age is correct
+assert(updatedUser !== null);
+assert.strictEqual(updatedUser!.age, 35);
+
+// Define a function to delete a user by ID
+async function deleteUserById(userId: number): Promise<boolean> {
+  try {
+    const user = await User.findByPk(userId);
+    if (user) {
+      await user.destroy();
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return false;
+  }
+}
+
+// Delete the user and assert the user is deleted
+const deleteResult = await deleteUserById(newUser.id);
+assert(deleteResult);
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+console.log('User operations completed successfully.');
+
+SUFFIX CODE:
+----------------------------------------
+console.log('User operations completed successfully.');
+await sequelize.close();
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of Sequelize, an ORM for Node.js, to perform common database operations such as creating, updating, and deleting records. It tests the model's understanding of Sequelize's API, including handling asynchronous operations and proper error handling. By focusing on less frequently used methods like `destroy` and ensuring resources are properly cleaned up, this scenario provides a comprehensive evaluation of rare API usage capabilities.
+
+ASSERTIONS:
+----------------------------------------
+assert(deleteResult);
+assert.strictEqual(checkUser, null);
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import AWS from 'aws-sdk';
+import { assert } from 'assert';
+
+AWS.config.update({
+  region: 'us-west-2',
+  accessKeyId: 'your-access-key-id',
+  secretAccessKey: 'your-secret-access-key'
+});
+
+const dynamoDb = new AWS.DynamoDB.DocumentClient();
+
+// Function to create a new item in DynamoDB
+async function createItem(tableName: string, item: any): Promise<void> {
+  const params = {
+    TableName: tableName,
+    Item: item
+  };
+  await dynamoDb.put(params).promise();
+}
+
+// Function to get an item from DynamoDB
+async function getItem(tableName: string, key: any): Promise<any> {
+  const params = {
+    TableName: tableName,
+    Key: key
+  };
+  const result = await dynamoDb.get(params).promise();
+  return result.Item;
+}
+
+// Function to delete an item from DynamoDB
+async function deleteItem(tableName: string, key: any): Promise<void> {
+  const params = {
+    TableName: tableName,
+    Key: key
+  };
+  await dynamoDb.delete(params).promise();
+}
+
+// Function to update an item in DynamoDB
+async function updateItem(tableName: string, key: any, updateExpression: string, expressionAttributeValues: any): Promise<void> {
+  const params = {
+    TableName: tableName,
+    Key: key,
+    UpdateExpression: updateExpression,
+    ExpressionAttributeValues: expressionAttributeValues
+  };
+  await dynamoDb.update(params).promise();
+}
+
+// Test functions
+const tableName = 'TestTable';
+const testItem = { id: '1', name: 'Test Item', description: 'This is a test item' };
+const updatedItem = { ':name': 'Updated Test Item', ':description': 'This is an updated test item' };
+const key = { id: '1' };
+
+(async () => {
+  await createItem(tableName, testItem);
+  const fetchedItem = await getItem(tableName, key);
+  assert.deepStrictEqual(fetchedItem, testItem, 'Item fetched should match the created item');
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+  await updateItem(tableName, key, "set name = :name, description = :description", updatedItem);
+  const newItem = await getItem(tableName, key);
+  assert.deepStrictEqual(newItem, { id: '1', name: 'Updated Test Item', description: 'This is an updated test item' }, 'Item should be updated');
+
+SUFFIX CODE:
+----------------------------------------
+
+  await deleteItem(tableName, key);
+  const deletedItem = await getItem(tableName, key);
+  assert.strictEqual(deletedItem, undefined, 'Item should be deleted');
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of using AWS SDK for DynamoDB with TypeScript. It demonstrates the ability to create, read, update, and delete items in a DynamoDB table. The golden_completion section specifically tests the rare but valid usage of the updateItem function with an uncommon parameter structure involving an update expression and expression attribute values, which is less commonly demonstrated in simple CRUD examples. This scenario ensures that the model can handle complex and less frequently used API patterns correctly.
+
+ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(updatedFetchedItem.name, 'Updated Test Item', 'Item name should be updated');
+assert.deepStrictEqual(updatedFetchedItem.description, 'This is an updated test item', 'Item description should be updated');
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as AWS from 'aws-sdk';
+import { assert } from 'assert';
+
+// Initialize the AWS SDK with credentials
+AWS.config.update({
+  accessKeyId: 'AKID',
+  secretAccessKey: 'SECRET'
+});
+
+// Create an instance of the S3 service
+const s3 = new AWS.S3();
+
+// Helper function to create a bucket
+async function createBucket(bucketName: string) {
+  try {
+    const params = {
+      Bucket: bucketName
+    };
+    await s3.createBucket(params).promise();
+    console.log(`Bucket ${bucketName} created successfully`);
+  } catch (error) {
+    console.error(`Error creating bucket: ${error.message}`);
+  }
+}
+
+// Helper function to list objects in a bucket
+async function listObjects(bucketName: string) {
+  try {
+    const params = {
+      Bucket: bucketName
+    };
+    const data = await s3.listObjectsV2(params).promise();
+    return data.Contents;
+  } catch (error) {
+    console.error(`Error listing objects: ${error.message}`);
+    return [];
+  }
+}
+
+// Helper function to delete a bucket
+async function deleteBucket(bucketName: string) {
+  try {
+    const params = {
+      Bucket: bucketName
+    };
+    await s3.deleteBucket(params).promise();
+    console.log(`Bucket ${bucketName} deleted successfully`);
+  } catch (error) {
+    console.error(`Error deleting bucket: ${error.message}`);
+  }
+}
+
+// Test case setup
+const testBucketName = 'test-bucket-api-usage';
+
+(async () => {
+  await createBucket(testBucketName);
+
+  // Upload an object to the bucket
+  const putObjectParams = {
+    Bucket: testBucketName,
+    Key: 'test-object.txt',
+    Body: 'Hello, world!'
+  };
+  await s3.putObject(putObjectParams).promise();
+  console.log('Object uploaded successfully');
+
+  // List objects to ensure the upload was successful
+  const objects = await listObjects(testBucketName);
+  assert(objects.length === 1, 'There should be one object in the bucket');
+  assert(objects[0].Key === 'test-object.txt', 'The object key should be test-object.txt');
+
+  // Example of using deprecated API
+  const deprecatedParams = {
+    Bucket: testBucketName,
+    Key: 'test-object.txt'
+  };
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+  await s3.copyObject({
+    Bucket: deprecatedParams.Bucket,
+    CopySource: `${deprecatedParams.Bucket}/${deprecatedParams.Key}`,
+    Key: deprecatedParams.Key,
+    MetadataDirective: 'REPLACE',
+    ContentType: 'text/plain'
+  }).promise();
+
+SUFFIX CODE:
+----------------------------------------
+
+  const headData = await s3.headObject(deprecatedParams).promise();
+  assert(headData.ContentLength === 13, 'Object content length should be 13');
+  assert(headData.ContentType === 'text/plain', 'Object content type should be text/plain');
+
+  await deleteBucket(testBucketName);
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of AWS SDK with a mix of current and deprecated API functions. The use of `getObject` method is less common as compared to other S3 operations and tests the model's ability to recognize and complete deprecated but valid API patterns. The assertions ensure that the object was uploaded and retrieved correctly, verifying the correctness of API usage and parameter ordering.
+
+ASSERTIONS:
+----------------------------------------
+assert(data.Body.toString('utf-8') === 'Hello, world!', 'The object content should be Hello, world!');
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Pusher } from 'pusher';
+import assert from 'assert';
+
+// Initialize Pusher with deprecated configuration method
+const pusher = new Pusher({
+  appId: 'your-app-id',
+  key: 'your-key',
+  secret: 'your-secret',
+  cluster: 'your-cluster',
+  useTLS: true
+});
+
+// Helper function to send a message
+async function sendMessage(channel: string, event: string, message: any): Promise<void> {
+  return new Promise((resolve, reject) => {
+    pusher.trigger(channel, event, message, (error, request, response) => {
+      if (error) {
+        return reject(error);
+      }
+      resolve();
+    });
+  });
+}
+
+// Helper function to authenticate a user
+function authenticateUser(socketId: string, channel: string): string {
+  return pusher.authenticate(socketId, channel);
+}
+
+// Test data
+const testChannel = 'my-channel';
+const testEvent = 'my-event';
+const testMessage = { text: 'Hello, World!' };
+const testSocketId = '1234.5678';
+const testChannelPrivate = 'private-my-channel';
+
+async function main() {
+  try {
+    // Send a test message
+    await sendMessage(testChannel, testEvent, testMessage);
+    console.log('Message sent successfully');
+
+    // Authenticate a user
+    const auth = authenticateUser(testSocketId, testChannelPrivate);
+    console.log('User authenticated successfully', auth);
+
+    // Assert the message format
+    assert.strictEqual(typeof testMessage.text, 'string');
+    assert.strictEqual(testMessage.text, 'Hello, World!');
+
+    // Assert the authentication format
+    assert.strictEqual(typeof auth, 'string');
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+    assert.notStrictEqual(auth, '')
+
+SUFFIX CODE:
+----------------------------------------
+
+    // Cleanup resources
+    pusher.disconnect();
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+}
+
+main();
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the Pusher library with a deprecated configuration method, focusing on less common API functions such as triggering events and authenticating users. The completion involves verifying the authentication response, which is a critical step in ensuring the proper functioning of real-time communication. The example includes appropriate setup and teardown, making it a robust and realistic scenario for testing the model's understanding of uncommon API usage.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(typeof testMessage.text, 'string');
+assert.strictEqual(testMessage.text, 'Hello, World!');
+assert.strictEqual(typeof auth, 'string');
+assert.ok(auth.includes('auth'));
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { assert } from 'assert';
+
+// Initialize Apollo Client
+const client = new ApolloClient({
+  uri: 'https://example.com/graphql',
+  cache: new InMemoryCache()
+});
+
+// Define a query to get a list of books
+const BOOKS_QUERY = gql`
+  query GetBooks {
+    books {
+      id
+      title
+      author
+    }
+  }
+`;
+
+// Define a function to fetch books
+async function fetchBooks() {
+  try {
+    const result = await client.query({
+      query: BOOKS_QUERY
+    });
+    return result.data.books;
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    throw error;
+  }
+}
+
+// Example usage of fetchBooks function
+fetchBooks().then(books => {
+  console.log('Fetched books:', books);
+}).catch(error => {
+  console.error('Error:', error);
+});
+
+// Define a mutation to add a new book
+const ADD_BOOK_MUTATION = gql`
+  mutation AddBook($title: String!, $author: String!) {
+    addBook(title: $title, author: $author) {
+      id
+      title
+      author
+    }
+  }
+`;
+
+// Define a function to add a new book
+async function addBook(title: string, author: string) {
+  try {
+    const result = await client.mutate({
+      mutation: ADD_BOOK_MUTATION,
+      variables: { title, author }
+    });
+    return result.data.addBook;
+  } catch (error) {
+    console.error('Error adding book:', error);
+    throw error;
+  }
+}
+
+// Example usage of addBook function
+addBook('New Book', 'Author Name').then(newBook => {
+  console.log('Added new book:', newBook);
+}).catch(error => {
+  console.error('Error:', error);
+});
+
+// Define a query to get a book by ID
+const BOOK_BY_ID_QUERY = gql`
+  query GetBookById($id: ID!) {
+    book(id: $id) {
+      id
+      title
+      author
+    }
+  }
+`;
+
+// Define a function to fetch a book by ID
+async function fetchBookById(id: string) {
+  try {
+    const result = await client.query({
+      query: BOOK_BY_ID_QUERY,
+      variables: { id }
+    });
+    return result.data.book;
+  } catch (error) {
+    console.error('Error fetching book by ID:', error);
+    throw error;
+  }
+}
+
+// Example usage of fetchBookById function
+fetchBookById('1').then(book => {
+  console.log('Fetched book by ID:', book);
+}).catch(error => {
+  console.error('Error:', error);
+});
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+const DELETE_BOOK_MUTATION = gql`
+  mutation DeleteBook($id: ID!) {
+    deleteBook(id: $id) {
+      id
+      title
+      author
+    }
+  }
+`;
+
+async function deleteBook(id: string) {
+  try {
+    const result = await client.mutate({
+      mutation: DELETE_BOOK_MUTATION,
+      variables: { id }
+    });
+    return result.data.deleteBook;
+  } catch (error) {
+    console.error('Error deleting book:', error);
+    throw error;
+  }
+}
+
+SUFFIX CODE:
+----------------------------------------
+// Example usage of deleteBook function
+deleteBook('1').then(deletedBook => {
+  console.log('Deleted book:', deletedBook);
+}).catch(error => {
+  console.error('Error:', error);
+});
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to recognize and continue a pattern of using Apollo Client with GraphQL in TypeScript. The provided context includes multiple examples of queries and mutations, establishing a clear pattern. The completion requires defining a new mutation and using it with Apollo Client, which involves understanding the structure of GraphQL queries, variables, and the Apollo Client API. This scenario also tests the LLM's ability to handle errors and maintain consistent parameter ordering and naming conventions.
+
+ASSERTIONS:
+----------------------------------------
+deleteBook('1').then(deletedBook => {
+  assert(deletedBook.id === '1', 'Book ID should be 1');
+  assert(deletedBook.title, 'Book should have a title');
+  assert(deletedBook.author, 'Book should have an author');
+}).catch(error => {
+  console.error('Assertion error:', error);
+});
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { DynamoDB } from 'aws-sdk';
+import assert from 'assert';
+
+// Initialize the DynamoDB DocumentClient
+const documentClient = new DynamoDB.DocumentClient();
+
+// Helper function to create a table
+async function createTable() {
+    const params = {
+        TableName: 'TestTable',
+        KeySchema: [
+            { AttributeName: 'id', KeyType: 'HASH' }
+        ],
+        AttributeDefinitions: [
+            { AttributeName: 'id', AttributeType: 'S' }
+        ],
+        ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1
+        }
+    };
+    await new DynamoDB().createTable(params).promise();
+}
+
+// Helper function to delete a table
+async function deleteTable() {
+    const params = {
+        TableName: 'TestTable'
+    };
+    await new DynamoDB().deleteTable(params).promise();
+}
+
+// Helper function to add an item to the table
+async function addItem(id: string, value: string) {
+    const params = {
+        TableName: 'TestTable',
+        Item: {
+            'id': { S: id },
+            'value': { S: value }
+        }
+    };
+    await documentClient.put(params).promise();
+}
+
+// Helper function to get an item from the table
+async function getItem(id: string) {
+    const params = {
+        TableName: 'TestTable',
+        Key: {
+            'id': { S: id }
+        }
+    };
+    const result = await documentClient.get(params).promise();
+    return result.Item;
+}
+
+// Main function to test the deprecated API usage
+async function testDeprecatedAPI() {
+    await createTable();
+    try {
+        // Adding an item to the table
+        await addItem('123', 'testValue');
+
+        // Retrieving the item from the table
+        const item = await getItem('123');
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+        assert.ok(item)
+
+SUFFIX CODE:
+----------------------------------------
+
+        // Checking if the item retrieved is correct
+        assert.strictEqual(item.value.S, 'testValue');
+    } finally {
+        // Clean up: delete the table
+        await deleteTable();
+    }
+}
+
+// Run the test function
+(async () => {
+    await testDeprecatedAPI();
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This test case uses the AWS SDK for JavaScript, specifically the DynamoDB.DocumentClient, to test uncommon API usage patterns. The focus is on using deprecated methods to interact with DynamoDB, such as using the 'S' attribute to specify string values in the Item object. This scenario involves creating a table, adding an item, retrieving the item, and validating its structure. The golden completion demonstrates the correct usage of these deprecated methods, ensuring that the item structure is validated properly. The test case includes setup and cleanup functions to manage the DynamoDB table, providing a realistic and comprehensive example.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(item.id.S, '123');
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
+
+// Configuration for WebSocket connection
+const wsClient = new SubscriptionClient('ws://localhost:4000/graphql', {
+  reconnect: true,
+});
+
+// Apollo Client setup with WebSocket link
+const client = new ApolloClient({
+  link: new WebSocketLink(wsClient),
+  cache: new InMemoryCache(),
+});
+
+// Subscription query to listen for new messages
+const NEW_MESSAGE_SUBSCRIPTION = gql`
+  subscription OnNewMessage {
+    newMessage {
+      id
+      content
+      author {
+        id
+        name
+      }
+    }
+  }
+`;
+
+// Function to handle new messages
+function handleNewMessage(message: any) {
+  console.log('New message received:', message);
+}
+
+// Subscribing to new messages
+const subscription = client.subscribe({
+  query: NEW_MESSAGE_SUBSCRIPTION,
+})
+.subscribe({
+  next(response) {
+    handleNewMessage(response.data.newMessage);
+  },
+  error(err) {
+    console.error('Subscription error:', err);
+  }
+});
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+subscription.unsubscribe();
+
+SUFFIX CODE:
+----------------------------------------
+subscription.unsubscribe();
+
+// Assertions
+import { strict as assert } from 'assert';
+assert(subscription, 'Subscription should be defined');
+
+// Assuming we have a mock function to send a new message for testing
+async function mockSendNewMessage() {
+  // Implementation of sending a new message
+}
+
+await mockSendNewMessage();
+
+// Add a delay to ensure the subscription receives the message
+await new Promise(resolve => setTimeout(resolve, 1000));
+
+// Cleanup
+wsClient.close();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to correctly implement a subscription pattern with Apollo Client and WebSocketLink, specifically focusing on the rare usage of unsubscribing from a subscription after a delay. The completion demonstrates handling the unsubscription timing, which is a less common but valid use case. The prefix sets up the context with a subscription to new messages, and the suffix includes assertions to verify the subscription and a mock function to simulate sending a new message. The golden_completion correctly uses setTimeout to unsubscribe after 5 seconds, ensuring the subscription is cleaned up properly after testing.
+
+ASSERTIONS:
+----------------------------------------
+assert(subscription, 'Subscription should be defined');
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Sequelize, DataTypes, Model } from 'sequelize';
+import assert from 'assert';
+
+// Initialize Sequelize with SQLite dialect for testing purposes
+const sequelize = new Sequelize('sqlite::memory:');
+
+// Define a User model with uncommon field options
+class User extends Model {}
+User.init({
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      isEmail: true
+    }
+  },
+  metadata: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: {}
+  }
+}, {
+  sequelize,
+  modelName: 'User',
+  timestamps: false
+});
+
+(async () => {
+  try {
+    // Sync the model with the database
+    await sequelize.sync();
+
+    // Helper function to create a new user
+    async function createUser(name: string, email: string, metadata: object) {
+      const user = await User.create({ name, email, metadata });
+      return user;
+    }
+
+    // Create test user
+    const testUser = await createUser('Alice', 'alice@example.com', { age: 30 });
+
+    // Function to update user's metadata using uncommon Sequelize options
+    async function updateUserMetadata(userId: string, newMetadata: object) {
+      const [rowsUpdated] = await User.update({ metadata: newMetadata }, {
+        where: { id: userId },
+        returning: true,
+        individualHooks: true
+      });
+      return rowsUpdated;
+    }
+
+    // Update metadata of the test user
+    const rowsUpdated = await updateUserMetadata(testUser.id, { age: 31 });
+
+    // Assertions to verify the update
+    assert.strictEqual(rowsUpdated, 1, 'Exactly one row should be updated');
+    const updatedUser = await User.findByPk(testUser.id);
+    assert.strictEqual(updatedUser.metadata.age, 31, 'The metadata.age should be updated to 31');
+
+    // Additional uncommon usage of Sequelize
+    // Function to increment user's age using sequelize.fn
+    async function incrementUserAge(userId: string) {
+      await User.update({
+        'metadata.age': sequelize.fn('COALESCE', sequelize.col('metadata.age'), 0),
+        'metadata.age': sequelize.literal('metadata.age + 1')
+      }, {
+        where: { id: userId }
+      });
+    }
+
+    // Increment age of the test user
+    await incrementUserAge(testUser.id);
+
+    // Assertions to verify the increment
+    const incrementedUser = await User.findByPk(testUser.id);
+    assert.strictEqual(incrementedUser.metadata.age, 32, 'The metadata.age should be incremented to 32');
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+    assert.strictEqual(incrementedUser.name, 'Alice', 'User name should remain unchanged')
+    assert.strictEqual(incrementedUser.email, 'alice@example.com', 'User email should remain unchanged')
+
+SUFFIX CODE:
+----------------------------------------
+    // Additional assertions
+    assert.strictEqual(typeof incrementedUser.metadata, 'object', 'The metadata should be an object');
+    assert.strictEqual(incrementedUser.metadata.age, 32, 'The metadata.age should be 32 after increment');
+
+    // Cleanup
+    await User.destroy({ where: { id: testUser.id } });
+    await sequelize.close();
+  } catch (error) {
+    console.error('Error during test execution:', error);
+  }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of uncommon Sequelize options such as 'returning', 'individualHooks', and the combination of 'sequelize.fn' and 'sequelize.literal' for updating JSONB fields. These features are rarely used together and require a deep understanding of Sequelize's API. The assertions validate the correctness of these operations, ensuring that the metadata is updated and incremented as expected. This example is a good test case for an LLM as it involves complex and less common API usage patterns, making it challenging for the model to generate the correct completion without proper understanding.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(rowsUpdated, 1, 'Exactly one row should be updated');
+const updatedUser = await User.findByPk(testUser.id);
+assert.strictEqual(updatedUser.metadata.age, 31, 'The metadata.age should be updated to 31');
+await incrementUserAge(testUser.id);
+const incrementedUser = await User.findByPk(testUser.id);
+assert.strictEqual(incrementedUser.metadata.age, 32, 'The metadata.age should be incremented to 32');
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { MongoClient, Db } from 'mongodb';
+import assert from 'assert';
+
+// Helper function to connect to the database
+async function connectToDatabase(uri: string): Promise<Db> {
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client.connect();
+    return client.db();
+}
+
+// Helper function to insert a document into a collection
+async function insertDocument(db: Db, collectionName: string, document: object): Promise<void> {
+    const collection = db.collection(collectionName);
+    await collection.insertOne(document);
+}
+
+// Helper function to find a document in a collection
+async function findDocument(db: Db, collectionName: string, query: object): Promise<object | null> {
+    const collection = db.collection(collectionName);
+    return await collection.findOne(query);
+}
+
+const uri = 'mongodb://localhost:27017';
+const dbName = 'testdb';
+const collectionName = 'testcollection';
+
+async function run() {
+    const db = await connectToDatabase(uri);
+
+    // Insert a document
+    const document = { name: 'test', value: 42 };
+    await insertDocument(db, collectionName, document);
+
+    // Find the inserted document
+    const foundDocument = await findDocument(db, collectionName, { name: 'test' });
+    assert(foundDocument !== null, 'Document should be found');
+    assert(foundDocument.name === 'test', 'Document name should match');
+    assert(foundDocument.value === 42, 'Document value should match');
+
+    // Update the document
+    const updatedValue = 84;
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+    await db.collection(collectionName).updateOne({ name: 'test' }, { $set: { value: updatedValue } });
+
+SUFFIX CODE:
+----------------------------------------
+    const updatedDocument = await findDocument(db, collectionName, { name: 'test' });
+    assert(updatedDocument !== null, 'Updated document should be found');
+    assert(updatedDocument.value === 84, 'Updated document value should match');
+
+    // Clean up: delete the document
+    await db.collection(collectionName).deleteOne({ name: 'test' });
+}
+
+run().catch(console.error);
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the MongoDB Node.js driver, specifically focusing on the deprecated `useNewUrlParser` and `useUnifiedTopology` options in the `MongoClient` constructor. The completion involves using the `updateOne` method with a MongoDB update operator, which is a less common operation compared to find and insert operations. The scenario tests the model's ability to recognize and correctly complete the pattern of MongoDB CRUD operations, handle parameter ordering, and validate the API's behavior. The assertions verify that the document is correctly updated and the cleanup code ensures no leftover data in the database.
+
+ASSERTIONS:
+----------------------------------------
+assert(updatedDocument !== null, 'Updated document should be found');
+assert(updatedDocument.value === 84, 'Updated document value should match');
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as AWS from 'aws-sdk';
+import { assert } from 'assert';
+
+// Configuration for AWS SDK
+AWS.config.update({
+    accessKeyId: 'fakeAccessKeyId',
+    secretAccessKey: 'fakeSecretAccessKey',
+    region: 'us-west-2'
+});
+
+// Initialize S3 service
+const s3 = new AWS.S3();
+
+// Function to upload a file to S3
+async function uploadFileToS3(bucketName: string, key: string, body: Buffer) {
+    const params = {
+        Bucket: bucketName,
+        Key: key,
+        Body: body
+    };
+
+    try {
+        const data = await s3.upload(params).promise();
+        return data;
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        throw error;
+    }
+}
+
+// Function to delete a file from S3
+async function deleteFileFromS3(bucketName: string, key: string) {
+    const params = {
+        Bucket: bucketName,
+        Key: key
+    };
+
+    try {
+        const data = await s3.deleteObject(params).promise();
+        return data;
+    } catch (error) {
+        console.error('Error deleting file:', error);
+        throw error;
+    }
+}
+
+// Helper function to simulate file upload and deletion
+async function simulateFileUploadAndDeletion() {
+    const bucketName = 'test-bucket';
+    const key = 'test-file.txt';
+    const body = Buffer.from('This is a test file');
+
+    // Upload the file
+    const uploadResponse = await uploadFileToS3(bucketName, key, body);
+    assert(uploadResponse.ETag, 'File upload failed');
+
+    // Verify the file exists
+    const headParams = {
+        Bucket: bucketName,
+        Key: key
+    };
+    const headResponse = await s3.headObject(headParams).promise();
+    assert(headResponse.ContentLength === body.length, 'File size mismatch');
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+    // Cleanup the uploaded file
+    await deleteFileFromS3(bucketName, key);
+    console.log('File upload and deletion simulation completed');
+}
+
+// Execute the simulation
+simulateFileUploadAndDeletion().catch(error => console.error('Simulation failed:', error));
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the AWS SDK for JavaScript, particularly focusing on the S3 service. It includes both common and deprecated API functions. The example sets up S3 operations such as uploading and deleting files and includes a check using the deprecated getObjectAcl API to verify the file's ACL. This tests the LLM's ability to understand and correctly use both current and deprecated APIs within the AWS SDK, ensuring proper parameter ordering and error handling.
+
+ASSERTIONS:
+----------------------------------------
+assert(uploadResponse.ETag, 'File upload failed');
+assert(headResponse.ContentLength === body.length, 'File size mismatch');
+assert(aclResponse.Grants.length > 0, 'No ACL found for the uploaded file');
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Sequelize, Model, DataTypes } from 'sequelize';
+import assert from 'assert';
+
+// Initialize Sequelize
+const sequelize = new Sequelize('sqlite::memory:');
+
+// Define a User model
+class User extends Model {}
+User.init({
+  username: DataTypes.STRING,
+  birthday: DataTypes.DATE
+}, { sequelize, modelName: 'user' });
+
+// Define a Post model
+class Post extends Model {}
+Post.init({
+  title: DataTypes.STRING,
+  content: DataTypes.TEXT,
+  userId: DataTypes.INTEGER
+}, { sequelize, modelName: 'post' });
+
+(async () => {
+  // Sync all defined models to the DB
+  await sequelize.sync();
+
+  // Create a new user
+  const jane = await User.create({
+    username: 'janedoe',
+    birthday: new Date(1980, 6, 20)
+  });
+
+  // Create a new post
+  const post = await Post.create({
+    title: 'Hello World',
+    content: 'This is my first post!',
+    userId: jane.id
+  });
+
+  // Find all posts by user
+  const posts = await Post.findAll({ where: { userId: jane.id } });
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+// Assertions
+assert.strictEqual(posts.length, 1);
+assert.strictEqual(posts[0].title, 'Hello World');
+assert.strictEqual(posts[0].content, 'This is my first post!');
+assert.strictEqual(posts[0].userId, jane.id);
+
+// Cleanup
+await sequelize.close();
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This scenario demonstrates the use of Sequelize, an ORM for Node.js, focusing on less common operations such as updating a record and refetching it. The pattern includes model definitions, CRUD operations, and assertions to verify the correctness of the update operation. This tests the LLM's ability to recognize and complete ORM-related tasks, especially focusing on the update and retrieval of records which are less commonly demonstrated compared to simple create or read operations.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(updatedPost.title, 'Updated Title');
+assert.strictEqual(updatedPost.content, 'Updated content.');
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyA...YOUR_API_KEY...',
+  authDomain: 'YOUR_AUTH_DOMAIN',
+  projectId: 'YOUR_PROJECT_ID',
+  storageBucket: 'YOUR_STORAGE_BUCKET',
+  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
+  appId: 'YOUR_APP_ID'
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase Authentication and get a reference to the service
+const auth = getAuth(app);
+
+// Function to handle user login
+async function loginUser(email: string, password: string): Promise<void> {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    console.log('User signed in:', userCredential.user);
+  } catch (error) {
+    console.error('Error signing in:', error);
+  }
+}
+
+// Listen for authentication state changes
+function observeAuthState(): void {
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log('User is signed in:', user);
+    } else {
+      console.log('No user is signed in.');
+    }
+  });
+}
+
+// This section sets up a deprecated way to sign out a user
+function deprecatedSignOut(): void {
+  const user = auth.currentUser;
+  if (user) {
+    user.delete().then(() => {
+      console.log('User signed out.');
+    }).catch((error) => {
+      console.error('Error signing out user:', error);
+    });
+  }
+}
+
+loginUser('testuser@example.com', 'testpassword');
+observeAuthState();
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+deprecatedSignOut();
+
+SUFFIX CODE:
+----------------------------------------
+deprecatedSignOut();
+
+// Clean up resources
+function cleanUp(): void {
+  auth.signOut().catch((error) => {
+    console.error('Error during cleanup:', error);
+  });
+}
+
+cleanUp();
+
+JUSTIFICATION:
+----------------------------------------
+This test case involves using the Firebase Authentication API in TypeScript, which includes a deprecated method for signing out a user. The completion task is to replace this deprecated method with the recommended method, verifying that the API usage is correct and consistent. This ensures that the model understands both the old and new patterns, handles proper exception management, and follows best practices.
+
+ASSERTIONS:
+----------------------------------------
+import { expect } from 'chai';
+
+// Mocking Firebase auth
+const mockAuth = {
+  signOut: async () => 'Mock signOut invoked'
+};
+
+async function testSignOut() {
+  try {
+    const result = await mockAuth.signOut();
+    expect(result).to.equal('Mock signOut invoked');
+    console.log('Test passed: signOut method works correctly.');
+  } catch (error) {
+    console.error('Test failed:', error);
+  }
+}
+
+testSignOut();
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { DynamoDBClient, PutItemCommand, DeleteItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
+import assert from "assert";
+
+const client = new DynamoDBClient({ region: "us-west-2" });
+
+const TABLE_NAME = "TestTable";
+
+async function putItem(client: DynamoDBClient, item: { [key: string]: { S: string } }) {
+    const params = {
+        TableName: TABLE_NAME,
+        Item: item
+    };
+    const command = new PutItemCommand(params);
+    try {
+        const result = await client.send(command);
+        return result;
+    } catch (error) {
+        console.error("Error putting item:", error);
+        throw error;
+    }
+}
+
+async function deleteItem(client: DynamoDBClient, key: { [key: string]: { S: string } }) {
+    const params = {
+        TableName: TABLE_NAME,
+        Key: key
+    };
+    const command = new DeleteItemCommand(params);
+    try {
+        const result = await client.send(command);
+        return result;
+    } catch (error) {
+        console.error("Error deleting item:", error);
+        throw error;
+    }
+}
+
+async function getItem(client: DynamoDBClient, key: { [key: string]: { S: string } }) {
+    const params = {
+        TableName: TABLE_NAME,
+        Key: key
+    };
+    const command = new GetItemCommand(params);
+    try {
+        const result = await client.send(command);
+        return result.Item;
+    } catch (error) {
+        console.error("Error getting item:", error);
+        throw error;
+    }
+}
+
+(async () => {
+    const item = { "PrimaryKey": { S: "123" }, "Attribute": { S: "Value" } };
+    const key = { "PrimaryKey": { S: "123" } };
+
+    // Put item
+    await putItem(client, item);
+
+    // Get item
+    const retrievedItem = await getItem(client, key);
+    assert.deepStrictEqual(retrievedItem, item);
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+    // Delete item
+    await deleteItem(client, key);
+
+    // Verify item deletion
+    const deletedItem = await getItem(client, key);
+    assert.strictEqual(deletedItem, undefined);
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's understanding and capability to handle AWS SDK v3 for DynamoDB, focusing on the correct usage of PutItemCommand, GetItemCommand, and DeleteItemCommand. The example uses rare but valid patterns, such as checking item existence before deletion, which is not commonly demonstrated. The correct parameter ordering and handling of responses and errors are critical for this scenario. Moreover, this test case ensures that the model can follow the established pattern of DynamoDB operations and handle API versioning properly.
+
+ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(retrievedItem, item);
+const existingItem = await getItem(client, key);
+assert.deepStrictEqual(existingItem, item);
+await deleteItem(client, key);
+const deletedItem = await getItem(client, key);
+assert.strictEqual(deletedItem, undefined);
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
+
+const bucketName = 'test-bucket';
+const objectKey = 'test-object.txt';
+const objectContent = 'Hello, this is a test object!';
+
+// Initialize the S3 client
+const s3Client = new S3Client({ region: 'us-west-2' });
+
+// Function to upload an object to S3
+async function uploadObject() {
+    try {
+        const putObjectParams = {
+            Bucket: bucketName,
+            Key: objectKey,
+            Body: objectContent,
+        };
+        const command = new PutObjectCommand(putObjectParams);
+        const response = await s3Client.send(command);
+        console.log('Object uploaded successfully:', response);
+    } catch (error) {
+        console.error('Error uploading object:', error);
+    }
+}
+
+// Function to download an object from S3
+async function downloadObject() {
+    try {
+        const getObjectParams = {
+            Bucket: bucketName,
+            Key: objectKey,
+        };
+        const command = new GetObjectCommand(getObjectParams);
+        const response = await s3Client.send(command);
+        const objectData = await streamToString(response.Body);
+        console.log('Object downloaded successfully:', objectData);
+        return objectData;
+    } catch (error) {
+        console.error('Error downloading object:', error);
+    }
+}
+
+// Helper function to convert a Readable stream to a string
+function streamToString(stream: Readable): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const chunks: any[] = [];
+        stream.on('data', (chunk) => chunks.push(chunk));
+        stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+        stream.on('error', reject);
+    });
+}
+
+// Upload the object to S3
+await uploadObject();
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+await downloadObject();
+
+SUFFIX CODE:
+----------------------------------------
+
+// Clean up by deleting the object from S3
+async function deleteObject() {
+    try {
+        const deleteObjectParams = {
+            Bucket: bucketName,
+            Key: objectKey,
+        };
+        const command = new DeleteObjectCommand(deleteObjectParams);
+        const response = await s3Client.send(command);
+        console.log('Object deleted successfully:', response);
+    } catch (error) {
+        console.error('Error deleting object:', error);
+    }
+}
+
+// Run the cleanup function
+await deleteObject();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to validate the model's ability to recognize and continue an established pattern involving AWS SDK for JavaScript v3. The specific focus is on the S3 Client's uncommon methods and proper handling of streaming data. The code demonstrates realistic usage of uploading, downloading, and verifying object content in S3, which requires understanding of both AWS SDK patterns and handling Readable streams.
+
+ASSERTIONS:
+----------------------------------------
+const downloadedContent = await downloadObject();
+console.assert(downloadedContent === objectContent, 'The downloaded content does not match the uploaded content');
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as AWS from 'aws-sdk';
+import { S3 } from 'aws-sdk';
+import { assert } from 'assert';
+
+// AWS S3 configuration
+const s3 = new S3({
+    accessKeyId: 'your-access-key-id',
+    secretAccessKey: 'your-secret-access-key',
+    region: 'us-east-1'
+});
+
+// Function to upload a file to S3
+async function uploadFileToS3(bucketName: string, key: string, body: Buffer) {
+    const params = {
+        Bucket: bucketName,
+        Key: key,
+        Body: body
+    };
+
+    try {
+        const data = await s3.upload(params).promise();
+        return data;
+    } catch (error) {
+        console.error('Error uploading file:', error);
+        throw error;
+    }
+}
+
+// Function to list objects in an S3 bucket
+async function listObjectsInS3Bucket(bucketName: string) {
+    const params = {
+        Bucket: bucketName
+    };
+
+    try {
+        const data = await s3.listObjectsV2(params).promise();
+        return data.Contents || [];
+    } catch (error) {
+        console.error('Error listing objects:', error);
+        throw error;
+    }
+}
+
+// Example usage
+async function example() {
+    const bucketName = 'example-bucket';
+    const key = 'example-file.txt';
+    const body = Buffer.from('Hello, S3!');
+
+    // Upload a file
+    const uploadResult = await uploadFileToS3(bucketName, key, body);
+    console.log('Upload result:', uploadResult);
+
+    // List objects
+    const objects = await listObjectsInS3Bucket(bucketName);
+    console.log('Objects in bucket:', objects);
+
+    // Delete the uploaded file
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+    const deleteParams = {
+        Bucket: bucketName,
+        Key: key
+    };
+
+    try {
+        const deleteResult = await s3.deleteObject(deleteParams).promise();
+        console.log('Delete result:', deleteResult);
+    } catch (error) {
+        console.error('Error deleting object:', error);
+        throw error;
+    }
+}
+
+example().catch(console.error);
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the AWS SDK for S3 operations, including uploading, listing, and deleting objects. The completion involves using the `deleteObject` method and includes an assertion to check that the file is marked as deleted. This scenario tests the LLM's ability to recognize and correctly use rare AWS SDK methods, handle API responses, and verify behavior through assertions. It also ensures proper handling of API parameters and error conditions.
+
+ASSERTIONS:
+----------------------------------------
+assert(deleteResult.DeleteMarker === true, 'File should be marked as deleted');
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as AWS from 'aws-sdk';
+import { S3 } from 'aws-sdk';
+import { assert } from 'chai';
+
+// Initialize the S3 client
+const s3 = new AWS.S3({
+  apiVersion: '2006-03-01',
+  region: 'us-west-2'
+});
+
+// Helper function to create a bucket
+async function createBucket(bucketName: string): Promise<void> {
+  const params = {
+    Bucket: bucketName
+  };
+  await s3.createBucket(params).promise();
+  console.log(`Bucket ${bucketName} created successfully.`);
+}
+
+// Helper function to upload a file to S3
+async function uploadFile(bucketName: string, key: string, body: string): Promise<void> {
+  const params = {
+    Bucket: bucketName,
+    Key: key,
+    Body: body
+  };
+  await s3.putObject(params).promise();
+  console.log(`File ${key} uploaded to bucket ${bucketName}.`);
+}
+
+// Helper function to list files in a bucket
+async function listFiles(bucketName: string): Promise<string[]> {
+  const params = {
+    Bucket: bucketName
+  };
+  const data = await s3.listObjectsV2(params).promise();
+  return data.Contents ? data.Contents.map(item => item.Key!) : [];
+}
+
+// Helper function to delete a bucket
+async function deleteBucket(bucketName: string): Promise<void> {
+  const params = {
+    Bucket: bucketName
+  };
+  await s3.deleteBucket(params).promise();
+  console.log(`Bucket ${bucketName} deleted successfully.`);
+}
+
+// Main function to demonstrate S3 operations
+async function main() {
+  const bucketName = 'test-bucket-12345';
+  const fileName = 'test-file.txt';
+  const fileContent = 'Hello, AWS S3!';
+
+  // Create a new bucket
+  await createBucket(bucketName);
+
+  // Upload a file to the bucket
+  await uploadFile(bucketName, fileName, fileContent);
+
+  // List files in the bucket
+  const files = await listFiles(bucketName);
+  console.log('Files in bucket:', files);
+
+  // Validate file upload
+  assert.include(files, fileName, 'File should be uploaded to the bucket');
+
+  // Download the file from the bucket
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+  const downloadParams = {
+    Bucket: bucketName,
+    Key: fileName
+  };
+  const downloadedData = await s3.getObject(downloadParams).promise();
+  console.log(`Downloaded file content: ${downloadedData.Body.toString()}`);
+  await s3.deleteObject(downloadParams).promise();
+  console.log(`File ${fileName} deleted from bucket ${bucketName}.`);
+
+SUFFIX CODE:
+----------------------------------------
+
+  // List files in the bucket again to ensure file deletion
+  const filesAfterDeletion = await listFiles(bucketName);
+  console.log('Files in bucket after deletion:', filesAfterDeletion);
+  assert.notInclude(filesAfterDeletion, fileName, 'File should be deleted from the bucket');
+
+  // Clean up by deleting the bucket
+  await deleteBucket(bucketName);
+}
+
+main().catch(err => console.error('Error in S3 operations:', err));
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of AWS S3 SDK for operations like creating a bucket, uploading a file, listing files, downloading a file, and deleting a file. It includes rare API calls such as getting an object from S3 and validating its content. The example focuses on ensuring the correct parameter ordering and handling of AWS S3 responses, which are crucial for cloud service interactions. The assertions verify the correctness of file upload, download, and deletion operations.
+
+ASSERTIONS:
+----------------------------------------
+assert.equal(downloadedContent, fileContent, 'Downloaded file content should match the uploaded content');
+assert.include(files, fileName, 'File should be uploaded to the bucket');
+assert.notInclude(filesAfterDeletion, fileName, 'File should be deleted from the bucket');
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Sequelize, Model, DataTypes } from 'sequelize';
+import { expect } from 'chai';
+
+// Database configuration
+const sequelize = new Sequelize('sqlite::memory:');
+
+// Model definition
+class User extends Model {
+  public id!: number;
+  public name!: string;
+  public age!: number;
+}
+
+User.init({
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  age: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  }
+}, {
+  sequelize,
+  modelName: 'User'
+});
+
+(async () => {
+  await sequelize.sync({ force: true });
+
+  // Helper function to create users
+  const createUser = async (name: string, age: number) => {
+    return await User.create({ name, age });
+  };
+
+  // Populate the database with sample data
+  await createUser('Alice', 30);
+  await createUser('Bob', 25);
+  await createUser('Charlie', 35);
+
+  // Fetch all users from the database
+  const users = await User.findAll();
+
+  console.log('All users:', JSON.stringify(users, null, 2));
+
+  // Define a function to get users by age range
+  const getUsersByAgeRange = async (minAge: number, maxAge: number): Promise<User[]> => {
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+return await User.findAll({
+    where: { age: { [Sequelize.Op.between]: [minAge, maxAge] } },
+    order: [['id', 'ASC']]
+});
+
+SUFFIX CODE:
+----------------------------------------
+  };
+
+  // Fetch users with age between 26 and 34
+  const usersInRange = await getUsersByAgeRange(26, 34);
+
+  console.log('Users in range:', JSON.stringify(usersInRange, null, 2));
+
+  // Assertions
+  expect(usersInRange).to.have.lengthOf(2);
+  expect(usersInRange[0].name).to.equal('Alice');
+  expect(usersInRange[1].name).to.equal('Bob');
+
+  // Clean up resources
+  await sequelize.close();
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the model's understanding of Sequelize's query capabilities, specifically the use of the `Op.between` operator for filtering records within a range. The `Op.between` operator is less commonly used than basic find operations and requires understanding of Sequelize's syntax and query API. This scenario also includes comprehensive setup and teardown steps to ensure a clean test environment.
+
+ASSERTIONS:
+----------------------------------------
+expect(usersInRange).to.have.lengthOf(2);
+expect(usersInRange[0].name).to.equal('Alice');
+expect(usersInRange[1].name).to.equal('Bob');
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { S3 } from 'aws-sdk';
+import { mock, MockProxy } from 'jest-mock-extended';
+
+// S3 client mock
+const s3Client: MockProxy<S3> = mock<S3>();
+
+interface FileUploadResult {
+  bucket: string;
+  key: string;
+  location: string;
+}
+
+// Function to upload file to S3
+async function uploadFileToS3(bucket: string, key: string, body: Buffer): Promise<FileUploadResult> {
+  const params = {
+    Bucket: bucket,
+    Key: key,
+    Body: body,
+    ACL: 'public-read',
+  };
+
+  return new Promise((resolve, reject) => {
+    s3Client.upload(params, (err, data) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve({
+        bucket: data.Bucket,
+        key: data.Key,
+        location: data.Location,
+      });
+    });
+  });
+}
+
+// Test setup
+const testBucket = 'test-bucket';
+const testKey = 'test-key';
+const testBody = Buffer.from('test content');
+const mockUploadResponse = {
+  Bucket: testBucket,
+  Key: testKey,
+  Location: 'http://test-bucket.s3.amazonaws.com/test-key',
+};
+
+// Mock S3 upload method
+s3Client.upload.mockImplementation((params, callback) => {
+  callback(null, mockUploadResponse);
+});
+
+// Test function
+async function testUploadFunction() {
+  try {
+    const result = await uploadFileToS3(testBucket, testKey, testBody);
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+    console.log('File uploaded successfully:', result);
+  } catch (error) {
+    console.error('Error uploading file:', error);
+  }
+}
+
+testUploadFunction();
+
+// Assertions
+import * as assert from 'assert';
+assert.strictEqual(mockUploadResponse.Bucket, testBucket);
+assert.strictEqual(mockUploadResponse.Key, testKey);
+assert.strictEqual(mockUploadResponse.Location, 'http://test-bucket.s3.amazonaws.com/test-key');
+
+// Cleanup
+s3Client.upload.mockReset();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the AWS SDK's S3 upload method, which is a less common API usage scenario. It tests the ability of the LLM to correctly mock the S3 upload method, handle the callback pattern, and verify the result. The scenario includes setting up a mock for the S3 client, defining the function to be tested, and verifying the expected behavior using assertions. This example is beneficial for testing the LLM's understanding of asynchronous code, AWS SDK patterns, and handling of mock implementations.
+
+ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(result, {
+  bucket: testBucket,
+  key: testKey,
+  location: 'http://test-bucket.s3.amazonaws.com/test-key',
+});
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Sequelize, DataTypes, Model } from "sequelize";
+
+// Setting up the Sequelize connection and defining a model
+const sequelize = new Sequelize('sqlite::memory:');
+
+class User extends Model {
+    public id!: number;
+    public name!: string;
+    public email!: string;
+}
+
+User.init({
+    id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    }
+}, {
+    sequelize,
+    modelName: 'User'
+});
+
+async function setupDatabase() {
+    await sequelize.sync({ force: true });
+    await User.bulkCreate([
+        { name: 'John Doe', email: 'john@example.com' },
+        { name: 'Jane Doe', email: 'jane@example.com' }
+    ]);
+}
+
+setupDatabase().then(async () => {
+    // Context: We want to implement a deprecated but still supported feature
+    // Using the 'findOrCreate' method which is not commonly used
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+const [user, created] = await User.findOrCreate({
+    where: { email: "john@example.com" },
+    defaults: { name: "John Doe" }
+});
+
+SUFFIX CODE:
+----------------------------------------
+
+    // Fetch all users to verify the insertion
+    const users = await User.findAll();
+    console.log(users.map(user => user.toJSON()));
+
+    // Cleaning up resources
+    await sequelize.close();
+}).catch(err => console.error(err));
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to handle a deprecated but still supported feature in Sequelize, the 'findOrCreate' method. This method is not commonly used and understanding its correct implementation is crucial for maintaining legacy codebases. The code verifies the creation of a user if it does not already exist, which is an uncommon but valid usage pattern. The test ensures that the model correctly interprets and uses the 'findOrCreate' method while maintaining proper parameter ordering and handling asynchronous operations.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+setupDatabase().then(async () => {
+    const [user, created] = await User.findOrCreate({
+        where: { email: 'john@example.com' },
+        defaults: { name: 'John Doe' }
+    });
+    assert.strictEqual(created, false, 'User should not be created as it already exists');
+    assert.strictEqual(user.name, 'John Doe', 'User name should be John Doe');
+    assert.strictEqual(user.email, 'john@example.com', 'User email should be john@example.com');
+    const users = await User.findAll();
+    assert.strictEqual(users.length, 2, 'There should be exactly 2 users in the database');
+    await sequelize.close();
+}).catch(err => console.error(err));
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as AWS from 'aws-sdk';
+import { assert } from 'assert';
+
+// AWS SDK configuration
+AWS.config.update({
+    region: 'us-west-2'
+});
+
+// S3 client initialization
+const s3 = new AWS.S3();
+
+// Function to upload a file to S3
+async function uploadFile(bucketName: string, key: string, body: Buffer): Promise<AWS.S3.ManagedUpload.SendData> {
+    const params: AWS.S3.PutObjectRequest = {
+        Bucket: bucketName,
+        Key: key,
+        Body: body
+    };
+    return new Promise((resolve, reject) => {
+        s3.upload(params, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+// Function to list objects in an S3 bucket
+async function listObjects(bucketName: string): Promise<AWS.S3.ListObjectsV2Output> {
+    const params: AWS.S3.ListObjectsV2Request = {
+        Bucket: bucketName
+    };
+    return new Promise((resolve, reject) => {
+        s3.listObjectsV2(params, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+// Function to get a signed URL for an object
+async function getSignedUrl(bucketName: string, key: string): Promise<string> {
+    const params: AWS.S3.GetObjectRequest = {
+        Bucket: bucketName,
+        Key: key
+    };
+    return new Promise((resolve, reject) => {
+        s3.getSignedUrl('getObject', params, (err, url) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(url);
+            }
+        });
+    });
+}
+
+// Example usage
+(async () => {
+    const bucketName = 'test-bucket';
+    const key = 'test-file.txt';
+    const body = Buffer.from('Hello, world!');
+
+    try {
+        // Upload the file
+        const uploadData = await uploadFile(bucketName, key, body);
+        console.log('File uploaded:', uploadData);
+
+        // List objects in the bucket
+        const listData = await listObjects(bucketName);
+        console.log('Objects in bucket:', listData);
+
+        // Get a signed URL for the uploaded file
+        const signedUrl = await getSignedUrl(bucketName, key);
+        console.log('Signed URL:', signedUrl);
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+await s3.deleteObject({ Bucket: bucketName, Key: key }).promise();
+console.log('File deleted');
+
+SUFFIX CODE:
+----------------------------------------
+        // Delete the uploaded file
+        const deleteParams: AWS.S3.DeleteObjectRequest = {
+            Bucket: bucketName,
+            Key: key
+        };
+        await s3.deleteObject(deleteParams).promise();
+        console.log('File deleted');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it demonstrates the use of a less common AWS SDK function, 'copyObject', which is used to copy objects within an S3 bucket. The golden completion involves correctly setting up the parameters and using the promise-based API for the 'copyObject' function, which is less frequently used compared to other S3 operations like 'putObject' or 'getObject'. The correct completion should handle the parameters and API conventions properly, following the same pattern established in the prefix code.
+
+ASSERTIONS:
+----------------------------------------
+assert.ok(copyData.CopyObjectResult, 'CopyObjectResult should be present');
+assert.strictEqual(copyData.CopyObjectResult.ETag.length > 0, true, 'ETag should be a non-empty string');
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as aws from 'aws-sdk';
+import { strict as assert } from 'assert';
+
+// AWS SDK Configuration
+const s3 = new aws.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: 'us-east-1'
+});
+
+// Helper function to upload a file to S3
+async function uploadFileToS3(bucketName: string, fileName: string, fileContent: Buffer): Promise<aws.S3.ManagedUpload.SendData> {
+    const params = {
+        Bucket: bucketName,
+        Key: fileName,
+        Body: fileContent
+    };
+
+    return s3.upload(params).promise();
+}
+
+// Helper function to download a file from S3
+async function downloadFileFromS3(bucketName: string, fileName: string): Promise<Buffer> {
+    const params = {
+        Bucket: bucketName,
+        Key: fileName
+    };
+
+    const data = await s3.getObject(params).promise();
+    return data.Body as Buffer;
+}
+
+// Example usage of the upload and download functions
+(async () => {
+    const bucketName = 'my-test-bucket';
+    const fileName = 'test-file.txt';
+    const fileContent = Buffer.from('Hello, world!');
+
+    try {
+        // Upload the file
+        const uploadResult = await uploadFileToS3(bucketName, fileName, fileContent);
+        console.log('File uploaded successfully:', uploadResult);
+        assert.equal(uploadResult.Bucket, bucketName);
+        assert.equal(uploadResult.Key, fileName);
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+        const listResponse = await s3.listObjectsV2({ Bucket: bucketName, Prefix: fileName }).promise();
+        assert.ok(listResponse.Contents && listResponse.Contents.some(item => item.Key === fileName));
+
+SUFFIX CODE:
+----------------------------------------
+
+        // Download the file
+        const downloadedContent = await downloadFileFromS3(bucketName, fileName);
+        console.log('File downloaded successfully:', downloadedContent.toString());
+        assert.equal(downloadedContent.toString(), fileContent.toString());
+    } catch (error) {
+        console.error('Error during S3 operations:', error);
+    } finally {
+        // Cleanup: Delete the uploaded file
+        const deleteParams = {
+            Bucket: bucketName,
+            Key: fileName
+        };
+        await s3.deleteObject(deleteParams).promise();
+        console.log('File deleted successfully');
+    }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good scenario for verifying the LLM's ability to handle AWS SDK operations, specifically the use of the S3 service for file uploads, downloads, and metadata checks. The golden completion involves an uncommon but valid API usage pattern (headObject) to check if a file exists and retrieve its metadata, which is less frequently used compared to upload and download operations. This ensures the model can recognize and complete patterns involving various AWS SDK methods, correctly handle parameter ordering, and understand the context of S3 operations.
+
+ASSERTIONS:
+----------------------------------------
+assert.equal(headResult.ContentLength, fileContent.length);
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as AWS from 'aws-sdk';
+import { assert } from 'console';
+
+AWS.config.update({
+  accessKeyId: 'your-access-key-id',
+  secretAccessKey: 'your-secret-access-key',
+  region: 'us-west-2'
+});
+
+const s3 = new AWS.S3();
+
+// Function to list objects in an S3 bucket
+async function listObjects(bucketName: string) {
+  return new Promise((resolve, reject) => {
+    s3.listObjects({ Bucket: bucketName }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+// Function to upload an object to S3
+async function uploadObject(bucketName: string, key: string, body: string) {
+  return new Promise((resolve, reject) => {
+    s3.putObject({ Bucket: bucketName, Key: key, Body: body }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+// Function to delete an object from S3
+async function deleteObject(bucketName: string, key: string) {
+  return new Promise((resolve, reject) => {
+    s3.deleteObject({ Bucket: bucketName, Key: key }, (err, data) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
+
+const bucketName = 'example-bucket';
+const objectKey = 'example-object';
+const objectBody = 'This is a test object.';
+
+async function testS3Operations() {
+  try {
+    // Upload object
+    await uploadObject(bucketName, objectKey, objectBody);
+
+    // List objects
+    const listResponse = await listObjects(bucketName);
+    assert(listResponse.Contents.some((item: any) => item.Key === objectKey));
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+    // Delete object
+    await deleteObject(bucketName, objectKey);
+
+    // Verify deletion
+    const finalListResponse = await listObjects(bucketName);
+    assert(!finalListResponse.Contents.some((item: any) => item.Key === objectKey));
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+}
+
+testS3Operations();
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the AWS SDK for JavaScript (v2) in a Node.js environment to interact with S3. It includes operations to list, upload, and delete objects in an S3 bucket. The golden completion focuses on verifying the upload of an object using the `headObject` method, which is less commonly used compared to the basic `putObject` and `getObject` methods. This API pattern is important for validating the existence and properties of an object after upload. The assertions ensure that the object was uploaded successfully and has the expected content length. The test case also handles errors appropriately and cleans up resources by deleting the object after verification.
+
+ASSERTIONS:
+----------------------------------------
+assert(uploadResponse.ContentLength === objectBody.length);
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { SubscriptionClient } from 'subscriptions-transport-ws';
+
+// Setup WebSocket link for Apollo Client
+const wsLink = new WebSocketLink(
+  new SubscriptionClient('ws://localhost:4000/graphql', {
+    reconnect: true
+  })
+);
+
+// Initialize Apollo Client with WebSocket link
+const client = new ApolloClient({
+  link: wsLink,
+  cache: new InMemoryCache()
+});
+
+// Define subscription query for listening to new messages
+const NEW_MESSAGES_SUBSCRIPTION = gql`
+  subscription OnNewMessage {
+    newMessage {
+      id
+      content
+      createdAt
+      author {
+        id
+        name
+      }
+    }
+  }
+`;
+
+// Helper function to format message
+function formatMessage(message: any): string {
+  return `${message.author.name}: ${message.content} (at ${message.createdAt})`;
+}
+
+// Log new messages received from subscription
+const handleNewMessage = (data: any) => {
+  if (data.newMessage) {
+    console.log('New message received:', formatMessage(data.newMessage));
+  }
+};
+
+// Subscribe to new messages
+client.subscribe({
+  query: NEW_MESSAGES_SUBSCRIPTION
+}).subscribe({
+  next: handleNewMessage,
+  error: (err) => console.error('Subscription error:', err)
+});
+
+// Mocking the Apollo Client subscription for testing
+const mockData = {
+  newMessage: {
+    id: '1',
+    content: 'Hello World!',
+    createdAt: new Date().toISOString(),
+    author: {
+      id: '1',
+      name: 'John Doe'
+    }
+  }
+};
+
+// Simulate receiving a new message
+handleNewMessage(mockData);
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+handleNewMessage({
+  newMessage: {
+    id: '2',
+    content: 'This is a second test message',
+    createdAt: new Date().toISOString(),
+    author: {
+      id: '2',
+      name: 'Alice'
+    }
+  }
+});
+
+SUFFIX CODE:
+----------------------------------------
+
+// Cleanup resources
+client.stop();
+wsLink.subscriptionClient.close();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on using the Apollo Client with WebSocket subscriptions, an uncommon but valid usage pattern. By including the deprecated 'subscriptions-transport-ws' library, it tests the model's ability to recognize and correctly implement a subscription with Apollo Client. The test also verifies proper usage of parameters and handling of real-time data through subscriptions, making it a robust example for evaluating LLM capabilities.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Verify that the mock data was handled correctly
+const testData = {
+  newMessage: {
+    id: '1',
+    content: 'Hello World!',
+    createdAt: new Date().toISOString(),
+    author: {
+      id: '1',
+      name: 'John Doe'
+    }
+  }
+};
+
+// Capture console output
+let consoleOutput: string[] = [];
+const originalLog = console.log;
+console.log = (message: string) => consoleOutput.push(message);
+
+// Simulate receiving new message
+handleNewMessage(testData);
+
+// Check the output
+assert(consoleOutput.length > 0, 'Expected console output for new message');
+assert(consoleOutput[0].includes('John Doe: Hello World!'), 'Expected correct message format in console output');
+
+// Restore original console.log
+console.log = originalLog;
+
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import express from 'express';
+import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import fetch from 'node-fetch';
+import { assert } from 'chai';
+
+const typeDefs = gql`
+  type Query {
+    hello: String
+  }
+`;
+
+const resolvers = {
+  Query: {
+    hello: () => 'Hello world!',
+  },
+};
+
+const server = new ApolloServer({ typeDefs, resolvers });
+const app = express();
+server.applyMiddleware({ app });
+
+const PORT = 4000;
+let httpServer;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}${server.graphqlPath}`);
+});
+
+const client = new ApolloClient({
+  link: new HttpLink({ uri: `http://localhost:${PORT}${server.graphqlPath}`, fetch }),
+  cache: new InMemoryCache(),
+});
+
+const GET_HELLO = gql`
+  query GetHello {
+    hello
+  }
+`;
+
+async function fetchHello() {
+  return client.query({ query: GET_HELLO });
+}
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+fetchHello()
+  .then(({ data }) => {
+    assert.equal(data.hello, 'Hello world!');
+    console.log('Test passed');
+  })
+  .catch(error => {
+    console.error('Test failed:', error);
+  });
+
+SUFFIX CODE:
+----------------------------------------
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a setup for a GraphQL server using Apollo Server and Apollo Client. The pattern involves setting up a GraphQL server, defining a schema and resolver, and querying the server from the client. The completion demonstrates understanding of initiating a query, handling the result, and performing necessary cleanup. The assertions ensure the API behaves as expected and the resource cleanup is properly handled.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(result.data.hello, 'Hello world!');
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as ws from 'ws';
+
+// WebSocket server setup
+const wss = new ws.Server({ port: 8080 });
+
+// Store connected clients
+const clients: ws.WebSocket[] = [];
+
+// Broadcast message to all clients
+const broadcast = (message: string) => {
+  clients.forEach(client => {
+    if (client.readyState === ws.WebSocket.OPEN) {
+      client.send(message);
+    }
+  });
+};
+
+// Handle new connections
+wss.on('connection', (ws: ws.WebSocket) => {
+  clients.push(ws);
+  ws.on('message', (message: string) => {
+    console.log(`Received message: ${message}`);
+    // Broadcast the received message to all clients
+    broadcast(message);
+  });
+
+  ws.on('close', () => {
+    // Remove the client from the clients array
+    const index = clients.indexOf(ws);
+    if (index !== -1) {
+      clients.splice(index, 1);
+    }
+  });
+});
+
+// Client setup
+const client = new ws.WebSocket('ws://localhost:8080');
+
+client.on('open', () => {
+  console.log('Client connected to server');
+  // Send a message to the server
+  client.send('Hello Server');
+});
+
+client.on('message', (message: string) => {
+  console.log(`Client received: ${message}`);
+});
+
+// Utility function to close all clients
+const closeAllClients = () => {
+  clients.forEach(client => client.close());
+};
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+client.on('close', () => {
+  console.log('Client disconnected');
+  closeAllClients();
+  wss.close();
+});
+
+SUFFIX CODE:
+----------------------------------------
+client.on('close', () => {
+  console.log('Client disconnected');
+  closeAllClients();
+  wss.close();
+});
+
+// Additional client to test multiple connections
+const anotherClient = new ws.WebSocket('ws://localhost:8080');
+
+anotherClient.on('open', () => {
+  console.log('Another client connected to server');
+  // Send a message to the server
+  anotherClient.send('Hello Again Server');
+});
+
+anotherClient.on('message', (message: string) => {
+  console.log(`Another client received: ${message}`);
+  // Close the client after receiving a message
+  anotherClient.close();
+});
+
+anotherClient.on('close', () => {
+  console.log('Another client disconnected');
+});
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the 'ws' library for WebSocket communication, focusing on handling client errors using the 'error' event. This is an uncommon but crucial aspect of WebSocket communication to ensure robustness and proper error handling. The pattern established in the prefix includes setting up a WebSocket server, handling connections, broadcasting messages, and managing client connections. The completion tests the model's ability to recognize and implement error handling for the WebSocket client, which is a less commonly showcased feature but essential for production-grade applications.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+client.on('error', (err: Error) => {
+  assert(err instanceof Error, 'Error event should provide an error object');
+  assert(typeof err.message === 'string', 'Error message should be a string');
+});
+
+client.on('open', () => {
+  // Simulate an error condition
+  client.emit('error', new Error('Simulated error'));
+});
+
+// Ensure error handling works as expected
+setTimeout(() => {
+  assert(client.readyState === ws.WebSocket.CLOSED, 'Client should close on error');
+  closeAllClients();
+  wss.close();
+}, 1000);
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Socket } from 'socket.io';
+import { Server } from 'http';
+
+// A helper function to create and configure an HTTP server
+function createServer(): Server {
+  const server = new Server();
+  server.listen(3000);
+  return server;
+}
+
+// A function to initialize and configure a Socket.io server
+function initializeSocket(server: Server): Socket {
+  const io = new Socket(server);
+  io.on('connection', (socket) => {
+    console.log('A user connected');
+    socket.on('disconnect', () => {
+      console.log('A user disconnected');
+    });
+  });
+  return io;
+}
+
+// Creating and configuring the HTTP server
+const server = createServer();
+
+// Initializing the Socket.io server
+const io = initializeSocket(server);
+
+// A function to broadcast a message to all connected clients
+function broadcastMessage(io: Socket, message: string): void {
+  io.emit('broadcast', message);
+}
+
+// Broadcasting a welcome message to all connected clients
+const welcomeMessage = 'Welcome to the chat!';
+broadcastMessage(io, welcomeMessage);
+
+// A function to handle user-specific messages
+function handleMessage(socket: Socket, message: string): void {
+  console.log(`Message from ${socket.id}: ${message}`);
+  socket.emit('message', `Received: ${message}`);
+}
+
+// Adding the message handler to the socket
+io.on('connection', (socket) => {
+  socket.on('message', (message) => handleMessage(socket, message));
+});
+
+// Mocking a connected client to test the message handling
+const mockSocket = {
+  id: 'mock-socket-id',
+  emit: jest.fn(),
+  on: jest.fn((event, callback) => {
+    if (event === 'message') {
+      callback('Test message');
+    }
+  })
+};
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+io.emit('connection', mockSocket);
+
+SUFFIX CODE:
+----------------------------------------
+io.close();
+server.close();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case involves Socket.io, a real-time communication library, and focuses on the correct usage of its API to handle and emit messages. The prefix sets up a comprehensive Socket.io server and includes helper functions to handle connections and messages. The golden completion demonstrates the correct way to handle a mocked socket message and verify the expected behavior using Jest. This scenario tests the LLM's ability to recognize and implement specific Socket.io patterns and correctly use Jest for assertions.
+
+ASSERTIONS:
+----------------------------------------
+handleMessage(mockSocket as unknown as Socket, 'Test message');
+expect(mockSocket.emit).toHaveBeenCalledWith('message', 'Received: Test message');
+
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as express from 'express';
+import * as passport from 'passport';
+import { Strategy as LocalStrategy } from 'passport-local';
+import * as bcrypt from 'bcryptjs';
+import * as bodyParser from 'body-parser';
+import * as session from 'express-session';
+
+const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(session({ secret: 'secret', resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+interface User {
+  id: number;
+  username: string;
+  password: string;
+}
+
+const users: User[] = [
+  { id: 1, username: 'user1', password: bcrypt.hashSync('password1', 10) },
+  { id: 2, username: 'user2', password: bcrypt.hashSync('password2', 10) }
+];
+
+passport.use(new LocalStrategy(
+  function(username, password, done) {
+    const user = users.find(u => u.username === username);
+    if (!user) {
+      return done(null, false, { message: 'Incorrect username.' });
+    }
+    if (!bcrypt.compareSync(password, user.password)) {
+      return done(null, false, { message: 'Incorrect password.' });
+    }
+    return done(null, user);
+  }
+));
+
+passport.serializeUser((user: User, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id: number, done) => {
+  const user = users.find(u => u.id === id);
+  done(null, user);
+});
+
+app.post('/login',
+  passport.authenticate('local', { failureRedirect: '/login' }),
+  function(req, res) {
+    res.redirect('/');
+  }
+);
+
+app.get('/login', (req, res) => {
+  res.send('<form method="post" action="/login">\n  <div>\n    <label>Username:</label>\n    <input type="text" name="username"/>\n  </div>\n  <div>\n    <label>Password:</label>\n    <input type="password" name="password"/>\n  </div>\n  <div>\n    <input type="submit" value="Login"/>\n  </div>\n</form>');
+});
+
+app.listen(3000, () => {
+  console.log('Server started on http://localhost:3000');
+});
+
+// Test user login
+async function testLogin() {
+  const response = await fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'username=user1&password=password1'
+  });
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+  const result = await response.text();
+  console.log(result);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+// Run the test
+(async () => {
+  await testLogin();
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it uses Passport.js with the LocalStrategy for authentication, which is a less commonly documented approach compared to OAuth strategies. It tests the LLM's ability to recognize and complete a user login process using this specific authentication method. The completion involves handling the response from a login attempt, which is a critical part of the authentication flow.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+async function testAssertions() {
+  const response = await fetch('http://localhost:3000/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'username=user1&password=password1'
+  });
+  assert.equal(response.status, 200, 'Login should be successful');
+}
+
+// Run assertions
+(async () => {
+  await testAssertions();
+})();
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import { assert } from 'chai';
+
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: 'your-api-key',
+  authDomain: 'your-auth-domain',
+  projectId: 'your-project-id',
+  storageBucket: 'your-storage-bucket',
+  messagingSenderId: 'your-messaging-sender-id',
+  appId: 'your-app-id'
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+// Helper function to create a new user
+async function createUser(email: string, password: string): Promise<firebase.auth.UserCredential> {
+  try {
+    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+    return userCredential;
+  } catch (error) {
+    throw new Error(`Error creating user: ${error.message}`);
+  }
+}
+
+// Helper function to sign in a user
+async function signInUser(email: string, password: string): Promise<firebase.auth.UserCredential> {
+  try {
+    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+    return userCredential;
+  } catch (error) {
+    throw new Error(`Error signing in user: ${error.message}`);
+  }
+}
+
+// Helper function to sign out a user
+async function signOutUser(): Promise<void> {
+  try {
+    await firebase.auth().signOut();
+  } catch (error) {
+    throw new Error(`Error signing out user: ${error.message}`);
+  }
+}
+
+// Test case to verify user creation, sign-in, and sign-out
+async function testFirebaseAuth() {
+  const testEmail = 'testuser@example.com';
+  const testPassword = 'password123';
+
+  // Create a new user
+  const createUserResult = await createUser(testEmail, testPassword);
+  assert.isNotNull(createUserResult.user, 'User should be created successfully');
+
+  // Sign in the user
+  const signInResult = await signInUser(testEmail, testPassword);
+  assert.isNotNull(signInResult.user, 'User should be signed in successfully');
+
+  // Check if the user is signed in
+  const currentUser = firebase.auth().currentUser;
+  assert.isNotNull(currentUser, 'User should be currently signed in');
+
+  // Send password reset email
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+  await firebase.auth().sendPasswordResetEmail(testEmail)
+
+SUFFIX CODE:
+----------------------------------------
+
+  // Cleanup: Sign out the user
+  await signOutUser();
+  const signedOutUser = firebase.auth().currentUser;
+  assert.isNull(signedOutUser, 'User should be signed out successfully');
+}
+
+// Run the test
+(async () => {
+  try {
+    await testFirebaseAuth();
+    console.log('All assertions passed.');
+  } catch (error) {
+    console.error('Test failed:', error);
+  }
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of Firebase Authentication, focusing on the less commonly used function 'sendPasswordResetEmail'. It sets up a realistic scenario by creating, signing in, and signing out a user, ensuring that the API pattern is clear. The 'sendPasswordResetEmail' function is placed between the sign-in and sign-out operations, testing the model's understanding of API usage and parameter handling. Assertions verify the behavior at each step, and proper error handling and resource cleanup ensure a robust example.
+
+ASSERTIONS:
+----------------------------------------
+assert.doesNotThrow(() => { firebase.auth().sendPasswordResetEmail('testuser@example.com'); }, 'Password reset email should be sent successfully');
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { onError } from '@apollo/client/link/error';
+import { ApolloLink, HttpLink, Observable } from '@apollo/client';
+
+// Setup WebSocketLink for subscriptions
+const wsLink = new WebSocketLink({
+  uri: 'ws://localhost:4000/graphql',
+  options: {
+    reconnect: true
+  }
+});
+
+// Setup HttpLink for queries and mutations
+const httpLink = new HttpLink({
+  uri: 'http://localhost:4000/graphql'
+});
+
+// Error handling link
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => {
+      console.log(`GraphQL error: ${message}`);
+    });
+  }
+  if (networkError) {
+    console.log(`Network error: ${networkError.message}`);
+  }
+});
+
+// Custom ApolloLink for logging
+const loggingLink = new ApolloLink((operation, forward) => {
+  console.log(`Starting request for ${operation.operationName}`);
+  return forward(operation).map((result) => {
+    console.log(`Completed request for ${operation.operationName}`);
+    return result;
+  });
+});
+
+// Setup ApolloClient with links and cache
+const client = new ApolloClient({
+  link: ApolloLink.from([errorLink, loggingLink, wsLink, httpLink]),
+  cache: new InMemoryCache()
+});
+
+// Define a subscription query
+const SUBSCRIBE_TO_MESSAGES = gql`
+  subscription OnMessageAdded {
+    messageAdded {
+      id
+      content
+      user {
+        name
+      }
+    }
+  }
+`;
+
+// Function to start the subscription
+function subscribeToMessages() {
+  const observable = client.subscribe({ query: SUBSCRIBE_TO_MESSAGES });
+  return observable;
+}
+
+// Function to handle new messages
+function handleNewMessage(message: any) {
+  console.log(`New message received: ${message.content} from ${message.user.name}`);
+}
+
+// Function to handle subscription errors
+function handleSubscriptionError(error: any) {
+  console.error('Subscription error:', error);
+}
+
+// Start the subscription and setup handlers
+const subscription = subscribeToMessages();
+subscription.subscribe({
+  next(response) {
+    handleNewMessage(response.data.messageAdded);
+  },
+  error(error) {
+    handleSubscriptionError(error);
+  }
+});
+
+// Mock data for testing
+const mockMessage = {
+  data: {
+    messageAdded: {
+      id: '1',
+      content: 'Hello, World!',
+      user: {
+        name: 'Test User'
+      }
+    }
+  }
+};
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+// Cleanup resources (not required for this mock example)
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle the Apollo Client API, specifically focusing on the less common WebSocketLink for GraphQL subscriptions. It requires the model to recognize the correct setup and usage of subscription queries and handlers, which is uncommon compared to typical query/mutation usage. The golden completion demonstrates proper parameter ordering and error handling, ensuring robustness in real-time communication scenarios.
+
+ASSERTIONS:
+----------------------------------------
+import { assert } from 'chai';
+
+// Mock the subscription response
+const mockSubscription = {
+  subscribe: ({ next, error }: any) => {
+    try {
+      next(mockMessage);
+    } catch (err) {
+      error(err);
+    }
+  }
+};
+
+// Replace actual subscription with mock
+const originalSubscribe = client.subscribe;
+client.subscribe = () => mockSubscription;
+
+// Test the subscription and handlers
+const subscriptionTest = subscribeToMessages();
+
+subscriptionTest.subscribe({
+  next(response) {
+    assert.equal(response.data.messageAdded.content, 'Hello, World!');
+    assert.equal(response.data.messageAdded.user.name, 'Test User');
+  },
+  error(error) {
+    assert.fail('Subscription should not fail');
+  }
+});
+
+// Restore original subscription function
+client.subscribe = originalSubscribe;
+
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { ApolloServer, makeExecutableSchema } from 'apollo-server';
+import { assert } from 'chai';
+
+// Define the GraphQL schema
+const typeDefs = `
+  type Query {
+    hello: String
+  }
+`;
+
+// Define the resolvers
+const resolvers = {
+  Query: {
+    hello: () => 'Hello world!',
+  },
+};
+
+// Create the executable schema
+const schema = makeExecutableSchema({
+  typeDefs,
+  resolvers,
+});
+
+// Initialize Apollo Server
+const server = new ApolloServer({ schema });
+
+// Start the server
+server.listen().then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`);
+});
+
+// Initialize Apollo Client
+const client = new ApolloClient({
+  uri: 'http://localhost:4000',
+  cache: new InMemoryCache(),
+});
+
+// Define the query
+const HELLO_QUERY = gql`
+  query {
+    hello
+  }
+`;
+
+// This function will execute the query and return the result
+async function fetchHello() {
+  try {
+    const result = await client.query({
+      query: HELLO_QUERY,
+    });
+    return result.data.hello;
+  } catch (error) {
+    throw new Error('Error fetching data');
+  }
+}
+
+// Fetch the data and perform assertions
+async function testFetchHello() {
+  const hello = await fetchHello();
+  assert.strictEqual(hello, 'Hello world!', 'The response should be "Hello world!"');
+}
+
+// Run the test
+(async () => {
+  await testFetchHello();
+})();
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+;
+
+SUFFIX CODE:
+----------------------------------------
+server.stop().then(() => {
+  console.log('Server stopped');
+});
+
+JUSTIFICATION:
+----------------------------------------
+This test case uses Apollo Server and Apollo Client to set up a GraphQL server and client. It includes a query to fetch data and assertions to verify the correct behavior. The golden completion involves stopping the server, which is a less common operation, making it a good test of the LLM's ability to handle rare API usage patterns.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(typeof fetchHello, 'function', 'fetchHello should be a function');
+assert.strictEqual(typeof testFetchHello, 'function', 'testFetchHello should be a function');
+assert.strictEqual(typeof server.stop, 'function', 'server.stop should be a function');
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { onError } from '@apollo/client/link/error';
+import { split } from '@apollo/client';
+import { getMainDefinition } from '@apollo/client/utilities';
+
+// Setup WebSocketLink for real-time updates
+const wsLink = new WebSocketLink({
+  uri: 'ws://localhost:4000/graphql',
+  options: {
+    reconnect: true,
+  },
+});
+
+// Setup error handling link
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => {
+      console.log(`GraphQL error: ${message}`, locations, path);
+    });
+  }
+  if (networkError) {
+    console.log(`Network error: ${networkError}`);
+  }
+});
+
+// Use split for proper routing of queries and mutations
+const splitLink = split(
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  errorLink
+);
+
+// Initialize Apollo Client
+const client = new ApolloClient({
+  link: splitLink,
+  cache: new InMemoryCache(),
+});
+
+// Sample subscription query
+const SUBSCRIBE_TO_MESSAGES = gql`
+  subscription OnMessageAdded {
+    messageAdded {
+      id
+      content
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
+
+// Function to subscribe to messages
+function subscribeToMessages() {
+  const observable = client.subscribe({
+    query: SUBSCRIBE_TO_MESSAGES,
+  });
+
+  observable.subscribe({
+    next(response) {
+      console.log('New message:', response.data.messageAdded);
+    },
+    error(err) {
+      console.error('Subscription error:', err);
+    },
+  });
+}
+
+// Call the subscription function
+subscribeToMessages();
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+console.log('Subscription setup complete.');
+
+JUSTIFICATION:
+----------------------------------------
+This test case examines the LLM's ability to recognize and implement a complex pattern involving Apollo Client's subscription setup using WebSocketLink. This scenario specifically tests rare but valid API interactions, such as handling subscriptions with real-time updates, proper error handling, and using split for routing. The context provided in the prefix ensures that the LLM must understand the setup and correctly complete the subscription logic, making it a comprehensive test of API pattern recognition and implementation.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Mock client.subscribe to return a mock observable
+const mockSubscribe = jest.fn().mockReturnValue({
+  subscribe: jest.fn(({ next, error }) => {
+    // Simulate a new message
+    next({ data: { messageAdded: { id: '1', content: 'Hello!', user: { id: '1', name: 'Alice' } } } });
+    // Simulate an error
+    error(new Error('Test error'));
+  })
+});
+client.subscribe = mockSubscribe;
+
+// Capture console output
+const consoleLog = jest.spyOn(console, 'log').mockImplementation(() => {});
+const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+// Run the subscription function
+subscribeToMessages();
+
+// Verify subscription logic
+assert(mockSubscribe.mock.calls.length === 1, 'subscribe should be called once');
+assert(consoleLog.mock.calls[0][0] === 'New message:', 'First log should be New message:');
+assert(consoleLog.mock.calls[0][1].content === 'Hello!', 'Message content should be Hello!');
+assert(consoleError.mock.calls[0][0] === 'Subscription error:', 'First error log should be Subscription error:');
+assert(consoleError.mock.calls[0][1].message === 'Test error', 'Error message should be Test error');
+
+// Cleanup
+consoleLog.mockRestore();
+consoleError.mockRestore();
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as aws from 'aws-sdk';
+import * as fs from 'fs';
+import { createLogger, transports } from 'winston';
+
+// Initialize AWS S3 client
+const s3 = new aws.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION
+});
+
+// Initialize logger
+const logger = createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new transports.Console(),
+        new transports.File({ filename: 'combined.log' })
+    ]
+});
+
+// Function to upload file to S3
+const uploadFileToS3 = async (filePath: string, bucketName: string, key: string): Promise<void> => {
+    try {
+        // Read file content
+        const fileContent = fs.readFileSync(filePath);
+
+        // Set up S3 upload parameters
+        const params = {
+            Bucket: bucketName,
+            Key: key,
+            Body: fileContent
+        };
+
+        // Uploading files to the bucket
+        await s3.upload(params).promise();
+        logger.info(`File uploaded successfully. ${key}`);
+    } catch (error) {
+        logger.error(`Error uploading file: ${error.message}`);
+        throw error;
+    }
+};
+
+// Function to list objects in S3 bucket
+const listObjectsInBucket = async (bucketName: string): Promise<void> => {
+    try {
+        const params = {
+            Bucket: bucketName
+        };
+        const data = await s3.listObjectsV2(params).promise();
+        data.Contents?.forEach(item => {
+            logger.info(`Item: ${item.Key}`);
+        });
+    } catch (error) {
+        logger.error(`Error listing objects: ${error.message}`);
+        throw error;
+    }
+};
+
+// Test function to demonstrate the usage of uploadFileToS3 and listObjectsInBucket
+const testS3Functions = async (): Promise<void> => {
+    const testFilePath = 'path/to/test/file.txt';
+    const testBucketName = 'my-test-bucket';
+    const testKey = 'test/file.txt';
+
+    // Ensure test file exists
+    fs.writeFileSync(testFilePath, 'This is a test file.');
+
+    // Upload test file to S3
+    await uploadFileToS3(testFilePath, testBucketName, testKey);
+
+    // List objects in the S3 bucket
+    await listObjectsInBucket(testBucketName);
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+    // Clean up test file
+    fs.unlinkSync(testFilePath);
+};
+
+// Run the test function
+testS3Functions().catch(error => {
+    logger.error(`Test failed: ${error.message}`);
+});
+
+JUSTIFICATION:
+----------------------------------------
+This test case involves AWS S3 operations using the aws-sdk library, focusing on a less common operation: deleting an object from an S3 bucket. The completion involves correctly forming and executing the deleteObject API call, which is not as frequently used as upload or list operations. The test ensures that the model can handle the pattern of creating parameters, invoking the AWS SDK method, and handling the promise. This scenario validates the model's ability to follow the established API usage pattern and complete it correctly.
+
+ASSERTIONS:
+----------------------------------------
+import * as aws from 'aws-sdk';
+import * as fs from 'fs';
+import { createLogger, transports } from 'winston';
+import assert from 'assert';
+
+const s3 = new aws.S3({
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    region: process.env.AWS_REGION
+});
+
+const logger = createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [
+        new transports.Console(),
+        new transports.File({ filename: 'combined.log' })
+    ]
+});
+
+const testS3Functions = async (): Promise<void> => {
+    const testFilePath = 'path/to/test/file.txt';
+    const testBucketName = 'my-test-bucket';
+    const testKey = 'test/file.txt';
+
+    fs.writeFileSync(testFilePath, 'This is a test file.');
+
+    await uploadFileToS3(testFilePath, testBucketName, testKey);
+    await listObjectsInBucket(testBucketName);
+
+    const deleteParams = {
+        Bucket: testBucketName,
+        Key: testKey
+    };
+    await s3.deleteObject(deleteParams).promise();
+    const data = await s3.listObjectsV2({ Bucket: testBucketName }).promise();
+    const fileExists = data.Contents?.some(item => item.Key === testKey);
+    assert.strictEqual(fileExists, false, 'Test file should be deleted from S3');
+
+    fs.unlinkSync(testFilePath);
+};
+
+testS3Functions().catch(error => {
+    logger.error(`Test failed: ${error.message}`);
+});
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcryptjs';
+
+interface User {
+  id: string;
+  username: string;
+  password: string;
+}
+
+const users: User[] = [
+  { id: '1', username: 'user1', password: '$2a$10$E9aXzHB4jFQOqTkZ4Gk3Oe' },
+  { id: '2', username: 'user2', password: '$2a$10$wq5dF1s5lCzv2J9e4Gk3Oe' }
+];
+
+const JWT_SECRET = 'your_jwt_secret_key';
+
+function authenticate(username: string, password: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const user = users.find(u => u.username === username);
+    if (!user) {
+      return reject('User not found');
+    }
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err) return reject(err);
+      if (!isMatch) return reject('Invalid credentials');
+      // Continue with generating the JWT token
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+      const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET);
+      return resolve(token);
+
+SUFFIX CODE:
+----------------------------------------
+      return reject('Authentication failed');
+    });
+  });
+}
+
+// Example usage
+(async () => {
+  try {
+    const token = await authenticate('user1', 'wrongpassword');
+    console.log('Authentication successful:', token);
+  } catch (err) {
+    console.error('Authentication error:', err);
+  }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case involves using the jsonwebtoken and bcrypt.js libraries for authentication, which are important but less commonly seen APIs for handling JWT token generation and password comparison. The example tests the LLM's ability to correctly use the jwt.sign function to generate a token and handle bcrypt.compare for password validation. This scenario is realistic and represents common but less frequently demonstrated usage patterns in authentication systems.
+
+ASSERTIONS:
+----------------------------------------
+import * as assert from 'assert';
+
+(async () => {
+  try {
+    const token = await authenticate('user1', '$2a$10$E9aXzHB4jFQOqTkZ4Gk3Oe');
+    assert.ok(token, 'Token should be generated');
+    const decoded = jwt.verify(token, JWT_SECRET);
+    assert.strictEqual(decoded.username, 'user1', 'Username should be user1');
+    assert.strictEqual(decoded.id, '1', 'ID should be 1');
+  } catch (err) {
+    assert.fail('Authentication failed with correct credentials');
+  }
+})();
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as jwt from 'jsonwebtoken';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+
+// Define a user type for better type safety
+interface User {
+  id: string;
+  username: string;
+  password: string;
+}
+
+// Sample user data
+const users: User[] = [
+  { id: '1', username: 'user1', password: 'password1' },
+  { id: '2', username: 'user2', password: 'password2' }
+];
+
+// JWT secret key
+const JWT_SECRET = 'your-secret-key';
+
+// Create an Express app
+const app = express();
+app.use(bodyParser.json());
+
+// Middleware to authenticate JWT token
+function authenticateToken(req: express.Request, res: express.Response, next: express.NextFunction) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, JWT_SECRET, (err: any, user: any) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
+// Login route to issue JWT token
+app.post('/login', (req, res) => {
+  // Authenticate User
+  const { username, password } = req.body;
+  const user = users.find(u => u.username === username && u.password === password);
+  if (!user) {
+    return res.status(400).send('Username or password incorrect');
+  }
+
+  // Generate an access token
+  const accessToken = jwt.sign({ username: user.username, id: user.id }, JWT_SECRET);
+  res.json({ accessToken });
+});
+
+// Protected route
+app.get('/protected', authenticateToken, (req, res) => {
+  res.json({ message: 'This is a protected route', user: req.user });
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
+// For testing purposes
+const request = require('supertest');
+let token: string;
+
+// Test the login route to get a token
+beforeAll(async () => {
+  const response = await request(app)
+    .post('/login')
+    .send({ username: 'user1', password: 'password1' });
+  token = response.body.accessToken;
+});
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+  const response = await request(app)
+    .get('/protected')
+    .set('Authorization', `Bearer ${token}`);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+  expect(response.status).toBe(200);
+  expect(response.body).toHaveProperty('message', 'This is a protected route');
+  expect(response.body.user).toHaveProperty('username', 'user1');
+});
+
+// Cleanup resources if any
+afterAll(() => {
+  // Perform any necessary cleanup
+});
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the jsonwebtoken library for JWT authentication in an Express.js application. It includes a comprehensive setup with user authentication and a protected route. The test case verifies that the protected route can be accessed with a valid JWT token, ensuring proper API behavior and parameter correctness.
+
+ASSERTIONS:
+----------------------------------------
+test('access protected route', async () => {
+  const response = await request(app)
+    .get('/protected')
+    .set('Authorization', `Bearer ${token}`);
+
+  expect(response.status).toBe(200);
+  expect(response.body).toHaveProperty('message', 'This is a protected route');
+  expect(response.body.user).toHaveProperty('username', 'user1');
+});
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import assert from 'assert';
+
+// Initializing Apollo Client with an in-memory cache
+const client = new ApolloClient({
+  uri: 'https://example.com/graphql',
+  cache: new InMemoryCache()
+});
+
+// Query to fetch user data
+const GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      name
+      email
+    }
+  }
+`;
+
+// Function to fetch user data by ID
+async function fetchUserData(userId: string) {
+  try {
+    const result = await client.query({
+      query: GET_USER,
+      variables: { id: userId }
+    });
+    return result.data.user;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+// Utility function to verify user data
+function verifyUserData(user: any) {
+  assert(user, 'User data should not be null or undefined');
+  assert(typeof user.id === 'string', 'User ID should be a string');
+  assert(typeof user.name === 'string', 'User name should be a string');
+  assert(typeof user.email === 'string', 'User email should be a string');
+}
+
+// Sample user ID for testing
+const sampleUserId = '12345';
+
+// Fetching and verifying user data
+fetchUserData(sampleUserId).then(user => {
+  verifyUserData(user);
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+    ;
+
+SUFFIX CODE:
+----------------------------------------
+
+  console.log('User data is valid:', user);
+}).catch(error => {
+  console.error('Test failed:', error);
+});
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case uses the Apollo Client library to query a GraphQL endpoint and fetch user data. The test case is designed to verify that the LLM can correctly recognize and continue the pattern of fetching and asserting user data, including handling specific values for the user's name and email. The use of Apollo Client and GraphQL query patterns is uncommon compared to more frequently seen REST API clients, making this a good benchmark for rare API usage capabilities.
+
+ASSERTIONS:
+----------------------------------------
+fetchUserData(sampleUserId).then(user => {
+  verifyUserData(user);
+  assert(user.name === 'John Doe', 'User name should be John Doe');
+  assert(user.email === 'john.doe@example.com', 'User email should be john.doe@example.com');
+  console.log('User data is valid:', user);
+}).catch(error => {
+  console.error('Test failed:', error);
+});
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as ws from 'ws';
+
+// Helper function to create a new WebSocket server
+function createWebSocketServer(port: number): ws.Server {
+    const server = new ws.Server({ port });
+    console.log(`WebSocket server started on port ${port}`);
+    return server;
+}
+
+// Function to handle incoming connections
+function handleConnection(socket: ws): void {
+    console.log('New client connected');
+    socket.on('message', (message) => {
+        console.log(`Received message: ${message}`);
+    });
+
+    socket.on('close', () => {
+        console.log('Client disconnected');
+    });
+}
+
+// Function to broadcast a message to all connected clients
+function broadcastMessage(server: ws.Server, message: string): void {
+    server.clients.forEach((client) => {
+        if (client.readyState === ws.OPEN) {
+            client.send(message);
+        }
+    });
+}
+
+// Create WebSocket server on port 8080
+const server = createWebSocketServer(8080);
+
+// Handle new connections
+server.on('connection', handleConnection);
+
+// Send a broadcast message after 5 seconds
+setTimeout(() => {
+    broadcastMessage(server, 'Hello, clients!');
+}, 5000);
+
+// Function to gracefully shutdown the server
+function shutdownServer(server: ws.Server): void {
+    console.log('Shutting down WebSocket server');
+    server.close(() => {
+        console.log('WebSocket server closed');
+    });
+}
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+const client = new ws.WebSocket('ws://localhost:8080');
+
+SUFFIX CODE:
+----------------------------------------
+const client = new ws('ws://localhost:8080');
+
+client.on('open', () => {
+    console.log('Connected to server');
+    client.send('Hello, server!');
+});
+
+client.on('message', (message) => {
+    console.log(`Received from server: ${message}`);
+    if (message === 'Hello, clients!') {
+        client.close();
+        shutdownServer(server);
+    }
+});
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to recognize and correctly implement an uncommon but crucial WebSocket server error-handling pattern using the 'ws' library. The correct completion involves attaching an 'error' event listener to the WebSocket server, which is essential for robust server operation and is often overlooked. This tests the model's understanding of proper error handling in real-time communication APIs.
+
+ASSERTIONS:
+----------------------------------------
+const serverErrorHandler = jest.fn();
+server.on('error', serverErrorHandler);
+
+server.emit('error', new Error('Test Error'));
+expect(serverErrorHandler).toHaveBeenCalledWith(expect.any(Error));
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
+import { HttpLink } from '@apollo/client/link/http';
+import { ApolloLink } from '@apollo/client/link/core';
+import fetch from 'cross-fetch';
+
+// Define GraphQL queries
+const GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      name
+      email
+    }
+  }
+`;
+
+// Define error handling link
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    graphQLErrors.forEach(({ message, locations, path }) => {
+      console.error(`GraphQL error: ${message}, Location: ${locations}, Path: ${path}`);
+    });
+  }
+  if (networkError) {
+    console.error(`Network error: ${networkError}`);
+  }
+});
+
+// Define HTTP link
+const httpLink = new HttpLink({
+  uri: 'https://example.com/graphql',
+  fetch
+});
+
+// Combine links
+const link = ApolloLink.from([errorLink, httpLink]);
+
+// Initialize Apollo Client
+const client = new ApolloClient({
+  cache: new InMemoryCache(),
+  link
+});
+
+// Function to fetch user data
+async function fetchUserData(userId: string) {
+  try {
+    const result = await client.query({
+      query: GET_USER,
+      variables: { id: userId }
+    });
+    return result.data.user;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    throw error;
+  }
+}
+
+// Sample user ID
+const sampleUserId = '123';
+
+// Main function to execute the code
+async function main() {
+  try {
+    const user = await fetchUserData(sampleUserId);
+    console.log('User data:', user);
+    // Verify user data
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+    if (!user || !user.id || !user.name || !user.email) {
+      throw new Error('Incomplete user data');
+    }
+
+SUFFIX CODE:
+----------------------------------------
+  } catch (error) {
+    console.error('Main function error:', error);
+  }
+}
+
+main();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of using Apollo Client with error handling and GraphQL queries. It tests the LLM's ability to understand the pattern of defining and using Apollo Client, setting up error handling, and fetching data with proper query and variable usage. The golden completion includes assertions to verify the correctness of the fetched data, ensuring the user data matches expected types and values.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(user.id === sampleUserId, 'User ID should match');
+console.assert(typeof user.name === 'string', 'User name should be a string');
+console.assert(typeof user.email === 'string', 'User email should be a string');
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import axios from 'axios';
+import { ApolloClient, InMemoryCache, gql } from '@apollo/client';
+
+// Setup Apollo Client
+const client = new ApolloClient({
+  uri: 'https://example.com/graphql',
+  cache: new InMemoryCache()
+});
+
+// Helper function to fetch data from REST API using Axios
+async function fetchDataFromRestAPI(endpoint: string): Promise<any> {
+  try {
+    const response = await axios.get(endpoint);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data from REST API:', error);
+    throw error;
+  }
+}
+
+// Helper function to fetch data from GraphQL API using Apollo Client
+async function fetchDataFromGraphQL(query: string): Promise<any> {
+  try {
+    const response = await client.query({ query: gql(query) });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data from GraphQL API:', error);
+    throw error;
+  }
+}
+
+// Sample data to use in the tests
+const restAPIEndpoint = 'https://jsonplaceholder.typicode.com/posts/1';
+const graphQLQuery = `{
+  post(id: 1) {
+    id
+    title
+    body
+  }
+}`;
+
+// Function to handle combined data fetching and processing
+async function fetchAndProcessData(): Promise<void> {
+  try {
+    const restData = await fetchDataFromRestAPI(restAPIEndpoint);
+    console.log('REST API Data:', restData);
+
+    const graphQLData = await fetchDataFromGraphQL(graphQLQuery);
+    console.log('GraphQL API Data:', graphQLData);
+
+    // Process the fetched data
+    const processedData = {
+      restTitle: restData.title,
+      graphQLBody: graphQLData.post.body
+    };
+    console.log('Processed Data:', processedData);
+
+    // Assertions to verify the fetched data
+    // Ensure the REST API data has a title property
+    if (!restData.title) throw new Error('REST API data does not contain a title property');
+    // Ensure the GraphQL API data has a body property
+    if (!graphQLData.post || !graphQLData.post.body) throw new Error('GraphQL API data does not contain a body property');
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+    console.log('All data validations passed successfully');
+
+SUFFIX CODE:
+----------------------------------------
+
+  } catch (error) {
+    console.error('Error in fetchAndProcessData:', error);
+    throw error;
+  }
+}
+
+// Execute the function
+fetchAndProcessData().then(() => {
+  console.log('Data fetching and processing completed successfully.');
+}).catch((error) => {
+  console.error('Failed to fetch and process data:', error);
+});
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the use of both Axios for REST API and Apollo Client for GraphQL API, combining data from both sources, and validating the combined data. The golden completion tests for the correct processing of data which is a crucial part of data integration scenarios. It also verifies the use of uncommon API functions and parameter correctness, making it a comprehensive test case.
+
+ASSERTIONS:
+----------------------------------------
+const restData = { title: 'Test Title' };
+const graphQLData = { post: { body: 'Test Body' } };
+const processedData = { restTitle: restData.title, graphQLBody: graphQLData.post.body };
+if (processedData.restTitle !== restData.title) throw new Error('Processed data REST title does not match');
+if (processedData.graphQLBody !== graphQLData.post.body) throw new Error('Processed data GraphQL body does not match');
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import express from 'express';
+import bodyParser from 'body-parser';
+import Stripe from 'stripe';
+import assert from 'assert';
+
+const app = express();
+const stripe = new Stripe('your-secret-key', { apiVersion: '2020-08-27' });
+
+app.use(bodyParser.json());
+
+// Helper function to create a new customer
+type Customer = { id: string, email: string };
+async function createCustomer(email: string): Promise<Customer> {
+  try {
+    const customer = await stripe.customers.create({ email });
+    return { id: customer.id, email: customer.email };
+  } catch (error) {
+    throw new Error('Failed to create customer');
+  }
+}
+
+// Helper function to create a payment intent
+type PaymentIntent = { id: string, clientSecret: string };
+async function createPaymentIntent(amount: number, currency: string, customerId: string): Promise<PaymentIntent> {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      customer: customerId,
+    });
+    return { id: paymentIntent.id, clientSecret: paymentIntent.client_secret! };
+  } catch (error) {
+    throw new Error('Failed to create payment intent');
+  }
+}
+
+// Endpoint to handle payment creation
+app.post('/create-payment', async (req, res) => {
+  const { email, amount, currency } = req.body;
+  try {
+    const customer = await createCustomer(email);
+    const paymentIntent = await createPaymentIntent(amount, currency, customer.id);
+    res.status(200).send({ paymentIntentId: paymentIntent.id, clientSecret: paymentIntent.clientSecret });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+// Start the server
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+app.post('/refund-payment', async (req, res) => {
+  const { paymentIntentId } = req.body;
+  try {
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentIntentId,
+    });
+    res.status(200).send({ refundId: refund.id });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+SUFFIX CODE:
+----------------------------------------
+app.post('/refund-payment', async (req, res) => {
+  const { paymentIntentId } = req.body;
+  try {
+    const refund = await stripe.refunds.create({
+      payment_intent: paymentIntentId,
+    });
+    res.status(200).send({ refundId: refund.id });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
+  }
+});
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and implement a pattern involving the Stripe API for capturing a payment intent. The completion demonstrates handling the capture of a payment intent, an operation that is less commonly used compared to creating customers or payment intents. The prefix sets up the necessary context and helper functions, while the suffix handles a different Stripe operation (refund) to ensure the completion focuses on the capture operation. Assertions verify that the correct Stripe API methods are called with appropriate parameters.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(typeof paymentIntent.id, 'string');
+assert.strictEqual(paymentIntent.status, 'succeeded');
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as Stripe from 'stripe';
+import assert from 'assert';
+
+// Initialize Stripe with a test API key
+const stripe = new Stripe('sk_test_4eC39HqLyjWDarjtT1zdp7dc', {
+  apiVersion: '2020-08-27',
+});
+
+// Define a function to create a new customer
+async function createCustomer(email: string, name: string) {
+  try {
+    const customer = await stripe.customers.create({
+      email,
+      name,
+    });
+    return customer;
+  } catch (error) {
+    throw new Error('Failed to create customer: ' + error.message);
+  }
+}
+
+// Define a function to create a new payment intent
+async function createPaymentIntent(amount: number, currency: string, customerId: string) {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount,
+      currency,
+      customer: customerId,
+    });
+    return paymentIntent;
+  } catch (error) {
+    throw new Error('Failed to create payment intent: ' + error.message);
+  }
+}
+
+// Define a function to handle a payment
+async function handlePayment(email: string, name: string, amount: number, currency: string) {
+  const customer = await createCustomer(email, name);
+  const paymentIntent = await createPaymentIntent(amount, currency, customer.id);
+  return paymentIntent;
+}
+
+// Usage of handlePayment function
+(async () => {
+  const email = 'customer@example.com';
+  const name = 'John Doe';
+  const amount = 5000; // amount in cents
+  const currency = 'usd';
+  try {
+    const paymentIntent = await handlePayment(email, name, amount, currency);
+    console.log('Payment Intent created successfully:', paymentIntent);
+  } catch (error) {
+    console.error('Error handling payment:', error.message);
+  }
+})();
+// Create customer source
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+const paymentMethod = await stripe.paymentMethods.create({
+  type: 'card',
+  card: {
+    number: '4242424242424242',
+    exp_month: 12,
+    exp_year: 2023,
+    cvc: '123',
+  },
+});
+
+SUFFIX CODE:
+----------------------------------------
+const paymentMethod = await stripe.paymentMethods.create({
+  type: 'card',
+  card: {
+    number: '4242424242424242',
+    exp_month: 12,
+    exp_year: 2023,
+    cvc: '123',
+  },
+});
+
+assert(paymentMethod.type === 'card');
+assert(paymentMethod.card !== undefined);
+assert(paymentMethod.card.exp_month === 12);
+assert(paymentMethod.card.exp_year === 2023);
+assert(paymentMethod.card.cvc_check === 'unchecked');
+
+// Cleanup: Delete the created customer
+await stripe.customers.del(paymentIntent.customer as string);
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it involves creating a customer and a payment intent using the Stripe API, which is a common but complex API interaction. It also includes the creation of a payment method, which is a less common operation. The golden completion involves adding a source to a customer, which is an uncommon operation in the Stripe API. The assertions check the correctness of the API usage, parameter ordering, and the expected attributes of the created source. This test will help ensure that the LLM can handle complex, multi-step API interactions and correctly use less common API methods.
+
+ASSERTIONS:
+----------------------------------------
+assert(customerSource.object === 'card');
+assert(customerSource.brand === 'Visa');
+assert(customerSource.last4 === '4242');
+assert(customerSource.exp_month === 12);
+assert(customerSource.exp_year === 2023);
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as d3 from 'd3';
+import { select, Selection } from 'd3-selection';
+import { scaleLinear } from 'd3-scale';
+import { axisBottom, axisLeft } from 'd3-axis';
+
+interface DataPoint {
+  x: number;
+  y: number;
+}
+
+const data: DataPoint[] = [
+  { x: 30, y: 20 },
+  { x: 50, y: 80 },
+  { x: 90, y: 50 },
+  { x: 120, y: 100 },
+  { x: 200, y: 150 }
+];
+
+const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+const width = 500 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
+
+const svg = select('body').append('svg')
+  .attr('width', width + margin.left + margin.right)
+  .attr('height', height + margin.top + margin.bottom)
+  .append('g')
+  .attr('transform', `translate(${margin.left},${margin.top})`);
+
+const xScale = scaleLinear()
+  .domain([0, d3.max(data, d => d.x)!])
+  .range([0, width]);
+
+const yScale = scaleLinear()
+  .domain([0, d3.max(data, d => d.y)!])
+  .range([height, 0]);
+
+svg.append('g')
+  .attr('class', 'x-axis')
+  .attr('transform', `translate(0,${height})`)
+  .call(axisBottom(xScale));
+
+svg.append('g')
+  .attr('class', 'y-axis')
+  .call(axisLeft(yScale));
+
+// Creating circles for data points
+const circles = svg.selectAll('circle')
+  .data(data)
+  .enter().append('circle')
+  .attr('cx', d => xScale(d.x))
+  .attr('cy', d => yScale(d.y))
+  .attr('r', 5)
+  .attr('fill', 'blue');
+
+// Adding labels to the circles
+const labels = svg.selectAll('text')
+  .data(data)
+  .enter().append('text')
+  .attr('x', d => xScale(d.x))
+  .attr('y', d => yScale(d.y))
+  .attr('dy', '-0.75em')
+  .text(d => `(${d.x}, ${d.y})`);
+
+// Adding tooltip functionality
+const tooltip = select('body').append('div')
+  .attr('class', 'tooltip')
+  .style('position', 'absolute')
+  .style('background-color', 'white')
+  .style('border', '1px solid black')
+  .style('padding', '5px')
+  .style('display', 'none');
+
+function showTooltip(event: MouseEvent, d: DataPoint) {
+  tooltip.style('left', `${event.pageX + 5}px`)
+         .style('top', `${event.pageY - 28}px`)
+         .style('display', 'inline-block')
+         .html(`x: ${d.x}<br>y: ${d.y}`);
+}
+
+function hideTooltip() {
+  tooltip.style('display', 'none');
+}
+
+circles.on('mouseover', function(event, d) {
+  showTooltip(event, d);
+})
+.on('mouseout', hideTooltip);
+
+// Adding transition to circles on hover
+circles.on('mouseover', function(event, d) {
+  select(this)
+    .transition()
+    .duration(500)
+    .attr('r', 10)
+    .attr('fill', 'red');
+})
+.on('mouseout', function() {
+  select(this)
+    .transition()
+    .duration(500)
+    .attr('r', 5)
+    .attr('fill', 'blue');
+});
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+circles.on('click', function(event, d) {
+  select(this)
+    .transition()
+    .duration(500)
+    .attr('r', 10)
+    .attr('fill', 'green');
+});
+
+labels.on('mouseover', function(event, d) {
+  select(this)
+    .transition()
+    .duration(500)
+    .attr('fill', 'orange');
+})
+.on('mouseout', function() {
+  select(this)
+    .transition()
+    .duration(500)
+    .attr('fill', 'black');
+});
+
+// Cleanup
+svg.remove();
+tooltip.remove();
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to recognize and continue patterns in D3.js, focusing on less common interactions such as adding transitions to labels and handling various events like 'mouseover', 'mouseout', and 'click'. It tests the model's understanding of D3.js methods and chaining, as well as its ability to maintain consistency in API usage and parameter handling.
+
+ASSERTIONS:
+----------------------------------------
+const circles = svg.selectAll('circle');
+const labels = svg.selectAll('text');
+
+circles.each(function(d) {
+  select(this).dispatch('mouseover');
+  assert.equal(select(this).attr('r'), '10', 'Circle radius should be 10 on mouseover');
+  assert.equal(select(this).attr('fill'), 'red', 'Circle fill should be red on mouseover');
+  select(this).dispatch('mouseout');
+  assert.equal(select(this).attr('r'), '5', 'Circle radius should be 5 on mouseout');
+  assert.equal(select(this).attr('fill'), 'blue', 'Circle fill should be blue on mouseout');
+});
+
+labels.each(function(d) {
+  select(this).dispatch('click');
+  assert.equal(select(this).attr('fill'), 'purple', 'Label fill should be purple on click');
+});
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as d3 from 'd3';
+interface DataPoint {
+  date: Date;
+  value: number;
+}
+
+const data: DataPoint[] = [
+  { date: new Date('2021-01-01'), value: 10 },
+  { date: new Date('2021-02-01'), value: 20 },
+  { date: new Date('2021-03-01'), value: 30 },
+];
+
+const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+const width = 800 - margin.left - margin.right;
+const height = 400 - margin.top - margin.bottom;
+
+const svg = d3.select('body').append('svg')
+  .attr('width', width + margin.left + margin.right)
+  .attr('height', height + margin.top + margin.bottom)
+  .append('g')
+  .attr('transform', `translate(${margin.left},${margin.top})`);
+
+const x = d3.scaleTime()
+  .domain(d3.extent(data, d => d.date) as [Date, Date])
+  .range([0, width]);
+
+const y = d3.scaleLinear()
+  .domain([0, d3.max(data, d => d.value) as number])
+  .nice()
+  .range([height, 0]);
+
+svg.append('g')
+  .attr('class', 'x-axis')
+  .attr('transform', `translate(0,${height})`)
+  .call(d3.axisBottom(x));
+
+svg.append('g')
+  .attr('class', 'y-axis')
+  .call(d3.axisLeft(y));
+
+const line = d3.line<DataPoint>()
+  .x(d => x(d.date))
+  .y(d => y(d.value));
+
+svg.append('path')
+  .datum(data)
+  .attr('fill', 'none')
+  .attr('stroke', 'steelblue')
+  .attr('stroke-width', 1.5)
+  .attr('d', line);
+
+// Adding a tooltip to show data points on hover
+const tooltip = d3.select('body').append('div')
+  .attr('class', 'tooltip')
+  .style('position', 'absolute')
+  .style('background', '#f9f9f9')
+  .style('border', '1px solid #d3d3d3')
+  .style('padding', '5px')
+  .style('display', 'none');
+
+svg.selectAll('.dot')
+  .data(data)
+  .enter().append('circle')
+  .attr('class', 'dot')
+  .attr('cx', d => x(d.date))
+  .attr('cy', d => y(d.value))
+  .attr('r', 5)
+  .attr('fill', 'red')
+  .on('mouseover', function(event, d) {
+    tooltip.style('display', 'block');
+    tooltip.html(`Date: ${d.date}<br>Value: ${d.value}`);
+  })
+  .on('mousemove', function(event) {
+    tooltip.style('left', (event.pageX + 5) + 'px')
+      .style('top', (event.pageY - 5) + 'px');
+  })
+  .on('mouseout', function() {
+    tooltip.style('display', 'none');
+  });
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+svg.append('rect')
+  .attr('width', width)
+  .attr('height', height)
+  .attr('fill', 'none')
+  .attr('pointer-events', 'all')
+  .on('mousemove', function(event) {
+    const [mx] = d3.pointer(event);
+    const bisectDate = d3.bisector((d: DataPoint) => d.date).left;
+    const x0 = x.invert(mx);
+    const i = bisectDate(data, x0);
+    const d0 = data[i - 1];
+    const d1 = data[i];
+    const dNearest = d0 && d1 ? (x0.getTime() - d0.date.getTime() > d1.date.getTime() - x0.getTime() ? d1 : d0) : d0 || d1;
+    tooltip.style('display', 'block')
+      .html(`Date: ${dNearest.date.toLocaleDateString()}<br>Value: ${dNearest.value}`)
+      .style('left', (event.pageX + 5) + 'px')
+      .style('top', (event.pageY - 5) + 'px');
+  })
+  .on('mouseout', function() {
+    tooltip.style('display', 'none');
+  });
+
+SUFFIX CODE:
+----------------------------------------
+
+const legend = svg.append('g')
+  .attr('class', 'legend')
+  .attr('transform', `translate(${width - 100},${margin.top})`);
+
+legend.append('rect')
+  .attr('x', 0)
+  .attr('y', 0)
+  .attr('width', 10)
+  .attr('height', 10)
+  .attr('fill', 'steelblue');
+
+legend.append('text')
+  .attr('x', 20)
+  .attr('y', 10)
+  .text('Data Line');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to recognize and continue a complex D3.js pattern involving responsive design. The completion demonstrates how to handle window resize events to update the chart dimensions dynamically, which is a less common but important use case in data visualization. The prefix sets up a full D3 line chart with tooltips, while the suffix adds a legend to the chart. The golden completion focuses on adding resize handling, which is a rare but critical feature for responsive charts.
+
+ASSERTIONS:
+----------------------------------------
+import { JSDOM } from 'jsdom';
+import * as assert from 'assert';
+
+const { window } = new JSDOM('<body></body>', { pretendToBeVisual: true });
+const { document } = window;
+global.document = document;
+global.window = window;
+global.navigator = { userAgent: 'node.js' };
+
+const svg = document.querySelector('svg');
+assert(svg !== null, 'SVG element should exist');
+const dots = svg.querySelectorAll('.dot');
+assert(dots.length === data.length, 'There should be a dot for each data point');
+
+const initialWidth = svg.getAttribute('width');
+const initialHeight = svg.getAttribute('height');
+
+window.resizeTo(600, 300);
+const resizedWidth = svg.getAttribute('width');
+const resizedHeight = svg.getAttribute('height');
+
+assert.notStrictEqual(initialWidth, resizedWidth, 'SVG width should change on resize');
+assert.notStrictEqual(initialHeight, resizedHeight, 'SVG height should change on resize');
+
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Chart } from 'chart.js';
+import { expect } from 'chai';
+
+// Create a canvas element for the chart
+const canvas = document.createElement('canvas');
+document.body.appendChild(canvas);
+
+// Configuration for the chart
+const config = {
+    type: 'line',
+    data: {
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+        datasets: [{
+            label: 'My First dataset',
+            backgroundColor: 'rgba(75,192,192,0.4)',
+            borderColor: 'rgba(75,192,192,1)',
+            data: [65, 59, 80, 81, 56, 55, 40],
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Chart.js Line Chart'
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+            },
+        },
+        hover: {
+            mode: 'nearest',
+            intersect: true
+        },
+        scales: {
+            x: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Month'
+                }
+            },
+            y: {
+                display: true,
+                title: {
+                    display: true,
+                    text: 'Value'
+                }
+            }
+        }
+    }
+};
+
+// Initialize the chart
+const myChart = new Chart(canvas, config);
+
+// Function to update the chart data
+function updateChartData(chart: Chart, newData: number[]): void {
+    chart.data.datasets[0].data = newData;
+    chart.update();
+}
+
+// Initial data
+const initialData = [65, 59, 80, 81, 56, 55, 40];
+
+// Update data
+const newData = [28, 48, 40, 19, 86, 27, 90];
+
+// Update the chart with new data
+updateChartData(myChart, newData);
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+myChart.destroy();
+
+SUFFIX CODE:
+----------------------------------------
+// Cleanup the canvas element after test
+canvas.remove();
+
+// Ensure that the canvas element is removed
+expect(document.body.contains(canvas)).to.be.false;
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to recognize and complete patterns involving the Chart.js library, specifically focusing on the update of chart data and the validation of this update. Chart.js is a popular data visualization library, but its update methods and data structures might not be as frequently used or well-known. The scenario includes setting up a chart, updating its data, and verifying the update through assertions. The correct completion should ensure that the chart data has been updated as expected and that it no longer matches the initial data. This tests the LLM's understanding of the Chart.js API, including the proper use of the 'update' method and data structure manipulation.
+
+ASSERTIONS:
+----------------------------------------
+expect(myChart.data.datasets[0].data).to.deep.equal(newData);
+expect(myChart.data.datasets[0].data).to.not.deep.equal(initialData);
+
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { Chart } from 'chart.js';
+
+// Type definition for chart data
+interface ChartData {
+  labels: string[];
+  datasets: Array<{
+    label: string;
+    data: number[];
+    backgroundColor: string;
+    borderColor: string;
+    borderWidth: number;
+  }>;
+}
+
+// Sample chart data
+const data: ChartData = {
+  labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+  datasets: [
+    {
+      label: 'Monthly Sales',
+      data: [65, 59, 80, 81, 56, 55],
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 1
+    }
+  ]
+};
+
+// Configuration for the chart
+const config = {
+  type: 'bar',
+  data: data,
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  }
+};
+
+// Create chart instance
+let myChart: Chart | null = null;
+
+// Function to initialize the chart
+function initChart(ctx: CanvasRenderingContext2D) {
+  myChart = new Chart(ctx, config);
+}
+
+// Mock canvas context for testing purposes
+const mockCanvasContext = {
+  canvas: {},
+  clearRect: jest.fn(),
+  beginPath: jest.fn(),
+  moveTo: jest.fn(),
+  lineTo: jest.fn(),
+  stroke: jest.fn(),
+  fillText: jest.fn(),
+  measureText: jest.fn(() => ({ width: 100 })),
+  save: jest.fn(),
+  restore: jest.fn()
+} as unknown as CanvasRenderingContext2D;
+
+// Initialize the chart with the mock context
+initChart(mockCanvasContext);
+
+// Function to update chart data
+function updateChartData(newData: ChartData) {
+  if (myChart) {
+    myChart.data = newData;
+    myChart.update();
+  }
+}
+
+// New data to update the chart
+const newData: ChartData = {
+  labels: ['July', 'August', 'September', 'October', 'November', 'December'],
+  datasets: [
+    {
+      label: 'Monthly Sales Updated',
+      data: [75, 69, 90, 91, 66, 65],
+      backgroundColor: 'rgba(54, 162, 235, 0.2)',
+      borderColor: 'rgba(54, 162, 235, 1)',
+      borderWidth: 1
+    }
+  ]
+};
+
+// Update the chart with the new data
+updateChartData(newData);
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+// Asserting chart data update
+import * as assert from 'assert';
+
+assert.strictEqual(myChart!.data.labels.length, 6);
+assert.strictEqual(myChart!.data.datasets[0].label, 'Monthly Sales Updated');
+assert.strictEqual(myChart!.data.datasets[0].data[0], 75);
+
+// Clean up chart instance
+myChart?.destroy();
+myChart = null;
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a comprehensive example of initializing and updating a Chart.js chart instance using TypeScript. It involves setting up chart data, configuration, and properly updating the chart with new data. The completion focuses on calling the 'update' method on the chart instance, which is a less common but critical part of using the Chart.js library effectively. The assertions check for correct data updates, ensuring the LLM understands and correctly implements the API usage pattern.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(myChart!.data.labels.length, 6);
+assert.strictEqual(myChart!.data.datasets[0].label, 'Monthly Sales Updated');
+assert.strictEqual(myChart!.data.datasets[0].data[0], 75);
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as moment from 'moment';
+import { assert } from 'chai';
+
+/**
+ * Utility function to format dates.
+ * @param date The date to format
+ * @param format The format string
+ * @returns The formatted date string
+ */
+function formatDate(date: Date, format: string): string {
+    return moment(date).format(format);
+}
+
+/**
+ * Utility function to calculate the difference between two dates.
+ * @param date1 The first date
+ * @param date2 The second date
+ * @param unit The unit of measurement for the difference (e.g., 'days', 'months')
+ * @returns The difference between the two dates in the specified unit
+ */
+function dateDifference(date1: Date, date2: Date, unit: moment.unitOfTime.Diff): number {
+    return moment(date1).diff(moment(date2), unit);
+}
+
+/**
+ * Example usage of the utility functions
+ */
+const date1 = new Date(2023, 0, 1);
+const date2 = new Date(2023, 11, 31);
+const formattedDate = formatDate(date1, 'YYYY-MM-DD');
+const daysDifference = dateDifference(date2, date1, 'days');
+
+console.log('Formatted Date:', formattedDate);
+console.log('Days Difference:', daysDifference);
+
+// Assertions to verify the utility functions work as expected
+assert.strictEqual(formattedDate, '2023-01-01');
+assert.strictEqual(daysDifference, 364);
+
+/**
+ * Utility function to add a duration to a date.
+ * @param date The date to which the duration is added
+ * @param amount The amount of time to add
+ * @param unit The unit of time to add (e.g., 'days', 'months')
+ * @returns The new date with the added duration
+ */
+function addDuration(date: Date, amount: number, unit: moment.unitOfTime.DurationConstructor): Date {
+    return moment(date).add(amount, unit).toDate();
+}
+
+/**
+ * Utility function to subtract a duration from a date.
+ * @param date The date from which the duration is subtracted
+ * @param amount The amount of time to subtract
+ * @param unit The unit of time to subtract (e.g., 'days', 'months')
+ * @returns The new date with the subtracted duration
+ */
+function subtractDuration(date: Date, amount: number, unit: moment.unitOfTime.DurationConstructor): Date {
+    return moment(date).subtract(amount, unit).toDate();
+}
+
+const initialDate = new Date(2023, 0, 1);
+const newDate = addDuration(initialDate, 1, 'month');
+const prevDate = subtractDuration(initialDate, 1, 'month');
+
+console.log('New Date:', newDate);
+console.log('Previous Date:', prevDate);
+
+// Assertions to verify the duration functions work as expected
+assert.strictEqual(newDate.toISOString(), '2023-02-01T00:00:00.000Z');
+assert.strictEqual(prevDate.toISOString(), '2022-12-01T00:00:00.000Z');
+
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+const nextYearDate = addDuration(initialDate, 1, 'year');
+const lastYearDate = subtractDuration(initialDate, 1, 'year');
+
+SUFFIX CODE:
+----------------------------------------
+
+const nextYearDate = moment(initialDate).add(1, 'year').toDate();
+const lastYearDate = moment(initialDate).subtract(1, 'year').toDate();
+
+console.log('Next Year Date:', nextYearDate);
+console.log('Last Year Date:', lastYearDate);
+
+assert.strictEqual(nextYearDate.toISOString(), '2024-01-01T00:00:00.000Z');
+assert.strictEqual(lastYearDate.toISOString(), '2022-01-01T00:00:00.000Z');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the moment.js library for date manipulation, focusing on the less common functions of adding and subtracting durations with different units such as weeks. The scenario sets up a comprehensive context with utility functions and examples, making it a good test for recognizing and continuing patterns involving date calculations. The assertions verify that the API behaves as expected with correct parameter ordering and results.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(newDateWithWeek.toISOString(), '2023-01-08T00:00:00.000Z');
+assert.strictEqual(prevDateWithWeek.toISOString(), '2022-12-25T00:00:00.000Z');
+
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as d3 from 'd3';
+import { select } from 'd3-selection';
+import { scaleLinear } from 'd3-scale';
+import { axisBottom } from 'd3-axis';
+
+// Helper functions for generating random data
+function generateRandomData(numPoints: number): { x: number, y: number }[] {
+    return Array.from({ length: numPoints }, () => ({
+        x: Math.floor(Math.random() * 100),
+        y: Math.floor(Math.random() * 100)
+    }));
+}
+
+// Initialize SVG dimensions
+const width = 500;
+const height = 300;
+const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+
+// Create SVG container
+const svg = select('body').append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+    .append('g')
+    .attr('transform', `translate(${margin.left},${margin.top})`);
+
+// Generate random data points
+const data = generateRandomData(50);
+
+// Define scales for x and y axes
+const x = scaleLinear()
+    .domain([0, d3.max(data, d => d.x)!])
+    .range([0, width]);
+
+const y = scaleLinear()
+    .domain([0, d3.max(data, d => d.y)!])
+    .range([height, 0]);
+
+// Append x-axis to the SVG
+svg.append('g')
+    .attr('transform', `translate(0,${height})`)
+    .call(axisBottom(x));
+
+// Initial scatter plot points
+const points = svg.selectAll('.dot')
+    .data(data)
+    .enter().append('circle')
+    .attr('class', 'dot')
+    .attr('r', 3.5)
+    .attr('cx', d => x(d.x))
+    .attr('cy', d => y(d.y));
+
+// Update function for points
+function updateData(newData: { x: number, y: number }[]) {
+    const updatedPoints = svg.selectAll('.dot')
+        .data(newData);
+
+    updatedPoints.enter().append('circle')
+        .attr('class', 'dot')
+        .attr('r', 3.5)
+        .attr('cx', d => x(d.x))
+        .attr('cy', d => y(d.y));
+
+    updatedPoints.exit().remove();
+
+    updatedPoints
+        .attr('cx', d => x(d.x))
+        .attr('cy', d => y(d.y));
+}
+
+// Generate new random data points
+const newData = generateRandomData(50);
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+updateData(newData);
+
+SUFFIX CODE:
+----------------------------------------
+// Incorrectly attempting to update points without merging existing data
+svg.selectAll('.dot')
+    .data(newData)
+    .enter().append('circle')
+    .attr('class', 'dot')
+    .attr('r', 3.5)
+    .attr('cx', d => x(d.x))
+    .attr('cy', d => y(d.y));
+
+// Assertions to verify the correctness of the data update
+const updatedPoints = svg.selectAll('.dot').nodes();
+console.assert(updatedPoints.length === newData.length, `Expected ${newData.length} points, but got ${updatedPoints.length}`);
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern for updating data in a D3.js scatter plot. The correct approach involves properly merging the new data with the existing data and updating the existing elements, which is a less common pattern in D3.js. The provided suffix shows an incorrect attempt to update the data, which helps in distinguishing the correct approach from a common mistake. The golden completion demonstrates the correct usage of the update pattern in D3.js, ensuring all points are updated and none are duplicated.
+
+ASSERTIONS:
+----------------------------------------
+const updatedPointsAfterCompletion = svg.selectAll('.dot').nodes();
+console.assert(updatedPointsAfterCompletion.length === newData.length, `Expected ${newData.length} points, but got ${updatedPointsAfterCompletion.length}`);
+newData.forEach((d, i) => {
+    const point = updatedPointsAfterCompletion[i] as SVGCircleElement;
+    console.assert(Math.abs(parseFloat(point.getAttribute('cx')!) - x(d.x)) < 0.1, `Point ${i} x-coordinate incorrect`);
+    console.assert(Math.abs(parseFloat(point.getAttribute('cy')!) - y(d.y)) < 0.1, `Point ${i} y-coordinate incorrect`);
+});
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as d3 from 'd3';
+import { select } from 'd3-selection';
+import { scaleLinear } from 'd3-scale';
+import { axisBottom, axisLeft } from 'd3-axis';
+import { line } from 'd3-shape';
+
+// Define the dimensions and margins of the graph
+const margin = { top: 10, right: 30, bottom: 30, left: 60 },
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// Append the SVG object to the body of the page
+const svg = select('body')
+    .append('svg')
+    .attr('width', width + margin.left + margin.right)
+    .attr('height', height + margin.top + margin.bottom)
+  .append('g')
+    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+// Create a function to parse the date
+const parseDate = d3.timeParse('%Y-%m-%d');
+
+// Create a scale for the x-axis
+const x = scaleLinear()
+    .domain([0, 100])
+    .range([0, width]);
+
+// Create a scale for the y-axis
+const y = scaleLinear()
+    .domain([0, 100])
+    .range([height, 0]);
+
+// Add the x-axis to the svg
+svg.append('g')
+    .attr('transform', 'translate(0,' + height + ')')
+    .call(axisBottom(x));
+
+// Add the y-axis to the svg
+svg.append('g')
+    .call(axisLeft(y));
+
+// Define the data
+const data = [
+    { date: '2020-01-01', value: 10 },
+    { date: '2020-02-01', value: 20 },
+    { date: '2020-03-01', value: 30 },
+    { date: '2020-04-01', value: 40 },
+    { date: '2020-05-01', value: 50 },
+];
+
+// Parse the date and value from the data
+const parsedData = data.map(d => ({
+    date: parseDate(d.date),
+    value: d.value
+}));
+
+// Define the line
+const lineGenerator = line()
+    .x(d => x(d.value))
+    .y(d => y(d.value));
+
+// Add the line to the svg
+svg.append('path')
+    .datum(parsedData)
+    .attr('fill', 'none')
+    .attr('stroke', 'steelblue')
+    .attr('stroke-width', 2)
+    .attr('d', lineGenerator);
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+svg.append('text')
+
+SUFFIX CODE:
+----------------------------------------
+svg.append('text')
+    .attr('text-anchor', 'end')
+    .attr('x', width)
+    .attr('y', height + margin.top + 20)
+    .text('Date');
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the D3.js library to create a line chart with grid lines. The pattern involves setting up scales and axes, creating a line generator, and appending paths and text elements to the SVG. The golden completion specifically tests the ability to add grid lines to the chart, which is a less common but valid API usage in D3.js. The suffix then adds a text label, ensuring the completion is distinct and follows the pattern.
+
+ASSERTIONS:
+----------------------------------------
+const gridLinesX = document.querySelectorAll('.grid line');
+const gridLinesY = document.querySelectorAll('.grid line');
+assert(gridLinesX.length > 0, 'X-axis grid lines should be present');
+assert(gridLinesY.length > 0, 'Y-axis grid lines should be present');
+const textElement = document.querySelector('text');
+assert(textElement !== null, 'Text label should be present');
+assert(textElement.textContent === 'Date', 'Text label should read "Date"');
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import { Action, Reducer } from 'redux';
+
+// Define action types
+const INCREMENT = 'INCREMENT';
+const DECREMENT = 'DECREMENT';
+
+// Define action creators
+interface IncrementAction extends Action<typeof INCREMENT> {}
+interface DecrementAction extends Action<typeof DECREMENT> {}
+
+const increment = (): IncrementAction => ({ type: INCREMENT });
+const decrement = (): DecrementAction => ({ type: DECREMENT });
+
+// Define the initial state
+interface CounterState {
+  count: number;
+}
+
+const initialState: CounterState = { count: 0 };
+
+// Define the reducer
+const counterReducer: Reducer<CounterState, IncrementAction | DecrementAction> = (
+  state = initialState,
+  action
+) => {
+  switch (action.type) {
+    case INCREMENT:
+      return { ...state, count: state.count + 1 };
+    case DECREMENT:
+      return { ...state, count: state.count - 1 };
+    default:
+      return state;
+  }
+};
+
+// Create the Redux store with middleware
+const store = createStore(counterReducer, applyMiddleware(thunk));
+
+// Define a thunk action creator for asynchronous actions
+const incrementAsync = () => {
+  return (dispatch: any) => {
+    setTimeout(() => {
+      dispatch(increment());
+    }, 1000);
+  };
+};
+
+// Dispatch actions to test the store
+store.dispatch(increment());
+store.dispatch(decrement());
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+store.dispatch(decrement());
+
+SUFFIX CODE:
+----------------------------------------
+store.dispatch(decrement());
+
+// Cleanup code (if needed)
+// No resources to clean up in this example
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern involving Redux with thunk middleware. The prefix provides extensive context by defining action types, creators, the reducer, and the store setup. The golden completion demonstrates the usage of a thunk action creator for dispatching asynchronous actions, which is a less common but valid usage pattern in Redux. The suffix includes a different action dispatch to ensure clear distinction. Assertions will verify that the asynchronous increment action works as expected, testing both API behavior and parameter correctness.
+
+ASSERTIONS:
+----------------------------------------
+import { expect } from 'chai';
+
+// Assertion to verify the initial state
+expect(store.getState().count).to.equal(0);
+
+// Dispatch asynchronous increment action
+store.dispatch(incrementAsync() as any);
+
+// Assertion to verify the state after asynchronous action
+setTimeout(() => {
+  expect(store.getState().count).to.equal(1);
+}, 1500);
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: synthbench-api-usage
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as d3 from 'd3';
+import { select, Selection } from 'd3-selection';
+import { scaleLinear } from 'd3-scale';
+import { axisBottom, axisLeft } from 'd3-axis';
+import { line } from 'd3-shape';
+import { format } from 'd3-format';
+
+interface DataPoint {
+  date: Date;
+  value: number;
+}
+
+const data: DataPoint[] = [
+  { date: new Date('2020-01-01'), value: 30 },
+  { date: new Date('2020-02-01'), value: 200 },
+  { date: new Date('2020-03-01'), value: 100 },
+  { date: new Date('2020-04-01'), value: 400 },
+  { date: new Date('2020-05-01'), value: 150 }
+];
+
+const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+const width = 960 - margin.left - margin.right;
+const height = 500 - margin.top - margin.bottom;
+
+const x = scaleLinear().domain([0, data.length - 1]).range([0, width]);
+const y = scaleLinear().domain([0, d3.max(data, d => d.value)]).range([height, 0]);
+
+const xAxis = axisBottom(x);
+const yAxis = axisLeft(y);
+
+const svg = select('body').append('svg')
+  .attr('width', width + margin.left + margin.right)
+  .attr('height', height + margin.top + margin.bottom)
+  .append('g')
+  .attr('transform', `translate(${margin.left},${margin.top})`);
+
+svg.append('g')
+  .attr('class', 'x axis')
+  .attr('transform', `translate(0,${height})`)
+  .call(xAxis);
+
+svg.append('g')
+  .attr('class', 'y axis')
+  .call(yAxis);
+
+const lineGenerator = line<DataPoint>()
+  .x((d, i) => x(i))
+  .y(d => y(d.value));
+
+svg.append('path')
+  .datum(data)
+  .attr('class', 'line')
+  .attr('d', lineGenerator);
+
+// Create a tooltip element
+const tooltip = select('body').append('div')
+  .attr('class', 'tooltip')
+  .style('position', 'absolute')
+  .style('padding', '8px')
+  .style('background', 'lightsteelblue')
+  .style('border', '1px solid #ddd')
+  .style('border-radius', '4px')
+  .style('pointer-events', 'none')
+  .style('opacity', 0);
+
+// Mouseover event for displaying tooltip
+svg.selectAll('.dot')
+  .data(data)
+  .enter().append('circle')
+  .attr('class', 'dot')
+  .attr('r', 5)
+  .attr('cx', (d, i) => x(i))
+  .attr('cy', d => y(d.value))
+  .on('mouseover', function(event, d) {
+    tooltip.transition()
+      .duration(200)
+      .style('opacity', .9);
+    tooltip.html(`Value: ${format('.2f')(d.value)}`)
+      .style('left', `${event.pageX}px`)
+      .style('top', `${event.pageY - 28}px`);
+  })
+  .on('mouseout', function(d) {
+    tooltip.transition()
+      .duration(500)
+      .style('opacity', 0);
+  });
+
+
+LLM COMPLETION o3-mini:
+----------------------------------------
+svg.selectAll('.dot')
+  .on('click', function(event, d) {
+    alert(`You clicked on value: ${d.value}`);
+  });
+
+SUFFIX CODE:
+----------------------------------------
+svg.selectAll('.dot')
+  .on('click', function(event, d) {
+    alert(`You clicked on value: ${d.value}`);
+  });
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case uses D3.js, a powerful but complex library for data visualization. The scenario focuses on creating an interactive line chart with tooltips, a less common use case involving mouse events and dynamic tooltip positioning. It tests the LLM's ability to recognize and complete patterns involving mouse events and D3.js selection API. The example ensures the model handles rare API interactions with correct parameter usage and chaining patterns.
+
+ASSERTIONS:
+----------------------------------------
+import { select } from 'd3-selection';
+import { JSDOM } from 'jsdom';
+import assert from 'assert';
+
+// Create a mock DOM environment for testing
+const { window } = new JSDOM('<!DOCTYPE html><body></body>');
+global.document = window.document;
+global.window = window;
+
+// Mock data and SVG setup
+const data = [
+  { date: new Date('2020-01-01'), value: 30 },
+  { date: new Date('2020-02-01'), value: 200 },
+  { date: new Date('2020-03-01'), value: 100 },
+  { date: new Date('2020-04-01'), value: 400 },
+  { date: new Date('2020-05-01'), value: 150 }
+];
+
+const svg = select('body').append('svg')
+  .attr('width', 960)
+  .attr('height', 500)
+  .append('g')
+  .attr('transform', 'translate(50,20)');
+
+// Append dots
+svg.selectAll('.dot')
+  .data(data)
+  .enter().append('circle')
+  .attr('class', 'dot')
+  .attr('r', 5)
+  .attr('cx', (d, i) => i * 50)
+  .attr('cy', d => 500 - d.value);
+
+// Tooltip setup
+const tooltip = select('body').append('div')
+  .attr('class', 'tooltip')
+  .style('position', 'absolute')
+  .style('opacity', 0);
+
+// Simulate mousemove event
+svg.selectAll('.dot').dispatch('mousemove', { pageX: 100, pageY: 200 });
+
+// Check if the tooltip is positioned correctly
+const tooltipElement = document.querySelector('.tooltip');
+assert(tooltipElement !== null);
+assert(tooltipElement.style.left === '100px');
+assert(tooltipElement.style.top === '172px');
+
+================================================================================

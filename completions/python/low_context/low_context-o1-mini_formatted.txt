@@ -1,0 +1,120 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: synthbench-low-context
+Language: python
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import os
+
+def read_file(file_path):
+    try:
+
+LLM COMPLETION o1-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+
+    finally:
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+# Test cases
+try:
+    with open('test.txt', 'w') as f:
+        f.write('Hello, world!')
+    content = read_file('test.txt')
+    assert content == 'Hello, world!'
+except Exception as e:
+    assert False, f'Exception occurred: {e}'
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a common pattern of file handling in Python, which involves opening a file, reading its contents, and handling the potential FileNotFoundError. The completion should recognize the need to read the file content and handle exceptions properly. The scenario is designed to test the LLM's ability to identify and continue a standard file I/O pattern with minimal context.
+
+ASSERTIONS:
+----------------------------------------
+assert read_file('non_existent.txt') == '', 'Should return empty string if file does not exist'
+try:
+    with open('example.txt', 'w') as f:
+        f.write('Example content')
+    content = read_file('example.txt')
+    assert content == 'Example content', 'Content should match written content'
+except Exception as e:
+    assert False, f'Exception occurred: {e}'
+finally:
+    if os.path.exists('example.txt'):
+        os.remove('example.txt')
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: synthbench-low-context
+Language: python
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import functools
+import time
+
+def timer(func):
+    """Print the runtime of the decorated function"""
+    @functools.wraps(func)
+    def wrapper_timer(*args, **kwargs):
+        start_time = time.perf_counter()
+        value = func(*args, **kwargs)
+        end_time = time.perf_counter()
+        run_time = end_time - start_time
+        print(f"Finished {func.__name__!r} in {run_time:.4f} secs")
+        return value
+    return wrapper_timer
+
+@timer
+def waste_some_time(num_times):
+    for _ in range(num_times):
+        sum([i**2 for i in range(10000)])
+
+@timer
+def do_something():
+    print("Doing something important...")
+
+
+LLM COMPLETION o1-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+do_something()
+
+@timer
+def another_function():
+    time.sleep(1)
+    return "Done"
+
+result = another_function()
+assert result == "Done"
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete the decorator pattern. The prefix provides a detailed setup of the timer decorator, which measures the execution time of the decorated functions. The suffix demonstrates the usage of the timer decorator on a different function and includes assertions to verify the correctness of another function. The completion must correctly use the established timer decorator pattern with minimal context provided.
+
+ASSERTIONS:
+----------------------------------------
+waste_some_time(5)
+
+================================================================================
