@@ -708,80 +708,64 @@ def analyze_benchmark_data(metrics=None):
                 dataframes[metric_name] = pd.DataFrame(metric_data)
     
     # Generate statistics for enabled metrics
+    print("\n===== SUMMARY OF METRICS =====")
+    
+    # Store averages for final summary
+    averages = {}
+    
     for metric_name, df in dataframes.items():
         if df is not None and not df.empty:
             print(f"\n{metric_name.replace('_', ' ').title()} Statistics:")
-            print(df.groupby("Language")[metric_name].describe())
+            stats = df.groupby("Language")[metric_name].describe()
+            print(stats)
             
             # Calculate and display average across all languages
             overall_mean = df[metric_name].mean()
             print(f"\nAverage {metric_name.replace('_', ' ').title()} across all languages: {overall_mean:.2f}")
-    
-    # Create figures directory
-    os.makedirs("figs", exist_ok=True)
-    
-    # Generate visualizations only for enabled metrics
-    for metric_name, df in dataframes.items():
-        if df is not None and not df.empty:
-            metric_title = metric_name.replace('_', ' ').title()
             
-            # Histogram
-            plt.figure(figsize=(12, 6))
-            sns.histplot(data=df, x=metric_name, hue="Language", element="step", bins=30)
-            plt.title(f"Histogram of {metric_title} Across Languages")
-            plt.xlabel(metric_title)
-            plt.ylabel("Count")
-            plt.tight_layout()
-            plt.savefig(f"figs/{metric_name}_histogram.png")
-            plt.close()
-    
-            # Box plot
-            plt.figure(figsize=(12, 6))
-            sns.boxplot(data=df, x="Language", y=metric_name)
-            plt.title(f"Distribution of {metric_title} by Language")
-            plt.xlabel("Language")
-            plt.ylabel(metric_title)
-            plt.tight_layout()
-            plt.savefig(f"figs/{metric_name}_boxplot.png")
-            plt.close()
-    
-    # Generate correlation matrix if multiple metrics are enabled
-    enabled_metrics = [m for m, e in metrics.items() if e]
-    if len(enabled_metrics) > 1:
-        plt.figure(figsize=(16, 14))
-        
-        # Prepare data for correlation matrix
-        corr_data = {}
-        for metric_name in enabled_metrics:
-            if metric_name in dataframes:
-                df = dataframes[metric_name]
-                if not df.empty:
-                    corr_data[metric_name.replace('_', ' ').title()] = df[metric_name]
-        
-        if corr_data:
-            correlation_df = pd.DataFrame(corr_data)
-            correlation_matrix = correlation_df.corr()
-    
-            sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1, center=0)
-            plt.xticks(rotation=45, ha='right')
-            plt.yticks(rotation=0)
-            plt.title("Correlation Matrix of Selected Complexity Metrics")
-            plt.tight_layout()
-            plt.savefig("figs/complexity_correlation_matrix.png")
-            plt.close()
+            # Store average for final summary
+            averages[metric_name] = overall_mean
     
     print(f"\nTotal number of test cases analyzed: {len(next(iter(dataframes.values())))}")
+    
+    # Print compact summary of all averages
+    print("\n===== COMPACT SUMMARY =====")
+    for metric_name, avg_value in averages.items():
+        print(f"Average {metric_name.replace('_', ' ').title()}: {avg_value:.2f}")
+    
+    # No plots will be generated
 
 if __name__ == "__main__":
-    # Run with all the metrics requested by the user enabled
-    analyze_benchmark_data({
+    # Disable plot generation and only print selected metrics
+    metrics = {
         'prefix_length': True,          # Lines in prefix
+        'prefix_char_length': False,     # Characters in prefix
         'token_count': True,            # Tokens in prefix
+        'ast_depth': False,             # AST depth
+        'cyclomatic': True,             # Cyclomatic complexity
+        'unique_apis': False,           # Unique APIs
+        'token_entropy': False,
+        'unique_token_ratio': False,
+        'max_indent': False,
+        'avg_nesting': False,
+        'total_lines': False,
+        'non_empty_lines': False,
+        'comment_lines': False,
+        'code_lines': False,
+        'comment_ratio': False,
+        'total_api_calls': False,
+        'api_diversity_ratio': False,
         'golden_length': True,          # Lines in golden completion
         'golden_token_count': True,     # Tokens in golden completion
-        'total_length': True,           # Total lines
-        'total_token_count': True,      # Total tokens
-        'test_count': True              # Number of tests per test case
-    })
+        'total_length': True,           # Total lines (prefix + golden + suffix + assertions)
+        'total_token_count': True,      # Total tokens (prefix + golden + suffix + assertions)
+        'test_count': False,            # Number of tests per test case
+    }
+    
+    # Create DataFrames for visualization but don't generate plots
+    dataframes = {}
+    
+    # Analyze benchmark data with modified metrics
+    analyze_benchmark_data(metrics)
 
 

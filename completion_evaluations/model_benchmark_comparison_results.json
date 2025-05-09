@@ -1,1843 +1,803 @@
 {
-  "testsource": {
-    "overall": {
-      "total_comparisons": 23819,
-      "line0_exact_matches": 0,
-      "line0_exact_match_rate": 0.0,
-      "proximity_matches": 0,
-      "proximity_match_rate": 0.0,
-      "avg_levenshtein": 38.56,
-      "avg_edit_similarity": 0.12,
-      "avg_cosine": 0.0
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 43.83,
-        "avg_edit_similarity": 0.13,
-        "avg_cosine": 0.0
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 36.32,
-        "avg_edit_similarity": 0.06,
-        "avg_cosine": 0.0
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 3909,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 43.29,
-        "avg_edit_similarity": 0.14,
-        "avg_cosine": 0.0
-      },
-      "low_context": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 29.67,
-        "avg_edit_similarity": 0.11,
-        "avg_cosine": 0.0
-      },
-      "pattern_matching": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 41.07,
-        "avg_edit_similarity": 0.15,
-        "avg_cosine": 0.0
-      },
-      "syntax_completion": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 37.5,
-        "avg_edit_similarity": 0.13,
-        "avg_cosine": 0.0
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 37.14,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.0
-      },
-      "c_sharp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 43.36,
-        "avg_edit_similarity": 0.13,
-        "avg_cosine": 0.0
-      },
-      "java": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 41.37,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.0
-      },
-      "javascript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 37.42,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.0
-      },
-      "python": {
-        "total_comparisons": 4319,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 32.75,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.0
-      },
-      "typescript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 39.97,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.0
-      }
-    }
-  },
-  "language": {
-    "overall": {
-      "total_comparisons": 23819,
-      "line0_exact_matches": 0,
-      "line0_exact_match_rate": 0.0,
-      "proximity_matches": 625,
-      "proximity_match_rate": 2.62,
-      "avg_levenshtein": 38.35,
-      "avg_edit_similarity": 0.07,
-      "avg_cosine": 0.0
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 104,
-        "proximity_match_rate": 2.63,
-        "avg_levenshtein": 46.77,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 39,
-        "proximity_match_rate": 1.0,
-        "avg_levenshtein": 28.84,
-        "avg_edit_similarity": 0.05,
-        "avg_cosine": 0.0
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 3909,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 117,
-        "proximity_match_rate": 2.99,
-        "avg_levenshtein": 44.17,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
-      },
-      "low_context": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 14,
-        "proximity_match_rate": 0.35,
-        "avg_levenshtein": 29.15,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
-      },
-      "pattern_matching": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 312,
-        "proximity_match_rate": 7.9,
-        "avg_levenshtein": 44.4,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
-      },
-      "syntax_completion": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 26,
-        "proximity_match_rate": 0.67,
-        "avg_levenshtein": 37.52,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 208,
-        "proximity_match_rate": 5.33,
-        "avg_levenshtein": 37.83,
-        "avg_edit_similarity": 0.03,
-        "avg_cosine": 0.0
-      },
-      "c_sharp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 26,
-        "proximity_match_rate": 0.67,
-        "avg_levenshtein": 44.94,
-        "avg_edit_similarity": 0.08,
-        "avg_cosine": 0.0
-      },
-      "java": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 273,
-        "proximity_match_rate": 7.0,
-        "avg_levenshtein": 43.51,
-        "avg_edit_similarity": 0.03,
-        "avg_cosine": 0.0
-      },
-      "javascript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 35.46,
-        "avg_edit_similarity": 0.08,
-        "avg_cosine": 0.0
-      },
-      "python": {
-        "total_comparisons": 4319,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 40,
-        "proximity_match_rate": 0.93,
-        "avg_levenshtein": 30.85,
-        "avg_edit_similarity": 0.08,
-        "avg_cosine": 0.0
-      },
-      "typescript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 78,
-        "proximity_match_rate": 2.0,
-        "avg_levenshtein": 38.35,
-        "avg_edit_similarity": 0.1,
-        "avg_cosine": 0.0
-      }
-    }
-  },
-  "prefix": {
-    "overall": {
-      "total_comparisons": 23819,
-      "line0_exact_matches": 26,
-      "line0_exact_match_rate": 0.11,
-      "proximity_matches": 3935,
-      "proximity_match_rate": 16.52,
-      "avg_levenshtein": 37.93,
-      "avg_edit_similarity": 0.15,
-      "avg_cosine": 0.03
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 679,
-        "proximity_match_rate": 17.19,
-        "avg_levenshtein": 45.37,
-        "avg_edit_similarity": 0.16,
-        "avg_cosine": 0.03
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 13,
-        "line0_exact_match_rate": 0.33,
-        "proximity_matches": 377,
-        "proximity_match_rate": 9.67,
-        "avg_levenshtein": 35.58,
-        "avg_edit_similarity": 0.09,
-        "avg_cosine": 0.02
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 3909,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 613,
-        "proximity_match_rate": 15.68,
-        "avg_levenshtein": 40.64,
-        "avg_edit_similarity": 0.16,
-        "avg_cosine": 0.02
-      },
-      "low_context": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 617,
-        "proximity_match_rate": 15.62,
-        "avg_levenshtein": 28.72,
-        "avg_edit_similarity": 0.16,
-        "avg_cosine": 0.05
-      },
-      "pattern_matching": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 687,
-        "proximity_match_rate": 17.39,
-        "avg_levenshtein": 40.68,
-        "avg_edit_similarity": 0.17,
-        "avg_cosine": 0.02
-      },
-      "syntax_completion": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 858,
-        "proximity_match_rate": 22.0,
-        "avg_levenshtein": 36.3,
-        "avg_edit_similarity": 0.15,
-        "avg_cosine": 0.03
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 65,
-        "proximity_match_rate": 1.67,
-        "avg_levenshtein": 35.13,
-        "avg_edit_similarity": 0.13,
-        "avg_cosine": 0.0
-      },
-      "c_sharp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 338,
-        "proximity_match_rate": 8.67,
-        "avg_levenshtein": 42.1,
-        "avg_edit_similarity": 0.13,
-        "avg_cosine": 0.0
-      },
-      "java": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 195,
-        "proximity_match_rate": 5.0,
-        "avg_levenshtein": 41.06,
-        "avg_edit_similarity": 0.15,
-        "avg_cosine": 0.02
-      },
-      "javascript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 1092,
-        "proximity_match_rate": 28.0,
-        "avg_levenshtein": 35.54,
-        "avg_edit_similarity": 0.18,
-        "avg_cosine": 0.05
-      },
-      "python": {
-        "total_comparisons": 4319,
-        "line0_exact_matches": 26,
-        "line0_exact_match_rate": 0.6,
-        "proximity_matches": 854,
-        "proximity_match_rate": 19.77,
-        "avg_levenshtein": 32.08,
-        "avg_edit_similarity": 0.16,
-        "avg_cosine": 0.06
-      },
-      "typescript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 1391,
-        "proximity_match_rate": 35.67,
-        "avg_levenshtein": 42.3,
-        "avg_edit_similarity": 0.15,
-        "avg_cosine": 0.05
-      }
-    }
-  },
-  "suffix": {
-    "overall": {
-      "total_comparisons": 23751,
-      "line0_exact_matches": 368,
-      "line0_exact_match_rate": 1.55,
-      "proximity_matches": 10393,
-      "proximity_match_rate": 43.76,
-      "avg_levenshtein": 36.41,
-      "avg_edit_similarity": 0.24,
-      "avg_cosine": 0.17
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 3937,
-        "line0_exact_matches": 40,
-        "line0_exact_match_rate": 1.02,
-        "proximity_matches": 2116,
-        "proximity_match_rate": 53.75,
-        "avg_levenshtein": 41.48,
-        "avg_edit_similarity": 0.27,
-        "avg_cosine": 0.19
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 78,
-        "line0_exact_match_rate": 2.0,
-        "proximity_matches": 1170,
-        "proximity_match_rate": 30.0,
-        "avg_levenshtein": 37.58,
-        "avg_edit_similarity": 0.15,
-        "avg_cosine": 0.11
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 3896,
-        "line0_exact_matches": 39,
-        "line0_exact_match_rate": 1.0,
-        "proximity_matches": 1953,
-        "proximity_match_rate": 50.13,
-        "avg_levenshtein": 40.79,
-        "avg_edit_similarity": 0.25,
-        "avg_cosine": 0.17
-      },
-      "low_context": {
-        "total_comparisons": 3908,
-        "line0_exact_matches": 27,
-        "line0_exact_match_rate": 0.69,
-        "proximity_matches": 1074,
-        "proximity_match_rate": 27.48,
-        "avg_levenshtein": 30.4,
-        "avg_edit_similarity": 0.16,
-        "avg_cosine": 0.12
-      },
-      "pattern_matching": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 106,
-        "line0_exact_match_rate": 2.68,
-        "proximity_matches": 2208,
-        "proximity_match_rate": 55.9,
-        "avg_levenshtein": 33.5,
-        "avg_edit_similarity": 0.36,
-        "avg_cosine": 0.28
-      },
-      "syntax_completion": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 65,
-        "line0_exact_match_rate": 1.67,
-        "proximity_matches": 1768,
-        "proximity_match_rate": 45.33,
-        "avg_levenshtein": 34.7,
-        "avg_edit_similarity": 0.26,
-        "avg_cosine": 0.18
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 65,
-        "line0_exact_match_rate": 1.67,
-        "proximity_matches": 1456,
-        "proximity_match_rate": 37.33,
-        "avg_levenshtein": 35.79,
-        "avg_edit_similarity": 0.23,
-        "avg_cosine": 0.16
-      },
-      "c_sharp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 78,
-        "line0_exact_match_rate": 2.0,
-        "proximity_matches": 2236,
-        "proximity_match_rate": 57.33,
-        "avg_levenshtein": 43.05,
-        "avg_edit_similarity": 0.26,
-        "avg_cosine": 0.19
-      },
-      "java": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 26,
-        "line0_exact_match_rate": 0.67,
-        "proximity_matches": 1729,
-        "proximity_match_rate": 44.33,
-        "avg_levenshtein": 38.62,
-        "avg_edit_similarity": 0.24,
-        "avg_cosine": 0.17
-      },
-      "javascript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 65,
-        "line0_exact_match_rate": 1.67,
-        "proximity_matches": 1534,
-        "proximity_match_rate": 39.33,
-        "avg_levenshtein": 32.72,
-        "avg_edit_similarity": 0.25,
-        "avg_cosine": 0.18
-      },
-      "python": {
-        "total_comparisons": 4277,
-        "line0_exact_matches": 69,
-        "line0_exact_match_rate": 1.61,
-        "proximity_matches": 1787,
-        "proximity_match_rate": 41.78,
-        "avg_levenshtein": 30.93,
-        "avg_edit_similarity": 0.24,
-        "avg_cosine": 0.17
-      },
-      "typescript": {
-        "total_comparisons": 3874,
-        "line0_exact_matches": 65,
-        "line0_exact_match_rate": 1.68,
-        "proximity_matches": 1651,
-        "proximity_match_rate": 42.62,
-        "avg_levenshtein": 37.9,
-        "avg_edit_similarity": 0.24,
-        "avg_cosine": 0.18
-      }
-    }
-  },
-  "golden_completion": {
-    "overall": {
-      "total_comparisons": 23819,
-      "line0_exact_matches": 23819,
-      "line0_exact_match_rate": 100.0,
-      "proximity_matches": 23714,
-      "proximity_match_rate": 99.56,
-      "avg_levenshtein": 0.0,
-      "avg_edit_similarity": 1.0,
-      "avg_cosine": 1.0
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 3950,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3937,
-        "proximity_match_rate": 99.67,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 3900,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3887,
-        "proximity_match_rate": 99.67,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 3909,
-        "line0_exact_matches": 3909,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3909,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "low_context": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 3950,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3884,
-        "proximity_match_rate": 98.33,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "pattern_matching": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 3950,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3950,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "syntax_completion": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 3900,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3887,
-        "proximity_match_rate": 99.67,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 3900,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3874,
-        "proximity_match_rate": 99.33,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "c_sharp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 3900,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3887,
-        "proximity_match_rate": 99.67,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "java": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 3900,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3900,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "javascript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 3900,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3874,
-        "proximity_match_rate": 99.33,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "python": {
-        "total_comparisons": 4319,
-        "line0_exact_matches": 4319,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 4305,
-        "proximity_match_rate": 99.68,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "typescript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 3900,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 3874,
-        "proximity_match_rate": 99.33,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      }
-    }
-  },
-  "LLM_justification": {
-    "overall": {
-      "total_comparisons": 23819,
-      "line0_exact_matches": 0,
-      "line0_exact_match_rate": 0.0,
-      "proximity_matches": 20414,
-      "proximity_match_rate": 85.7,
-      "avg_levenshtein": 481.15,
-      "avg_edit_similarity": 0.06,
-      "avg_cosine": 0.08
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3739,
-        "proximity_match_rate": 94.66,
-        "avg_levenshtein": 464.35,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.1
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 2080,
-        "proximity_match_rate": 53.33,
-        "avg_levenshtein": 552.87,
-        "avg_edit_similarity": 0.04,
-        "avg_cosine": 0.03
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 3909,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3764,
-        "proximity_match_rate": 96.29,
-        "avg_levenshtein": 506.95,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.09
-      },
-      "low_context": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3400,
-        "proximity_match_rate": 86.08,
-        "avg_levenshtein": 422.22,
-        "avg_edit_similarity": 0.05,
-        "avg_cosine": 0.07
-      },
-      "pattern_matching": {
-        "total_comparisons": 3950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3739,
-        "proximity_match_rate": 94.66,
-        "avg_levenshtein": 517.95,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.09
-      },
-      "syntax_completion": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3445,
-        "proximity_match_rate": 88.33,
-        "avg_levenshtein": 434.82,
-        "avg_edit_similarity": 0.06,
-        "avg_cosine": 0.08
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3289,
-        "proximity_match_rate": 84.33,
-        "avg_levenshtein": 519.91,
-        "avg_edit_similarity": 0.05,
-        "avg_cosine": 0.07
-      },
-      "c_sharp": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3432,
-        "proximity_match_rate": 88.0,
-        "avg_levenshtein": 488.61,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.07
-      },
-      "java": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3484,
-        "proximity_match_rate": 89.33,
-        "avg_levenshtein": 485.59,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.08
-      },
-      "javascript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3185,
-        "proximity_match_rate": 81.67,
-        "avg_levenshtein": 477.4,
-        "avg_edit_similarity": 0.06,
-        "avg_cosine": 0.08
-      },
-      "python": {
-        "total_comparisons": 4319,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3813,
-        "proximity_match_rate": 88.28,
-        "avg_levenshtein": 428.93,
-        "avg_edit_similarity": 0.06,
-        "avg_cosine": 0.09
-      },
-      "typescript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 3211,
-        "proximity_match_rate": 82.33,
-        "avg_levenshtein": 492.06,
-        "avg_edit_similarity": 0.06,
-        "avg_cosine": 0.08
-      }
-    }
-  },
   "4omini_sft39_spm_fix2_5": {
     "overall": {
-      "total_comparisons": 1802,
-      "line0_exact_matches": 859,
-      "line0_exact_match_rate": 47.67,
-      "proximity_matches": 1445,
-      "proximity_match_rate": 80.19,
-      "avg_levenshtein": 18.69,
-      "avg_edit_similarity": 0.65,
-      "avg_cosine": 0.64
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 103,
-        "line0_exact_match_rate": 34.33,
-        "proximity_matches": 223,
-        "proximity_match_rate": 74.33,
-        "avg_levenshtein": 24.86,
-        "avg_edit_similarity": 0.56,
-        "avg_cosine": 0.55
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 196,
-        "line0_exact_match_rate": 65.77,
-        "proximity_matches": 234,
-        "proximity_match_rate": 78.52,
-        "avg_levenshtein": 13.28,
-        "avg_edit_similarity": 0.73,
-        "avg_cosine": 0.72
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 135,
-        "line0_exact_match_rate": 45.15,
-        "proximity_matches": 254,
-        "proximity_match_rate": 84.95,
-        "avg_levenshtein": 19.65,
-        "avg_edit_similarity": 0.65,
-        "avg_cosine": 0.64
-      },
-      "low_context": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 152,
-        "line0_exact_match_rate": 51.01,
-        "proximity_matches": 247,
-        "proximity_match_rate": 82.89,
-        "avg_levenshtein": 15.05,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.7
-      },
-      "pattern_matching": {
-        "total_comparisons": 288,
-        "line0_exact_matches": 145,
-        "line0_exact_match_rate": 50.35,
-        "proximity_matches": 245,
-        "proximity_match_rate": 85.07,
-        "avg_levenshtein": 18.17,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.66
-      },
-      "syntax_completion": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 126,
-        "line0_exact_match_rate": 42.14,
-        "proximity_matches": 234,
-        "proximity_match_rate": 78.26,
-        "avg_levenshtein": 19.88,
-        "avg_edit_similarity": 0.62,
-        "avg_cosine": 0.61
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 164,
-        "line0_exact_match_rate": 54.67,
-        "proximity_matches": 241,
-        "proximity_match_rate": 80.33,
-        "avg_levenshtein": 15.65,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.68
-      },
-      "c_sharp": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 137,
-        "line0_exact_match_rate": 45.97,
-        "proximity_matches": 237,
-        "proximity_match_rate": 79.53,
-        "avg_levenshtein": 21.87,
-        "avg_edit_similarity": 0.65,
-        "avg_cosine": 0.63
-      },
-      "java": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 175,
-        "line0_exact_match_rate": 58.92,
-        "proximity_matches": 261,
-        "proximity_match_rate": 87.88,
-        "avg_levenshtein": 13.96,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.76
-      },
-      "javascript": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 133,
-        "line0_exact_match_rate": 44.93,
-        "proximity_matches": 224,
-        "proximity_match_rate": 75.68,
-        "avg_levenshtein": 20.41,
-        "avg_edit_similarity": 0.61,
-        "avg_cosine": 0.59
-      },
-      "python": {
-        "total_comparisons": 313,
-        "line0_exact_matches": 146,
-        "line0_exact_match_rate": 46.65,
-        "proximity_matches": 256,
-        "proximity_match_rate": 81.79,
-        "avg_levenshtein": 15.4,
-        "avg_edit_similarity": 0.66,
-        "avg_cosine": 0.65
-      },
-      "typescript": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 34.9,
-        "proximity_matches": 226,
-        "proximity_match_rate": 75.84,
-        "avg_levenshtein": 25.02,
-        "avg_edit_similarity": 0.54,
-        "avg_cosine": 0.52
-      }
-    }
-  },
-  "claude-3-5-sonnet": {
-    "overall": {
-      "total_comparisons": 1817,
-      "line0_exact_matches": 707,
-      "line0_exact_match_rate": 38.91,
-      "proximity_matches": 1413,
-      "proximity_match_rate": 77.77,
-      "avg_levenshtein": 22.35,
-      "avg_edit_similarity": 0.57,
-      "avg_cosine": 0.54
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 65,
-        "line0_exact_match_rate": 21.67,
-        "proximity_matches": 220,
-        "proximity_match_rate": 73.33,
-        "avg_levenshtein": 31.14,
-        "avg_edit_similarity": 0.44,
-        "avg_cosine": 0.39
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 166,
-        "line0_exact_match_rate": 55.7,
-        "proximity_matches": 212,
-        "proximity_match_rate": 71.14,
-        "avg_levenshtein": 17.95,
-        "avg_edit_similarity": 0.63,
-        "avg_cosine": 0.62
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 97,
-        "line0_exact_match_rate": 32.44,
-        "proximity_matches": 244,
-        "proximity_match_rate": 81.61,
-        "avg_levenshtein": 25.3,
-        "avg_edit_similarity": 0.53,
-        "avg_cosine": 0.46
-      },
-      "low_context": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 151,
-        "line0_exact_match_rate": 50.33,
-        "proximity_matches": 253,
-        "proximity_match_rate": 84.33,
-        "avg_levenshtein": 13.81,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.7
-      },
-      "pattern_matching": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 124,
-        "line0_exact_match_rate": 41.33,
-        "proximity_matches": 258,
-        "proximity_match_rate": 86.0,
-        "avg_levenshtein": 22.38,
-        "avg_edit_similarity": 0.61,
-        "avg_cosine": 0.57
-      },
-      "syntax_completion": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 101,
-        "line0_exact_match_rate": 33.67,
-        "proximity_matches": 218,
-        "proximity_match_rate": 72.67,
-        "avg_levenshtein": 22.99,
-        "avg_edit_similarity": 0.53,
-        "avg_cosine": 0.5
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 133,
-        "line0_exact_match_rate": 44.48,
-        "proximity_matches": 229,
-        "proximity_match_rate": 76.59,
-        "avg_levenshtein": 20.36,
-        "avg_edit_similarity": 0.59,
-        "avg_cosine": 0.55
-      },
-      "c_sharp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 122,
-        "line0_exact_match_rate": 40.67,
-        "proximity_matches": 243,
-        "proximity_match_rate": 81.0,
-        "avg_levenshtein": 23.98,
-        "avg_edit_similarity": 0.59,
-        "avg_cosine": 0.56
-      },
-      "java": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 147,
-        "line0_exact_match_rate": 49.16,
-        "proximity_matches": 260,
-        "proximity_match_rate": 86.96,
-        "avg_levenshtein": 18.4,
-        "avg_edit_similarity": 0.67,
-        "avg_cosine": 0.66
-      },
-      "javascript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 107,
-        "line0_exact_match_rate": 35.67,
-        "proximity_matches": 228,
-        "proximity_match_rate": 76.0,
-        "avg_levenshtein": 23.85,
-        "avg_edit_similarity": 0.54,
-        "avg_cosine": 0.5
-      },
-      "python": {
-        "total_comparisons": 319,
-        "line0_exact_matches": 116,
-        "line0_exact_match_rate": 36.36,
-        "proximity_matches": 227,
-        "proximity_match_rate": 71.16,
-        "avg_levenshtein": 19.11,
-        "avg_edit_similarity": 0.56,
-        "avg_cosine": 0.54
-      },
-      "typescript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 82,
-        "line0_exact_match_rate": 27.33,
-        "proximity_matches": 226,
-        "proximity_match_rate": 75.33,
-        "avg_levenshtein": 28.57,
-        "avg_edit_similarity": 0.46,
-        "avg_cosine": 0.41
-      }
-    }
-  },
-  "claude-3-7-sonnet": {
-    "overall": {
-      "total_comparisons": 1818,
-      "line0_exact_matches": 533,
-      "line0_exact_match_rate": 29.32,
-      "proximity_matches": 1184,
-      "proximity_match_rate": 65.13,
-      "avg_levenshtein": 26.78,
-      "avg_edit_similarity": 0.47,
-      "avg_cosine": 0.42
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 40,
-        "line0_exact_match_rate": 13.33,
-        "proximity_matches": 181,
-        "proximity_match_rate": 60.33,
-        "avg_levenshtein": 36.98,
-        "avg_edit_similarity": 0.34,
-        "avg_cosine": 0.27
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 143,
-        "line0_exact_match_rate": 47.99,
-        "proximity_matches": 171,
-        "proximity_match_rate": 57.38,
-        "avg_levenshtein": 19.43,
-        "avg_edit_similarity": 0.54,
-        "avg_cosine": 0.52
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 75,
-        "line0_exact_match_rate": 25.0,
-        "proximity_matches": 203,
-        "proximity_match_rate": 67.67,
-        "avg_levenshtein": 29.78,
-        "avg_edit_similarity": 0.45,
-        "avg_cosine": 0.38
-      },
-      "low_context": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 110,
-        "line0_exact_match_rate": 36.67,
-        "proximity_matches": 207,
-        "proximity_match_rate": 69.0,
-        "avg_levenshtein": 18.93,
-        "avg_edit_similarity": 0.55,
-        "avg_cosine": 0.54
-      },
-      "pattern_matching": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 99,
-        "line0_exact_match_rate": 33.0,
-        "proximity_matches": 225,
-        "proximity_match_rate": 75.0,
-        "avg_levenshtein": 25.89,
-        "avg_edit_similarity": 0.53,
-        "avg_cosine": 0.47
-      },
-      "syntax_completion": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 59,
-        "line0_exact_match_rate": 19.67,
-        "proximity_matches": 184,
-        "proximity_match_rate": 61.33,
-        "avg_levenshtein": 29.66,
-        "avg_edit_similarity": 0.4,
-        "avg_cosine": 0.33
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 94,
-        "line0_exact_match_rate": 31.54,
-        "proximity_matches": 180,
-        "proximity_match_rate": 60.4,
-        "avg_levenshtein": 25.96,
-        "avg_edit_similarity": 0.46,
-        "avg_cosine": 0.41
-      },
-      "c_sharp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 96,
-        "line0_exact_match_rate": 32.0,
-        "proximity_matches": 203,
-        "proximity_match_rate": 67.67,
-        "avg_levenshtein": 28.67,
-        "avg_edit_similarity": 0.49,
-        "avg_cosine": 0.43
-      },
-      "java": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 113,
-        "line0_exact_match_rate": 37.67,
-        "proximity_matches": 216,
-        "proximity_match_rate": 72.0,
-        "avg_levenshtein": 24.02,
-        "avg_edit_similarity": 0.55,
-        "avg_cosine": 0.52
-      },
-      "javascript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 83,
-        "line0_exact_match_rate": 27.67,
-        "proximity_matches": 196,
-        "proximity_match_rate": 65.33,
-        "avg_levenshtein": 27.36,
-        "avg_edit_similarity": 0.46,
-        "avg_cosine": 0.4
-      },
-      "python": {
-        "total_comparisons": 320,
-        "line0_exact_matches": 78,
-        "line0_exact_match_rate": 24.38,
-        "proximity_matches": 188,
-        "proximity_match_rate": 58.75,
-        "avg_levenshtein": 23.6,
-        "avg_edit_similarity": 0.44,
-        "avg_cosine": 0.39
-      },
-      "typescript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 69,
-        "line0_exact_match_rate": 23.0,
-        "proximity_matches": 201,
-        "proximity_match_rate": 67.0,
-        "avg_levenshtein": 31.31,
-        "avg_edit_similarity": 0.41,
-        "avg_cosine": 0.36
-      }
-    }
-  },
-  "DeepSeek-R1": {
-    "overall": {
-      "total_comparisons": 1787,
-      "line0_exact_matches": 811,
-      "line0_exact_match_rate": 45.38,
-      "proximity_matches": 1419,
-      "proximity_match_rate": 79.41,
-      "avg_levenshtein": 19.57,
-      "avg_edit_similarity": 0.65,
-      "avg_cosine": 0.64
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 34.78,
-        "proximity_matches": 246,
-        "proximity_match_rate": 82.27,
-        "avg_levenshtein": 24.54,
-        "avg_edit_similarity": 0.61,
-        "avg_cosine": 0.61
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 283,
-        "line0_exact_matches": 119,
-        "line0_exact_match_rate": 42.05,
-        "proximity_matches": 162,
-        "proximity_match_rate": 57.24,
-        "avg_levenshtein": 24.4,
-        "avg_edit_similarity": 0.51,
-        "avg_cosine": 0.5
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 149,
-        "line0_exact_match_rate": 50.34,
-        "proximity_matches": 261,
-        "proximity_match_rate": 88.18,
-        "avg_levenshtein": 16.6,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.69
-      },
-      "low_context": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 171,
-        "line0_exact_match_rate": 57.97,
-        "proximity_matches": 256,
-        "proximity_match_rate": 86.78,
-        "avg_levenshtein": 12.48,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.76
-      },
-      "pattern_matching": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 146,
-        "line0_exact_match_rate": 49.32,
-        "proximity_matches": 259,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 18.59,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.68
-      },
-      "syntax_completion": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 112,
-        "line0_exact_match_rate": 37.58,
-        "proximity_matches": 220,
-        "proximity_match_rate": 73.83,
-        "avg_levenshtein": 21.21,
-        "avg_edit_similarity": 0.61,
-        "avg_cosine": 0.59
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 288,
-        "line0_exact_matches": 151,
-        "line0_exact_match_rate": 52.43,
-        "proximity_matches": 237,
-        "proximity_match_rate": 82.29,
-        "avg_levenshtein": 15.75,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.7
-      },
-      "c_sharp": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 140,
-        "line0_exact_match_rate": 47.14,
-        "proximity_matches": 246,
-        "proximity_match_rate": 82.83,
-        "avg_levenshtein": 20.64,
-        "avg_edit_similarity": 0.68,
-        "avg_cosine": 0.66
-      },
-      "java": {
-        "total_comparisons": 293,
-        "line0_exact_matches": 163,
-        "line0_exact_match_rate": 55.63,
-        "proximity_matches": 248,
-        "proximity_match_rate": 84.64,
-        "avg_levenshtein": 15.32,
-        "avg_edit_similarity": 0.73,
-        "avg_cosine": 0.72
-      },
-      "javascript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 125,
-        "line0_exact_match_rate": 41.67,
-        "proximity_matches": 225,
-        "proximity_match_rate": 75.0,
-        "avg_levenshtein": 23.31,
-        "avg_edit_similarity": 0.6,
-        "avg_cosine": 0.58
-      },
-      "python": {
-        "total_comparisons": 311,
-        "line0_exact_matches": 143,
-        "line0_exact_match_rate": 45.98,
-        "proximity_matches": 246,
-        "proximity_match_rate": 79.1,
-        "avg_levenshtein": 15.0,
-        "avg_edit_similarity": 0.67,
-        "avg_cosine": 0.66
-      },
-      "typescript": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 89,
-        "line0_exact_match_rate": 29.87,
-        "proximity_matches": 217,
-        "proximity_match_rate": 72.82,
-        "avg_levenshtein": 27.39,
-        "avg_edit_similarity": 0.53,
-        "avg_cosine": 0.51
-      }
-    }
-  },
-  "DeepSeek-V3-0324": {
-    "overall": {
-      "total_comparisons": 1810,
-      "line0_exact_matches": 891,
-      "line0_exact_match_rate": 49.23,
-      "proximity_matches": 1481,
-      "proximity_match_rate": 81.82,
-      "avg_levenshtein": 19.34,
-      "avg_edit_similarity": 0.67,
-      "avg_cosine": 0.66
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 96,
-        "line0_exact_match_rate": 32.0,
-        "proximity_matches": 240,
-        "proximity_match_rate": 80.0,
-        "avg_levenshtein": 25.47,
-        "avg_edit_similarity": 0.57,
-        "avg_cosine": 0.55
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 148,
-        "line0_exact_match_rate": 50.17,
-        "proximity_matches": 188,
-        "proximity_match_rate": 63.73,
-        "avg_levenshtein": 26.36,
-        "avg_edit_similarity": 0.58,
-        "avg_cosine": 0.58
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 151,
-        "line0_exact_match_rate": 50.67,
-        "proximity_matches": 262,
-        "proximity_match_rate": 87.92,
-        "avg_levenshtein": 17.95,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.67
-      },
-      "low_context": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 183,
-        "line0_exact_match_rate": 61.0,
-        "proximity_matches": 264,
-        "proximity_match_rate": 88.0,
-        "avg_levenshtein": 11.18,
-        "avg_edit_similarity": 0.78,
-        "avg_cosine": 0.78
-      },
-      "pattern_matching": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 163,
-        "line0_exact_match_rate": 54.7,
-        "proximity_matches": 267,
-        "proximity_match_rate": 89.6,
-        "avg_levenshtein": 17.11,
-        "avg_edit_similarity": 0.74,
-        "avg_cosine": 0.71
-      },
-      "syntax_completion": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 141,
-        "line0_exact_match_rate": 47.16,
-        "proximity_matches": 246,
-        "proximity_match_rate": 82.27,
-        "avg_levenshtein": 17.88,
-        "avg_edit_similarity": 0.67,
-        "avg_cosine": 0.66
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 172,
-        "line0_exact_match_rate": 57.33,
-        "proximity_matches": 242,
-        "proximity_match_rate": 80.67,
-        "avg_levenshtein": 18.58,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.71
-      },
-      "c_sharp": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 148,
-        "line0_exact_match_rate": 49.5,
-        "proximity_matches": 260,
-        "proximity_match_rate": 86.96,
-        "avg_levenshtein": 18.07,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.69
-      },
-      "java": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 179,
-        "line0_exact_match_rate": 60.47,
-        "proximity_matches": 266,
-        "proximity_match_rate": 89.86,
-        "avg_levenshtein": 15.01,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.75
-      },
-      "javascript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 140,
-        "line0_exact_match_rate": 46.67,
-        "proximity_matches": 227,
-        "proximity_match_rate": 75.67,
-        "avg_levenshtein": 21.19,
-        "avg_edit_similarity": 0.64,
-        "avg_cosine": 0.61
-      },
-      "python": {
-        "total_comparisons": 316,
-        "line0_exact_matches": 155,
-        "line0_exact_match_rate": 49.05,
-        "proximity_matches": 255,
-        "proximity_match_rate": 80.7,
-        "avg_levenshtein": 14.28,
-        "avg_edit_similarity": 0.68,
-        "avg_cosine": 0.68
-      },
-      "typescript": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 97,
-        "line0_exact_match_rate": 32.44,
-        "proximity_matches": 231,
-        "proximity_match_rate": 77.26,
-        "avg_levenshtein": 29.14,
-        "avg_edit_similarity": 0.52,
-        "avg_cosine": 0.5
-      }
-    }
-  },
-  "gpt-35-turbo-completions": {
-    "overall": {
-      "total_comparisons": 1536,
-      "line0_exact_matches": 835,
-      "line0_exact_match_rate": 54.36,
-      "proximity_matches": 1265,
-      "proximity_match_rate": 82.36,
-      "avg_levenshtein": 15.05,
-      "avg_edit_similarity": 0.72,
-      "avg_cosine": 0.71
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 255,
-        "line0_exact_matches": 107,
-        "line0_exact_match_rate": 41.96,
-        "proximity_matches": 202,
-        "proximity_match_rate": 79.22,
-        "avg_levenshtein": 19.22,
-        "avg_edit_similarity": 0.66,
-        "avg_cosine": 0.66
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 252,
-        "line0_exact_matches": 171,
-        "line0_exact_match_rate": 67.86,
-        "proximity_matches": 200,
-        "proximity_match_rate": 79.37,
-        "avg_levenshtein": 14.83,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.75
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 260,
-        "line0_exact_matches": 140,
-        "line0_exact_match_rate": 53.85,
-        "proximity_matches": 222,
-        "proximity_match_rate": 85.38,
-        "avg_levenshtein": 15.88,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.69
-      },
-      "low_context": {
-        "total_comparisons": 269,
-        "line0_exact_matches": 155,
-        "line0_exact_match_rate": 57.62,
-        "proximity_matches": 232,
-        "proximity_match_rate": 86.25,
-        "avg_levenshtein": 9.97,
-        "avg_edit_similarity": 0.78,
-        "avg_cosine": 0.79
-      },
-      "pattern_matching": {
-        "total_comparisons": 240,
-        "line0_exact_matches": 146,
-        "line0_exact_match_rate": 60.83,
-        "proximity_matches": 204,
-        "proximity_match_rate": 85.0,
-        "avg_levenshtein": 14.0,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.74
-      },
-      "syntax_completion": {
-        "total_comparisons": 240,
-        "line0_exact_matches": 116,
-        "line0_exact_match_rate": 48.33,
-        "proximity_matches": 197,
-        "proximity_match_rate": 82.08,
-        "avg_levenshtein": 15.29,
-        "avg_edit_similarity": 0.7,
-        "avg_cosine": 0.69
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 272,
-        "line0_exact_matches": 167,
-        "line0_exact_match_rate": 61.4,
-        "proximity_matches": 228,
-        "proximity_match_rate": 83.82,
-        "avg_levenshtein": 12.03,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.76
-      },
-      "c_sharp": {
-        "total_comparisons": 260,
-        "line0_exact_matches": 136,
-        "line0_exact_match_rate": 52.31,
-        "proximity_matches": 217,
-        "proximity_match_rate": 83.46,
-        "avg_levenshtein": 16.58,
-        "avg_edit_similarity": 0.73,
-        "avg_cosine": 0.71
-      },
-      "java": {
-        "total_comparisons": 255,
-        "line0_exact_matches": 175,
-        "line0_exact_match_rate": 68.63,
-        "proximity_matches": 234,
-        "proximity_match_rate": 91.76,
-        "avg_levenshtein": 10.16,
-        "avg_edit_similarity": 0.83,
-        "avg_cosine": 0.84
-      },
-      "javascript": {
-        "total_comparisons": 230,
-        "line0_exact_matches": 123,
-        "line0_exact_match_rate": 53.48,
-        "proximity_matches": 184,
-        "proximity_match_rate": 80.0,
-        "avg_levenshtein": 15.29,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.69
-      },
-      "python": {
-        "total_comparisons": 275,
-        "line0_exact_matches": 132,
-        "line0_exact_match_rate": 48.0,
-        "proximity_matches": 217,
-        "proximity_match_rate": 78.91,
-        "avg_levenshtein": 16.63,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.68
-      },
-      "typescript": {
-        "total_comparisons": 244,
-        "line0_exact_matches": 102,
-        "line0_exact_match_rate": 41.8,
-        "proximity_matches": 185,
-        "proximity_match_rate": 75.82,
-        "avg_levenshtein": 19.9,
-        "avg_edit_similarity": 0.62,
-        "avg_cosine": 0.6
-      }
-    }
-  },
-  "gpt-4.5-preview": {
-    "overall": {
-      "total_comparisons": 1809,
-      "line0_exact_matches": 885,
-      "line0_exact_match_rate": 48.92,
-      "proximity_matches": 1417,
-      "proximity_match_rate": 78.33,
-      "avg_levenshtein": 17.89,
-      "avg_edit_similarity": 0.67,
+      "total_comparisons": 1800,
+      "line0_exact_matches": 867,
+      "line0_exact_match_rate": 48.17,
       "avg_cosine": 0.65
     },
     "categories": {
       "api_usage": {
         "total_comparisons": 300,
-        "line0_exact_matches": 114,
-        "line0_exact_match_rate": 38.0,
-        "proximity_matches": 237,
-        "proximity_match_rate": 79.0,
-        "avg_levenshtein": 21.83,
-        "avg_edit_similarity": 0.64,
-        "avg_cosine": 0.62
+        "line0_exact_matches": 122,
+        "line0_exact_match_rate": 40.67,
+        "avg_cosine": 0.61
       },
       "code2NL_NL2code": {
-        "total_comparisons": 292,
-        "line0_exact_matches": 118,
-        "line0_exact_match_rate": 40.41,
-        "proximity_matches": 153,
-        "proximity_match_rate": 52.4,
-        "avg_levenshtein": 23.88,
-        "avg_edit_similarity": 0.49,
-        "avg_cosine": 0.48
+        "total_comparisons": 300,
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.67,
+        "avg_cosine": 0.52
       },
       "code_purpose_understanding": {
         "total_comparisons": 300,
-        "line0_exact_matches": 169,
-        "line0_exact_match_rate": 56.33,
-        "proximity_matches": 253,
-        "proximity_match_rate": 84.33,
-        "avg_levenshtein": 15.93,
-        "avg_edit_similarity": 0.73,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
         "avg_cosine": 0.71
       },
       "low_context": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 196,
-        "line0_exact_match_rate": 65.77,
-        "proximity_matches": 264,
-        "proximity_match_rate": 88.59,
-        "avg_levenshtein": 8.53,
-        "avg_edit_similarity": 0.82,
-        "avg_cosine": 0.81
+        "total_comparisons": 300,
+        "line0_exact_matches": 170,
+        "line0_exact_match_rate": 56.67,
+        "avg_cosine": 0.77
       },
       "pattern_matching": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 149,
-        "line0_exact_match_rate": 49.83,
-        "proximity_matches": 258,
-        "proximity_match_rate": 86.29,
-        "avg_levenshtein": 18.22,
-        "avg_edit_similarity": 0.7,
-        "avg_cosine": 0.67
+        "total_comparisons": 300,
+        "line0_exact_matches": 151,
+        "line0_exact_match_rate": 50.33,
+        "avg_cosine": 0.66
       },
       "syntax_completion": {
         "total_comparisons": 300,
-        "line0_exact_matches": 130,
-        "line0_exact_match_rate": 43.33,
-        "proximity_matches": 238,
-        "proximity_match_rate": 79.33,
-        "avg_levenshtein": 18.67,
-        "avg_edit_similarity": 0.65,
+        "line0_exact_matches": 127,
+        "line0_exact_match_rate": 42.33,
         "avg_cosine": 0.63
       }
     },
     "languages": {
       "cpp": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 178,
-        "line0_exact_match_rate": 59.73,
-        "proximity_matches": 239,
-        "proximity_match_rate": 80.2,
-        "avg_levenshtein": 12.14,
-        "avg_edit_similarity": 0.74,
-        "avg_cosine": 0.73
+        "total_comparisons": 300,
+        "line0_exact_matches": 171,
+        "line0_exact_match_rate": 57.0,
+        "avg_cosine": 0.71
       },
       "c_sharp": {
         "total_comparisons": 300,
-        "line0_exact_matches": 146,
-        "line0_exact_match_rate": 48.67,
-        "proximity_matches": 248,
-        "proximity_match_rate": 82.67,
-        "avg_levenshtein": 18.73,
-        "avg_edit_similarity": 0.7,
+        "line0_exact_matches": 144,
+        "line0_exact_match_rate": 48.0,
         "avg_cosine": 0.67
       },
       "java": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 158,
-        "line0_exact_match_rate": 53.02,
-        "proximity_matches": 243,
-        "proximity_match_rate": 81.54,
-        "avg_levenshtein": 17.09,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.7
+        "total_comparisons": 300,
+        "line0_exact_matches": 182,
+        "line0_exact_match_rate": 60.67,
+        "avg_cosine": 0.75
       },
       "javascript": {
         "total_comparisons": 300,
-        "line0_exact_matches": 129,
-        "line0_exact_match_rate": 43.0,
-        "proximity_matches": 215,
-        "proximity_match_rate": 71.67,
-        "avg_levenshtein": 20.87,
-        "avg_edit_similarity": 0.61,
-        "avg_cosine": 0.58
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.67,
+        "avg_cosine": 0.61
       },
       "python": {
-        "total_comparisons": 319,
-        "line0_exact_matches": 165,
-        "line0_exact_match_rate": 51.72,
-        "proximity_matches": 257,
-        "proximity_match_rate": 80.56,
-        "avg_levenshtein": 14.08,
-        "avg_edit_similarity": 0.71,
-        "avg_cosine": 0.7
+        "total_comparisons": 300,
+        "line0_exact_matches": 138,
+        "line0_exact_match_rate": 46.0,
+        "avg_cosine": 0.66
       },
       "typescript": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 109,
-        "line0_exact_match_rate": 37.07,
-        "proximity_matches": 215,
-        "proximity_match_rate": 73.13,
-        "avg_levenshtein": 24.78,
-        "avg_edit_similarity": 0.56,
-        "avg_cosine": 0.54
+        "total_comparisons": 300,
+        "line0_exact_matches": 98,
+        "line0_exact_match_rate": 32.67,
+        "avg_cosine": 0.51
       }
     }
   },
-  "gpt-4o-mini": {
+  "claude-3-5-sonnet": {
     "overall": {
-      "total_comparisons": 1820,
-      "line0_exact_matches": 835,
-      "line0_exact_match_rate": 45.88,
-      "proximity_matches": 1443,
-      "proximity_match_rate": 79.29,
-      "avg_levenshtein": 17.89,
-      "avg_edit_similarity": 0.65,
-      "avg_cosine": 0.64
+      "total_comparisons": 1784,
+      "line0_exact_matches": 894,
+      "line0_exact_match_rate": 50.11,
+      "avg_cosine": 0.68
     },
     "categories": {
       "api_usage": {
         "total_comparisons": 300,
-        "line0_exact_matches": 116,
-        "line0_exact_match_rate": 38.67,
-        "proximity_matches": 256,
-        "proximity_match_rate": 85.33,
-        "avg_levenshtein": 20.4,
-        "avg_edit_similarity": 0.65,
+        "line0_exact_matches": 107,
+        "line0_exact_match_rate": 35.67,
+        "avg_cosine": 0.6
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 291,
+        "line0_exact_matches": 145,
+        "line0_exact_match_rate": 49.83,
+        "avg_cosine": 0.57
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.73
+      },
+      "low_context": {
+        "total_comparisons": 295,
+        "line0_exact_matches": 175,
+        "line0_exact_match_rate": 59.32,
+        "avg_cosine": 0.78
+      },
+      "pattern_matching": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 162,
+        "line0_exact_match_rate": 54.36,
+        "avg_cosine": 0.73
+      },
+      "syntax_completion": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 142,
+        "line0_exact_match_rate": 47.33,
+        "avg_cosine": 0.67
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 295,
+        "line0_exact_matches": 181,
+        "line0_exact_match_rate": 61.36,
+        "avg_cosine": 0.78
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.0,
+        "avg_cosine": 0.69
+      },
+      "java": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 180,
+        "line0_exact_match_rate": 60.61,
+        "avg_cosine": 0.78
+      },
+      "javascript": {
+        "total_comparisons": 295,
+        "line0_exact_matches": 126,
+        "line0_exact_match_rate": 42.71,
+        "avg_cosine": 0.6
+      },
+      "python": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 148,
+        "line0_exact_match_rate": 49.33,
+        "avg_cosine": 0.7
+      },
+      "typescript": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 112,
+        "line0_exact_match_rate": 37.71,
+        "avg_cosine": 0.55
+      }
+    }
+  },
+  "claude-3-7-sonnet": {
+    "overall": {
+      "total_comparisons": 1787,
+      "line0_exact_matches": 842,
+      "line0_exact_match_rate": 47.12,
+      "avg_cosine": 0.64
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 90,
+        "line0_exact_match_rate": 30.2,
+        "avg_cosine": 0.51
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 296,
+        "line0_exact_matches": 149,
+        "line0_exact_match_rate": 50.34,
+        "avg_cosine": 0.58
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.16,
+        "avg_cosine": 0.65
+      },
+      "low_context": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 178,
+        "line0_exact_match_rate": 59.93,
+        "avg_cosine": 0.76
+      },
+      "pattern_matching": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 150,
+        "line0_exact_match_rate": 50.17,
+        "avg_cosine": 0.69
+      },
+      "syntax_completion": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 128,
+        "line0_exact_match_rate": 42.95,
+        "avg_cosine": 0.61
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.88,
+        "avg_cosine": 0.69
+      },
+      "c_sharp": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 143,
+        "line0_exact_match_rate": 47.83,
+        "avg_cosine": 0.66
+      },
+      "java": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 165,
+        "line0_exact_match_rate": 55.18,
+        "avg_cosine": 0.7
+      },
+      "javascript": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.82,
+        "avg_cosine": 0.6
+      },
+      "python": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.82,
+        "avg_cosine": 0.65
+      },
+      "typescript": {
+        "total_comparisons": 294,
+        "line0_exact_matches": 103,
+        "line0_exact_match_rate": 35.03,
+        "avg_cosine": 0.51
+      }
+    }
+  },
+  "DeepSeek-R1": {
+    "overall": {
+      "total_comparisons": 1795,
+      "line0_exact_matches": 807,
+      "line0_exact_match_rate": 44.96,
+      "avg_cosine": 0.65
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 105,
+        "line0_exact_match_rate": 35.23,
         "avg_cosine": 0.64
       },
       "code2NL_NL2code": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 132,
-        "line0_exact_match_rate": 44.0,
-        "proximity_matches": 164,
-        "proximity_match_rate": 54.67,
-        "avg_levenshtein": 21.66,
-        "avg_edit_similarity": 0.51,
-        "avg_cosine": 0.5
+        "total_comparisons": 299,
+        "line0_exact_matches": 114,
+        "line0_exact_match_rate": 38.13,
+        "avg_cosine": 0.47
       },
       "code_purpose_understanding": {
         "total_comparisons": 300,
         "line0_exact_matches": 152,
         "line0_exact_match_rate": 50.67,
-        "proximity_matches": 254,
-        "proximity_match_rate": 84.67,
-        "avg_levenshtein": 17.56,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.67
+        "avg_cosine": 0.7
       },
       "low_context": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 161,
-        "line0_exact_match_rate": 53.67,
-        "proximity_matches": 251,
-        "proximity_match_rate": 83.67,
-        "avg_levenshtein": 11.57,
-        "avg_edit_similarity": 0.74,
-        "avg_cosine": 0.74
+        "total_comparisons": 299,
+        "line0_exact_matches": 162,
+        "line0_exact_match_rate": 54.18,
+        "avg_cosine": 0.77
       },
       "pattern_matching": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 152,
-        "line0_exact_match_rate": 50.67,
-        "proximity_matches": 266,
-        "proximity_match_rate": 88.67,
-        "avg_levenshtein": 16.34,
-        "avg_edit_similarity": 0.72,
+        "total_comparisons": 299,
+        "line0_exact_matches": 146,
+        "line0_exact_match_rate": 48.83,
         "avg_cosine": 0.68
       },
       "syntax_completion": {
         "total_comparisons": 300,
-        "line0_exact_matches": 114,
-        "line0_exact_match_rate": 38.0,
-        "proximity_matches": 236,
-        "proximity_match_rate": 78.67,
-        "avg_levenshtein": 19.57,
-        "avg_edit_similarity": 0.62,
+        "line0_exact_matches": 128,
+        "line0_exact_match_rate": 42.67,
+        "avg_cosine": 0.64
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.73
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 129,
+        "line0_exact_match_rate": 43.0,
+        "avg_cosine": 0.65
+      },
+      "java": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 158,
+        "line0_exact_match_rate": 53.2,
+        "avg_cosine": 0.69
+      },
+      "javascript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 122,
+        "line0_exact_match_rate": 40.67,
+        "avg_cosine": 0.6
+      },
+      "python": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 133,
+        "line0_exact_match_rate": 44.63,
+        "avg_cosine": 0.68
+      },
+      "typescript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 102,
+        "line0_exact_match_rate": 34.0,
+        "avg_cosine": 0.55
+      }
+    }
+  },
+  "DeepSeek-V3-0324": {
+    "overall": {
+      "total_comparisons": 1790,
+      "line0_exact_matches": 892,
+      "line0_exact_match_rate": 49.83,
+      "avg_cosine": 0.68
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 111,
+        "line0_exact_match_rate": 37.37,
+        "avg_cosine": 0.63
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 135,
+        "line0_exact_match_rate": 45.15,
+        "avg_cosine": 0.53
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.73
+      },
+      "low_context": {
+        "total_comparisons": 296,
+        "line0_exact_matches": 177,
+        "line0_exact_match_rate": 59.8,
+        "avg_cosine": 0.8
+      },
+      "pattern_matching": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 170,
+        "line0_exact_match_rate": 56.86,
+        "avg_cosine": 0.75
+      },
+      "syntax_completion": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 136,
+        "line0_exact_match_rate": 45.48,
+        "avg_cosine": 0.67
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 177,
+        "line0_exact_match_rate": 59.0,
+        "avg_cosine": 0.75
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.67,
+        "avg_cosine": 0.68
+      },
+      "java": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 184,
+        "line0_exact_match_rate": 61.54,
+        "avg_cosine": 0.76
+      },
+      "javascript": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 131,
+        "line0_exact_match_rate": 44.11,
+        "avg_cosine": 0.63
+      },
+      "python": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.33,
+        "avg_cosine": 0.71
+      },
+      "typescript": {
+        "total_comparisons": 296,
+        "line0_exact_matches": 119,
+        "line0_exact_match_rate": 40.2,
+        "avg_cosine": 0.58
+      }
+    }
+  },
+  "gpt-35-turbo-completions": {
+    "overall": {
+      "total_comparisons": 1663,
+      "line0_exact_matches": 727,
+      "line0_exact_match_rate": 43.72,
+      "avg_cosine": 0.61
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 285,
+        "line0_exact_matches": 91,
+        "line0_exact_match_rate": 31.93,
+        "avg_cosine": 0.56
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 276,
+        "line0_exact_matches": 149,
+        "line0_exact_match_rate": 53.99,
+        "avg_cosine": 0.62
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 280,
+        "line0_exact_matches": 125,
+        "line0_exact_match_rate": 44.64,
         "avg_cosine": 0.61
+      },
+      "low_context": {
+        "total_comparisons": 272,
+        "line0_exact_matches": 127,
+        "line0_exact_match_rate": 46.69,
+        "avg_cosine": 0.64
+      },
+      "pattern_matching": {
+        "total_comparisons": 267,
+        "line0_exact_matches": 122,
+        "line0_exact_match_rate": 45.69,
+        "avg_cosine": 0.62
+      },
+      "syntax_completion": {
+        "total_comparisons": 283,
+        "line0_exact_matches": 113,
+        "line0_exact_match_rate": 39.93,
+        "avg_cosine": 0.6
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 286,
+        "line0_exact_matches": 137,
+        "line0_exact_match_rate": 47.9,
+        "avg_cosine": 0.61
+      },
+      "c_sharp": {
+        "total_comparisons": 282,
+        "line0_exact_matches": 119,
+        "line0_exact_match_rate": 42.2,
+        "avg_cosine": 0.62
+      },
+      "java": {
+        "total_comparisons": 279,
+        "line0_exact_matches": 156,
+        "line0_exact_match_rate": 55.91,
+        "avg_cosine": 0.7
+      },
+      "javascript": {
+        "total_comparisons": 278,
+        "line0_exact_matches": 107,
+        "line0_exact_match_rate": 38.49,
+        "avg_cosine": 0.55
+      },
+      "python": {
+        "total_comparisons": 276,
+        "line0_exact_matches": 132,
+        "line0_exact_match_rate": 47.83,
+        "avg_cosine": 0.7
+      },
+      "typescript": {
+        "total_comparisons": 262,
+        "line0_exact_matches": 76,
+        "line0_exact_match_rate": 29.01,
+        "avg_cosine": 0.45
+      }
+    }
+  },
+  "gpt-4.1-mini": {
+    "overall": {
+      "total_comparisons": 1690,
+      "line0_exact_matches": 872,
+      "line0_exact_match_rate": 51.6,
+      "avg_cosine": 0.69
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 283,
+        "line0_exact_matches": 112,
+        "line0_exact_match_rate": 39.58,
+        "avg_cosine": 0.66
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 265,
+        "line0_exact_matches": 126,
+        "line0_exact_match_rate": 47.55,
+        "avg_cosine": 0.56
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 292,
+        "line0_exact_matches": 164,
+        "line0_exact_match_rate": 56.16,
+        "avg_cosine": 0.74
+      },
+      "low_context": {
+        "total_comparisons": 294,
+        "line0_exact_matches": 185,
+        "line0_exact_match_rate": 62.93,
+        "avg_cosine": 0.79
+      },
+      "pattern_matching": {
+        "total_comparisons": 272,
+        "line0_exact_matches": 152,
+        "line0_exact_match_rate": 55.88,
+        "avg_cosine": 0.74
+      },
+      "syntax_completion": {
+        "total_comparisons": 284,
+        "line0_exact_matches": 133,
+        "line0_exact_match_rate": 46.83,
+        "avg_cosine": 0.66
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 287,
+        "line0_exact_matches": 174,
+        "line0_exact_match_rate": 60.63,
+        "avg_cosine": 0.75
+      },
+      "c_sharp": {
+        "total_comparisons": 281,
+        "line0_exact_matches": 138,
+        "line0_exact_match_rate": 49.11,
+        "avg_cosine": 0.7
+      },
+      "java": {
+        "total_comparisons": 282,
+        "line0_exact_matches": 165,
+        "line0_exact_match_rate": 58.51,
+        "avg_cosine": 0.77
+      },
+      "javascript": {
+        "total_comparisons": 277,
+        "line0_exact_matches": 132,
+        "line0_exact_match_rate": 47.65,
+        "avg_cosine": 0.65
+      },
+      "python": {
+        "total_comparisons": 293,
+        "line0_exact_matches": 153,
+        "line0_exact_match_rate": 52.22,
+        "avg_cosine": 0.72
+      },
+      "typescript": {
+        "total_comparisons": 270,
+        "line0_exact_matches": 110,
+        "line0_exact_match_rate": 40.74,
+        "avg_cosine": 0.57
+      }
+    }
+  },
+  "gpt-4.1-nano": {
+    "overall": {
+      "total_comparisons": 1772,
+      "line0_exact_matches": 662,
+      "line0_exact_match_rate": 37.36,
+      "avg_cosine": 0.58
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 90,
+        "line0_exact_match_rate": 30.2,
+        "avg_cosine": 0.57
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 295,
+        "line0_exact_matches": 87,
+        "line0_exact_match_rate": 29.49,
+        "avg_cosine": 0.4
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 127,
+        "line0_exact_match_rate": 42.33,
+        "avg_cosine": 0.64
+      },
+      "low_context": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.33,
+        "avg_cosine": 0.73
+      },
+      "pattern_matching": {
+        "total_comparisons": 288,
+        "line0_exact_matches": 115,
+        "line0_exact_match_rate": 39.93,
+        "avg_cosine": 0.61
+      },
+      "syntax_completion": {
+        "total_comparisons": 293,
+        "line0_exact_matches": 96,
+        "line0_exact_match_rate": 32.76,
+        "avg_cosine": 0.55
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 145,
+        "line0_exact_match_rate": 48.49,
+        "avg_cosine": 0.64
+      },
+      "c_sharp": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 103,
+        "line0_exact_match_rate": 34.45,
+        "avg_cosine": 0.6
+      },
+      "java": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 136,
+        "line0_exact_match_rate": 45.48,
+        "avg_cosine": 0.66
+      },
+      "javascript": {
+        "total_comparisons": 290,
+        "line0_exact_matches": 90,
+        "line0_exact_match_rate": 31.03,
+        "avg_cosine": 0.52
+      },
+      "python": {
+        "total_comparisons": 298,
+        "line0_exact_matches": 106,
+        "line0_exact_match_rate": 35.57,
+        "avg_cosine": 0.59
+      },
+      "typescript": {
+        "total_comparisons": 287,
+        "line0_exact_matches": 82,
+        "line0_exact_match_rate": 28.57,
+        "avg_cosine": 0.49
+      }
+    }
+  },
+  "gpt-4.5-preview": {
+    "overall": {
+      "total_comparisons": 1735,
+      "line0_exact_matches": 922,
+      "line0_exact_match_rate": 53.14,
+      "avg_cosine": 0.71
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 128,
+        "line0_exact_match_rate": 43.1,
+        "avg_cosine": 0.68
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 251,
+        "line0_exact_matches": 132,
+        "line0_exact_match_rate": 52.59,
+        "avg_cosine": 0.61
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 174,
+        "line0_exact_match_rate": 58.19,
+        "avg_cosine": 0.74
+      },
+      "low_context": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 191,
+        "line0_exact_match_rate": 64.31,
+        "avg_cosine": 0.81
+      },
+      "pattern_matching": {
+        "total_comparisons": 296,
+        "line0_exact_matches": 162,
+        "line0_exact_match_rate": 54.73,
+        "avg_cosine": 0.72
+      },
+      "syntax_completion": {
+        "total_comparisons": 295,
+        "line0_exact_matches": 135,
+        "line0_exact_match_rate": 45.76,
+        "avg_cosine": 0.68
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 286,
+        "line0_exact_matches": 189,
+        "line0_exact_match_rate": 66.08,
+        "avg_cosine": 0.79
+      },
+      "c_sharp": {
+        "total_comparisons": 297,
+        "line0_exact_matches": 145,
+        "line0_exact_match_rate": 48.82,
+        "avg_cosine": 0.71
+      },
+      "java": {
+        "total_comparisons": 290,
+        "line0_exact_matches": 179,
+        "line0_exact_match_rate": 61.72,
+        "avg_cosine": 0.79
+      },
+      "javascript": {
+        "total_comparisons": 289,
+        "line0_exact_matches": 138,
+        "line0_exact_match_rate": 47.75,
+        "avg_cosine": 0.65
+      },
+      "python": {
+        "total_comparisons": 296,
+        "line0_exact_matches": 156,
+        "line0_exact_match_rate": 52.7,
+        "avg_cosine": 0.71
+      },
+      "typescript": {
+        "total_comparisons": 277,
+        "line0_exact_matches": 115,
+        "line0_exact_match_rate": 41.52,
+        "avg_cosine": 0.61
+      }
+    }
+  },
+  "gpt-4o-mini": {
+    "overall": {
+      "total_comparisons": 1797,
+      "line0_exact_matches": 801,
+      "line0_exact_match_rate": 44.57,
+      "avg_cosine": 0.63
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 113,
+        "line0_exact_match_rate": 37.79,
+        "avg_cosine": 0.62
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 110,
+        "line0_exact_match_rate": 36.67,
+        "avg_cosine": 0.46
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 153,
+        "line0_exact_match_rate": 51.0,
+        "avg_cosine": 0.7
+      },
+      "low_context": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 171,
+        "line0_exact_match_rate": 57.0,
+        "avg_cosine": 0.78
+      },
+      "pattern_matching": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 140,
+        "line0_exact_match_rate": 46.82,
+        "avg_cosine": 0.64
+      },
+      "syntax_completion": {
+        "total_comparisons": 299,
+        "line0_exact_matches": 114,
+        "line0_exact_match_rate": 38.13,
+        "avg_cosine": 0.59
       }
     },
     "languages": {
@@ -1845,1045 +805,457 @@
         "total_comparisons": 300,
         "line0_exact_matches": 169,
         "line0_exact_match_rate": 56.33,
-        "proximity_matches": 235,
-        "proximity_match_rate": 78.33,
-        "avg_levenshtein": 12.96,
-        "avg_edit_similarity": 0.71,
         "avg_cosine": 0.7
       },
       "c_sharp": {
         "total_comparisons": 300,
-        "line0_exact_matches": 141,
-        "line0_exact_match_rate": 47.0,
-        "proximity_matches": 253,
-        "proximity_match_rate": 84.33,
-        "avg_levenshtein": 18.96,
-        "avg_edit_similarity": 0.68,
+        "line0_exact_matches": 128,
+        "line0_exact_match_rate": 42.67,
         "avg_cosine": 0.66
       },
       "java": {
         "total_comparisons": 300,
-        "line0_exact_matches": 164,
-        "line0_exact_match_rate": 54.67,
-        "proximity_matches": 259,
-        "proximity_match_rate": 86.33,
-        "avg_levenshtein": 15.15,
-        "avg_edit_similarity": 0.73,
-        "avg_cosine": 0.72
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.7
       },
       "javascript": {
         "total_comparisons": 300,
-        "line0_exact_matches": 119,
-        "line0_exact_match_rate": 39.67,
-        "proximity_matches": 217,
-        "proximity_match_rate": 72.33,
-        "avg_levenshtein": 20.13,
-        "avg_edit_similarity": 0.6,
-        "avg_cosine": 0.56
+        "line0_exact_matches": 120,
+        "line0_exact_match_rate": 40.0,
+        "avg_cosine": 0.58
       },
       "python": {
-        "total_comparisons": 320,
-        "line0_exact_matches": 147,
-        "line0_exact_match_rate": 45.94,
-        "proximity_matches": 258,
-        "proximity_match_rate": 80.62,
-        "avg_levenshtein": 14.52,
-        "avg_edit_similarity": 0.67,
-        "avg_cosine": 0.66
+        "total_comparisons": 300,
+        "line0_exact_matches": 130,
+        "line0_exact_match_rate": 43.33,
+        "avg_cosine": 0.64
       },
       "typescript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 95,
-        "line0_exact_match_rate": 31.67,
-        "proximity_matches": 221,
-        "proximity_match_rate": 73.67,
-        "avg_levenshtein": 25.86,
-        "avg_edit_similarity": 0.53,
+        "total_comparisons": 297,
+        "line0_exact_matches": 91,
+        "line0_exact_match_rate": 30.64,
         "avg_cosine": 0.51
       }
     }
   },
   "gpt-4o": {
     "overall": {
-      "total_comparisons": 1737,
-      "line0_exact_matches": 919,
-      "line0_exact_match_rate": 52.91,
-      "proximity_matches": 1431,
-      "proximity_match_rate": 82.38,
-      "avg_levenshtein": 15.07,
-      "avg_edit_similarity": 0.7,
-      "avg_cosine": 0.7
+      "total_comparisons": 1798,
+      "line0_exact_matches": 927,
+      "line0_exact_match_rate": 51.56,
+      "avg_cosine": 0.68
     },
     "categories": {
       "api_usage": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 125,
-        "line0_exact_match_rate": 42.23,
-        "proximity_matches": 252,
-        "proximity_match_rate": 85.14,
-        "avg_levenshtein": 18.89,
-        "avg_edit_similarity": 0.66,
-        "avg_cosine": 0.65
+        "total_comparisons": 299,
+        "line0_exact_matches": 130,
+        "line0_exact_match_rate": 43.48,
+        "avg_cosine": 0.68
       },
       "code2NL_NL2code": {
-        "total_comparisons": 264,
-        "line0_exact_matches": 133,
-        "line0_exact_match_rate": 50.38,
-        "proximity_matches": 160,
-        "proximity_match_rate": 60.61,
-        "avg_levenshtein": 17.86,
-        "avg_edit_similarity": 0.57,
-        "avg_cosine": 0.57
+        "total_comparisons": 299,
+        "line0_exact_matches": 131,
+        "line0_exact_match_rate": 43.81,
+        "avg_cosine": 0.51
       },
       "code_purpose_understanding": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 167,
-        "line0_exact_match_rate": 56.8,
-        "proximity_matches": 259,
-        "proximity_match_rate": 88.1,
-        "avg_levenshtein": 14.44,
-        "avg_edit_similarity": 0.74,
-        "avg_cosine": 0.74
+        "total_comparisons": 300,
+        "line0_exact_matches": 170,
+        "line0_exact_match_rate": 56.67,
+        "avg_cosine": 0.72
       },
       "low_context": {
-        "total_comparisons": 287,
-        "line0_exact_matches": 187,
-        "line0_exact_match_rate": 65.16,
-        "proximity_matches": 254,
-        "proximity_match_rate": 88.5,
-        "avg_levenshtein": 8.36,
-        "avg_edit_similarity": 0.81,
+        "total_comparisons": 300,
+        "line0_exact_matches": 195,
+        "line0_exact_match_rate": 65.0,
         "avg_cosine": 0.82
       },
       "pattern_matching": {
-        "total_comparisons": 287,
-        "line0_exact_matches": 159,
-        "line0_exact_match_rate": 55.4,
-        "proximity_matches": 255,
-        "proximity_match_rate": 88.85,
-        "avg_levenshtein": 14.43,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.73
+        "total_comparisons": 300,
+        "line0_exact_matches": 165,
+        "line0_exact_match_rate": 55.0,
+        "avg_cosine": 0.71
       },
       "syntax_completion": {
-        "total_comparisons": 289,
-        "line0_exact_matches": 138,
-        "line0_exact_match_rate": 47.75,
-        "proximity_matches": 235,
-        "proximity_match_rate": 81.31,
-        "avg_levenshtein": 16.39,
-        "avg_edit_similarity": 0.68,
-        "avg_cosine": 0.67
+        "total_comparisons": 300,
+        "line0_exact_matches": 136,
+        "line0_exact_match_rate": 45.33,
+        "avg_cosine": 0.65
       }
     },
     "languages": {
       "cpp": {
-        "total_comparisons": 278,
+        "total_comparisons": 300,
         "line0_exact_matches": 185,
-        "line0_exact_match_rate": 66.55,
-        "proximity_matches": 242,
-        "proximity_match_rate": 87.05,
-        "avg_levenshtein": 10.04,
-        "avg_edit_similarity": 0.8,
-        "avg_cosine": 0.79
+        "line0_exact_match_rate": 61.67,
+        "avg_cosine": 0.75
       },
       "c_sharp": {
-        "total_comparisons": 290,
-        "line0_exact_matches": 155,
-        "line0_exact_match_rate": 53.45,
-        "proximity_matches": 252,
-        "proximity_match_rate": 86.9,
-        "avg_levenshtein": 15.45,
-        "avg_edit_similarity": 0.74,
-        "avg_cosine": 0.72
+        "total_comparisons": 300,
+        "line0_exact_matches": 153,
+        "line0_exact_match_rate": 51.0,
+        "avg_cosine": 0.69
       },
       "java": {
-        "total_comparisons": 283,
-        "line0_exact_matches": 171,
-        "line0_exact_match_rate": 60.42,
-        "proximity_matches": 251,
-        "proximity_match_rate": 88.69,
-        "avg_levenshtein": 12.16,
-        "avg_edit_similarity": 0.78,
-        "avg_cosine": 0.78
+        "total_comparisons": 299,
+        "line0_exact_matches": 187,
+        "line0_exact_match_rate": 62.54,
+        "avg_cosine": 0.76
       },
       "javascript": {
-        "total_comparisons": 286,
-        "line0_exact_matches": 139,
-        "line0_exact_match_rate": 48.6,
-        "proximity_matches": 222,
-        "proximity_match_rate": 77.62,
-        "avg_levenshtein": 17.85,
-        "avg_edit_similarity": 0.65,
+        "total_comparisons": 299,
+        "line0_exact_matches": 143,
+        "line0_exact_match_rate": 47.83,
         "avg_cosine": 0.63
       },
       "python": {
-        "total_comparisons": 310,
-        "line0_exact_matches": 162,
-        "line0_exact_match_rate": 52.26,
-        "proximity_matches": 248,
-        "proximity_match_rate": 80.0,
-        "avg_levenshtein": 12.63,
-        "avg_edit_similarity": 0.7,
-        "avg_cosine": 0.7
+        "total_comparisons": 300,
+        "line0_exact_matches": 146,
+        "line0_exact_match_rate": 48.67,
+        "avg_cosine": 0.69
       },
       "typescript": {
-        "total_comparisons": 290,
-        "line0_exact_matches": 107,
-        "line0_exact_match_rate": 36.9,
-        "proximity_matches": 216,
-        "proximity_match_rate": 74.48,
-        "avg_levenshtein": 22.23,
-        "avg_edit_similarity": 0.56,
-        "avg_cosine": 0.55
+        "total_comparisons": 300,
+        "line0_exact_matches": 113,
+        "line0_exact_match_rate": 37.67,
+        "avg_cosine": 0.56
       }
     }
   },
   "Ministral-3B": {
     "overall": {
-      "total_comparisons": 1820,
-      "line0_exact_matches": 443,
-      "line0_exact_match_rate": 24.34,
-      "proximity_matches": 1131,
-      "proximity_match_rate": 62.14,
-      "avg_levenshtein": 26.41,
-      "avg_edit_similarity": 0.46,
-      "avg_cosine": 0.41
+      "total_comparisons": 1800,
+      "line0_exact_matches": 414,
+      "line0_exact_match_rate": 23.0,
+      "avg_cosine": 0.45
     },
     "categories": {
       "api_usage": {
         "total_comparisons": 300,
-        "line0_exact_matches": 50,
-        "line0_exact_match_rate": 16.67,
-        "proximity_matches": 196,
-        "proximity_match_rate": 65.33,
-        "avg_levenshtein": 32.57,
-        "avg_edit_similarity": 0.42,
-        "avg_cosine": 0.36
+        "line0_exact_matches": 56,
+        "line0_exact_match_rate": 18.67,
+        "avg_cosine": 0.45
       },
       "code2NL_NL2code": {
         "total_comparisons": 300,
-        "line0_exact_matches": 84,
-        "line0_exact_match_rate": 28.0,
-        "proximity_matches": 122,
-        "proximity_match_rate": 40.67,
-        "avg_levenshtein": 26.41,
-        "avg_edit_similarity": 0.36,
-        "avg_cosine": 0.34
+        "line0_exact_matches": 66,
+        "line0_exact_match_rate": 22.0,
+        "avg_cosine": 0.32
       },
       "code_purpose_understanding": {
         "total_comparisons": 300,
-        "line0_exact_matches": 85,
-        "line0_exact_match_rate": 28.33,
-        "proximity_matches": 214,
-        "proximity_match_rate": 71.33,
-        "avg_levenshtein": 26.9,
-        "avg_edit_similarity": 0.51,
-        "avg_cosine": 0.46
+        "line0_exact_matches": 84,
+        "line0_exact_match_rate": 28.0,
+        "avg_cosine": 0.51
       },
       "low_context": {
         "total_comparisons": 300,
-        "line0_exact_matches": 64,
-        "line0_exact_match_rate": 21.33,
-        "proximity_matches": 170,
-        "proximity_match_rate": 56.67,
-        "avg_levenshtein": 22.17,
-        "avg_edit_similarity": 0.43,
-        "avg_cosine": 0.41
+        "line0_exact_matches": 79,
+        "line0_exact_match_rate": 26.33,
+        "avg_cosine": 0.5
       },
       "pattern_matching": {
         "total_comparisons": 300,
-        "line0_exact_matches": 87,
-        "line0_exact_match_rate": 29.0,
-        "proximity_matches": 224,
-        "proximity_match_rate": 74.67,
-        "avg_levenshtein": 24.64,
-        "avg_edit_similarity": 0.56,
-        "avg_cosine": 0.49
+        "line0_exact_matches": 71,
+        "line0_exact_match_rate": 23.67,
+        "avg_cosine": 0.46
       },
       "syntax_completion": {
         "total_comparisons": 300,
-        "line0_exact_matches": 64,
-        "line0_exact_match_rate": 21.33,
-        "proximity_matches": 194,
-        "proximity_match_rate": 64.67,
-        "avg_levenshtein": 26.34,
-        "avg_edit_similarity": 0.46,
-        "avg_cosine": 0.41
+        "line0_exact_matches": 58,
+        "line0_exact_match_rate": 19.33,
+        "avg_cosine": 0.43
       }
     },
     "languages": {
       "cpp": {
         "total_comparisons": 300,
-        "line0_exact_matches": 96,
-        "line0_exact_match_rate": 32.0,
-        "proximity_matches": 180,
-        "proximity_match_rate": 60.0,
-        "avg_levenshtein": 22.75,
-        "avg_edit_similarity": 0.49,
-        "avg_cosine": 0.45
+        "line0_exact_matches": 68,
+        "line0_exact_match_rate": 22.67,
+        "avg_cosine": 0.42
       },
       "c_sharp": {
         "total_comparisons": 300,
-        "line0_exact_matches": 85,
-        "line0_exact_match_rate": 28.33,
-        "proximity_matches": 228,
-        "proximity_match_rate": 76.0,
-        "avg_levenshtein": 27.39,
-        "avg_edit_similarity": 0.52,
-        "avg_cosine": 0.49
+        "line0_exact_matches": 76,
+        "line0_exact_match_rate": 25.33,
+        "avg_cosine": 0.51
       },
       "java": {
         "total_comparisons": 300,
-        "line0_exact_matches": 98,
-        "line0_exact_match_rate": 32.67,
-        "proximity_matches": 216,
-        "proximity_match_rate": 72.0,
-        "avg_levenshtein": 23.51,
-        "avg_edit_similarity": 0.55,
-        "avg_cosine": 0.52
+        "line0_exact_matches": 83,
+        "line0_exact_match_rate": 27.67,
+        "avg_cosine": 0.5
       },
       "javascript": {
         "total_comparisons": 300,
-        "line0_exact_matches": 54,
-        "line0_exact_match_rate": 18.0,
-        "proximity_matches": 160,
-        "proximity_match_rate": 53.33,
-        "avg_levenshtein": 28.56,
-        "avg_edit_similarity": 0.39,
-        "avg_cosine": 0.35
+        "line0_exact_matches": 56,
+        "line0_exact_match_rate": 18.67,
+        "avg_cosine": 0.38
       },
       "python": {
-        "total_comparisons": 320,
-        "line0_exact_matches": 69,
-        "line0_exact_match_rate": 21.56,
-        "proximity_matches": 168,
-        "proximity_match_rate": 52.5,
-        "avg_levenshtein": 23.48,
-        "avg_edit_similarity": 0.42,
-        "avg_cosine": 0.37
+        "total_comparisons": 300,
+        "line0_exact_matches": 87,
+        "line0_exact_match_rate": 29.0,
+        "avg_cosine": 0.52
       },
       "typescript": {
         "total_comparisons": 300,
-        "line0_exact_matches": 41,
-        "line0_exact_match_rate": 13.67,
-        "proximity_matches": 179,
-        "proximity_match_rate": 59.67,
-        "avg_levenshtein": 32.98,
-        "avg_edit_similarity": 0.36,
-        "avg_cosine": 0.31
+        "line0_exact_matches": 44,
+        "line0_exact_match_rate": 14.67,
+        "avg_cosine": 0.35
       }
     }
   },
   "o1-mini": {
     "overall": {
-      "total_comparisons": 1771,
-      "line0_exact_matches": 795,
-      "line0_exact_match_rate": 44.89,
-      "proximity_matches": 1345,
-      "proximity_match_rate": 75.95,
-      "avg_levenshtein": 18.39,
-      "avg_edit_similarity": 0.64,
-      "avg_cosine": 0.62
+      "total_comparisons": 63,
+      "line0_exact_matches": 42,
+      "line0_exact_match_rate": 66.67,
+      "avg_cosine": 0.83
     },
     "categories": {
       "api_usage": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 97,
-        "line0_exact_match_rate": 32.55,
-        "proximity_matches": 222,
-        "proximity_match_rate": 74.5,
-        "avg_levenshtein": 24.02,
-        "avg_edit_similarity": 0.58,
-        "avg_cosine": 0.57
+        "total_comparisons": 15,
+        "line0_exact_matches": 9,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.84
       },
       "code2NL_NL2code": {
-        "total_comparisons": 281,
-        "line0_exact_matches": 118,
-        "line0_exact_match_rate": 41.99,
-        "proximity_matches": 156,
-        "proximity_match_rate": 55.52,
-        "avg_levenshtein": 21.01,
-        "avg_edit_similarity": 0.5,
-        "avg_cosine": 0.49
+        "total_comparisons": 8,
+        "line0_exact_matches": 6,
+        "line0_exact_match_rate": 75.0,
+        "avg_cosine": 0.86
       },
       "code_purpose_understanding": {
-        "total_comparisons": 292,
-        "line0_exact_matches": 143,
-        "line0_exact_match_rate": 48.97,
-        "proximity_matches": 250,
-        "proximity_match_rate": 85.62,
-        "avg_levenshtein": 17.17,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.66
+        "total_comparisons": 10,
+        "line0_exact_matches": 6,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.82
       },
       "low_context": {
-        "total_comparisons": 293,
-        "line0_exact_matches": 174,
-        "line0_exact_match_rate": 59.39,
-        "proximity_matches": 241,
-        "proximity_match_rate": 82.25,
-        "avg_levenshtein": 10.19,
-        "avg_edit_similarity": 0.76,
-        "avg_cosine": 0.76
-      },
-      "pattern_matching": {
-        "total_comparisons": 293,
-        "line0_exact_matches": 137,
-        "line0_exact_match_rate": 46.76,
-        "proximity_matches": 238,
-        "proximity_match_rate": 81.23,
-        "avg_levenshtein": 18.71,
-        "avg_edit_similarity": 0.67,
-        "avg_cosine": 0.63
+        "total_comparisons": 18,
+        "line0_exact_matches": 13,
+        "line0_exact_match_rate": 72.22,
+        "avg_cosine": 0.86
       },
       "syntax_completion": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 116,
-        "line0_exact_match_rate": 39.46,
-        "proximity_matches": 225,
-        "proximity_match_rate": 76.53,
-        "avg_levenshtein": 19.3,
-        "avg_edit_similarity": 0.61,
-        "avg_cosine": 0.59
+        "total_comparisons": 7,
+        "line0_exact_matches": 5,
+        "line0_exact_match_rate": 71.43,
+        "avg_cosine": 0.83
+      },
+      "pattern_matching": {
+        "total_comparisons": 5,
+        "line0_exact_matches": 3,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.6
       }
     },
     "languages": {
       "cpp": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 157,
-        "line0_exact_match_rate": 53.22,
-        "proximity_matches": 227,
-        "proximity_match_rate": 76.95,
-        "avg_levenshtein": 15.42,
-        "avg_edit_similarity": 0.68,
-        "avg_cosine": 0.66
+        "total_comparisons": 18,
+        "line0_exact_matches": 16,
+        "line0_exact_match_rate": 88.89,
+        "avg_cosine": 0.99
       },
       "c_sharp": {
-        "total_comparisons": 291,
-        "line0_exact_matches": 129,
-        "line0_exact_match_rate": 44.33,
-        "proximity_matches": 240,
-        "proximity_match_rate": 82.47,
-        "avg_levenshtein": 19.74,
-        "avg_edit_similarity": 0.68,
-        "avg_cosine": 0.65
+        "total_comparisons": 11,
+        "line0_exact_matches": 7,
+        "line0_exact_match_rate": 63.64,
+        "avg_cosine": 0.72
       },
       "java": {
-        "total_comparisons": 289,
-        "line0_exact_matches": 155,
-        "line0_exact_match_rate": 53.63,
-        "proximity_matches": 233,
-        "proximity_match_rate": 80.62,
-        "avg_levenshtein": 15.66,
-        "avg_edit_similarity": 0.7,
-        "avg_cosine": 0.69
+        "total_comparisons": 15,
+        "line0_exact_matches": 12,
+        "line0_exact_match_rate": 80.0,
+        "avg_cosine": 0.84
       },
       "javascript": {
-        "total_comparisons": 288,
-        "line0_exact_matches": 111,
-        "line0_exact_match_rate": 38.54,
-        "proximity_matches": 204,
-        "proximity_match_rate": 70.83,
-        "avg_levenshtein": 20.0,
-        "avg_edit_similarity": 0.58,
-        "avg_cosine": 0.56
+        "total_comparisons": 4,
+        "line0_exact_matches": 3,
+        "line0_exact_match_rate": 75.0,
+        "avg_cosine": 0.75
       },
       "python": {
-        "total_comparisons": 318,
-        "line0_exact_matches": 148,
-        "line0_exact_match_rate": 46.54,
-        "proximity_matches": 236,
-        "proximity_match_rate": 74.21,
-        "avg_levenshtein": 14.82,
-        "avg_edit_similarity": 0.65,
-        "avg_cosine": 0.64
+        "total_comparisons": 5,
+        "line0_exact_matches": 3,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.89
       },
       "typescript": {
-        "total_comparisons": 290,
-        "line0_exact_matches": 95,
-        "line0_exact_match_rate": 32.76,
-        "proximity_matches": 205,
-        "proximity_match_rate": 70.69,
-        "avg_levenshtein": 25.09,
-        "avg_edit_similarity": 0.52,
-        "avg_cosine": 0.51
+        "total_comparisons": 10,
+        "line0_exact_matches": 1,
+        "line0_exact_match_rate": 10.0,
+        "avg_cosine": 0.62
       }
     }
   },
   "o1-preview": {
     "overall": {
-      "total_comparisons": 1782,
-      "line0_exact_matches": 781,
-      "line0_exact_match_rate": 43.83,
-      "proximity_matches": 1332,
-      "proximity_match_rate": 74.75,
-      "avg_levenshtein": 19.43,
-      "avg_edit_similarity": 0.61,
-      "avg_cosine": 0.59
+      "total_comparisons": 79,
+      "line0_exact_matches": 58,
+      "line0_exact_match_rate": 73.42,
+      "avg_cosine": 0.89
     },
     "categories": {
       "api_usage": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 96,
-        "line0_exact_match_rate": 32.0,
-        "proximity_matches": 216,
-        "proximity_match_rate": 72.0,
-        "avg_levenshtein": 27.29,
-        "avg_edit_similarity": 0.53,
-        "avg_cosine": 0.5
+        "total_comparisons": 11,
+        "line0_exact_matches": 7,
+        "line0_exact_match_rate": 63.64,
+        "avg_cosine": 0.88
       },
       "code2NL_NL2code": {
-        "total_comparisons": 285,
-        "line0_exact_matches": 129,
-        "line0_exact_match_rate": 45.26,
-        "proximity_matches": 164,
-        "proximity_match_rate": 57.54,
-        "avg_levenshtein": 18.09,
-        "avg_edit_similarity": 0.53,
-        "avg_cosine": 0.52
+        "total_comparisons": 7,
+        "line0_exact_matches": 5,
+        "line0_exact_match_rate": 71.43,
+        "avg_cosine": 0.81
       },
       "code_purpose_understanding": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 140,
-        "line0_exact_match_rate": 47.14,
-        "proximity_matches": 241,
-        "proximity_match_rate": 81.14,
-        "avg_levenshtein": 19.6,
-        "avg_edit_similarity": 0.65,
-        "avg_cosine": 0.62
+        "total_comparisons": 15,
+        "line0_exact_matches": 9,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.78
       },
       "low_context": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 165,
-        "line0_exact_match_rate": 55.74,
-        "proximity_matches": 242,
-        "proximity_match_rate": 81.76,
-        "avg_levenshtein": 11.06,
-        "avg_edit_similarity": 0.74,
-        "avg_cosine": 0.74
+        "total_comparisons": 34,
+        "line0_exact_matches": 27,
+        "line0_exact_match_rate": 79.41,
+        "avg_cosine": 0.93
       },
       "pattern_matching": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 133,
-        "line0_exact_match_rate": 45.08,
-        "proximity_matches": 247,
-        "proximity_match_rate": 83.73,
-        "avg_levenshtein": 20.55,
-        "avg_edit_similarity": 0.65,
-        "avg_cosine": 0.61
+        "total_comparisons": 7,
+        "line0_exact_matches": 7,
+        "line0_exact_match_rate": 100.0,
+        "avg_cosine": 1.0
       },
       "syntax_completion": {
-        "total_comparisons": 289,
-        "line0_exact_matches": 108,
-        "line0_exact_match_rate": 37.37,
-        "proximity_matches": 208,
-        "proximity_match_rate": 71.97,
-        "avg_levenshtein": 19.99,
-        "avg_edit_similarity": 0.58,
-        "avg_cosine": 0.56
+        "total_comparisons": 5,
+        "line0_exact_matches": 3,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.95
       }
     },
     "languages": {
       "cpp": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 151,
-        "line0_exact_match_rate": 51.36,
-        "proximity_matches": 214,
-        "proximity_match_rate": 72.79,
-        "avg_levenshtein": 16.23,
-        "avg_edit_similarity": 0.64,
-        "avg_cosine": 0.61
+        "total_comparisons": 15,
+        "line0_exact_matches": 11,
+        "line0_exact_match_rate": 73.33,
+        "avg_cosine": 0.9
       },
       "c_sharp": {
-        "total_comparisons": 293,
-        "line0_exact_matches": 133,
-        "line0_exact_match_rate": 45.39,
-        "proximity_matches": 237,
-        "proximity_match_rate": 80.89,
-        "avg_levenshtein": 19.75,
-        "avg_edit_similarity": 0.66,
-        "avg_cosine": 0.65
+        "total_comparisons": 7,
+        "line0_exact_matches": 4,
+        "line0_exact_match_rate": 57.14,
+        "avg_cosine": 0.93
       },
       "java": {
-        "total_comparisons": 289,
-        "line0_exact_matches": 151,
-        "line0_exact_match_rate": 52.25,
-        "proximity_matches": 230,
-        "proximity_match_rate": 79.58,
-        "avg_levenshtein": 17.14,
-        "avg_edit_similarity": 0.68,
-        "avg_cosine": 0.66
+        "total_comparisons": 20,
+        "line0_exact_matches": 16,
+        "line0_exact_match_rate": 80.0,
+        "avg_cosine": 0.92
       },
       "javascript": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 112,
-        "line0_exact_match_rate": 38.1,
-        "proximity_matches": 210,
-        "proximity_match_rate": 71.43,
-        "avg_levenshtein": 22.96,
-        "avg_edit_similarity": 0.55,
-        "avg_cosine": 0.52
+        "total_comparisons": 5,
+        "line0_exact_matches": 3,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.82
       },
       "python": {
-        "total_comparisons": 318,
-        "line0_exact_matches": 149,
-        "line0_exact_match_rate": 46.86,
-        "proximity_matches": 239,
-        "proximity_match_rate": 75.16,
-        "avg_levenshtein": 14.97,
-        "avg_edit_similarity": 0.64,
-        "avg_cosine": 0.63
+        "total_comparisons": 28,
+        "line0_exact_matches": 20,
+        "line0_exact_match_rate": 71.43,
+        "avg_cosine": 0.86
       },
       "typescript": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 85,
-        "line0_exact_match_rate": 28.91,
-        "proximity_matches": 202,
-        "proximity_match_rate": 68.71,
-        "avg_levenshtein": 25.89,
-        "avg_edit_similarity": 0.5,
-        "avg_cosine": 0.46
+        "total_comparisons": 4,
+        "line0_exact_matches": 4,
+        "line0_exact_match_rate": 100.0,
+        "avg_cosine": 1.0
       }
     }
   },
   "o3-mini": {
     "overall": {
-      "total_comparisons": 1820,
-      "line0_exact_matches": 632,
-      "line0_exact_match_rate": 34.73,
-      "proximity_matches": 1262,
-      "proximity_match_rate": 69.34,
-      "avg_levenshtein": 23.73,
-      "avg_edit_similarity": 0.55,
-      "avg_cosine": 0.52
+      "total_comparisons": 1586,
+      "line0_exact_matches": 733,
+      "line0_exact_match_rate": 46.22,
+      "avg_cosine": 0.67
     },
     "categories": {
       "api_usage": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 82,
-        "line0_exact_match_rate": 27.33,
-        "proximity_matches": 216,
-        "proximity_match_rate": 72.0,
-        "avg_levenshtein": 29.2,
-        "avg_edit_similarity": 0.5,
-        "avg_cosine": 0.47
+        "total_comparisons": 277,
+        "line0_exact_matches": 103,
+        "line0_exact_match_rate": 37.18,
+        "avg_cosine": 0.63
       },
       "code2NL_NL2code": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 88,
-        "line0_exact_match_rate": 29.33,
-        "proximity_matches": 134,
-        "proximity_match_rate": 44.67,
-        "avg_levenshtein": 26.0,
-        "avg_edit_similarity": 0.39,
-        "avg_cosine": 0.38
+        "total_comparisons": 219,
+        "line0_exact_matches": 104,
+        "line0_exact_match_rate": 47.49,
+        "avg_cosine": 0.58
       },
       "code_purpose_understanding": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 110,
-        "line0_exact_match_rate": 36.67,
-        "proximity_matches": 232,
-        "proximity_match_rate": 77.33,
-        "avg_levenshtein": 24.61,
-        "avg_edit_similarity": 0.58,
-        "avg_cosine": 0.55
+        "total_comparisons": 286,
+        "line0_exact_matches": 142,
+        "line0_exact_match_rate": 49.65,
+        "avg_cosine": 0.7
       },
       "low_context": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 151,
-        "line0_exact_match_rate": 50.33,
-        "proximity_matches": 241,
-        "proximity_match_rate": 80.33,
-        "avg_levenshtein": 14.53,
-        "avg_edit_similarity": 0.7,
-        "avg_cosine": 0.69
+        "total_comparisons": 276,
+        "line0_exact_matches": 167,
+        "line0_exact_match_rate": 60.51,
+        "avg_cosine": 0.8
       },
       "pattern_matching": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 34.67,
-        "proximity_matches": 223,
-        "proximity_match_rate": 74.33,
-        "avg_levenshtein": 23.76,
-        "avg_edit_similarity": 0.58,
-        "avg_cosine": 0.52
+        "total_comparisons": 258,
+        "line0_exact_matches": 114,
+        "line0_exact_match_rate": 44.19,
+        "avg_cosine": 0.64
       },
       "syntax_completion": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 89,
-        "line0_exact_match_rate": 29.67,
-        "proximity_matches": 206,
-        "proximity_match_rate": 68.67,
-        "avg_levenshtein": 24.55,
-        "avg_edit_similarity": 0.55,
-        "avg_cosine": 0.52
+        "total_comparisons": 270,
+        "line0_exact_matches": 103,
+        "line0_exact_match_rate": 38.15,
+        "avg_cosine": 0.62
       }
     },
     "languages": {
       "cpp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 132,
-        "line0_exact_match_rate": 44.0,
-        "proximity_matches": 217,
-        "proximity_match_rate": 72.33,
-        "avg_levenshtein": 21.98,
-        "avg_edit_similarity": 0.59,
-        "avg_cosine": 0.57
+        "total_comparisons": 265,
+        "line0_exact_matches": 164,
+        "line0_exact_match_rate": 61.89,
+        "avg_cosine": 0.78
       },
       "c_sharp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 106,
-        "line0_exact_match_rate": 35.33,
-        "proximity_matches": 232,
-        "proximity_match_rate": 77.33,
-        "avg_levenshtein": 24.14,
-        "avg_edit_similarity": 0.6,
-        "avg_cosine": 0.55
+        "total_comparisons": 262,
+        "line0_exact_matches": 109,
+        "line0_exact_match_rate": 41.6,
+        "avg_cosine": 0.67
       },
       "java": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 130,
-        "line0_exact_match_rate": 43.33,
-        "proximity_matches": 221,
-        "proximity_match_rate": 73.67,
-        "avg_levenshtein": 20.97,
-        "avg_edit_similarity": 0.62,
-        "avg_cosine": 0.59
-      },
-      "javascript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 96,
-        "line0_exact_match_rate": 32.0,
-        "proximity_matches": 193,
-        "proximity_match_rate": 64.33,
-        "avg_levenshtein": 24.13,
-        "avg_edit_similarity": 0.52,
-        "avg_cosine": 0.48
-      },
-      "python": {
-        "total_comparisons": 320,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 32.5,
-        "proximity_matches": 199,
-        "proximity_match_rate": 62.19,
-        "avg_levenshtein": 19.01,
-        "avg_edit_similarity": 0.55,
-        "avg_cosine": 0.53
-      },
-      "typescript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 64,
-        "line0_exact_match_rate": 21.33,
-        "proximity_matches": 200,
-        "proximity_match_rate": 66.67,
-        "avg_levenshtein": 32.47,
-        "avg_edit_similarity": 0.42,
-        "avg_cosine": 0.39
-      }
-    }
-  },
-  "assertions": {
-    "overall": {
-      "total_comparisons": 11955,
-      "line0_exact_matches": 434,
-      "line0_exact_match_rate": 3.63,
-      "proximity_matches": 4696,
-      "proximity_match_rate": 39.28,
-      "avg_levenshtein": 43.04,
-      "avg_edit_similarity": 0.22,
-      "avg_cosine": 0.12
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 1902,
+        "total_comparisons": 260,
         "line0_exact_matches": 146,
-        "line0_exact_match_rate": 7.68,
-        "proximity_matches": 957,
-        "proximity_match_rate": 50.32,
-        "avg_levenshtein": 44.67,
-        "avg_edit_similarity": 0.27,
-        "avg_cosine": 0.18
+        "line0_exact_match_rate": 56.15,
+        "avg_cosine": 0.74
       },
-      "code2NL_NL2code": {
-        "total_comparisons": 1950,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 689,
-        "proximity_match_rate": 35.33,
-        "avg_levenshtein": 47.65,
-        "avg_edit_similarity": 0.13,
-        "avg_cosine": 0.05
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 1959,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 5.31,
-        "proximity_matches": 914,
-        "proximity_match_rate": 46.66,
-        "avg_levenshtein": 43.12,
-        "avg_edit_similarity": 0.26,
-        "avg_cosine": 0.13
-      },
-      "low_context": {
-        "total_comparisons": 2000,
-        "line0_exact_matches": 54,
-        "line0_exact_match_rate": 2.7,
-        "proximity_matches": 576,
-        "proximity_match_rate": 28.8,
-        "avg_levenshtein": 43.4,
-        "avg_edit_similarity": 0.21,
-        "avg_cosine": 0.12
-      },
-      "pattern_matching": {
-        "total_comparisons": 1986,
-        "line0_exact_matches": 26,
-        "line0_exact_match_rate": 1.31,
-        "proximity_matches": 858,
-        "proximity_match_rate": 43.2,
-        "avg_levenshtein": 41.47,
-        "avg_edit_similarity": 0.23,
-        "avg_cosine": 0.1
-      },
-      "syntax_completion": {
-        "total_comparisons": 1924,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 5.41,
-        "proximity_matches": 650,
-        "proximity_match_rate": 33.78,
-        "avg_levenshtein": 38.8,
-        "avg_edit_similarity": 0.24,
-        "avg_cosine": 0.13
-      }
-    },
-    "languages": {
       "javascript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 52,
-        "line0_exact_match_rate": 1.33,
-        "proximity_matches": 1534,
-        "proximity_match_rate": 39.33,
-        "avg_levenshtein": 41.56,
-        "avg_edit_similarity": 0.21,
-        "avg_cosine": 0.09
+        "total_comparisons": 268,
+        "line0_exact_matches": 105,
+        "line0_exact_match_rate": 39.18,
+        "avg_cosine": 0.6
       },
       "python": {
-        "total_comparisons": 4155,
-        "line0_exact_matches": 70,
-        "line0_exact_match_rate": 1.68,
-        "proximity_matches": 1381,
-        "proximity_match_rate": 33.24,
-        "avg_levenshtein": 42.23,
-        "avg_edit_similarity": 0.21,
-        "avg_cosine": 0.12
+        "total_comparisons": 288,
+        "line0_exact_matches": 131,
+        "line0_exact_match_rate": 45.49,
+        "avg_cosine": 0.65
       },
       "typescript": {
-        "total_comparisons": 3900,
-        "line0_exact_matches": 312,
-        "line0_exact_match_rate": 8.0,
-        "proximity_matches": 1781,
-        "proximity_match_rate": 45.67,
-        "avg_levenshtein": 45.39,
-        "avg_edit_similarity": 0.25,
-        "avg_cosine": 0.14
-      }
-    }
-  },
-  "gpt-35-turbo-completions_completion_1": {
-    "overall": {
-      "total_comparisons": 141,
-      "line0_exact_matches": 76,
-      "line0_exact_match_rate": 53.9,
-      "proximity_matches": 119,
-      "proximity_match_rate": 84.4,
-      "avg_levenshtein": 10.5,
-      "avg_edit_similarity": 0.75,
-      "avg_cosine": 0.76
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 46,
-        "line0_exact_matches": 20,
-        "line0_exact_match_rate": 43.48,
-        "proximity_matches": 34,
-        "proximity_match_rate": 73.91,
-        "avg_levenshtein": 18.39,
-        "avg_edit_similarity": 0.62,
-        "avg_cosine": 0.65
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 9,
-        "line0_exact_matches": 4,
-        "line0_exact_match_rate": 44.44,
-        "proximity_matches": 7,
-        "proximity_match_rate": 77.78,
-        "avg_levenshtein": 10.56,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.7
-      },
-      "low_context": {
-        "total_comparisons": 48,
-        "line0_exact_matches": 27,
-        "line0_exact_match_rate": 56.25,
-        "proximity_matches": 42,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 6.0,
-        "avg_edit_similarity": 0.82,
-        "avg_cosine": 0.81
-      },
-      "pattern_matching": {
-        "total_comparisons": 38,
-        "line0_exact_matches": 25,
-        "line0_exact_match_rate": 65.79,
-        "proximity_matches": 36,
-        "proximity_match_rate": 94.74,
-        "avg_levenshtein": 6.63,
-        "avg_edit_similarity": 0.84,
-        "avg_cosine": 0.83
-      }
-    },
-    "languages": {
-      "python": {
-        "total_comparisons": 141,
-        "line0_exact_matches": 76,
-        "line0_exact_match_rate": 53.9,
-        "proximity_matches": 119,
-        "proximity_match_rate": 84.4,
-        "avg_levenshtein": 10.5,
-        "avg_edit_similarity": 0.75,
-        "avg_cosine": 0.76
-      }
-    }
-  },
-  "gpt-35-turbo-completions_completion_2": {
-    "overall": {
-      "total_comparisons": 141,
-      "line0_exact_matches": 76,
-      "line0_exact_match_rate": 53.9,
-      "proximity_matches": 119,
-      "proximity_match_rate": 84.4,
-      "avg_levenshtein": 10.5,
-      "avg_edit_similarity": 0.75,
-      "avg_cosine": 0.76
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 46,
-        "line0_exact_matches": 20,
-        "line0_exact_match_rate": 43.48,
-        "proximity_matches": 34,
-        "proximity_match_rate": 73.91,
-        "avg_levenshtein": 18.39,
-        "avg_edit_similarity": 0.62,
-        "avg_cosine": 0.65
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 9,
-        "line0_exact_matches": 4,
-        "line0_exact_match_rate": 44.44,
-        "proximity_matches": 7,
-        "proximity_match_rate": 77.78,
-        "avg_levenshtein": 10.56,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.66
-      },
-      "low_context": {
-        "total_comparisons": 48,
-        "line0_exact_matches": 27,
-        "line0_exact_match_rate": 56.25,
-        "proximity_matches": 42,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 6.0,
-        "avg_edit_similarity": 0.82,
-        "avg_cosine": 0.81
-      },
-      "pattern_matching": {
-        "total_comparisons": 38,
-        "line0_exact_matches": 25,
-        "line0_exact_match_rate": 65.79,
-        "proximity_matches": 36,
-        "proximity_match_rate": 94.74,
-        "avg_levenshtein": 6.63,
-        "avg_edit_similarity": 0.84,
-        "avg_cosine": 0.83
-      }
-    },
-    "languages": {
-      "python": {
-        "total_comparisons": 141,
-        "line0_exact_matches": 76,
-        "line0_exact_match_rate": 53.9,
-        "proximity_matches": 119,
-        "proximity_match_rate": 84.4,
-        "avg_levenshtein": 10.5,
-        "avg_edit_similarity": 0.75,
-        "avg_cosine": 0.76
-      }
-    }
-  },
-  "gpt-35-turbo-completions_completion_3": {
-    "overall": {
-      "total_comparisons": 141,
-      "line0_exact_matches": 76,
-      "line0_exact_match_rate": 53.9,
-      "proximity_matches": 120,
-      "proximity_match_rate": 85.11,
-      "avg_levenshtein": 10.49,
-      "avg_edit_similarity": 0.75,
-      "avg_cosine": 0.76
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 46,
-        "line0_exact_matches": 20,
-        "line0_exact_match_rate": 43.48,
-        "proximity_matches": 34,
-        "proximity_match_rate": 73.91,
-        "avg_levenshtein": 18.37,
-        "avg_edit_similarity": 0.62,
-        "avg_cosine": 0.65
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 9,
-        "line0_exact_matches": 4,
-        "line0_exact_match_rate": 44.44,
-        "proximity_matches": 7,
-        "proximity_match_rate": 77.78,
-        "avg_levenshtein": 10.56,
-        "avg_edit_similarity": 0.69,
-        "avg_cosine": 0.7
-      },
-      "low_context": {
-        "total_comparisons": 48,
-        "line0_exact_matches": 27,
-        "line0_exact_match_rate": 56.25,
-        "proximity_matches": 42,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 6.0,
-        "avg_edit_similarity": 0.82,
-        "avg_cosine": 0.81
-      },
-      "pattern_matching": {
-        "total_comparisons": 38,
-        "line0_exact_matches": 25,
-        "line0_exact_match_rate": 65.79,
-        "proximity_matches": 37,
-        "proximity_match_rate": 97.37,
-        "avg_levenshtein": 6.61,
-        "avg_edit_similarity": 0.84,
-        "avg_cosine": 0.83
-      }
-    },
-    "languages": {
-      "python": {
-        "total_comparisons": 141,
-        "line0_exact_matches": 76,
-        "line0_exact_match_rate": 53.9,
-        "proximity_matches": 120,
-        "proximity_match_rate": 85.11,
-        "avg_levenshtein": 10.49,
-        "avg_edit_similarity": 0.75,
-        "avg_cosine": 0.76
+        "total_comparisons": 243,
+        "line0_exact_matches": 78,
+        "line0_exact_match_rate": 32.1,
+        "avg_cosine": 0.55
       }
     }
   }

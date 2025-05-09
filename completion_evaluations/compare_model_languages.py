@@ -1,6 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
 
 # Input data from the table
@@ -70,22 +68,6 @@ line0_exact_match_normalized = calculate_language_preference(line0_exact_match_d
 cosine_outliers = find_language_outliers(cosine_normalized, 0.15)
 line0_exact_match_outliers = find_language_outliers(line0_exact_match_normalized, 0.1)
 
-# Create heat maps to visualize language preferences across models
-plt.figure(figsize=(12, 10))
-
-# For cosine similarity (higher is better)
-plt.subplot(1, 2, 1)
-sns.heatmap(cosine_normalized, cmap="RdYlGn", center=1, annot=True, fmt=".2f", cbar_kws={'label': 'Relative Performance'})
-plt.title("Cosine Similarity Language Preference\n(Relative to Model Average)")
-
-# For line 0 exact match rate (higher is better)
-plt.subplot(1, 2, 2)
-sns.heatmap(line0_exact_match_normalized, cmap="RdYlGn", center=1, annot=True, fmt=".2f", cbar_kws={'label': 'Relative Performance'})
-plt.title("Line 0 Exact Match Rate Language Preference\n(Relative to Model Average)")
-
-plt.tight_layout()
-plt.savefig("language_preference_heatmaps.png", dpi=300, bbox_inches='tight')
-
 # Create a function to display the outliers
 def display_outliers(outliers, metric_name):
     print(f"\n=== {metric_name} Outliers ===")
@@ -151,32 +133,7 @@ composite_ranking = (
 for lang, score in composite_ranking.sort_values().items():
     print(f"{lang}: {score:.2f} ({(score-1)*100:.1f}% from neutral)")
 
-# Create a bar chart showing performance of selected interesting models across languages
-def plot_model_performance_across_languages(data, model_list, metric_name):
-    plt.figure(figsize=(12, 6))
-    
-    # Create a subset with just the selected models
-    subset = data.loc[model_list]
-    
-    # Prepare the plot
-    ax = subset.T.plot(kind='bar', figsize=(12, 6))
-    plt.title(f"{metric_name} across Languages for Selected Models")
-    plt.xlabel("Language")
-    plt.ylabel(metric_name)
-    plt.legend(title="Model")
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
-    
-    plt.tight_layout()
-    plt.savefig(f"selected_models_{metric_name.lower().replace(' ', '_')}.png", dpi=300, bbox_inches='tight')
-
-# Choose some interesting models to compare
-interesting_models = ["o1-preview", "o3-mini", "Claude 3.7 Sonnet", "GPT-4o", "Ministral-3B"]
-
-# Plot their performance across languages for each metric
-plot_model_performance_across_languages(cosine_data, interesting_models, "Cosine Similarity")
-plot_model_performance_across_languages(line0_exact_match_data, interesting_models, "Line 0 Exact Match Rate (%)")
-
-print("\nAnalysis complete. Output files have been saved.")
+print("\nAnalysis complete.")
 
 # Add this function to identify best/worst models for each language
 def analyze_language_performance(cosine_df, line0_exact_match_df, top_n=3):
@@ -241,95 +198,6 @@ def analyze_language_performance(cosine_df, line0_exact_match_df, top_n=3):
     
     return composite_scores
 
-# Add a function to visualize the best model for each language
-def visualize_best_models_by_language(composite_scores):
-    """Create a bar chart showing the best model for each language"""
-    plt.figure(figsize=(12, 6))
-    
-    # Find the best model for each language
-    best_models = {}
-    for language in languages:
-        best_model = composite_scores[language].idxmax()
-        best_score = composite_scores.loc[best_model, language]
-        best_models[language] = (best_model, best_score)
-    
-    # Create data for the plot
-    langs = []
-    model_names = []
-    scores = []
-    colors = plt.cm.tab20(np.linspace(0, 1, len(best_models)))
-    
-    for i, (lang, (model, score)) in enumerate(best_models.items()):
-        langs.append(lang)
-        model_names.append(model)
-        scores.append(score)
-    
-    # Create the bar chart
-    bars = plt.bar(langs, scores, color=colors)
-    
-    # Annotate bars with model names
-    for i, bar in enumerate(bars):
-        plt.text(
-            bar.get_x() + bar.get_width()/2, 
-            bar.get_height() + 0.01, 
-            model_names[i], 
-            ha='center', 
-            va='bottom',
-            rotation=45,
-            fontsize=9
-        )
-    
-    plt.title("Best Performing Model for Each Language")
-    plt.xlabel("Programming Language")
-    plt.ylabel("Composite Performance Score")
-    plt.ylim(top=1.1)  # Add space for model name labels
-    plt.tight_layout()
-    
-    plt.savefig("best_models_by_language.png", dpi=300, bbox_inches='tight')
-
-# Add a radar chart to compare top models across all languages
-def create_model_radar_chart(cosine_df, line0_exact_match_df, selected_models):
-    """Create a radar chart comparing selected models across all languages"""
-    # Number of languages (variables)
-    num_vars = len(languages)
-    
-    # Compute angles for the radar chart
-    angles = np.linspace(0, 2*np.pi, num_vars, endpoint=False).tolist()
-    angles += angles[:1]  # Close the loop
-    
-    # Create figure
-    fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
-    
-    # Add language labels
-    plt.xticks(angles[:-1], languages, size=12)
-    
-    # Add composite scores for each selected model
-    composite_scores = pd.DataFrame(index=cosine_df.index, columns=cosine_df.columns)
-    
-    for language in languages:
-        # Normalize each metric (0-1 scale)
-        cosine_norm = (cosine_df[language] - cosine_df[language].min()) / (cosine_df[language].max() - cosine_df[language].min())
-        line0_exact_match_norm = (line0_exact_match_df[language] - line0_exact_match_df[language].min()) / (line0_exact_match_df[language].max() - line0_exact_match_df[language].min())
-        
-        # Compute composite score 
-        composite_scores[language] = (cosine_norm + line0_exact_match_norm) / 2
-    
-    # Plot each model
-    for i, model in enumerate(selected_models):
-        model_values = composite_scores.loc[model].values.tolist()
-        model_values += model_values[:1]  # Close the loop
-        
-        ax.plot(angles, model_values, linewidth=2, label=model)
-        ax.fill(angles, model_values, alpha=0.1)
-    
-    # Add legend
-    plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
-    
-    plt.title("Model Performance Across Languages", size=15, y=1.1)
-    plt.tight_layout()
-    
-    plt.savefig("model_radar_chart.png", dpi=300, bbox_inches='tight')
-
 # Run the new analyses after the existing code
 print("\n" + "=" * 50)
 print("ADDITIONAL ANALYSES: BEST AND WORST MODELS BY LANGUAGE")
@@ -337,12 +205,3 @@ print("=" * 50)
 
 # Determine best and worst models for each language
 composite_scores = analyze_language_performance(cosine_data, line0_exact_match_data, top_n=3)
-
-# Create visualization of best model for each language
-visualize_best_models_by_language(composite_scores)
-
-# Create radar chart comparing top-performing models across languages
-top_models = ["o1-preview", "GPT-4.5 preview", "o1-mini", "DeepSeek-V3", "GPT-4o"]
-create_model_radar_chart(cosine_data, line0_exact_match_data, top_models)
-
-print("\nAdditional visualizations saved: best_models_by_language.png and model_radar_chart.png")
