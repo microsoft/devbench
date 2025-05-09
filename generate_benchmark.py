@@ -1048,6 +1048,14 @@ def main():
     parser.add_argument('--json-output', type=str, help='Path to output JSON file for detailed test results')
     parser.add_argument('--models-dir', type=str, default='completions/python', 
                        help='Directory containing model completions (default: completions/python)')
+    # Arguments for benchmark generation
+    parser.add_argument('--generate', action='store_true', help='Generate benchmark test cases')
+    parser.add_argument('--completions', type=int, default=10, help='Number of completions to generate')
+    parser.add_argument('--language', type=str, default='python', choices=['python', 'javascript', 'c_sharp', 'cpp', 'typescript', 'java'], 
+                        help='Programming language for the generated benchmark')
+    parser.add_argument('--output', type=str, help='Custom output file path for generated benchmarks')
+    parser.add_argument('--prompt-type', type=str, default='api_usage', 
+                        help='Type of prompt to use (e.g., api_usage, code_purpose_understanding)')
     
     args = parser.parse_args()
     
@@ -1152,72 +1160,118 @@ def main():
         )
         return
     
-    valid_completions = 0
-    total_completions = 0
-    LANGUAGE = "python"
-    output_file = f"benchmark/{LANGUAGE}/api_usage/api_usage.jsonl"
-    SYSTEM_PROMPT = python_prompts.API_USAGE_SYSTEM_PROMPT
-    USER_PROMPT = python_prompts.API_USAGE_USER_PROMPT
-
-    while valid_completions < total_completions:
+    # Generate benchmark test cases if --generate is used
+    if args.generate:
+        valid_completions = 0
+        total_completions = args.completions
+        LANGUAGE = args.language.lower()
+        
+        # Determine prompt module based on language
+        prompt_module = None
+        if LANGUAGE == 'python':
+            prompt_module = python_prompts
+        elif LANGUAGE == 'javascript':
+            prompt_module = javascript_prompts
+        elif LANGUAGE == 'c_sharp':
+            prompt_module = c_sharp_prompts
+        elif LANGUAGE == 'cpp':
+            prompt_module = cpp_prompts
+        elif LANGUAGE == 'typescript':
+            prompt_module = typescript_prompts
+        elif LANGUAGE == 'java':
+            prompt_module = java_prompts
+        else:
+            print(f"Unsupported language: {LANGUAGE}")
+            return
+        
+        # Get the correct prompts based on prompt type
+        prompt_type = args.prompt_type.upper()
         try:
-            # Prompt the AI with a message
-            messages = [
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT
-                },
-                {
-                    "role": "user",
-                    "content": USER_PROMPT
-                }
-            ]
+            SYSTEM_PROMPT = getattr(prompt_module, f"{prompt_type}_SYSTEM_PROMPT")
+            USER_PROMPT = getattr(prompt_module, f"{prompt_type}_USER_PROMPT")
+        except AttributeError:
+            print(f"Prompt type '{args.prompt_type}' not found for language '{LANGUAGE}'")
+            print("Available prompt types for this language:")
+            for attr in dir(prompt_module):
+                if attr.endswith("_SYSTEM_PROMPT"):
+                    print(f"  - {attr.replace('_SYSTEM_PROMPT', '').lower()}")
+            return
+        
+        # Set output file path
+        if args.output:
+            output_file = args.output
+        else:
+            # Create default path: benchmark/{language}/{prompt_type}/{prompt_type}.jsonl
+            prompt_type_dir = args.prompt_type.lower()
+            os.makedirs(f"benchmark/{LANGUAGE}/{prompt_type_dir}", exist_ok=True)
+            output_file = f"benchmark/{LANGUAGE}/{prompt_type_dir}/{prompt_type_dir}.jsonl"
+        
+        print(f"Generating {total_completions} benchmark test cases for {LANGUAGE} using {args.prompt_type} prompts")
+        print(f"Output will be saved to: {output_file}")
+        
+        while valid_completions < total_completions:
+            try:
+                # Prompt the AI with a message
+                messages = [
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT
+                    },
+                    {
+                        "role": "user",
+                        "content": USER_PROMPT
+                    }
+                ]
 
-            completion = client.chat.completions.create(  
-                model=deployment,  
-                messages=messages,
-                max_tokens=4000,  
-                temperature=0.7,  
-                top_p=0.95,  
-                frequency_penalty=0,  
-                presence_penalty=0,
-                stop=None,  
-                stream=False  
-            )
+                completion = client.chat.completions.create(  
+                    model=deployment,  
+                    messages=messages,
+                    max_tokens=4000,  
+                    temperature=0.7,  
+                    top_p=0.95,  
+                    frequency_penalty=0,  
+                    presence_penalty=0,
+                    stop=None,  
+                    stream=False  
+                )
 
-            response_content = completion.choices[0].message.content
-            results = validate_test_case(response_content, LANGUAGE)
+                response_content = completion.choices[0].message.content
+                results = validate_test_case(response_content, LANGUAGE)
 
-            if results["syntax_valid"]:
-                # Append to JSONL file
-                with open(output_file, 'a') as f:
-                    cleaned_response = response_content.replace("```json", "").replace("```", "").strip()
-                    json_obj = json.loads(cleaned_response)
-                    json_line = json.dumps(json_obj)
+                if results["syntax_valid"]:
+                    # Append to JSONL file
+                    with open(output_file, 'a') as f:
+                        cleaned_response = response_content.replace("```json", "").replace("```", "").strip()
+                        json_obj = json.loads(cleaned_response)
+                        json_line = json.dumps(json_obj)
 
-                    f.write(json_line + '\n')
-                
-                valid_completions += 1
-                print(f"Valid completion {valid_completions}/{total_completions} saved")
-                
-                # Display the test case and validation results
-                print("\nTest Case Details:")
-                display_test_case(response_content)
-                display_validation_results(response_content, LANGUAGE)
-            else:
-                print("Invalid syntax - retrying...")
+                        f.write(json_line + '\n')
+                    
+                    valid_completions += 1
+                    print(f"Valid completion {valid_completions}/{total_completions} saved")
+                    
+                    # Display the test case and validation results
+                    print("\nTest Case Details:")
+                    display_test_case(response_content)
+                    display_validation_results(response_content, LANGUAGE)
+                else:
+                    print("Invalid syntax - retrying...")
 
-        except Exception as e:
-            print(f"Error occurred: {str(e)}")
-            continue
-    
-    print(f"\nCompleted! {valid_completions} valid completions have been saved to {output_file}")
+            except Exception as e:
+                print(f"Error occurred: {str(e)}")
+                continue
+        
+        print(f"\nCompleted! {valid_completions} valid completions have been saved to {output_file}")
 
-    # Process the generated JSONL file
-    output_txt_file = output_file.replace('.jsonl', '_formatted.txt')
-    print(f"\nGenerating formatted output in {output_txt_file}...")
-    process_jsonl_file(output_file, output_txt_file)
-    print("Formatting complete!")
+        # Process the generated JSONL file
+        output_txt_file = output_file.replace('.jsonl', '_formatted.txt')
+        print(f"\nGenerating formatted output in {output_txt_file}...")
+        process_jsonl_file(output_file, output_txt_file)
+        print("Formatting complete!")
+        return
+        
+    # If neither --execute nor --generate are specified, print help
+    parser.print_help()
 
 if __name__ == "__main__":
     main()
@@ -1237,3 +1291,7 @@ if __name__ == "__main__":
 # python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_1/python --models DeepSeek-R1
 # python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_3/python
 # python generate_benchmark.py --execute --model-eval --benchmark-dir benchmark/python --verbose --models-dir new_completions_02_5/python
+
+# Examples for generating benchmark test cases:
+# python generate_benchmark.py --generate --completions 10 --language python --prompt-type api_usage
+# python generate_benchmark.py --generate --completions 1 --language javascript --prompt-type code_purpose_understanding
