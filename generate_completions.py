@@ -217,18 +217,16 @@ DEPLOYMENTS = [
     # {"name": "claude-3-7-sonnet", "type": MODEL_TYPE_CLAUDE_37},
     # {"name": "gpt-4o-mini", "type": MODEL_TYPE_GPT4OMINI},
     # {"name": "gpt-35-turbo-completions", "type": MODEL_TYPE_GPT35TURBO_COMPLETIONS},
-    {"name": "DeepSeek-R1", "type": MODEL_TYPE_DEEPSEEK_R1},
+    # {"name": "DeepSeek-R1", "type": MODEL_TYPE_DEEPSEEK_R1},
     # {"name": "gpt-4.5-preview", "type": MODEL_TYPE_GPT45},
     # {"name": "Ministral-3B", "type": MODEL_TYPE_MINISTRAL},
     # {"name": "DeepSeek-V3-0324", "type": MODEL_TYPE_DEEPSEEK_V3},
     # {"name": "gpt-4.1-mini", "type": MODEL_TYPE_GPT41MINI},
     # {"name": "gpt-4.1-nano", "type": MODEL_TYPE_GPT41NANO},
-    # {"name": "gpt-4o", "type": MODEL_TYPE_GPT4O},
+    {"name": "gpt-4o", "type": MODEL_TYPE_GPT4O},
     # {"name": MIDTRAIN_DEVDIV4_MODEL, "type": MODEL_TYPE_MIDTRAIN_DEVDIV4},
     # {"name": MIDTRAIN_DEVDIV4_V4_MODEL, "type": MODEL_TYPE_MIDTRAIN_DEVDIV4_V4},
 ]
-
-VERSION = "v1"
 
 # Split input dirs into common and python-only (dogfood) categories
 common_dirs = [
@@ -1077,7 +1075,7 @@ def validate_completions():
     model_error_counts = defaultdict(int)
     
     # Walk through the output directory
-    for file_path in glob.glob(f"{OUTPUT_DIR}/{VERSION}/**/*{file_pattern_suffix}", recursive=True):
+    for file_path in glob.glob(f"{OUTPUT_DIR}/**/*{file_pattern_suffix}", recursive=True):
         # Skip formatted text files
         if "_formatted" in file_path:
             continue
@@ -1182,7 +1180,7 @@ def regenerate_failed_completions():
     failed_completions = []
     
     # Walk through the output directory to find failures
-    for file_path in glob.glob(f"{OUTPUT_DIR}/{VERSION}/**/*{file_pattern_suffix}", recursive=True):
+    for file_path in glob.glob(f"{OUTPUT_DIR}/**/*{file_pattern_suffix}", recursive=True):
         # Skip formatted text files
         if "_formatted" in file_path:
             continue
@@ -1297,7 +1295,7 @@ def generate_all_formatted_text_files():
     file_pattern_suffix = f"_x{NUM_COMPLETIONS}.jsonl" if NUM_COMPLETIONS > 1 else ".jsonl"
     
     # Walk through the output directory to find JSONL files matching the current pattern
-    for file_path in glob.glob(f"{OUTPUT_DIR}/{VERSION}/**/*{file_pattern_suffix}", recursive=True):
+    for file_path in glob.glob(f"{OUTPUT_DIR}/**/*{file_pattern_suffix}", recursive=True):
         # Skip files that already have _formatted in the name
         if "_formatted" in file_path:
             continue
@@ -1360,7 +1358,7 @@ def regenerate_deepseek_failures():
     failed_completions = []
     
     # Find all the DeepSeek failures
-    for file_path in glob.glob(f"{OUTPUT_DIR}/{VERSION}/**/*-DeepSeek-R1{file_pattern_suffix}", recursive=True):
+    for file_path in glob.glob(f"{OUTPUT_DIR}/**/*-DeepSeek-R1{file_pattern_suffix}", recursive=True):
         if "_formatted" in file_path:
             continue
             
@@ -1486,7 +1484,7 @@ def clean_all_deepseek_completions():
     file_pattern_suffix = f"_x{NUM_COMPLETIONS}.jsonl" if NUM_COMPLETIONS > 1 else ".jsonl"
     
     # Find all DeepSeek-R1 JSONL files
-    deepseek_files = glob.glob(f"{OUTPUT_DIR}/{VERSION}/**/*-DeepSeek-R1{file_pattern_suffix}", recursive=True)
+    deepseek_files = glob.glob(f"{OUTPUT_DIR}/**/*-DeepSeek-R1{file_pattern_suffix}", recursive=True)
     print(f"Found {len(deepseek_files)} DeepSeek-R1 completion files")
     
     files_updated = 0
@@ -1567,7 +1565,7 @@ def process_typescript_syntax_completion_line_by_line():
     file_pattern_suffix = f"_x{NUM_COMPLETIONS}" if NUM_COMPLETIONS > 1 else ""
     
     # File path for the TypeScript syntax completion file
-    file_path = f"{OUTPUT_DIR}/{VERSION}/typescript/syntax_completion/syntax_completion-DeepSeek-R1{file_pattern_suffix}.jsonl"
+    file_path = f"{OUTPUT_DIR}/typescript/syntax_completion/syntax_completion-DeepSeek-R1{file_pattern_suffix}.jsonl"
     
     # Check if the file exists
     if not os.path.exists(file_path):
@@ -1766,7 +1764,7 @@ def regenerate_and_save_failed_completions():
         print(f"\nChecking for {deployment_name} failures...")
         
         # Find all files for this deployment
-        deployment_files = glob.glob(f"{OUTPUT_DIR}/{VERSION}/**/*-{deployment_name}{file_pattern_suffix}", recursive=True)
+        deployment_files = glob.glob(f"{OUTPUT_DIR}/**/*-{deployment_name}{file_pattern_suffix}", recursive=True)
         
         if not deployment_files:
             print(f"No files found for {deployment_name}")
@@ -1915,7 +1913,7 @@ def detect_and_generate_missing_files():
     
     # Find all existing files first and put them in a set for fast lookup
     existing_files_dict = {}
-    for file_path in glob.glob(f"{OUTPUT_DIR}/{VERSION}/**/*{file_pattern_suffix}", recursive=True):
+    for file_path in glob.glob(f"{OUTPUT_DIR}/**/*{file_pattern_suffix}", recursive=True):
         if "_formatted" in file_path:
             continue
         
@@ -1939,7 +1937,7 @@ def detect_and_generate_missing_files():
                 
                 # Construct expected filename
                 expected_filename = f"{curr_file}-{model_name}{completion_suffix}.jsonl"
-                expected_path = os.path.join(OUTPUT_DIR, VERSION, language, curr_dir, expected_filename)
+                expected_path = os.path.join(OUTPUT_DIR, language, curr_dir, expected_filename)
                 expected_files.append((expected_path, model_info))
                 
                 # Check if file exists (case insensitive)
@@ -1956,7 +1954,7 @@ def detect_and_generate_missing_files():
                     
                     # Construct expected filename
                     expected_filename = f"{curr_file}-{model_name}{completion_suffix}.jsonl"
-                    expected_path = os.path.join(OUTPUT_DIR, VERSION, language, curr_dir, expected_filename)
+                    expected_path = os.path.join(OUTPUT_DIR, language, curr_dir, expected_filename)
                     expected_files.append((expected_path, model_info))
                     
                     # Check if file exists (case insensitive)
@@ -1994,8 +1992,12 @@ def detect_and_generate_missing_files():
         #     for file_path, model_info in missing_files:
         #         # Extract language and directories from file path
         #         path_parts = os.path.normpath(file_path).split(os.path.sep)
-        #         language_idx = path_parts.index(VERSION) + 1
-        #         language = path_parts[language_idx]
+        #         try:
+        #             language_idx = path_parts.index(OUTPUT_DIR) + 1
+        #             language = path_parts[language_idx]
+        #         except (ValueError, IndexError):
+        #             print(f"Could not determine language from path: {file_path}")
+        #             continue
         #         
         #         # Get directory and file
         #         is_python_only = any(pd in path_parts for pd in [p.split('/')[0] for p in python_only_dirs])
@@ -2014,7 +2016,7 @@ def detect_and_generate_missing_files():
         #                     break
         #         
         #         # Get input file path
-        #         input_jsonl = f"benchmark/{VERSION}/{language}/{curr_dir}/{curr_file}.jsonl"
+        #         input_jsonl = f"benchmark/{language}/{curr_dir}/{curr_file}.jsonl"
         #         
         #         # Create output directory
         #         os.makedirs(os.path.dirname(file_path), exist_ok=True)
@@ -2045,8 +2047,8 @@ def generate_missing_deepseek_files():
     # Number of completions we're generating
     num_completions = 3
     
-    # Output directory based on the pattern shown in the file paths
-    output_dir = "new_completions_08_3"
+    # Output directory
+    output_dir = "completions"
     
     # DeepSeek-R1 deployment info
     deepseek_deployment = {"name": "DeepSeek-R1", "type": MODEL_TYPE_DEEPSEEK_R1}
@@ -2066,8 +2068,8 @@ def generate_missing_deepseek_files():
     # Process each missing file
     for language, test_type in missing_files:
         # Construct input and output paths
-        input_jsonl = f"benchmark/v1/{language}/{test_type}/{test_type}.jsonl"
-        output_jsonl = f"{output_dir}/v1/{language}/{test_type}/{test_type}-{deepseek_deployment['name']}_x{num_completions}.jsonl"
+        input_jsonl = f"benchmark/{language}/{test_type}/{test_type}.jsonl"
+        output_jsonl = f"{output_dir}/{language}/{test_type}/{test_type}-{deepseek_deployment['name']}_x{num_completions}.jsonl"
         
         # Create output directory
         os.makedirs(os.path.dirname(output_jsonl), exist_ok=True)
@@ -2090,67 +2092,67 @@ def generate_missing_deepseek_files():
 
 
 def main():
-    # print(f"\nRunning with {NUM_COMPLETIONS} completion(s) per test case")
-    # print(f"Output directory: {OUTPUT_DIR}")
+    print(f"\nRunning with {NUM_COMPLETIONS} completion(s) per test case")
+    print(f"Output directory: {OUTPUT_DIR}")
     
-    # # Process each deployment separately
-    # for deployment_info in DEPLOYMENTS:
-    #     deployment_name = deployment_info["name"]
+    # Process each deployment separately
+    for deployment_info in DEPLOYMENTS:
+        deployment_name = deployment_info["name"]
         
-    #     for language in languages:            
-    #         # Process common directories for all languages
-    #         for i in range(len(common_dirs)):
-    #             curr_dir = common_dirs[i]
-    #             curr_file = common_files[i]
-    #             input_jsonl = f"benchmark/{VERSION}/{language}/{curr_dir}/{curr_file}.jsonl"
+        for language in languages:            
+            # Process common directories for all languages
+            for i in range(len(common_dirs)):
+                curr_dir = common_dirs[i]
+                curr_file = common_files[i]
+                input_jsonl = f"benchmark/{language}/{curr_dir}/{curr_file}.jsonl"
                 
-    #             # Adjust output filename based on number of completions
-    #             if NUM_COMPLETIONS > 1:
-    #                 output_jsonl = f"{OUTPUT_DIR}/{VERSION}/{language}/{curr_dir}/{curr_file}-{deployment_name}_x{NUM_COMPLETIONS}.jsonl"
-    #             else:
-    #                 output_jsonl = f"{OUTPUT_DIR}/{VERSION}/{language}/{curr_dir}/{curr_file}-{deployment_name}.jsonl"
+                # Adjust output filename based on number of completions
+                if NUM_COMPLETIONS > 1:
+                    output_jsonl = f"{OUTPUT_DIR}/{language}/{curr_dir}/{curr_file}-{deployment_name}_x{NUM_COMPLETIONS}.jsonl"
+                else:
+                    output_jsonl = f"{OUTPUT_DIR}/{language}/{curr_dir}/{curr_file}-{deployment_name}.jsonl"
 
-    #             # Create output directory if it doesn't exist
-    #             os.makedirs(os.path.dirname(output_jsonl), exist_ok=True)
+                # Create output directory if it doesn't exist
+                os.makedirs(os.path.dirname(output_jsonl), exist_ok=True)
                 
-    #             # Process with the current deployment
-    #             process_jsonl(input_jsonl, output_jsonl, deployment_info)
-    #             print(f"Processing completed for {deployment_name} ({language}/{curr_dir}). JSONL saved to {output_jsonl}.")
+                # Process with the current deployment
+                process_jsonl(input_jsonl, output_jsonl, deployment_info)
+                print(f"Processing completed for {deployment_name} ({language}/{curr_dir}). JSONL saved to {output_jsonl}.")
 
-    #             # Generate formatted text output
-    #             output_txt_file = output_jsonl.replace('.jsonl', '_formatted.txt')
-    #             print(f"\nGenerating formatted output in {output_txt_file}...")
-    #             process_jsonl_file(output_jsonl, output_txt_file, deployment_name)
-    #             print("Formatting complete!")
+                # Generate formatted text output
+                output_txt_file = output_jsonl.replace('.jsonl', '_formatted.txt')
+                print(f"\nGenerating formatted output in {output_txt_file}...")
+                process_jsonl_file(output_jsonl, output_txt_file, deployment_name)
+                print("Formatting complete!")
             
-    #         # Process Python-only directories (only if the current language is Python)
-    #         if language == "python":
-    #             for i in range(len(python_only_dirs)):
-    #                 curr_dir = python_only_dirs[i]
-    #                 curr_file = python_only_files[i]
-    #                 input_jsonl = f"benchmark/{VERSION}/{language}/{curr_dir}/{curr_file}.jsonl"
+            # Process Python-only directories (only if the current language is Python)
+            if language == "python":
+                for i in range(len(python_only_dirs)):
+                    curr_dir = python_only_dirs[i]
+                    curr_file = python_only_files[i]
+                    input_jsonl = f"benchmark/{language}/{curr_dir}/{curr_file}.jsonl"
                     
-    #                 # Adjust output filename based on number of completions
-    #                 if NUM_COMPLETIONS > 1:
-    #                     output_jsonl = f"{OUTPUT_DIR}/{VERSION}/{language}/{curr_dir}/{curr_file}-{deployment_name}_x{NUM_COMPLETIONS}.jsonl"
-    #                 else:
-    #                     output_jsonl = f"{OUTPUT_DIR}/{VERSION}/{language}/{curr_dir}/{curr_file}-{deployment_name}.jsonl"
+                    # Adjust output filename based on number of completions
+                    if NUM_COMPLETIONS > 1:
+                        output_jsonl = f"{OUTPUT_DIR}/{language}/{curr_dir}/{curr_file}-{deployment_name}_x{NUM_COMPLETIONS}.jsonl"
+                    else:
+                        output_jsonl = f"{OUTPUT_DIR}/{language}/{curr_dir}/{curr_file}-{deployment_name}.jsonl"
 
-    #                 # Create output directory if it doesn't exist
-    #                 os.makedirs(os.path.dirname(output_jsonl), exist_ok=True)
+                    # Create output directory if it doesn't exist
+                    os.makedirs(os.path.dirname(output_jsonl), exist_ok=True)
                     
-    #                 # Process with the current deployment
-    #                 process_jsonl(input_jsonl, output_jsonl, deployment_info)
-    #                 print(f"Processing completed for {deployment_name} ({language}/{curr_dir}). JSONL saved to {output_jsonl}.")
+                    # Process with the current deployment
+                    process_jsonl(input_jsonl, output_jsonl, deployment_info)
+                    print(f"Processing completed for {deployment_name} ({language}/{curr_dir}). JSONL saved to {output_jsonl}.")
 
-    #                 # Generate formatted text output
-    #                 output_txt_file = output_jsonl.replace('.jsonl', '_formatted.txt')
-    #                 print(f"\nGenerating formatted output in {output_txt_file}...")
-    #                 process_jsonl_file(output_jsonl, output_txt_file, deployment_name)
-    #                 print("Formatting complete!")
+                    # Generate formatted text output
+                    output_txt_file = output_jsonl.replace('.jsonl', '_formatted.txt')
+                    print(f"\nGenerating formatted output in {output_txt_file}...")
+                    process_jsonl_file(output_jsonl, output_txt_file, deployment_name)
+                    print("Formatting complete!")
 
-    # Call validate_completions after processing all files
-    validate_completions()
+    # # Call validate_completions after processing all files
+    # validate_completions()
 
     # # Regenerate and save failed completions
     # regenerate_and_save_failed_completions()
