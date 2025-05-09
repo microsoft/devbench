@@ -70,36 +70,6 @@
         "avg_levenshtein": 37.5,
         "avg_edit_similarity": 0.13,
         "avg_cosine": 0.0
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 65,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 30.8,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.0
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 91,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 35.43,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.0
-      },
-      "dogfood/organization": {
-        "total_comparisons": 104,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 35.12,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
       }
     },
     "languages": {
@@ -235,36 +205,6 @@
         "proximity_match_rate": 0.67,
         "avg_levenshtein": 37.52,
         "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 65,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 13,
-        "proximity_match_rate": 20.0,
-        "avg_levenshtein": 21.6,
-        "avg_edit_similarity": 0.2,
-        "avg_cosine": 0.0
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 91,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 36.43,
-        "avg_edit_similarity": 0.07,
-        "avg_cosine": 0.0
-      },
-      "dogfood/organization": {
-        "total_comparisons": 104,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 19.12,
-        "avg_edit_similarity": 0.02,
         "avg_cosine": 0.0
       }
     },
@@ -402,36 +342,6 @@
         "avg_levenshtein": 36.3,
         "avg_edit_similarity": 0.15,
         "avg_cosine": 0.03
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 65,
-        "line0_exact_matches": 13,
-        "line0_exact_match_rate": 20.0,
-        "proximity_matches": 26,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 34.4,
-        "avg_edit_similarity": 0.35,
-        "avg_cosine": 0.27
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 91,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 31.14,
-        "avg_edit_similarity": 0.26,
-        "avg_cosine": 0.17
-      },
-      "dogfood/organization": {
-        "total_comparisons": 104,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 78,
-        "proximity_match_rate": 75.0,
-        "avg_levenshtein": 56.75,
-        "avg_edit_similarity": 0.21,
-        "avg_cosine": 0.38
       }
     },
     "languages": {
@@ -568,36 +478,6 @@
         "avg_levenshtein": 34.7,
         "avg_edit_similarity": 0.26,
         "avg_cosine": 0.18
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 65,
-        "line0_exact_matches": 13,
-        "line0_exact_match_rate": 20.0,
-        "proximity_matches": 52,
-        "proximity_match_rate": 80.0,
-        "avg_levenshtein": 16.6,
-        "avg_edit_similarity": 0.47,
-        "avg_cosine": 0.45
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 91,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 13,
-        "proximity_match_rate": 14.29,
-        "avg_levenshtein": 39.14,
-        "avg_edit_similarity": 0.21,
-        "avg_cosine": 0.07
-      },
-      "dogfood/organization": {
-        "total_comparisons": 104,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 39,
-        "proximity_match_rate": 37.5,
-        "avg_levenshtein": 47.38,
-        "avg_edit_similarity": 0.18,
-        "avg_cosine": 0.14
       }
     },
     "languages": {
@@ -731,36 +611,6 @@
         "line0_exact_match_rate": 100.0,
         "proximity_matches": 3887,
         "proximity_match_rate": 99.67,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 65,
-        "line0_exact_matches": 65,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 65,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 91,
-        "line0_exact_matches": 91,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 91,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 0.0,
-        "avg_edit_similarity": 1.0,
-        "avg_cosine": 1.0
-      },
-      "dogfood/organization": {
-        "total_comparisons": 104,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 100.0,
-        "proximity_matches": 104,
-        "proximity_match_rate": 100.0,
         "avg_levenshtein": 0.0,
         "avg_edit_similarity": 1.0,
         "avg_cosine": 1.0
@@ -900,36 +750,6 @@
         "avg_levenshtein": 434.82,
         "avg_edit_similarity": 0.06,
         "avg_cosine": 0.08
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 65,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 52,
-        "proximity_match_rate": 80.0,
-        "avg_levenshtein": 364.4,
-        "avg_edit_similarity": 0.05,
-        "avg_cosine": 0.02
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 91,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 91,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 288.57,
-        "avg_edit_similarity": 0.11,
-        "avg_cosine": 0.22
-      },
-      "dogfood/organization": {
-        "total_comparisons": 104,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 104,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 279.12,
-        "avg_edit_similarity": 0.06,
-        "avg_cosine": 0.3
       }
     },
     "languages": {
@@ -1066,36 +886,6 @@
         "avg_levenshtein": 19.88,
         "avg_edit_similarity": 0.62,
         "avg_cosine": 0.61
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 1,
-        "proximity_match_rate": 20.0,
-        "avg_levenshtein": 35.8,
-        "avg_edit_similarity": 0.19,
-        "avg_cosine": 0.0
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 6,
-        "proximity_match_rate": 85.71,
-        "avg_levenshtein": 27.29,
-        "avg_edit_similarity": 0.46,
-        "avg_cosine": 0.41
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 1,
-        "proximity_match_rate": 12.5,
-        "avg_levenshtein": 43.75,
-        "avg_edit_similarity": 0.08,
-        "avg_cosine": 0.07
       }
     },
     "languages": {
@@ -1232,36 +1022,6 @@
         "avg_levenshtein": 22.99,
         "avg_edit_similarity": 0.53,
         "avg_cosine": 0.5
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 19.4,
-        "avg_edit_similarity": 0.51,
-        "avg_cosine": 0.4
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 1,
-        "line0_exact_match_rate": 14.29,
-        "proximity_matches": 1,
-        "proximity_match_rate": 14.29,
-        "avg_levenshtein": 28.86,
-        "avg_edit_similarity": 0.34,
-        "avg_cosine": 0.26
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 5,
-        "proximity_match_rate": 62.5,
-        "avg_levenshtein": 36.5,
-        "avg_edit_similarity": 0.12,
-        "avg_cosine": 0.23
       }
     },
     "languages": {
@@ -1398,36 +1158,6 @@
         "avg_levenshtein": 29.66,
         "avg_edit_similarity": 0.4,
         "avg_cosine": 0.33
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 19.8,
-        "avg_edit_similarity": 0.5,
-        "avg_cosine": 0.4
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 1,
-        "line0_exact_match_rate": 14.29,
-        "proximity_matches": 3,
-        "proximity_match_rate": 42.86,
-        "avg_levenshtein": 33.14,
-        "avg_edit_similarity": 0.34,
-        "avg_cosine": 0.17
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 4,
-        "line0_exact_match_rate": 50.0,
-        "proximity_matches": 8,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 25.62,
-        "avg_edit_similarity": 0.59,
-        "avg_cosine": 0.7
       }
     },
     "languages": {
@@ -1564,36 +1294,6 @@
         "avg_levenshtein": 21.21,
         "avg_edit_similarity": 0.61,
         "avg_cosine": 0.59
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 18.2,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.4
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 5,
-        "proximity_match_rate": 71.43,
-        "avg_levenshtein": 24.71,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.35
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 6,
-        "line0_exact_match_rate": 75.0,
-        "proximity_matches": 8,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 6.38,
-        "avg_edit_similarity": 0.89,
-        "avg_cosine": 0.88
       }
     },
     "languages": {
@@ -1730,36 +1430,6 @@
         "avg_levenshtein": 17.88,
         "avg_edit_similarity": 0.67,
         "avg_cosine": 0.66
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 18.2,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.4
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 4,
-        "proximity_match_rate": 57.14,
-        "avg_levenshtein": 24.29,
-        "avg_edit_similarity": 0.49,
-        "avg_cosine": 0.33
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 5,
-        "line0_exact_match_rate": 62.5,
-        "proximity_matches": 8,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 22.0,
-        "avg_edit_similarity": 0.68,
-        "avg_cosine": 0.81
       }
     },
     "languages": {
@@ -1896,36 +1566,6 @@
         "avg_levenshtein": 15.29,
         "avg_edit_similarity": 0.7,
         "avg_cosine": 0.69
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 1,
-        "proximity_match_rate": 20.0,
-        "avg_levenshtein": 35.6,
-        "avg_edit_similarity": 0.16,
-        "avg_cosine": 0.07
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 6,
-        "proximity_match_rate": 85.71,
-        "avg_levenshtein": 33.43,
-        "avg_edit_similarity": 0.26,
-        "avg_cosine": 0.11
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 1,
-        "proximity_match_rate": 12.5,
-        "avg_levenshtein": 28.12,
-        "avg_edit_similarity": 0.1,
-        "avg_cosine": 0.09
       }
     },
     "languages": {
@@ -2062,36 +1702,6 @@
         "avg_levenshtein": 18.67,
         "avg_edit_similarity": 0.65,
         "avg_cosine": 0.63
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 1,
-        "line0_exact_match_rate": 20.0,
-        "proximity_matches": 1,
-        "proximity_match_rate": 20.0,
-        "avg_levenshtein": 24.4,
-        "avg_edit_similarity": 0.31,
-        "avg_cosine": 0.25
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 6,
-        "proximity_match_rate": 85.71,
-        "avg_levenshtein": 24.86,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.38
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 6,
-        "line0_exact_match_rate": 75.0,
-        "proximity_matches": 7,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 22.75,
-        "avg_edit_similarity": 0.79,
-        "avg_cosine": 0.83
       }
     },
     "languages": {
@@ -2228,36 +1838,6 @@
         "avg_levenshtein": 19.57,
         "avg_edit_similarity": 0.62,
         "avg_cosine": 0.61
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 1,
-        "line0_exact_match_rate": 20.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 24.6,
-        "avg_edit_similarity": 0.35,
-        "avg_cosine": 0.22
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 6,
-        "proximity_match_rate": 85.71,
-        "avg_levenshtein": 27.57,
-        "avg_edit_similarity": 0.44,
-        "avg_cosine": 0.33
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 5,
-        "line0_exact_match_rate": 62.5,
-        "proximity_matches": 8,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 14.75,
-        "avg_edit_similarity": 0.78,
-        "avg_cosine": 0.8
       }
     },
     "languages": {
@@ -2394,36 +1974,6 @@
         "avg_levenshtein": 16.39,
         "avg_edit_similarity": 0.68,
         "avg_cosine": 0.67
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 1,
-        "line0_exact_match_rate": 20.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 26.0,
-        "avg_edit_similarity": 0.34,
-        "avg_cosine": 0.22
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 6,
-        "proximity_match_rate": 85.71,
-        "avg_levenshtein": 24.14,
-        "avg_edit_similarity": 0.49,
-        "avg_cosine": 0.35
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 7,
-        "line0_exact_match_rate": 87.5,
-        "proximity_matches": 8,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 6.25,
-        "avg_edit_similarity": 0.9,
-        "avg_cosine": 0.94
       }
     },
     "languages": {
@@ -2560,36 +2110,6 @@
         "avg_levenshtein": 26.34,
         "avg_edit_similarity": 0.46,
         "avg_cosine": 0.41
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 3,
-        "proximity_match_rate": 60.0,
-        "avg_levenshtein": 18.6,
-        "avg_edit_similarity": 0.49,
-        "avg_cosine": 0.47
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 31.29,
-        "avg_edit_similarity": 0.25,
-        "avg_cosine": 0.17
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 7,
-        "line0_exact_match_rate": 87.5,
-        "proximity_matches": 8,
-        "proximity_match_rate": 100.0,
-        "avg_levenshtein": 6.25,
-        "avg_edit_similarity": 0.9,
-        "avg_cosine": 0.94
       }
     },
     "languages": {
@@ -2726,36 +2246,6 @@
         "avg_levenshtein": 19.3,
         "avg_edit_similarity": 0.61,
         "avg_cosine": 0.59
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 18.2,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.4
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 4,
-        "proximity_match_rate": 57.14,
-        "avg_levenshtein": 25.0,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.35
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 6,
-        "line0_exact_match_rate": 75.0,
-        "proximity_matches": 7,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 10.38,
-        "avg_edit_similarity": 0.78,
-        "avg_cosine": 0.81
       }
     },
     "languages": {
@@ -2892,36 +2382,6 @@
         "avg_levenshtein": 19.99,
         "avg_edit_similarity": 0.58,
         "avg_cosine": 0.56
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 18.2,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.4
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 28.57,
-        "proximity_matches": 5,
-        "proximity_match_rate": 71.43,
-        "avg_levenshtein": 25.43,
-        "avg_edit_similarity": 0.47,
-        "avg_cosine": 0.38
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 6,
-        "line0_exact_match_rate": 75.0,
-        "proximity_matches": 7,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 10.38,
-        "avg_edit_similarity": 0.78,
-        "avg_cosine": 0.81
       }
     },
     "languages": {
@@ -3058,36 +2518,6 @@
         "avg_levenshtein": 24.55,
         "avg_edit_similarity": 0.55,
         "avg_cosine": 0.52
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 2,
-        "line0_exact_match_rate": 40.0,
-        "proximity_matches": 2,
-        "proximity_match_rate": 40.0,
-        "avg_levenshtein": 18.2,
-        "avg_edit_similarity": 0.48,
-        "avg_cosine": 0.4
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 1,
-        "proximity_match_rate": 14.29,
-        "avg_levenshtein": 31.43,
-        "avg_edit_similarity": 0.24,
-        "avg_cosine": 0.17
-      },
-      "dogfood/organization": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 6,
-        "line0_exact_match_rate": 75.0,
-        "proximity_matches": 7,
-        "proximity_match_rate": 87.5,
-        "avg_levenshtein": 10.38,
-        "avg_edit_similarity": 0.78,
-        "avg_cosine": 0.81
       }
     },
     "languages": {
@@ -3224,36 +2654,6 @@
         "avg_levenshtein": 38.8,
         "avg_edit_similarity": 0.24,
         "avg_cosine": 0.13
-      },
-      "dogfood/idiomatic": {
-        "total_comparisons": 39,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 0,
-        "proximity_match_rate": 0.0,
-        "avg_levenshtein": 44.0,
-        "avg_edit_similarity": 0.1,
-        "avg_cosine": 0.0
-      },
-      "dogfood/nl2code": {
-        "total_comparisons": 91,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 13,
-        "proximity_match_rate": 14.29,
-        "avg_levenshtein": 46.86,
-        "avg_edit_similarity": 0.17,
-        "avg_cosine": 0.0
-      },
-      "dogfood/organization": {
-        "total_comparisons": 104,
-        "line0_exact_matches": 0,
-        "line0_exact_match_rate": 0.0,
-        "proximity_matches": 39,
-        "proximity_match_rate": 37.5,
-        "avg_levenshtein": 23.5,
-        "avg_edit_similarity": 0.25,
-        "avg_cosine": 0.19
       }
     },
     "languages": {

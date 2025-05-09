@@ -684,13 +684,16 @@ def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="comp
             category = None
             for i, part in enumerate(path_parts):
                 if part.endswith('.jsonl'):
-                    # Handle special case for dogfood/* subcategories
-                    if i >= 2 and path_parts[i-2] == "dogfood":
-                        # Use both levels for the category (e.g., "dogfood/idiomatic")
-                        category = f"{path_parts[i-2]}/{path_parts[i-1]}"
-                    else:
-                        # Default case: use immediate parent directory
-                        category = path_parts[i-1]
+                    # Use immediate parent directory as category
+                    category = path_parts[i-1]
+                    
+                    # Handle nested categories if needed
+                    if i >= 2:
+                        # Check if we need to use a hierarchical category path
+                        parent_dir = path_parts[i-2]
+                        if parent_dir not in ["python", "javascript", "cpp", "java", "c_sharp", "typescript"]:
+                            # Use hierarchical category path
+                            category = f"{parent_dir}/{category}"
                     break
             
             if not category:
@@ -1188,13 +1191,16 @@ def execute_multi_completion_model_tests(benchmark_jsonl_files: List[str], model
             category = None
             for i, part in enumerate(path_parts):
                 if part.endswith('.jsonl'):
-                    # Handle special case for dogfood/* subcategories
-                    if i >= 2 and path_parts[i-2] == "dogfood":
-                        # Use both levels for the category (e.g., "dogfood/idiomatic")
-                        category = f"{path_parts[i-2]}/{path_parts[i-1]}"
-                    else:
-                        # Default case: use immediate parent directory
-                        category = path_parts[i-1]
+                    # Use immediate parent directory as category
+                    category = path_parts[i-1]
+                    
+                    # Handle nested categories if needed
+                    if i >= 2:
+                        # Check if we need to use a hierarchical category path
+                        parent_dir = path_parts[i-2]
+                        if parent_dir not in ["python", "javascript", "cpp", "java", "c_sharp", "typescript"]:
+                            # Use hierarchical category path
+                            category = f"{parent_dir}/{category}"
                     break
             
             if not category:
@@ -1957,55 +1963,7 @@ def main():
         return
     
     valid_completions = 0
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/code2NL_NL2code/code2NL_NL2code.jsonl"
-    # SYSTEM_PROMPT = python_prompts.NL2CODE_CODE2NL_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.NL2CODE_CODE2NL_USER_PROMPT
-
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/dogfood/idiomatic/dogfood_idiomatic.jsonl"
-    # SYSTEM_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_USER_PROMPT
-
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/dogfood/nl2code/dogfood_nl2code.jsonl"
-    # SYSTEM_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_USER_PROMPT
-
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/dogfood/organization/dogfood_organization.jsonl"
-    # SYSTEM_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.DOGFOOD_IDIOMATIC_USER_PROMPT
-
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/low_context/low_context.jsonl"
-    # SYSTEM_PROMPT = python_prompts.LOW_CONTEXT_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.LOW_CONTEXT_USER_PROMPT
-
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/pattern_matching/pattern_matching.jsonl"
-    # SYSTEM_PROMPT = python_prompts.PATTERN_MATCHING_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.PATTERN_MATCHING_USER_PROMPT
-
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/syntax_completion/syntax_completion.jsonl"
-    # SYSTEM_PROMPT = python_prompts.SYNTAX_COMPLETION_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.SYNTAX_COMPLETION_USER_PROMPT
-
-    # total_completions = 0
-    # LANGUAGE = "python"
-    # output_file = f"benchmark/{LANGUAGE}/code_purpose_understanding/code_purpose_understanding.jsonl"
-    # SYSTEM_PROMPT = python_prompts.CODE_PURPOSE_UNDERSTANDING_SYSTEM_PROMPT
-    # USER_PROMPT = python_prompts.CODE_PURPOSE_UNDERSTANDING_USER_PROMPT
-
-    total_completions = 1
+    total_completions = 0
     LANGUAGE = "python"
     output_file = f"benchmark/{LANGUAGE}/api_usage/api_usage.jsonl"
     SYSTEM_PROMPT = python_prompts.API_USAGE_SYSTEM_PROMPT

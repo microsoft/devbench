@@ -228,7 +228,7 @@ DEPLOYMENTS = [
     # {"name": MIDTRAIN_DEVDIV4_V4_MODEL, "type": MODEL_TYPE_MIDTRAIN_DEVDIV4_V4},
 ]
 
-# Split input dirs into common and python-only (dogfood) categories
+# Split input dirs into categories
 common_dirs = [
     "low_context",
     "api_usage",
@@ -238,13 +238,7 @@ common_dirs = [
     "code2NL_NL2code",
 ]
 
-python_only_dirs = [
-    "dogfood/nl2code",
-    "dogfood/idiomatic",
-    "dogfood/organization"
-]
-
-# Split input files into common and python-only (dogfood) categories
+# Split input files into categories
 common_files = [
     "low_context",
     "api_usage",
@@ -252,12 +246,6 @@ common_files = [
     "code_purpose_understanding",
     "syntax_completion",
     "code2NL_NL2code",
-]
-
-python_only_files = [
-    "dogfood_nl2code",
-    "dogfood_idiomatic",
-    "dogfood_organization"
 ]
 
 languages = [
@@ -1943,23 +1931,6 @@ def detect_and_generate_missing_files():
                 # Check if file exists (case insensitive)
                 if expected_filename.lower() not in existing_files_dict:
                     missing_files.append((expected_path, model_info))
-        
-        # Process Python-only directories
-        if language == "python":
-            for i, curr_dir in enumerate(python_only_dirs):
-                curr_file = python_only_files[i]
-                
-                for model_info in all_models:
-                    model_name = model_info["name"]
-                    
-                    # Construct expected filename
-                    expected_filename = f"{curr_file}-{model_name}{completion_suffix}.jsonl"
-                    expected_path = os.path.join(OUTPUT_DIR, language, curr_dir, expected_filename)
-                    expected_files.append((expected_path, model_info))
-                    
-                    # Check if file exists (case insensitive)
-                    if expected_filename.lower() not in existing_files_dict:
-                        missing_files.append((expected_path, model_info))
     
     # Report statistics
     print(f"\nTotal expected files: {len(expected_files)}")
@@ -2124,32 +2095,6 @@ def main():
                 print(f"\nGenerating formatted output in {output_txt_file}...")
                 process_jsonl_file(output_jsonl, output_txt_file, deployment_name)
                 print("Formatting complete!")
-            
-            # Process Python-only directories (only if the current language is Python)
-            if language == "python":
-                for i in range(len(python_only_dirs)):
-                    curr_dir = python_only_dirs[i]
-                    curr_file = python_only_files[i]
-                    input_jsonl = f"benchmark/{language}/{curr_dir}/{curr_file}.jsonl"
-                    
-                    # Adjust output filename based on number of completions
-                    if NUM_COMPLETIONS > 1:
-                        output_jsonl = f"{OUTPUT_DIR}/{language}/{curr_dir}/{curr_file}-{deployment_name}_x{NUM_COMPLETIONS}.jsonl"
-                    else:
-                        output_jsonl = f"{OUTPUT_DIR}/{language}/{curr_dir}/{curr_file}-{deployment_name}.jsonl"
-
-                    # Create output directory if it doesn't exist
-                    os.makedirs(os.path.dirname(output_jsonl), exist_ok=True)
-                    
-                    # Process with the current deployment
-                    process_jsonl(input_jsonl, output_jsonl, deployment_info)
-                    print(f"Processing completed for {deployment_name} ({language}/{curr_dir}). JSONL saved to {output_jsonl}.")
-
-                    # Generate formatted text output
-                    output_txt_file = output_jsonl.replace('.jsonl', '_formatted.txt')
-                    print(f"\nGenerating formatted output in {output_txt_file}...")
-                    process_jsonl_file(output_jsonl, output_txt_file, deployment_name)
-                    print("Formatting complete!")
 
     # # Call validate_completions after processing all files
     # validate_completions()

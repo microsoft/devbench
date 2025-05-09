@@ -192,11 +192,6 @@ def load_benchmark_files(benchmark_dir):
                     print(f"Could not determine language/category for {root}")
                     continue
                 
-                # Handle dogfood subcategories
-                if category == 'dogfood' and len(parts) > parts.index(category) + 1:
-                    subcategory = parts[parts.index(category) + 1]
-                    category = f"dogfood/{subcategory}"
-                
                 file_path = os.path.join(root, file)
                 
                 # Create key based on language and category
@@ -294,13 +289,6 @@ def load_and_compare_completions(completions_dir, benchmark_dir, debug=False):
                 if not language or not category:
                     print(f"Could not determine language/category for {file_path}")
                     continue
-                
-                # Handle dogfood subcategories
-                if category == 'dogfood':
-                    dogfood_index = path_parts.index('dogfood')
-                    if dogfood_index + 1 < len(path_parts):
-                        subcategory = path_parts[dogfood_index + 1]
-                        category = f"dogfood/{subcategory}"
                 
                 # Create benchmark key to locate corresponding benchmark data
                 benchmark_key = f"{language}/{category}"
