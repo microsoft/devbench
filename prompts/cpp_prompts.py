@@ -1,4 +1,3 @@
-# SYNTAX COMPLETION PROMPT
 SYNTAX_COMPLETION_SYSTEM_PROMPT = """
 You are an expert C++ developer tasked with creating benchmark examples for testing syntax completion and language-specific structure capabilities in large language models.
 Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to complete complex syntactical patterns and nested structures.
@@ -252,7 +251,6 @@ Use proper escaping for newlines/quotes and maintain indentation in the escaped 
 
 """
 
-# NATURAL LANGUAGE TO CODE AND CODE TO NATURAL LANGUAGE PROMPT
 NL2CODE_CODE2NL_SYSTEM_PROMPT = """
 You are an expert C++ developer tasked with creating benchmark examples for testing bidirectional translation between code and natural language capabilities in large language models.
 Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to translate between code and documentation in both directions.
@@ -527,7 +525,6 @@ Use proper escaping for newlines/quotes and maintain indentation in the escaped 
 
 """
 
-# CODE PURPOSE UNDERSTANDING PROMPT
 CODE_PURPOSE_UNDERSTANDING_SYSTEM_PROMPT = """
 You are an expert C++ developer tasked with creating benchmark examples for testing semantic understanding and code purpose comprehension capabilities in large language models.
 Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to understand and continue code based on its underlying business logic and domain context.
@@ -762,7 +759,6 @@ Use proper escaping for newlines/quotes and maintain indentation in the escaped 
 
 """
 
-# LOW-CONTEXT SCENARIOS PROMPT
 LOW_CONTEXT_SYSTEM_PROMPT = """
 You are an expert C++ developer tasked with creating benchmark examples for testing low-context pattern matching capabilities in large language models.
 Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code with minimal surrounding context.
@@ -1040,7 +1036,6 @@ Use proper escaping for newlines/quotes and maintain indentation in the escaped 
 
 """
 
-# PATTERN MATCHING PROMPT
 PATTERN_MATCHING_SYSTEM_PROMPT = """
 You are an expert C++ developer tasked with creating benchmark examples for testing pattern matching capabilities in large language models.
 Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code.

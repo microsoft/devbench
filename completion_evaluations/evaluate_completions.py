@@ -181,13 +181,12 @@ def load_benchmark_files(benchmark_dir):
                 language = None
                 category = None
                 
-                # Find language by looking for v0/v1 marker
-                for i, part in enumerate(parts):
-                    if part in ['v0', 'v1'] and i+1 < len(parts):
-                        language = parts[i+1]
-                        if i+2 < len(parts):
-                            category = parts[i+2]
-                        break
+                # Find language directly from the path
+                benchmark_index = parts.index('benchmark') if 'benchmark' in parts else -1
+                if benchmark_index >= 0 and benchmark_index + 1 < len(parts):
+                    language = parts[benchmark_index + 1]
+                    if benchmark_index + 2 < len(parts):
+                        category = parts[benchmark_index + 2]
                 
                 if not language or not category:
                     print(f"Could not determine language/category for {root}")
@@ -285,14 +284,12 @@ def load_and_compare_completions(completions_dir, benchmark_dir, debug=False):
                 language = None
                 category = None
                 
-                # Find language and category in path
-                for i, part in enumerate(path_parts):
-                    if part in ['v0', 'v1']:
-                        if i+1 < len(path_parts):
-                            language = path_parts[i+1]
-                        if i+2 < len(path_parts):
-                            category = path_parts[i+2]
-                        break
+                # Find language from the path
+                completions_index = path_parts.index('completions') if 'completions' in path_parts else -1
+                if completions_index >= 0 and completions_index + 1 < len(path_parts):
+                    language = path_parts[completions_index + 1]
+                    if completions_index + 2 < len(path_parts):
+                        category = path_parts[completions_index + 2]
                 
                 if not language or not category:
                     print(f"Could not determine language/category for {file_path}")
@@ -1136,7 +1133,7 @@ def print_most_dissimilar_cases(test_cases, top_n=10, similarity_metric='edit_si
         else:
             print("   No other language test cases found.")
 
-def run_comparison(benchmark_base="../benchmark/v1", completions_base="../completions/v1", 
+def run_comparison(benchmark_base="../benchmark", completions_base="../completions", 
                   results_file="model_benchmark_comparison_results.json", plots_dir="plots", debug=False):
     """Run the comparison pipeline and save results."""
     # Load and compare completions
@@ -1177,10 +1174,10 @@ def run_comparison(benchmark_base="../benchmark/v1", completions_base="../comple
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Evaluate code completions against benchmarks.')
-    parser.add_argument('--completions', default="../completions/v1", 
-                        help='Path to the completions directory (default: ../completions/v1)')
-    parser.add_argument('--benchmark', default="../benchmark/v1",
-                        help='Path to the benchmark directory (default: ../benchmark/v1)')
+    parser.add_argument('--completions', default="../completions", 
+                        help='Path to the completions directory (default: ../completions)')
+    parser.add_argument('--benchmark', default="../benchmark",
+                        help='Path to the benchmark directory (default: ../benchmark)')
     parser.add_argument('--results', default="model_benchmark_comparison_results.json",
                         help='Path for the output results JSON file (default: model_benchmark_comparison_results.json)')
     parser.add_argument('--plots', default="plots",
@@ -1206,10 +1203,3 @@ if __name__ == "__main__":
         print("Debug mode enabled: printing most dissimilar test cases")
     
     run_comparison(benchmark_base, completions_base, results_file, plots_dir, debug)
-
-# Examples:
-# python evaluate_completions.py --completions ../new_completions_oai_41_mini/v1
-# python evaluate_completions.py --completions ../new_completions_oai_41_nano/v1
-
-# python evaluate_completions.py --completions ../new_completions_02_1/v1 --results results_02_1.json --plots plots_02_1
-# python evaluate_completions.py --completions ../new_completions_02_1/v1 --debug
