@@ -63,7 +63,6 @@ CLAUDE_35_MODEL = "claude-3-5-sonnet-20240620"
 CLAUDE_37_MODEL = "claude-3-7-sonnet-20250219"
 
 # Define model types
-MODEL_TYPE_AZURE_OPENAI = "azure_openai"
 MODEL_TYPE_O1MINI = "o1mini"
 MODEL_TYPE_O1PREVIEW = "o1preview"
 MODEL_TYPE_O3MINI = "o3mini"
@@ -164,7 +163,6 @@ GPT4O_API_KEY = os.getenv("GPT4O_API_KEY")
 
 # Add to DEPLOYMENTS list
 DEPLOYMENTS = [
-    # {"name": "4omini_sft39_spm_fix2_5", "type": MODEL_TYPE_AZURE_OPENAI},
     {"name": "o1-mini", "type": MODEL_TYPE_O1MINI},
     {"name": "o1-preview", "type": MODEL_TYPE_O1PREVIEW},
     {"name": "o3-mini", "type": MODEL_TYPE_O3MINI},

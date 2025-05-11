@@ -5,6 +5,9 @@
 
 # User-specific files
 .env
+benchmark.zip
+*croissant*
+test_file.jsonl
 *.rsuser
 *.suo
 *.user
