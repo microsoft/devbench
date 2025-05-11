@@ -1009,10 +1009,10 @@
   },
   "o1-mini": {
     "overall": {
-      "total_comparisons": 63,
-      "line0_exact_matches": 42,
-      "line0_exact_match_rate": 66.67,
-      "avg_cosine": 0.83
+      "total_comparisons": 73,
+      "line0_exact_matches": 48,
+      "line0_exact_match_rate": 65.75,
+      "avg_cosine": 0.84
     },
     "categories": {
       "api_usage": {
@@ -1034,10 +1034,10 @@
         "avg_cosine": 0.82
       },
       "low_context": {
-        "total_comparisons": 18,
-        "line0_exact_matches": 13,
-        "line0_exact_match_rate": 72.22,
-        "avg_cosine": 0.86
+        "total_comparisons": 28,
+        "line0_exact_matches": 19,
+        "line0_exact_match_rate": 67.86,
+        "avg_cosine": 0.88
       },
       "syntax_completion": {
         "total_comparisons": 7,
@@ -1078,10 +1078,10 @@
         "avg_cosine": 0.75
       },
       "python": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 3,
+        "total_comparisons": 15,
+        "line0_exact_matches": 9,
         "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.89
+        "avg_cosine": 0.9
       },
       "typescript": {
         "total_comparisons": 10,
