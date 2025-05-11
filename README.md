@@ -1,10 +1,10 @@
-# DataSynthCodeBench
+# DevBench
 
 A comprehensive framework for generating, evaluating, and comparing code completions across multiple programming languages and AI models on our synthetic, telemetry-driven benchmark.
 
 ## Overview
 
-DataSynthCodeBench provides tools for:
+DevBench provides tools for:
 - Generating standardized code benchmark test cases across multiple programming languages
 - Running code completions through various AI models
 - Evaluating model performance using multiple metrics
@@ -40,8 +40,8 @@ The benchmark supports multiple programming languages:
 1. Clone this repository
 2. Create and activate a conda environment:
    ```bash
-   conda create -n datasynthcodebench python=3.10
-   conda activate datasynthcodebench
+   conda create -n devbench python=3.10
+   conda activate devbench
    ```
 3. Install requirements:
    ```bash

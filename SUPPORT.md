@@ -1,4 +1,4 @@
-# Support for DataSynthCodeBench
+# Support for DevBench
 
 ## How to file issues and get help
 
@@ -42,7 +42,7 @@ Feature requests are welcome! When submitting a feature request:
 
 ## Support Policy
 
-Support for DataSynthCodeBench is provided on a best-effort basis by the project maintainers and community. This is an open-source project, and there is no guarantee of immediate responses or fixes.
+Support for DevBench is provided on a best-effort basis by the project maintainers and community. This is an open-source project, and there is no guarantee of immediate responses or fixes.
 
 The code in this repository is provided as a reference implementation for research purposes. Users should expect to adapt the code to their specific needs and environments.
 

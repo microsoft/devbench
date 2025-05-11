@@ -115,7 +115,7 @@ CRITICAL JSON FORMATTING REQUIREMENTS:
 
 Required JSON fields:
 - id: A unique numeric identifier
-- testsource: Use "synthbench-syntax-completion"
+- testsource: Use "devbench-syntax-completion"
 - language: "typescript"
 - prefix: The code that comes before the completion (may or may not establish the syntax pattern)
 - suffix: The code that follows the completion (may or may not establish the syntax pattern) - should be DIFFERENT from the golden completion
@@ -186,7 +186,7 @@ Requirements:
 Format your response as a single line JSON object with newlines escaped appropriately.
 
 Example format:
-{"id": "1", "testsource": "synthbench-syntax-completion", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+{"id": "1", "testsource": "devbench-syntax-completion", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
 
 VALIDATION CHECKLIST BEFORE SUBMITTING:
 1. Have you properly escaped ALL special characters?
@@ -327,7 +327,7 @@ CRITICAL JSON FORMATTING REQUIREMENTS:
 
 Required JSON fields:
 - id: A unique numeric identifier
-- testsource: Use "synthbench-code2NL-NL2code"
+- testsource: Use "devbench-code2NL-NL2code"
 - language: "typescript"
 - prefix: The segment that establishes the code-comment relationship before the completion
 - suffix: The segment that follows the completion with code or comments
@@ -436,7 +436,7 @@ Requirements:
 Format your response as a single line JSON object with newlines escaped appropriately.
 
 Example format:
-{"id": "1", "testsource": "synthbench-code2NL-NL2code", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+{"id": "1", "testsource": "devbench-code2NL-NL2code", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
 
 VALIDATION CHECKLIST BEFORE SUBMITTING:
 1. Have you properly escaped ALL special characters?
@@ -556,7 +556,7 @@ CRITICAL JSON FORMATTING REQUIREMENTS:
 
 Required JSON fields:
 - id: A unique numeric identifier
-- testsource: Use "synthbench-code-purpose-understanding"
+- testsource: Use "devbench-code-purpose-understanding"
 - language: "typescript"
 - prefix: The code that comes before the completion (may or may not establish the semantic pattern)
 - suffix: The code that follows the completion (may or may not establish the semantic pattern) - should be DIFFERENT from the golden completion
@@ -627,7 +627,7 @@ Requirements:
 Format your response as a single line JSON object with newlines escaped appropriately.
 
 Example format:
-{"id": "1", "testsource": "synthbench-code-purpose-understanding", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+{"id": "1", "testsource": "devbench-code-purpose-understanding", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
 
 VALIDATION CHECKLIST BEFORE SUBMITTING:
 1. Have you properly escaped ALL special characters?
@@ -778,7 +778,7 @@ CRITICAL JSON FORMATTING REQUIREMENTS:
 
 Required JSON fields:
 - id: A unique numeric identifier
-- testsource: Use "synthbench-low-context"  
+- testsource: Use "devbench-low-context"  
 - language: "typescript"
 - prefix: The code that comes before the completion (may or may not establish the pattern)
 - suffix: The code that follows the completion (may or may not establish the pattern) - should be DIFFERENT from the golden completion
@@ -857,7 +857,7 @@ Requirements:
 Format your response as a single line JSON object with newlines escaped appropriately.
 
 Example format:
-{"id": "1", "testsource": "synthbench-low-context", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+{"id": "1", "testsource": "devbench-low-context", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
 
 VALIDATION CHECKLIST BEFORE SUBMITTING:
 1. Have you properly escaped ALL special characters?
@@ -985,7 +985,7 @@ CRITICAL JSON FORMATTING REQUIREMENTS:
 
 Required JSON fields:
 - id: A unique numeric identifier
-- testsource: Use "synthbench-pattern-matching"
+- testsource: Use "devbench-pattern-matching"
 - language: "typescript"
 - prefix: The code that comes before the completion (MUST establish or begin a clear pattern)
 - suffix: The code that follows the completion (may continue or complete the pattern) - should be DIFFERENT from the golden completion
@@ -1066,7 +1066,7 @@ Requirements:
 Format your response as a single line JSON object with newlines escaped appropriately.
 
 Example format:
-{"id": "1", "testsource": "synthbench-pattern-matching", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+{"id": "1", "testsource": "devbench-pattern-matching", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
 
 VALIDATION CHECKLIST BEFORE SUBMITTING:
 1. Have you properly escaped ALL special characters?
@@ -1288,7 +1288,7 @@ CRITICAL JSON FORMATTING REQUIREMENTS:
 
 Required JSON fields:
 - id: A unique numeric identifier
-- testsource: Use "synthbench-api-usage"  
+- testsource: Use "devbench-api-usage"  
 - language: "typescript"
 - prefix: The code that comes before the completion (may or may not establish the API pattern)
 - suffix: The code that follows the completion (may or may not establish the API pattern) - should be DIFFERENT from the golden completion
@@ -1359,7 +1359,7 @@ Requirements:
 Format your response as a single line JSON object with newlines escaped appropriately.
 
 Example format:
-{"id": "1", "testsource": "synthbench-api-usage", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+{"id": "1", "testsource": "devbench-api-usage", "language": "typescript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
 
 VALIDATION CHECKLIST BEFORE SUBMITTING:
 1. Have you properly escaped ALL special characters?
