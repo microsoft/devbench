@@ -4,18 +4,41 @@ import json
 from openai import AzureOpenAI  
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 import dotenv
-from typing import Dict, List
+from typing import Dict, List, Optional
 import re
 import ast
 import glob
 import argparse
+import numpy as np
+from collections import defaultdict
+from pathlib import Path
 
 dotenv.load_dotenv()
 
 # o3-mini endpoint and deployment details - matching generate_completions.py
-O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "[ANONYMIZED-ENDPOINT-2]")  # Endpoint without the deployment path
-O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "[ANONYMIZED-DEPLOYMENT-3]")  # The deployment name to use in API calls
+O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "https://deepprompteastus.openai.azure.com")  # Endpoint without the deployment path
+O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "deepprompt-o3-mini-2025-01-31")  # The deployment name to use in API calls
 O3MINI_API_VERSION = "2024-12-01-preview"
+
+def bootstrap_ci(judge_results, n_bootstrap=10000, confidence=0.95):
+    """
+    Calculate bootstrap confidence intervals for the given results.
+    
+    Args:
+        judge_results: List of score values
+        n_bootstrap: Number of bootstrap samples (default: 10000)
+        confidence: Confidence level (default: 0.95)
+        
+    Returns:
+        Tuple of (lower_ci, upper_ci)
+    """
+    N = len(judge_results)
+    bootstrap_means = [
+        np.mean(np.random.choice(judge_results, N, replace=True)) for _ in range(n_bootstrap)
+    ]
+    lower = np.percentile(bootstrap_means, (1 - confidence) / 2 * 100)
+    upper = np.percentile(bootstrap_means, (1 + confidence) / 2 * 100)
+    return lower, upper
 
 def read_jsonl_file(file_path):
     """Read a JSONL file and return a list of parsed JSON objects."""
@@ -135,15 +158,54 @@ def display_score_summary(results_dir: str, specific_model=None):
             print(f"\nModel: {model_name}")
             print("-" * 50)
             
-            # Display overall score first
+            # Display overall score first with confidence intervals if available
             overall = model_data.get('overall', {})
-            print(f"OVERALL: Score: {overall.get('score'):.2f}/10 (across {overall.get('categories_count')} categories)")
+            score_str = f"{overall.get('score'):.2f}/10"
+            
+            # Add confidence interval if available
+            ci_warning = overall.get('ci_warning', False)
+            ci_str = f" (95% CI: {overall.get('lower_ci'):.2f}-{overall.get('upper_ci'):.2f})"
+            if ci_warning:
+                ci_str += " ⚠️ Limited samples"
+                
+            score_str += ci_str
+                
+            print(f"OVERALL: Score: {score_str} (across {overall.get('categories_count')} categories, {overall.get('sample_count')} samples)")
+            
+            # Display language breakdowns if available
+            if 'languages' in model_data:
+                print("\nLanguage breakdown:")
+                for language, lang_data in model_data['languages'].items():
+                    lang_score = lang_data.get('score')
+                    samples = lang_data.get('sample_count')
+                    
+                    lang_score_str = f"{lang_score:.2f}"
+                    lang_ci_warning = lang_data.get('ci_warning', False)
+                    lang_ci_str = f" (95% CI: {lang_data.get('lower_ci'):.2f}-{lang_data.get('upper_ci'):.2f})"
+                    if lang_ci_warning:
+                        lang_ci_str += " ⚠️ Limited samples"
+                        
+                    lang_score_str += lang_ci_str
+                        
+                    print(f"  {language}: {lang_score_str} ({samples} samples)")
             
             # Display each category
+            print("\nCategory breakdown:")
             for category, scores in model_data.items():
-                if category == 'overall':
+                if category in ('overall', 'languages'):
                     continue
-                print(f"{category}: Score: {scores['score']:.2f}/10, Evaluations: {scores['evaluations']}")
+                
+                cat_score_str = f"{scores['score']:.2f}"
+                cat_ci_warning = scores.get('ci_warning', False)
+                cat_ci_str = f" (95% CI: {scores.get('lower_ci'):.2f}-{scores.get('upper_ci'):.2f})"
+                if cat_ci_warning:
+                    cat_ci_str += " ⚠️ Limited samples"
+                    
+                cat_score_str += cat_ci_str
+                    
+                print(f"  {category}: {cat_score_str}, Evaluations: {scores['evaluations']}")
+                
+            print(f"\nDetailed results available in: {results_dir}/{model_name}_detailed_results/")
     else:
         print("No evaluation results found.")
 
@@ -177,6 +239,29 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
     )
 
     model_data = read_jsonl_file(model_file)
+    
+    # Extract language and category from the file path
+    # Expected structure: ../completions/{language}/{category}/{filename}
+    file_path = os.path.normpath(model_file)
+    path_parts = file_path.split(os.sep)
+    
+    # Default values
+    actual_language = "unknown"
+    actual_category = "unknown"
+    
+    # Find the "completions" folder in the path to get more reliable indexes
+    for i, part in enumerate(path_parts):
+        if part == "completions":
+            # If we found the completions folder, the structure should be:
+            # .../completions/language/category/filename.jsonl
+            if i + 2 < len(path_parts):  # Ensure we have enough parts for language
+                actual_language = path_parts[i + 1]
+            if i + 3 < len(path_parts):  # Ensure we have enough parts for category
+                # Category might contain underscores itself (like api_usage)
+                actual_category = path_parts[i + 2]
+            break
+    
+    print(f"Path components: Language={actual_language}, Category={actual_category}")
 
     # Limit the number of evaluations for debugging
     if max_evaluations is not None:
@@ -227,6 +312,9 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
             prefix = entry.get("prefix", "")
             suffix = entry.get("suffix", "")
             model_completion = entry.get(model_name, "")
+            
+            # Use extracted language from path, but allow entry values to override if present
+            language = entry.get("language", actual_language)
  
             print(f"\n\nEvaluating single completion for ID: {entry_id}")
             
@@ -257,6 +345,8 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
                 result = {
                     "id": entry_id,
                     "score": score,
+                    "language": language,
+                    "category": actual_category,
                     "full_response": response_content
                 }
 
@@ -270,6 +360,8 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
                 evaluation_results.append({
                     "id": entry_id,
                     "score": None,
+                    "language": language,
+                    "category": actual_category,
                     "error": str(e)
                 })
 
@@ -309,66 +401,101 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
     # List of model names to ensure consistent ordering
     model_names = []
     
+    # Enhanced data structure to store detailed results by language/category
+    detailed_results = {}
+    
     # Process all single model evaluation files
     for file_path in single_eval_files:
         try:
             # Extract filename without extension
             filename = os.path.basename(file_path)
-            file_base = filename.split('_single_evaluation.json')[0]
             
-            # Read the result file
-            with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+            # New file naming convention: {language}_{category}_{model_name}_single_evaluation.json
+            file_parts = filename.split('_single_evaluation.json')[0]
             
-            # Extract model name - for our use case, model names have a specific pattern
-            # like "4omini_sft39_spm_16_o3fix_10", "claude-3-5-sonnet", etc.
-            # We need to identify the model name correctly from the filename
+            # Special case for handling complex category names with underscores (like api_usage)
+            # First try to find the model name which often has distinctive patterns
             model_patterns = [
-                "4omini_sft39_spm", 
                 "claude-3", 
                 "gpt-", 
                 "Ministral-3B", 
                 "DeepSeek", 
                 "o1-",
-                "o3-"
+                "o3-",
+                "4omini"
             ]
             
-            # Find the model name by looking for known patterns
-            model_name = None
+            found_pattern = False
             for pattern in model_patterns:
-                if pattern in file_base:
-                    # Find the pattern and everything after it
-                    start_index = file_base.find(pattern)
-                    if start_index >= 0:
-                        # Extract from the pattern to the end or next underscore
-                        remaining = file_base[start_index:]
-                        if "_" in remaining:
-                            model_name = remaining.split("_", 1)[0]
-                        else:
-                            model_name = remaining
+                if pattern in file_parts:
+                    # Found a known model pattern
+                    found_pattern = True
+                    
+                    # Find the position of the model pattern
+                    pattern_pos = file_parts.find(pattern)
+                    
+                    # Extract parts before the pattern (language_category_)
+                    prefix_parts = file_parts[:pattern_pos].strip('_').split('_')
+                    
+                    # Make sure we have at least language and category
+                    if len(prefix_parts) >= 2:
+                        language_from_file = prefix_parts[0]
+                        # Category might have underscores, so join all remaining parts except the last
+                        category_from_file = '_'.join(prefix_parts[1:])
                         
-                        # For 4omini models, include all parts
-                        if pattern == "4omini_sft39_spm":
-                            model_name = "4omini_sft39_spm_16_o3fix_10"
+                        # Extract model name (the pattern and everything after it)
+                        model_name = file_parts[pattern_pos:]
+                        
+                        # Remove any "usage_" prefix from model name if present
+                        if model_name.startswith("usage_"):
+                            model_name = model_name[6:]  # Remove "usage_" prefix
+                            
                         break
             
-            # If we couldn't determine the model name, skip this file
-            if not model_name:
-                print(f"Warning: Could not determine model name for {filename}, skipping.")
-                continue
+            if not found_pattern:
+                # Fallback to simple splitting - this may not handle complex categories well
+                parts = file_parts.split('_')
+                if len(parts) < 3:
+                    print(f"Warning: unexpected filename format for {filename}, skipping.")
+                    continue
+                    
+                language_from_file = parts[0]
+                category_from_file = parts[1]
+                model_name = '_'.join(parts[2:])
             
-            # Determine the category by removing the model name from the filename
-            category = file_base.replace(model_name, "").strip("_")
-            if not category:
-                category = "general"
-                
-            print(f"Processing {filename}: Model={model_name}, Category={category}")
+            print(f"Processing {filename}: Model={model_name}, Language={language_from_file}, Category={category_from_file}")
+            
+            # Read the result file
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
             
             # Calculate average score for this category
             scores = []
+            all_results = []
+            language_category_results = defaultdict(list)
+            
             for entry in data:
                 if entry.get('score') is not None:
-                    scores.append(entry['score'])
+                    score = entry.get('score')
+                    scores.append(score)
+                    
+                    # Extract language and category from the entry
+                    # Default to the ones from filename if not present
+                    language = entry.get('language', language_from_file)
+                    category = entry.get('category', category_from_file)
+                    entry_id = entry.get('id', 'unknown')
+                    
+                    # Store detailed result
+                    result_entry = {
+                        "id": entry_id,
+                        "score": score,
+                        "category": category,
+                        "language": language
+                    }
+                    all_results.append(result_entry)
+                    
+                    # Group by language and category
+                    language_category_results[language].append(score)
             
             if not scores:
                 print(f"No valid scores found in {file_path}")
@@ -376,23 +503,42 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
                 
             avg_score = sum(scores) / len(scores)
             
+            # Calculate confidence intervals regardless of sample size
+            # If sample is small, we'll note it in the output
+            lower_ci, upper_ci = bootstrap_ci(scores)
+            if len(scores) < 5:
+                print(f"Warning: Only {len(scores)} samples for {category_from_file} in {model_name}. CI may not be statistically meaningful.")
+            
             # Add the model to our list if it's new
             if model_name not in model_data:
                 model_data[model_name] = {
-                    'overall': {'scores': [], 'categories_count': 0},
-                    'categories': {}
+                    'overall': {'scores': [], 'categories_count': 0, 'all_scores': []},
+                    'categories': {},
+                    'languages': defaultdict(list)
                 }
                 model_names.append(model_name)
+                detailed_results[model_name] = []
             
-            # Add category scores
-            model_data[model_name]['categories'][category] = {
+            # Add category scores with confidence intervals
+            model_data[model_name]['categories'][category_from_file] = {
                 'score': round(avg_score, 2),
-                'evaluations': len(scores)
+                'evaluations': len(scores),
+                'lower_ci': round(lower_ci, 2),
+                'upper_ci': round(upper_ci, 2),
+                'ci_warning': len(scores) < 5
             }
+            
+            # Group scores by language
+            for language, lang_scores in language_category_results.items():
+                model_data[model_name]['languages'][language].extend(lang_scores)
             
             # Also append to overall averages
             model_data[model_name]['overall']['scores'].append(avg_score)
             model_data[model_name]['overall']['categories_count'] += 1
+            model_data[model_name]['overall']['all_scores'].extend(scores)
+            
+            # Add detailed results
+            detailed_results[model_name].extend(all_results)
                 
         except Exception as e:
             print(f"Error processing single evaluation file {file_path}: {str(e)}")
@@ -402,27 +548,80 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
     for model_name in model_names:
         model_info = model_data[model_name]
         
+        # Calculate overall confidence intervals
+        all_scores = model_info['overall']['all_scores']
+        overall_lower_ci, overall_upper_ci = bootstrap_ci(all_scores)
+        ci_warning = len(all_scores) < 5
+        
         # Create the model entry
         final_summary[model_name] = {
             'overall': {
                 'score': round(
                     sum(model_info['overall']['scores']) / 
                     len(model_info['overall']['scores']), 2),
-                'categories_count': model_info['overall']['categories_count']
+                'categories_count': model_info['overall']['categories_count'],
+                'sample_count': len(all_scores),
+                'lower_ci': round(overall_lower_ci, 2),
+                'upper_ci': round(overall_upper_ci, 2),
+                'ci_warning': ci_warning
             }
         }
         
         # Add all categories
         for category, data in model_info['categories'].items():
             final_summary[model_name][category] = data
+        
+        # Add language statistics
+        final_summary[model_name]['languages'] = {}
+        for language, scores in model_info['languages'].items():
+            lang_lower_ci, lang_upper_ci = bootstrap_ci(scores)
+            lang_ci_warning = len(scores) < 5
+                
+            final_summary[model_name]['languages'][language] = {
+                'score': round(sum(scores) / len(scores), 2),
+                'sample_count': len(scores),
+                'lower_ci': round(lang_lower_ci, 2),
+                'upper_ci': round(lang_upper_ci, 2),
+                'ci_warning': lang_ci_warning
+            }
     
-    # Determine the output file path
+    # Determine the output file path for main summary
     if output_file is None:
         output_file = os.path.join(results_dir, "single_model_summary.json")
     
     # Save the summary
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(final_summary, f, indent=2)
+    
+    # Generate more granular output files
+    for model_name in model_names:
+        model_output_dir = os.path.join(results_dir, f"{model_name}_detailed_results")
+        os.makedirs(model_output_dir, exist_ok=True)
+        
+        # Save detailed stats
+        stats_path = os.path.join(model_output_dir, "stats.jsonl")
+        with open(stats_path, 'w', encoding='utf-8') as stats_f:
+            stats_f.write(json.dumps(final_summary[model_name]) + "\n")
+        
+        # Save aggregated score
+        score_path = os.path.join(model_output_dir, "score.jsonl")
+        with open(score_path, 'w', encoding='utf-8') as score_f:
+            aggregate_score = {
+                "average_score": final_summary[model_name]['overall']['score'],
+                "number of samples considered": final_summary[model_name]['overall']['sample_count'],
+                "lower_ci": final_summary[model_name]['overall']['lower_ci'],
+                "upper_ci": final_summary[model_name]['overall']['upper_ci'],
+                "ci_warning": final_summary[model_name]['overall']['ci_warning']
+            }
+            score_f.write(json.dumps(aggregate_score) + "\n")
+        
+        # Save detailed results
+        outputs_path = os.path.join(model_output_dir, "outputs.jsonl")
+        with open(outputs_path, 'w', encoding='utf-8') as output_f:
+            for result in detailed_results[model_name]:
+                output_f.write(json.dumps(result) + "\n")
+        
+        print(f"Detailed results for {model_name} saved to {model_output_dir}")
     
     print(f"\nSingle model evaluation summary saved to {output_file}")
     
@@ -507,11 +706,34 @@ def main():
                 print(f"Reached max evaluations limit ({max_evaluations}). Stopping.")
                 break
             
-            # Generate output file path
-            category = os.path.basename(os.path.dirname(model_file))
-            output_file = os.path.join(output_dir, f"{category}_{model_name}_single_evaluation.json")
+            # Extract language and category from path
+            # Structure: ../completions/{language}/{category}/{filename}
+            file_path = os.path.normpath(model_file)
+            path_parts = file_path.split(os.sep)
             
-            print(f"Evaluating {model_name} for {category}")
+            # Default values
+            language = "unknown"
+            category = "unknown"
+            
+            # Find the "completions" folder in the path to get more reliable indexes
+            for i, part in enumerate(path_parts):
+                if part == "completions":
+                    # If we found the completions folder, the structure should be:
+                    # .../completions/language/category/filename.jsonl
+                    if i + 2 < len(path_parts):  # Ensure we have enough parts for language
+                        language = path_parts[i + 1]
+                    if i + 3 < len(path_parts):  # Ensure we have enough parts for category
+                        # Category might contain underscores itself (like api_usage)
+                        category = path_parts[i + 2]
+                    break
+            
+            print(f"Extracted from path: language={language}, category={category}")
+                        
+            # Generate output file path - include both language and category
+            # Ensure no prefix is added to the model name
+            output_file = os.path.join(output_dir, f"{language}_{category}_{model_name}_single_evaluation.json")
+            
+            print(f"Evaluating {model_name} for {language}/{category}")
             evaluations_done = evaluate_single_completion(
                 model_file,
                 output_file,
