@@ -63,12 +63,8 @@ COMPLETIONS_API_KEY="your_completions_api_key"
 # Various Model API Keys
 GPT4O_API_KEY="your_gpt4o_api_key"
 GPT4OMINI_API_KEY="your_gpt4omini_api_key"
-GPT35TURBO_API_KEY="your_gpt35turbo_api_key"
 DEEPSEEK_R1_API_KEY="your_deepseek_r1_api_key"
-GPT45_API_KEY="your_gpt45_api_key"
 MINISTRAL_API_KEY="your_ministral_api_key"
-O1MINI_API_KEY="your_o1mini_api_key"
-O1PREVIEW_API_KEY="your_o1preview_api_key"
 O3MINI_API_KEY="your_o3mini_api_key"
 CLAUDE_API_KEY="your_claude_api_key"
 DEEPSEEK_V3_API_KEY="your_deepseek_v3_api_key"
@@ -88,10 +84,13 @@ Replace the placeholder values with your actual API keys and credentials. You ma
 
 The scripts `generate_benchmark.py` and `generate_completions.py` were used for our specific experimental setup, which primarily uses Azure AI Foundry to access various language models. If you're using different methods to access these models, you'll need to modify these scripts accordingly:
 
-- `generate_benchmark.py`: This script may need modifications in how it authenticates and calls language models to generate benchmark test cases.
-- `generate_completions.py`: This script contains hardcoded endpoints and authentication methods for specific models through Azure AI Foundry and other platforms.
+- `generate_benchmark.py`: This script may need modifications in how it authenticates and calls language models to generate benchmark test cases. This script contains an anonymized endpoint (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment name (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoint and deployment name you're using.
+- `generate_completions.py`: This script contains anonymized endpoints (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment names (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoints and deployment names for each model service you're using.
 
-Consider these scripts as templates that demonstrate the methodology rather than plug-and-play solutions. You'll likely need to adapt the model access methods, API calls, and authentication to match your specific infrastructure and available model access methods.
+These scripts should be considered templates that demonstrate the methodology rather than plug-and-play solutions. You'll need to:
+1. Replace all anonymized endpoints and deployment names with your actual values
+2. Adapt the model access methods, API calls, and authentication to match your specific infrastructure
+3. Ensure you have the proper API keys and credentials for each model you intend to use
 
 ### ⚠️ Security Warning: Executing LLM-Generated Code
 
@@ -121,7 +120,7 @@ Use `generate_benchmark.py` to create benchmark test cases for a specific langua
 # Generate 10 Python API usage benchmark test cases
 python generate_benchmark.py --generate --completions 10 --language python --prompt-type api_usage
 
-# Generate 10 JavaScript code understanding test cases
+# Generate 10 JavaScript code purpose understanding test cases
 python generate_benchmark.py --generate --completions 10 --language javascript --prompt-type code_purpose_understanding
 ```
 
@@ -240,25 +239,3 @@ This script calculates various code complexity metrics including:
 - Line count
 - Token count
 - Cyclomatic complexity
-
-## Contributing
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
-## Trademarks
-
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft 
-trademarks or logos is subject to and must follow 
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.

@@ -211,14 +211,22 @@ def load_and_compare_completions(completions_dir, benchmark_dir, debug=False):
                             
                             # Process each model completion in the data
                             for model_name, model_completion in data.items():
-                                # Skip the id field and any empty completions
-                                if model_name == 'id' or not model_completion:
+                                # Skip the id field
+                                if model_name == 'id':
                                     continue
                                 
                                 # Update total count
                                 results[model_name]['total'] += 1
                                 results[model_name]['categories'][category]['total'] += 1
                                 results[model_name]['languages'][language]['total'] += 1
+                                
+                                # For empty completions, set metrics to 0 instead of skipping
+                                if not model_completion:
+                                    # Add 0 values for empty completions
+                                    results[model_name]['cosine_similarities'].append(0.0)
+                                    results[model_name]['categories'][category]['cosine_similarities'].append(0.0)
+                                    results[model_name]['languages'][language]['cosine_similarities'].append(0.0)
+                                    continue
                                 
                                 # Line0 exact match comparison
                                 model_line0 = model_completion.strip().split('\n')[0].strip()
@@ -335,10 +343,10 @@ def create_specific_category_comparisons(formatted_results, plots_dir="plots"):
     os.makedirs(plots_dir, exist_ok=True)
     
     # Specific models to compare with clean display names mapping
-    selected_models = ['claude-3-7-sonnet', 'gpt-4.5-preview', 'o3-mini', 'DeepSeek-V3-0324']
+    selected_models = ['claude-3-7-sonnet', 'gpt-4o', 'o3-mini', 'DeepSeek-V3-0324']
     model_display_names = {
         'claude-3-7-sonnet': 'Claude 3.7 Sonnet',
-        'gpt-4.5-preview': 'GPT-4.5 Preview',
+        'gpt-4o': 'GPT-4o',
         'o3-mini': 'o3-mini',
         'DeepSeek-V3-0324': 'DeepSeek-V3'
     }
@@ -389,19 +397,27 @@ def create_specific_category_comparisons(formatted_results, plots_dir="plots"):
     # Create DataFrame
     df_comparison = pd.DataFrame(comparison_data)
     
+    # Use consistent figure dimensions and font sizes for all plots
+    figure_width = 20
+    figure_height = 10
+    
+    # Set consistent font sizes for all plots
+    font_sizes = {
+        'font.size': 16,
+        'axes.titlesize': 22,
+        'axes.labelsize': 20,
+        'xtick.labelsize': 18,
+        'ytick.labelsize': 18,
+        'legend.fontsize': 18
+    }
+    
     # Create a plot for each metric
     for metric_key, metric_label in metrics:
-        plt.figure(figsize=(16, 10))
+        # Apply consistent font settings
+        plt.rcParams.update(font_sizes)
         
-        # Set font sizes - increased for better readability
-        plt.rcParams.update({
-            'font.size': 20,
-            'axes.titlesize': 28,
-            'axes.labelsize': 26,
-            'xtick.labelsize': 24,
-            'ytick.labelsize': 24,
-            'legend.fontsize': 24
-        })
+        # Create figure with consistent dimensions
+        plt.figure(figsize=(figure_width, figure_height))
         
         # Convert metric key to DataFrame column name
         if metric_key == 'avg_cosine':
@@ -415,76 +431,65 @@ def create_specific_category_comparisons(formatted_results, plots_dir="plots"):
         # Create the bar plot with clean category names
         ax = sns.barplot(data=df_comparison, x='Category', y=y_col, hue='Model', order=category_order)
         
-        # Set the title and labels with increased font sizes
-        ax.set_title(f'{metric_label} by Category Across Languages', fontsize=32, pad=25)
-        ax.set_xlabel('Category', fontsize=28)
-        ax.set_ylabel(metric_label, fontsize=28)
+        # Set the title and labels with consistent font sizes
+        ax.set_title(f'{metric_label} by Category Across Languages', fontsize=font_sizes['axes.titlesize'], pad=30)
+        ax.set_xlabel('Category', fontsize=font_sizes['axes.labelsize'])
+        ax.set_ylabel(metric_label, fontsize=font_sizes['axes.labelsize'], labelpad=15)
         
         # Rotate x-axis labels for better readability
-        plt.xticks(rotation=45, ha='right', fontsize=24)
-        plt.yticks(fontsize=24)
+        plt.xticks(rotation=45, ha='right', fontsize=font_sizes['xtick.labelsize'])
+        plt.yticks(fontsize=font_sizes['ytick.labelsize'])
         
-        # Only add legend for the cosine similarity plot
-        if metric_key == 'avg_cosine':
-            legend = plt.legend(title='Model', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=24)
-            legend.get_title().set_fontsize(26)
-        else:
-            # Remove legend for the line0_exact_match_rate plot
-            ax.get_legend().remove()
+        # Add legend with consistent positioning
+        legend = plt.legend(title='Model', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=font_sizes['legend.fontsize'])
+        legend.get_title().set_fontsize(font_sizes['legend.fontsize'] + 2)
         
         # Format y-axis for percentage metrics
         if 'Rate' in metric_label:
             plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.1f}%'))
         
-        plt.tight_layout()
+        # Adjust the subplot parameters for consistent layout
+        plt.subplots_adjust(top=0.85, left=0.15)
         
         # Generate a safe filename
         safe_metric = metric_key.replace('_', '-')
         plt.savefig(f'{plots_dir}/specific_category_comparison_{safe_metric}.png', bbox_inches='tight', dpi=300)
         plt.close()
         
-        # Create an additional plot for line0_exact_match_rate WITH legend
+        # For line0_exact_match_rate, create a second version without legend for compatibility with previous code
         if metric_key == 'line0_exact_match_rate':
-            # Use a wider figure to accommodate the legend
-            plt.figure(figsize=(20, 10))
+            # Apply the same font settings
+            plt.rcParams.update(font_sizes)
             
-            # Apply smaller font settings for this specific plot
-            plt.rcParams.update({
-                'font.size': 16,
-                'axes.titlesize': 22,
-                'axes.labelsize': 20,
-                'xtick.labelsize': 18,
-                'ytick.labelsize': 18,
-                'legend.fontsize': 18
-            })
+            # Create figure with the same dimensions
+            plt.figure(figsize=(figure_width, figure_height))
             
             # Create the plot again
             ax = sns.barplot(data=df_comparison, x='Category', y=y_col, hue='Model', order=category_order)
             
-            # Set the title and labels with more conservative font sizes
-            ax.set_title(f'{metric_label} by Category Across Languages', fontsize=24, pad=30)
-            ax.set_xlabel('Category', fontsize=20)
-            ax.set_ylabel(metric_label, fontsize=20, labelpad=15)
+            # Set the same title and labels
+            ax.set_title(f'{metric_label} by Category Across Languages', fontsize=font_sizes['axes.titlesize'], pad=30)
+            ax.set_xlabel('Category', fontsize=font_sizes['axes.labelsize'])
+            ax.set_ylabel(metric_label, fontsize=font_sizes['axes.labelsize'], labelpad=15)
             
-            # Rotate x-axis labels for better readability
-            plt.xticks(rotation=45, ha='right', fontsize=18)
-            plt.yticks(fontsize=18)
+            # Rotate x-axis labels with the same formatting
+            plt.xticks(rotation=45, ha='right', fontsize=font_sizes['xtick.labelsize'])
+            plt.yticks(fontsize=font_sizes['ytick.labelsize'])
             
-            # Add legend for this version
-            legend = plt.legend(title='Model', bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=18)
-            legend.get_title().set_fontsize(20)
+            # Remove legend for this version
+            ax.get_legend().remove()
             
             # Format y-axis for percentage metrics
             plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda x, _: f'{x:.1f}%'))
             
-            # Adjust the subplot parameters directly for more control
+            # Apply the same subplot adjustments
             plt.subplots_adjust(top=0.85, left=0.15)
             
-            # Save with a different filename to indicate it has a legend
-            plt.savefig(f'{plots_dir}/specific_category_comparison_{safe_metric}_with_legend.png', bbox_inches='tight', dpi=300)
+            # Save with a different filename to indicate it has no legend
+            plt.savefig(f'{plots_dir}/specific_category_comparison_{safe_metric}_no_legend.png', bbox_inches='tight', dpi=300)
             plt.close()
     
-    print("Created specific category comparison plots across languages")
+    print("Created specific category comparison plots across languages with consistent formatting")
 
 def run_comparison(benchmark_base="../benchmark", completions_base="../completions", 
                   results_file="model_benchmark_comparison_results.json", plots_dir="plots", debug=False):

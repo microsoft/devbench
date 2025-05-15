@@ -1,4 +1,508 @@
 {
+  "claude-3-5-sonnet": {
+    "overall": {
+      "total_comparisons": 1800,
+      "line0_exact_matches": 894,
+      "line0_exact_match_rate": 49.67,
+      "avg_cosine": 0.67
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 107,
+        "line0_exact_match_rate": 35.67,
+        "avg_cosine": 0.6
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 145,
+        "line0_exact_match_rate": 48.33,
+        "avg_cosine": 0.56
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.73
+      },
+      "low_context": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 175,
+        "line0_exact_match_rate": 58.33,
+        "avg_cosine": 0.77
+      },
+      "pattern_matching": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 162,
+        "line0_exact_match_rate": 54.0,
+        "avg_cosine": 0.73
+      },
+      "syntax_completion": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 142,
+        "line0_exact_match_rate": 47.33,
+        "avg_cosine": 0.67
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 181,
+        "line0_exact_match_rate": 60.33,
+        "avg_cosine": 0.76
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.0,
+        "avg_cosine": 0.69
+      },
+      "java": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 180,
+        "line0_exact_match_rate": 60.0,
+        "avg_cosine": 0.77
+      },
+      "javascript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 126,
+        "line0_exact_match_rate": 42.0,
+        "avg_cosine": 0.59
+      },
+      "python": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 148,
+        "line0_exact_match_rate": 49.33,
+        "avg_cosine": 0.7
+      },
+      "typescript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 112,
+        "line0_exact_match_rate": 37.33,
+        "avg_cosine": 0.54
+      }
+    }
+  },
+  "claude-3-7-sonnet": {
+    "overall": {
+      "total_comparisons": 1800,
+      "line0_exact_matches": 842,
+      "line0_exact_match_rate": 46.78,
+      "avg_cosine": 0.63
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 90,
+        "line0_exact_match_rate": 30.0,
+        "avg_cosine": 0.51
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 149,
+        "line0_exact_match_rate": 49.67,
+        "avg_cosine": 0.58
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.0,
+        "avg_cosine": 0.65
+      },
+      "low_context": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 178,
+        "line0_exact_match_rate": 59.33,
+        "avg_cosine": 0.75
+      },
+      "pattern_matching": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 150,
+        "line0_exact_match_rate": 50.0,
+        "avg_cosine": 0.69
+      },
+      "syntax_completion": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 128,
+        "line0_exact_match_rate": 42.67,
+        "avg_cosine": 0.61
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.68
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 143,
+        "line0_exact_match_rate": 47.67,
+        "avg_cosine": 0.66
+      },
+      "java": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 165,
+        "line0_exact_match_rate": 55.0,
+        "avg_cosine": 0.7
+      },
+      "javascript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.67,
+        "avg_cosine": 0.6
+      },
+      "python": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.67,
+        "avg_cosine": 0.65
+      },
+      "typescript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 103,
+        "line0_exact_match_rate": 34.33,
+        "avg_cosine": 0.5
+      }
+    }
+  },
+  "DeepSeek-R1": {
+    "overall": {
+      "total_comparisons": 1800,
+      "line0_exact_matches": 807,
+      "line0_exact_match_rate": 44.83,
+      "avg_cosine": 0.65
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 105,
+        "line0_exact_match_rate": 35.0,
+        "avg_cosine": 0.63
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 114,
+        "line0_exact_match_rate": 38.0,
+        "avg_cosine": 0.47
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 152,
+        "line0_exact_match_rate": 50.67,
+        "avg_cosine": 0.7
+      },
+      "low_context": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 162,
+        "line0_exact_match_rate": 54.0,
+        "avg_cosine": 0.77
+      },
+      "pattern_matching": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 146,
+        "line0_exact_match_rate": 48.67,
+        "avg_cosine": 0.68
+      },
+      "syntax_completion": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 128,
+        "line0_exact_match_rate": 42.67,
+        "avg_cosine": 0.64
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.73
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 129,
+        "line0_exact_match_rate": 43.0,
+        "avg_cosine": 0.65
+      },
+      "java": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 158,
+        "line0_exact_match_rate": 52.67,
+        "avg_cosine": 0.68
+      },
+      "javascript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 122,
+        "line0_exact_match_rate": 40.67,
+        "avg_cosine": 0.6
+      },
+      "python": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 133,
+        "line0_exact_match_rate": 44.33,
+        "avg_cosine": 0.68
+      },
+      "typescript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 102,
+        "line0_exact_match_rate": 34.0,
+        "avg_cosine": 0.55
+      }
+    }
+  },
+  "DeepSeek-V3-0324": {
+    "overall": {
+      "total_comparisons": 1800,
+      "line0_exact_matches": 892,
+      "line0_exact_match_rate": 49.56,
+      "avg_cosine": 0.68
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 111,
+        "line0_exact_match_rate": 37.0,
+        "avg_cosine": 0.62
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 135,
+        "line0_exact_match_rate": 45.0,
+        "avg_cosine": 0.53
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 163,
+        "line0_exact_match_rate": 54.33,
+        "avg_cosine": 0.73
+      },
+      "low_context": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 177,
+        "line0_exact_match_rate": 59.0,
+        "avg_cosine": 0.79
+      },
+      "pattern_matching": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 170,
+        "line0_exact_match_rate": 56.67,
+        "avg_cosine": 0.74
+      },
+      "syntax_completion": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 136,
+        "line0_exact_match_rate": 45.33,
+        "avg_cosine": 0.67
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 177,
+        "line0_exact_match_rate": 59.0,
+        "avg_cosine": 0.75
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 134,
+        "line0_exact_match_rate": 44.67,
+        "avg_cosine": 0.68
+      },
+      "java": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 184,
+        "line0_exact_match_rate": 61.33,
+        "avg_cosine": 0.76
+      },
+      "javascript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 131,
+        "line0_exact_match_rate": 43.67,
+        "avg_cosine": 0.62
+      },
+      "python": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.0,
+        "avg_cosine": 0.7
+      },
+      "typescript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 119,
+        "line0_exact_match_rate": 39.67,
+        "avg_cosine": 0.58
+      }
+    }
+  },
+  "gpt-4.1-mini": {
+    "overall": {
+      "total_comparisons": 1800,
+      "line0_exact_matches": 872,
+      "line0_exact_match_rate": 48.44,
+      "avg_cosine": 0.65
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 112,
+        "line0_exact_match_rate": 37.33,
+        "avg_cosine": 0.62
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 126,
+        "line0_exact_match_rate": 42.0,
+        "avg_cosine": 0.5
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 164,
+        "line0_exact_match_rate": 54.67,
+        "avg_cosine": 0.72
+      },
+      "low_context": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 185,
+        "line0_exact_match_rate": 61.67,
+        "avg_cosine": 0.78
+      },
+      "pattern_matching": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 152,
+        "line0_exact_match_rate": 50.67,
+        "avg_cosine": 0.67
+      },
+      "syntax_completion": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 133,
+        "line0_exact_match_rate": 44.33,
+        "avg_cosine": 0.62
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 174,
+        "line0_exact_match_rate": 58.0,
+        "avg_cosine": 0.72
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 138,
+        "line0_exact_match_rate": 46.0,
+        "avg_cosine": 0.66
+      },
+      "java": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 165,
+        "line0_exact_match_rate": 55.0,
+        "avg_cosine": 0.72
+      },
+      "javascript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 132,
+        "line0_exact_match_rate": 44.0,
+        "avg_cosine": 0.6
+      },
+      "python": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 153,
+        "line0_exact_match_rate": 51.0,
+        "avg_cosine": 0.7
+      },
+      "typescript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 110,
+        "line0_exact_match_rate": 36.67,
+        "avg_cosine": 0.51
+      }
+    }
+  },
+  "gpt-4.1-nano": {
+    "overall": {
+      "total_comparisons": 1800,
+      "line0_exact_matches": 662,
+      "line0_exact_match_rate": 36.78,
+      "avg_cosine": 0.57
+    },
+    "categories": {
+      "api_usage": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 90,
+        "line0_exact_match_rate": 30.0,
+        "avg_cosine": 0.57
+      },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 87,
+        "line0_exact_match_rate": 29.0,
+        "avg_cosine": 0.39
+      },
+      "code_purpose_understanding": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 127,
+        "line0_exact_match_rate": 42.33,
+        "avg_cosine": 0.64
+      },
+      "low_context": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 147,
+        "line0_exact_match_rate": 49.0,
+        "avg_cosine": 0.73
+      },
+      "pattern_matching": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 115,
+        "line0_exact_match_rate": 38.33,
+        "avg_cosine": 0.58
+      },
+      "syntax_completion": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 96,
+        "line0_exact_match_rate": 32.0,
+        "avg_cosine": 0.54
+      }
+    },
+    "languages": {
+      "cpp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 145,
+        "line0_exact_match_rate": 48.33,
+        "avg_cosine": 0.63
+      },
+      "c_sharp": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 103,
+        "line0_exact_match_rate": 34.33,
+        "avg_cosine": 0.6
+      },
+      "java": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 136,
+        "line0_exact_match_rate": 45.33,
+        "avg_cosine": 0.66
+      },
+      "javascript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 90,
+        "line0_exact_match_rate": 30.0,
+        "avg_cosine": 0.5
+      },
+      "python": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 106,
+        "line0_exact_match_rate": 35.33,
+        "avg_cosine": 0.59
+      },
+      "typescript": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 82,
+        "line0_exact_match_rate": 27.33,
+        "avg_cosine": 0.46
+      }
+    }
+  },
   "gpt-4o-copilot": {
     "overall": {
       "total_comparisons": 1800,
@@ -83,690 +587,18 @@
       }
     }
   },
-  "claude-3-5-sonnet": {
-    "overall": {
-      "total_comparisons": 1784,
-      "line0_exact_matches": 894,
-      "line0_exact_match_rate": 50.11,
-      "avg_cosine": 0.68
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 107,
-        "line0_exact_match_rate": 35.67,
-        "avg_cosine": 0.6
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 291,
-        "line0_exact_matches": 145,
-        "line0_exact_match_rate": 49.83,
-        "avg_cosine": 0.57
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 163,
-        "line0_exact_match_rate": 54.33,
-        "avg_cosine": 0.73
-      },
-      "low_context": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 175,
-        "line0_exact_match_rate": 59.32,
-        "avg_cosine": 0.78
-      },
-      "pattern_matching": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 162,
-        "line0_exact_match_rate": 54.36,
-        "avg_cosine": 0.73
-      },
-      "syntax_completion": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 142,
-        "line0_exact_match_rate": 47.33,
-        "avg_cosine": 0.67
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 181,
-        "line0_exact_match_rate": 61.36,
-        "avg_cosine": 0.78
-      },
-      "c_sharp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 147,
-        "line0_exact_match_rate": 49.0,
-        "avg_cosine": 0.69
-      },
-      "java": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 180,
-        "line0_exact_match_rate": 60.61,
-        "avg_cosine": 0.78
-      },
-      "javascript": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 126,
-        "line0_exact_match_rate": 42.71,
-        "avg_cosine": 0.6
-      },
-      "python": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 148,
-        "line0_exact_match_rate": 49.33,
-        "avg_cosine": 0.7
-      },
-      "typescript": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 112,
-        "line0_exact_match_rate": 37.71,
-        "avg_cosine": 0.55
-      }
-    }
-  },
-  "claude-3-7-sonnet": {
-    "overall": {
-      "total_comparisons": 1787,
-      "line0_exact_matches": 842,
-      "line0_exact_match_rate": 47.12,
-      "avg_cosine": 0.64
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 90,
-        "line0_exact_match_rate": 30.2,
-        "avg_cosine": 0.51
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 149,
-        "line0_exact_match_rate": 50.34,
-        "avg_cosine": 0.58
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 147,
-        "line0_exact_match_rate": 49.16,
-        "avg_cosine": 0.65
-      },
-      "low_context": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 178,
-        "line0_exact_match_rate": 59.93,
-        "avg_cosine": 0.76
-      },
-      "pattern_matching": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 150,
-        "line0_exact_match_rate": 50.17,
-        "avg_cosine": 0.69
-      },
-      "syntax_completion": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 128,
-        "line0_exact_match_rate": 42.95,
-        "avg_cosine": 0.61
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 163,
-        "line0_exact_match_rate": 54.88,
-        "avg_cosine": 0.69
-      },
-      "c_sharp": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 143,
-        "line0_exact_match_rate": 47.83,
-        "avg_cosine": 0.66
-      },
-      "java": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 165,
-        "line0_exact_match_rate": 55.18,
-        "avg_cosine": 0.7
-      },
-      "javascript": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 134,
-        "line0_exact_match_rate": 44.82,
-        "avg_cosine": 0.6
-      },
-      "python": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 134,
-        "line0_exact_match_rate": 44.82,
-        "avg_cosine": 0.65
-      },
-      "typescript": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 103,
-        "line0_exact_match_rate": 35.03,
-        "avg_cosine": 0.51
-      }
-    }
-  },
-  "DeepSeek-R1": {
-    "overall": {
-      "total_comparisons": 1795,
-      "line0_exact_matches": 807,
-      "line0_exact_match_rate": 44.96,
-      "avg_cosine": 0.65
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 105,
-        "line0_exact_match_rate": 35.23,
-        "avg_cosine": 0.64
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 114,
-        "line0_exact_match_rate": 38.13,
-        "avg_cosine": 0.47
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 152,
-        "line0_exact_match_rate": 50.67,
-        "avg_cosine": 0.7
-      },
-      "low_context": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 162,
-        "line0_exact_match_rate": 54.18,
-        "avg_cosine": 0.77
-      },
-      "pattern_matching": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 146,
-        "line0_exact_match_rate": 48.83,
-        "avg_cosine": 0.68
-      },
-      "syntax_completion": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 128,
-        "line0_exact_match_rate": 42.67,
-        "avg_cosine": 0.64
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 163,
-        "line0_exact_match_rate": 54.33,
-        "avg_cosine": 0.73
-      },
-      "c_sharp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 129,
-        "line0_exact_match_rate": 43.0,
-        "avg_cosine": 0.65
-      },
-      "java": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 158,
-        "line0_exact_match_rate": 53.2,
-        "avg_cosine": 0.69
-      },
-      "javascript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 122,
-        "line0_exact_match_rate": 40.67,
-        "avg_cosine": 0.6
-      },
-      "python": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 133,
-        "line0_exact_match_rate": 44.63,
-        "avg_cosine": 0.68
-      },
-      "typescript": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 102,
-        "line0_exact_match_rate": 34.0,
-        "avg_cosine": 0.55
-      }
-    }
-  },
-  "DeepSeek-V3-0324": {
-    "overall": {
-      "total_comparisons": 1790,
-      "line0_exact_matches": 892,
-      "line0_exact_match_rate": 49.83,
-      "avg_cosine": 0.68
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 111,
-        "line0_exact_match_rate": 37.37,
-        "avg_cosine": 0.63
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 135,
-        "line0_exact_match_rate": 45.15,
-        "avg_cosine": 0.53
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 163,
-        "line0_exact_match_rate": 54.33,
-        "avg_cosine": 0.73
-      },
-      "low_context": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 177,
-        "line0_exact_match_rate": 59.8,
-        "avg_cosine": 0.8
-      },
-      "pattern_matching": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 170,
-        "line0_exact_match_rate": 56.86,
-        "avg_cosine": 0.75
-      },
-      "syntax_completion": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 136,
-        "line0_exact_match_rate": 45.48,
-        "avg_cosine": 0.67
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 177,
-        "line0_exact_match_rate": 59.0,
-        "avg_cosine": 0.75
-      },
-      "c_sharp": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 134,
-        "line0_exact_match_rate": 44.67,
-        "avg_cosine": 0.68
-      },
-      "java": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 184,
-        "line0_exact_match_rate": 61.54,
-        "avg_cosine": 0.76
-      },
-      "javascript": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 131,
-        "line0_exact_match_rate": 44.11,
-        "avg_cosine": 0.63
-      },
-      "python": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 147,
-        "line0_exact_match_rate": 49.33,
-        "avg_cosine": 0.71
-      },
-      "typescript": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 119,
-        "line0_exact_match_rate": 40.2,
-        "avg_cosine": 0.58
-      }
-    }
-  },
-  "gpt-35-turbo-completions": {
-    "overall": {
-      "total_comparisons": 1663,
-      "line0_exact_matches": 727,
-      "line0_exact_match_rate": 43.72,
-      "avg_cosine": 0.61
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 285,
-        "line0_exact_matches": 91,
-        "line0_exact_match_rate": 31.93,
-        "avg_cosine": 0.56
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 276,
-        "line0_exact_matches": 149,
-        "line0_exact_match_rate": 53.99,
-        "avg_cosine": 0.62
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 280,
-        "line0_exact_matches": 125,
-        "line0_exact_match_rate": 44.64,
-        "avg_cosine": 0.61
-      },
-      "low_context": {
-        "total_comparisons": 272,
-        "line0_exact_matches": 127,
-        "line0_exact_match_rate": 46.69,
-        "avg_cosine": 0.64
-      },
-      "pattern_matching": {
-        "total_comparisons": 267,
-        "line0_exact_matches": 122,
-        "line0_exact_match_rate": 45.69,
-        "avg_cosine": 0.62
-      },
-      "syntax_completion": {
-        "total_comparisons": 283,
-        "line0_exact_matches": 113,
-        "line0_exact_match_rate": 39.93,
-        "avg_cosine": 0.6
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 286,
-        "line0_exact_matches": 137,
-        "line0_exact_match_rate": 47.9,
-        "avg_cosine": 0.61
-      },
-      "c_sharp": {
-        "total_comparisons": 282,
-        "line0_exact_matches": 119,
-        "line0_exact_match_rate": 42.2,
-        "avg_cosine": 0.62
-      },
-      "java": {
-        "total_comparisons": 279,
-        "line0_exact_matches": 156,
-        "line0_exact_match_rate": 55.91,
-        "avg_cosine": 0.7
-      },
-      "javascript": {
-        "total_comparisons": 278,
-        "line0_exact_matches": 107,
-        "line0_exact_match_rate": 38.49,
-        "avg_cosine": 0.55
-      },
-      "python": {
-        "total_comparisons": 276,
-        "line0_exact_matches": 132,
-        "line0_exact_match_rate": 47.83,
-        "avg_cosine": 0.7
-      },
-      "typescript": {
-        "total_comparisons": 262,
-        "line0_exact_matches": 76,
-        "line0_exact_match_rate": 29.01,
-        "avg_cosine": 0.45
-      }
-    }
-  },
-  "gpt-4.1-mini": {
-    "overall": {
-      "total_comparisons": 1690,
-      "line0_exact_matches": 872,
-      "line0_exact_match_rate": 51.6,
-      "avg_cosine": 0.69
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 283,
-        "line0_exact_matches": 112,
-        "line0_exact_match_rate": 39.58,
-        "avg_cosine": 0.66
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 265,
-        "line0_exact_matches": 126,
-        "line0_exact_match_rate": 47.55,
-        "avg_cosine": 0.56
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 292,
-        "line0_exact_matches": 164,
-        "line0_exact_match_rate": 56.16,
-        "avg_cosine": 0.74
-      },
-      "low_context": {
-        "total_comparisons": 294,
-        "line0_exact_matches": 185,
-        "line0_exact_match_rate": 62.93,
-        "avg_cosine": 0.79
-      },
-      "pattern_matching": {
-        "total_comparisons": 272,
-        "line0_exact_matches": 152,
-        "line0_exact_match_rate": 55.88,
-        "avg_cosine": 0.74
-      },
-      "syntax_completion": {
-        "total_comparisons": 284,
-        "line0_exact_matches": 133,
-        "line0_exact_match_rate": 46.83,
-        "avg_cosine": 0.66
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 287,
-        "line0_exact_matches": 174,
-        "line0_exact_match_rate": 60.63,
-        "avg_cosine": 0.75
-      },
-      "c_sharp": {
-        "total_comparisons": 281,
-        "line0_exact_matches": 138,
-        "line0_exact_match_rate": 49.11,
-        "avg_cosine": 0.7
-      },
-      "java": {
-        "total_comparisons": 282,
-        "line0_exact_matches": 165,
-        "line0_exact_match_rate": 58.51,
-        "avg_cosine": 0.77
-      },
-      "javascript": {
-        "total_comparisons": 277,
-        "line0_exact_matches": 132,
-        "line0_exact_match_rate": 47.65,
-        "avg_cosine": 0.65
-      },
-      "python": {
-        "total_comparisons": 293,
-        "line0_exact_matches": 153,
-        "line0_exact_match_rate": 52.22,
-        "avg_cosine": 0.72
-      },
-      "typescript": {
-        "total_comparisons": 270,
-        "line0_exact_matches": 110,
-        "line0_exact_match_rate": 40.74,
-        "avg_cosine": 0.57
-      }
-    }
-  },
-  "gpt-4.1-nano": {
-    "overall": {
-      "total_comparisons": 1772,
-      "line0_exact_matches": 662,
-      "line0_exact_match_rate": 37.36,
-      "avg_cosine": 0.58
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 90,
-        "line0_exact_match_rate": 30.2,
-        "avg_cosine": 0.57
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 87,
-        "line0_exact_match_rate": 29.49,
-        "avg_cosine": 0.4
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 300,
-        "line0_exact_matches": 127,
-        "line0_exact_match_rate": 42.33,
-        "avg_cosine": 0.64
-      },
-      "low_context": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 147,
-        "line0_exact_match_rate": 49.33,
-        "avg_cosine": 0.73
-      },
-      "pattern_matching": {
-        "total_comparisons": 288,
-        "line0_exact_matches": 115,
-        "line0_exact_match_rate": 39.93,
-        "avg_cosine": 0.61
-      },
-      "syntax_completion": {
-        "total_comparisons": 293,
-        "line0_exact_matches": 96,
-        "line0_exact_match_rate": 32.76,
-        "avg_cosine": 0.55
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 145,
-        "line0_exact_match_rate": 48.49,
-        "avg_cosine": 0.64
-      },
-      "c_sharp": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 103,
-        "line0_exact_match_rate": 34.45,
-        "avg_cosine": 0.6
-      },
-      "java": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 136,
-        "line0_exact_match_rate": 45.48,
-        "avg_cosine": 0.66
-      },
-      "javascript": {
-        "total_comparisons": 290,
-        "line0_exact_matches": 90,
-        "line0_exact_match_rate": 31.03,
-        "avg_cosine": 0.52
-      },
-      "python": {
-        "total_comparisons": 298,
-        "line0_exact_matches": 106,
-        "line0_exact_match_rate": 35.57,
-        "avg_cosine": 0.59
-      },
-      "typescript": {
-        "total_comparisons": 287,
-        "line0_exact_matches": 82,
-        "line0_exact_match_rate": 28.57,
-        "avg_cosine": 0.49
-      }
-    }
-  },
-  "gpt-4.5-preview": {
-    "overall": {
-      "total_comparisons": 1735,
-      "line0_exact_matches": 922,
-      "line0_exact_match_rate": 53.14,
-      "avg_cosine": 0.71
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 128,
-        "line0_exact_match_rate": 43.1,
-        "avg_cosine": 0.68
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 251,
-        "line0_exact_matches": 132,
-        "line0_exact_match_rate": 52.59,
-        "avg_cosine": 0.61
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 299,
-        "line0_exact_matches": 174,
-        "line0_exact_match_rate": 58.19,
-        "avg_cosine": 0.74
-      },
-      "low_context": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 191,
-        "line0_exact_match_rate": 64.31,
-        "avg_cosine": 0.81
-      },
-      "pattern_matching": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 162,
-        "line0_exact_match_rate": 54.73,
-        "avg_cosine": 0.72
-      },
-      "syntax_completion": {
-        "total_comparisons": 295,
-        "line0_exact_matches": 135,
-        "line0_exact_match_rate": 45.76,
-        "avg_cosine": 0.68
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 286,
-        "line0_exact_matches": 189,
-        "line0_exact_match_rate": 66.08,
-        "avg_cosine": 0.79
-      },
-      "c_sharp": {
-        "total_comparisons": 297,
-        "line0_exact_matches": 145,
-        "line0_exact_match_rate": 48.82,
-        "avg_cosine": 0.71
-      },
-      "java": {
-        "total_comparisons": 290,
-        "line0_exact_matches": 179,
-        "line0_exact_match_rate": 61.72,
-        "avg_cosine": 0.79
-      },
-      "javascript": {
-        "total_comparisons": 289,
-        "line0_exact_matches": 138,
-        "line0_exact_match_rate": 47.75,
-        "avg_cosine": 0.65
-      },
-      "python": {
-        "total_comparisons": 296,
-        "line0_exact_matches": 156,
-        "line0_exact_match_rate": 52.7,
-        "avg_cosine": 0.71
-      },
-      "typescript": {
-        "total_comparisons": 277,
-        "line0_exact_matches": 115,
-        "line0_exact_match_rate": 41.52,
-        "avg_cosine": 0.61
-      }
-    }
-  },
   "gpt-4o-mini": {
     "overall": {
-      "total_comparisons": 1797,
+      "total_comparisons": 1800,
       "line0_exact_matches": 801,
-      "line0_exact_match_rate": 44.57,
+      "line0_exact_match_rate": 44.5,
       "avg_cosine": 0.63
     },
     "categories": {
       "api_usage": {
-        "total_comparisons": 299,
+        "total_comparisons": 300,
         "line0_exact_matches": 113,
-        "line0_exact_match_rate": 37.79,
+        "line0_exact_match_rate": 37.67,
         "avg_cosine": 0.62
       },
       "code2NL_NL2code": {
@@ -788,15 +620,15 @@
         "avg_cosine": 0.78
       },
       "pattern_matching": {
-        "total_comparisons": 299,
+        "total_comparisons": 300,
         "line0_exact_matches": 140,
-        "line0_exact_match_rate": 46.82,
+        "line0_exact_match_rate": 46.67,
         "avg_cosine": 0.64
       },
       "syntax_completion": {
-        "total_comparisons": 299,
+        "total_comparisons": 300,
         "line0_exact_matches": 114,
-        "line0_exact_match_rate": 38.13,
+        "line0_exact_match_rate": 38.0,
         "avg_cosine": 0.59
       }
     },
@@ -832,32 +664,32 @@
         "avg_cosine": 0.64
       },
       "typescript": {
-        "total_comparisons": 297,
+        "total_comparisons": 300,
         "line0_exact_matches": 91,
-        "line0_exact_match_rate": 30.64,
-        "avg_cosine": 0.51
+        "line0_exact_match_rate": 30.33,
+        "avg_cosine": 0.5
       }
     }
   },
   "gpt-4o": {
     "overall": {
-      "total_comparisons": 1798,
+      "total_comparisons": 1800,
       "line0_exact_matches": 927,
-      "line0_exact_match_rate": 51.56,
+      "line0_exact_match_rate": 51.5,
       "avg_cosine": 0.68
     },
     "categories": {
       "api_usage": {
-        "total_comparisons": 299,
+        "total_comparisons": 300,
         "line0_exact_matches": 130,
-        "line0_exact_match_rate": 43.48,
+        "line0_exact_match_rate": 43.33,
         "avg_cosine": 0.68
       },
       "code2NL_NL2code": {
-        "total_comparisons": 299,
+        "total_comparisons": 300,
         "line0_exact_matches": 131,
-        "line0_exact_match_rate": 43.81,
-        "avg_cosine": 0.51
+        "line0_exact_match_rate": 43.67,
+        "avg_cosine": 0.5
       },
       "code_purpose_understanding": {
         "total_comparisons": 300,
@@ -898,15 +730,15 @@
         "avg_cosine": 0.69
       },
       "java": {
-        "total_comparisons": 299,
+        "total_comparisons": 300,
         "line0_exact_matches": 187,
-        "line0_exact_match_rate": 62.54,
+        "line0_exact_match_rate": 62.33,
         "avg_cosine": 0.76
       },
       "javascript": {
-        "total_comparisons": 299,
+        "total_comparisons": 300,
         "line0_exact_matches": 143,
-        "line0_exact_match_rate": 47.83,
+        "line0_exact_match_rate": 47.67,
         "avg_cosine": 0.63
       },
       "python": {
@@ -1007,255 +839,87 @@
       }
     }
   },
-  "o1-mini": {
-    "overall": {
-      "total_comparisons": 73,
-      "line0_exact_matches": 48,
-      "line0_exact_match_rate": 65.75,
-      "avg_cosine": 0.84
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 15,
-        "line0_exact_matches": 9,
-        "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.84
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 8,
-        "line0_exact_matches": 6,
-        "line0_exact_match_rate": 75.0,
-        "avg_cosine": 0.86
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 10,
-        "line0_exact_matches": 6,
-        "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.82
-      },
-      "low_context": {
-        "total_comparisons": 28,
-        "line0_exact_matches": 19,
-        "line0_exact_match_rate": 67.86,
-        "avg_cosine": 0.88
-      },
-      "syntax_completion": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 5,
-        "line0_exact_match_rate": 71.43,
-        "avg_cosine": 0.83
-      },
-      "pattern_matching": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 3,
-        "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.6
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 18,
-        "line0_exact_matches": 16,
-        "line0_exact_match_rate": 88.89,
-        "avg_cosine": 0.99
-      },
-      "c_sharp": {
-        "total_comparisons": 11,
-        "line0_exact_matches": 7,
-        "line0_exact_match_rate": 63.64,
-        "avg_cosine": 0.72
-      },
-      "java": {
-        "total_comparisons": 15,
-        "line0_exact_matches": 12,
-        "line0_exact_match_rate": 80.0,
-        "avg_cosine": 0.84
-      },
-      "javascript": {
-        "total_comparisons": 4,
-        "line0_exact_matches": 3,
-        "line0_exact_match_rate": 75.0,
-        "avg_cosine": 0.75
-      },
-      "python": {
-        "total_comparisons": 15,
-        "line0_exact_matches": 9,
-        "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.9
-      },
-      "typescript": {
-        "total_comparisons": 10,
-        "line0_exact_matches": 1,
-        "line0_exact_match_rate": 10.0,
-        "avg_cosine": 0.62
-      }
-    }
-  },
-  "o1-preview": {
-    "overall": {
-      "total_comparisons": 79,
-      "line0_exact_matches": 58,
-      "line0_exact_match_rate": 73.42,
-      "avg_cosine": 0.89
-    },
-    "categories": {
-      "api_usage": {
-        "total_comparisons": 11,
-        "line0_exact_matches": 7,
-        "line0_exact_match_rate": 63.64,
-        "avg_cosine": 0.88
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 5,
-        "line0_exact_match_rate": 71.43,
-        "avg_cosine": 0.81
-      },
-      "code_purpose_understanding": {
-        "total_comparisons": 15,
-        "line0_exact_matches": 9,
-        "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.78
-      },
-      "low_context": {
-        "total_comparisons": 34,
-        "line0_exact_matches": 27,
-        "line0_exact_match_rate": 79.41,
-        "avg_cosine": 0.93
-      },
-      "pattern_matching": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 7,
-        "line0_exact_match_rate": 100.0,
-        "avg_cosine": 1.0
-      },
-      "syntax_completion": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 3,
-        "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.95
-      }
-    },
-    "languages": {
-      "cpp": {
-        "total_comparisons": 15,
-        "line0_exact_matches": 11,
-        "line0_exact_match_rate": 73.33,
-        "avg_cosine": 0.9
-      },
-      "c_sharp": {
-        "total_comparisons": 7,
-        "line0_exact_matches": 4,
-        "line0_exact_match_rate": 57.14,
-        "avg_cosine": 0.93
-      },
-      "java": {
-        "total_comparisons": 20,
-        "line0_exact_matches": 16,
-        "line0_exact_match_rate": 80.0,
-        "avg_cosine": 0.92
-      },
-      "javascript": {
-        "total_comparisons": 5,
-        "line0_exact_matches": 3,
-        "line0_exact_match_rate": 60.0,
-        "avg_cosine": 0.82
-      },
-      "python": {
-        "total_comparisons": 28,
-        "line0_exact_matches": 20,
-        "line0_exact_match_rate": 71.43,
-        "avg_cosine": 0.86
-      },
-      "typescript": {
-        "total_comparisons": 4,
-        "line0_exact_matches": 4,
-        "line0_exact_match_rate": 100.0,
-        "avg_cosine": 1.0
-      }
-    }
-  },
   "o3-mini": {
     "overall": {
-      "total_comparisons": 1586,
+      "total_comparisons": 1800,
       "line0_exact_matches": 733,
-      "line0_exact_match_rate": 46.22,
-      "avg_cosine": 0.67
+      "line0_exact_match_rate": 40.72,
+      "avg_cosine": 0.59
     },
     "categories": {
       "api_usage": {
-        "total_comparisons": 277,
+        "total_comparisons": 300,
         "line0_exact_matches": 103,
-        "line0_exact_match_rate": 37.18,
-        "avg_cosine": 0.63
-      },
-      "code2NL_NL2code": {
-        "total_comparisons": 219,
-        "line0_exact_matches": 104,
-        "line0_exact_match_rate": 47.49,
+        "line0_exact_match_rate": 34.33,
         "avg_cosine": 0.58
       },
+      "code2NL_NL2code": {
+        "total_comparisons": 300,
+        "line0_exact_matches": 104,
+        "line0_exact_match_rate": 34.67,
+        "avg_cosine": 0.43
+      },
       "code_purpose_understanding": {
-        "total_comparisons": 286,
+        "total_comparisons": 300,
         "line0_exact_matches": 142,
-        "line0_exact_match_rate": 49.65,
-        "avg_cosine": 0.7
+        "line0_exact_match_rate": 47.33,
+        "avg_cosine": 0.67
       },
       "low_context": {
-        "total_comparisons": 276,
+        "total_comparisons": 300,
         "line0_exact_matches": 167,
-        "line0_exact_match_rate": 60.51,
-        "avg_cosine": 0.8
+        "line0_exact_match_rate": 55.67,
+        "avg_cosine": 0.74
       },
       "pattern_matching": {
-        "total_comparisons": 258,
+        "total_comparisons": 300,
         "line0_exact_matches": 114,
-        "line0_exact_match_rate": 44.19,
-        "avg_cosine": 0.64
+        "line0_exact_match_rate": 38.0,
+        "avg_cosine": 0.55
       },
       "syntax_completion": {
-        "total_comparisons": 270,
+        "total_comparisons": 300,
         "line0_exact_matches": 103,
-        "line0_exact_match_rate": 38.15,
-        "avg_cosine": 0.62
+        "line0_exact_match_rate": 34.33,
+        "avg_cosine": 0.56
       }
     },
     "languages": {
       "cpp": {
-        "total_comparisons": 265,
+        "total_comparisons": 300,
         "line0_exact_matches": 164,
-        "line0_exact_match_rate": 61.89,
-        "avg_cosine": 0.78
+        "line0_exact_match_rate": 54.67,
+        "avg_cosine": 0.69
       },
       "c_sharp": {
-        "total_comparisons": 262,
+        "total_comparisons": 300,
         "line0_exact_matches": 109,
-        "line0_exact_match_rate": 41.6,
-        "avg_cosine": 0.67
+        "line0_exact_match_rate": 36.33,
+        "avg_cosine": 0.59
       },
       "java": {
-        "total_comparisons": 260,
+        "total_comparisons": 300,
         "line0_exact_matches": 146,
-        "line0_exact_match_rate": 56.15,
-        "avg_cosine": 0.74
+        "line0_exact_match_rate": 48.67,
+        "avg_cosine": 0.64
       },
       "javascript": {
-        "total_comparisons": 268,
+        "total_comparisons": 300,
         "line0_exact_matches": 105,
-        "line0_exact_match_rate": 39.18,
-        "avg_cosine": 0.6
+        "line0_exact_match_rate": 35.0,
+        "avg_cosine": 0.53
       },
       "python": {
-        "total_comparisons": 288,
+        "total_comparisons": 300,
         "line0_exact_matches": 131,
-        "line0_exact_match_rate": 45.49,
-        "avg_cosine": 0.65
+        "line0_exact_match_rate": 43.67,
+        "avg_cosine": 0.62
       },
       "typescript": {
-        "total_comparisons": 243,
+        "total_comparisons": 300,
         "line0_exact_matches": 78,
-        "line0_exact_match_rate": 32.1,
-        "avg_cosine": 0.55
+        "line0_exact_match_rate": 26.0,
+        "avg_cosine": 0.45
       }
     }
   }

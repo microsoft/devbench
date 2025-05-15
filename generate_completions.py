@@ -38,21 +38,11 @@ print(f"Using output directory: {OUTPUT_DIR}")
 print(f"Using temperature: {TEMPERATURE}")
 
 # Hardcoded Azure OpenAI Endpoint and API Key
-ENDPOINT = "https://github-research-aoai-eastus2.openai.azure.com/"
-
-O1MINI_ENDPOINT = "https://deepprompteastus.openai.azure.com/"  # Remove the deployment path
-O1MINI_DEPLOYMENT = "deepprompt-o1-mini-2024-09-12-global"  # Add deployment name as separate variable
-O1MINI_MODEL = "o1-mini"
-O1MINI_API_VERSION = "2025-01-01-preview"  # Add API version
-
-# Update the O1PREVIEW_ENDPOINT to use the base URL without the deployment path
-O1PREVIEW_ENDPOINT = "https://deepprompteastus.openai.azure.com/"
-O1PREVIEW_DEPLOYMENT = "deepprompt-o1-preview"  # Add deployment name as separate variable
-O1PREVIEW_API_VERSION = "2025-01-01-preview"  # Add API version
+ENDPOINT = "[ANONYMIZED-ENDPOINT-1]"
 
 # o3-mini endpoint and deployment details
-O3MINI_ENDPOINT = "https://deepprompteastus.openai.azure.com"  # Remove the deployment path from endpoint
-O3MINI_DEPLOYMENT = "deepprompt-o3-mini-2025-01-31"  # The deployment name to use in API calls
+O3MINI_ENDPOINT = "[ANONYMIZED-ENDPOINT-2]"  # Remove the deployment path from endpoint
+O3MINI_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-3]"  # The deployment name to use in API calls
 O3MINI_API_VERSION = "2024-12-01-preview"
 
 # Add Claude API configuration
@@ -63,15 +53,13 @@ CLAUDE_35_MODEL = "claude-3-5-sonnet-20240620"
 CLAUDE_37_MODEL = "claude-3-7-sonnet-20250219"
 
 # Define model types
-MODEL_TYPE_O1MINI = "o1mini"
-MODEL_TYPE_O1PREVIEW = "o1preview"
 MODEL_TYPE_O3MINI = "o3mini"
 MODEL_TYPE_CLAUDE_35 = "claude_35_sonnet"
 MODEL_TYPE_CLAUDE_37 = "claude_37_sonnet"
 
 # Add GPT-4o mini endpoint and model details
-GPT4OMINI_ENDPOINT = "https://deepprompteastus.openai.azure.com/"
-GPT4OMINI_DEPLOYMENT = "deepprompt-gpt-4o-mini-2024-07-18"
+GPT4OMINI_ENDPOINT = "[ANONYMIZED-ENDPOINT-2]"
+GPT4OMINI_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-4]"
 GPT4OMINI_MODEL = "gpt-4o-mini"
 GPT4OMINI_API_VERSION = "2025-01-01-preview"
 
@@ -82,7 +70,7 @@ MODEL_TYPE_GPT4OMINI = "gpt4o_mini"
 GPT4OMINI_API_KEY = os.getenv("GPT4OMINI_API_KEY")
 
 # Add DeepSeek R1 endpoint and model details
-DEEPSEEK_R1_ENDPOINT = "https://DeepSeek-R1-xrkdn.eastus.models.ai.azure.com"
+DEEPSEEK_R1_ENDPOINT = "[ANONYMIZED-ENDPOINT-3]"
 DEEPSEEK_R1_MODEL = "DeepSeek-R1"
 
 # Add model type for DeepSeek R1
@@ -91,20 +79,8 @@ MODEL_TYPE_DEEPSEEK_R1 = "deepseek_r1"
 # Add API key environment variable
 DEEPSEEK_R1_API_KEY = os.getenv("DEEPSEEK_R1_API_KEY")
 
-# Add GPT-4.5 endpoint and model details
-GPT45_ENDPOINT = "https://DeepPromptEastUS2.openai.azure.com/"
-GPT45_DEPLOYMENT = "gpt-4.5-preview"
-GPT45_MODEL = "gpt-4.5-preview"
-GPT45_API_VERSION = "2024-12-01-preview"
-
-# Add model type for GPT-4.5
-MODEL_TYPE_GPT45 = "gpt45_preview"
-
-# Add API key environment variable
-GPT45_API_KEY = os.getenv("GPT45_API_KEY")
-
 # Add Ministral-3B endpoint and model details
-MINISTRAL_ENDPOINT = "https://Ministral-3B-udnwz.eastus.models.ai.azure.com"
+MINISTRAL_ENDPOINT = "[ANONYMIZED-ENDPOINT-5]"
 MINISTRAL_MODEL = "Ministral-3B"
 
 # Add model type for Ministral-3B
@@ -114,7 +90,7 @@ MODEL_TYPE_MINISTRAL = "ministral_3b"
 MINISTRAL_API_KEY = os.getenv("MINISTRAL_API_KEY")
 
 # Add DeepSeek V3 endpoint and model details
-DEEPSEEK_V3_ENDPOINT = "https://DeepSeek-V3-0324-emzev.eastus.models.ai.azure.com"
+DEEPSEEK_V3_ENDPOINT = "[ANONYMIZED-ENDPOINT-6]"
 DEEPSEEK_V3_MODEL = "DeepSeek-V3-0324"
 
 # Add model type for DeepSeek V3
@@ -123,16 +99,8 @@ MODEL_TYPE_DEEPSEEK_V3 = "deepseek_v3"
 # Add API key environment variable
 DEEPSEEK_V3_API_KEY = os.getenv("DEEPSEEK_V3_API_KEY")
 
-# Add GPT-3.5 Turbo Completions (Instruct) endpoint and model details
-GPT35TURBO_COMPLETIONS_ENDPOINT = "https://deeppromptnorthcentralus.openai.azure.com/"
-GPT35TURBO_COMPLETIONS_DEPLOYMENT = "deepprompt-gpt-35-turbo-0125"
-GPT35TURBO_COMPLETIONS_API_VERSION = "2023-09-15-preview"
-
-# Add model type for GPT-3.5 Turbo Completions
-MODEL_TYPE_GPT35TURBO_COMPLETIONS = "gpt35_turbo_completions"
-
 # Add GPT-4.1 mini endpoint and model details
-GPT41MINI_ENDPOINT = "https://ai-copilotevals.openai.azure.com/"
+GPT41MINI_ENDPOINT = "[ANONYMIZED-ENDPOINT-8]"
 GPT41MINI_DEPLOYMENT = "gpt-4.1-mini"
 GPT41MINI_MODEL = "gpt-4.1-mini"
 GPT41MINI_API_VERSION = "2025-01-01-preview"
@@ -141,7 +109,7 @@ GPT41MINI_API_VERSION = "2025-01-01-preview"
 MODEL_TYPE_GPT41MINI = "gpt41_mini"
 
 # Add GPT-4.1 nano endpoint and model details
-GPT41NANO_ENDPOINT = "https://ai-copilotevals.openai.azure.com/"
+GPT41NANO_ENDPOINT = "[ANONYMIZED-ENDPOINT-8]"
 GPT41NANO_DEPLOYMENT = "gpt-4.1-nano"
 GPT41NANO_MODEL = "gpt-4.1-nano"
 GPT41NANO_API_VERSION = "2025-01-01-preview"
@@ -150,8 +118,8 @@ GPT41NANO_API_VERSION = "2025-01-01-preview"
 MODEL_TYPE_GPT41NANO = "gpt41_nano"
 
 # Add GPT-4o endpoint and model details
-GPT4O_ENDPOINT = "https://deeppromptswedencentral.openai.azure.com/"
-GPT4O_DEPLOYMENT = "deepprompt-gpt-4o-2024-05-13"
+GPT4O_ENDPOINT = "[ANONYMIZED-ENDPOINT-9]"
+GPT4O_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-6]"
 GPT4O_MODEL = "gpt-4o"
 GPT4O_API_VERSION = "2025-01-01-preview"
 
@@ -163,15 +131,11 @@ GPT4O_API_KEY = os.getenv("GPT4O_API_KEY")
 
 # Add to DEPLOYMENTS list
 DEPLOYMENTS = [
-    {"name": "o1-mini", "type": MODEL_TYPE_O1MINI},
-    {"name": "o1-preview", "type": MODEL_TYPE_O1PREVIEW},
     {"name": "o3-mini", "type": MODEL_TYPE_O3MINI},
     {"name": "claude-3-5-sonnet", "type": MODEL_TYPE_CLAUDE_35},
     {"name": "claude-3-7-sonnet", "type": MODEL_TYPE_CLAUDE_37},
     {"name": "gpt-4o-mini", "type": MODEL_TYPE_GPT4OMINI},
-    {"name": "gpt-35-turbo-completions", "type": MODEL_TYPE_GPT35TURBO_COMPLETIONS},
     {"name": "DeepSeek-R1", "type": MODEL_TYPE_DEEPSEEK_R1},
-    {"name": "gpt-4.5-preview", "type": MODEL_TYPE_GPT45},
     {"name": "Ministral-3B", "type": MODEL_TYPE_MINISTRAL},
     {"name": "DeepSeek-V3-0324", "type": MODEL_TYPE_DEEPSEEK_V3},
     {"name": "gpt-4.1-mini", "type": MODEL_TYPE_GPT41MINI},
@@ -210,8 +174,6 @@ languages = [
 
 
 API_KEY = os.getenv("COMPLETIONS_API_KEY")
-O1MINI_API_KEY = os.getenv("O1MINI_API_KEY")  # Add API key for o1-mini
-O1PREVIEW_API_KEY = os.getenv("O1PREVIEW_API_KEY")  # Add API key for o1-preview
 O3MINI_API_KEY = os.getenv("O3MINI_API_KEY")  # Add API key for o3-mini
 
 # Initialize GPT-4.1 mini client with Azure AD authentication
@@ -225,20 +187,6 @@ client = AzureOpenAI(
     azure_endpoint=ENDPOINT,
     api_key=API_KEY,
     api_version="2024-12-01-preview",
-)
-
-# Initialize o1-mini client
-o1mini_client = AzureOpenAI(
-    azure_endpoint=O1MINI_ENDPOINT,
-    azure_ad_token_provider=token_provider,
-    api_version=O1MINI_API_VERSION,
-)
-
-# Update the o1-preview client initialization to use AzureOpenAI with token-based auth
-o1preview_client = AzureOpenAI(
-    azure_endpoint=O1PREVIEW_ENDPOINT,
-    azure_ad_token_provider=token_provider,
-    api_version=O1PREVIEW_API_VERSION,
 )
 
 # Initialize o3-mini client (using standard AzureOpenAI client)
@@ -264,13 +212,6 @@ gpt4omini_client = AzureOpenAI(
 deepseek_r1_client = ChatCompletionsClient(
     endpoint=DEEPSEEK_R1_ENDPOINT,
     credential=AzureKeyCredential(DEEPSEEK_R1_API_KEY),
-)
-
-# Initialize GPT-4.5 client
-gpt45_client = AzureOpenAI(
-    api_version=GPT45_API_VERSION,
-    azure_endpoint=GPT45_ENDPOINT,
-    api_key=GPT45_API_KEY,
 )
 
 # Initialize Ministral-3B client
@@ -503,15 +444,7 @@ def call_inference_model(prefix, suffix, deployment_info):
     deployment_name = deployment_info["name"]
     
     # Select appropriate client and model based on deployment type
-    if deployment_type == MODEL_TYPE_O1MINI:
-        client = o1mini_client
-        model_name = O1MINI_DEPLOYMENT
-        use_chat_api = True
-    elif deployment_type == MODEL_TYPE_O1PREVIEW:
-        client = o1preview_client
-        model_name = O1PREVIEW_DEPLOYMENT
-        use_chat_api = True
-    elif deployment_type == MODEL_TYPE_DEEPSEEK_R1:
+    if deployment_type == MODEL_TYPE_DEEPSEEK_R1:
         client = deepseek_r1_client
         model_name = DEEPSEEK_R1_MODEL
         use_chat_api = False
@@ -531,44 +464,13 @@ def call_inference_model(prefix, suffix, deployment_info):
         messages = get_prompt_template(prefix, suffix)
         
         if use_chat_api:
-            # For AzureOpenAI client (o1-preview and o1-mini)
-            # Convert system message to user message for models that don't support system role
-            if deployment_type in [MODEL_TYPE_O1PREVIEW, MODEL_TYPE_O1MINI]:
-                modified_messages = []
-                system_content = ""
-                
-                # Extract system content and convert to a prefix for the user message
-                for msg in messages:
-                    if msg["role"] == "system":
-                        system_content = msg["content"]
-                    else:
-                        # If there was a system message, prepend it to the user message
-                        if system_content and msg["role"] == "user":
-                            modified_messages.append({
-                                "role": "user",
-                                "content": f"{system_content}\n\n{msg['content']}"
-                            })
-                        else:
-                            modified_messages.append(msg)
-                
-                messages = modified_messages if modified_messages else messages
-                
-                # Use max_completion_tokens instead of max_tokens
-                completion = client.chat.completions.create(
-                    model=model_name,
-                    messages=messages,
-                    max_completion_tokens=800,
-                    stream=False
-                )
-            else:
-                # For other models that use the chat API but accept max_tokens
-                completion = client.chat.completions.create(
-                    model=model_name,
-                    messages=messages,
-                    max_tokens=800,
-                    temperature=TEMPERATURE,
-                    stream=False
-                )
+            completion = client.chat.completions.create(
+                model=model_name,
+                messages=messages,
+                max_tokens=800,
+                temperature=TEMPERATURE,
+                stream=False
+            )
             
             return completion.choices[0].message.content
         else:
@@ -582,7 +484,7 @@ def call_inference_model(prefix, suffix, deployment_info):
                     sdk_messages.append(UserMessage(content=msg["content"]))
             
             # Model-specific API calls
-            if deployment_type in [MODEL_TYPE_O1MINI, MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3]:
+            if deployment_type in [MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3]:
                 max_retries = 3 if deployment_type in [MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3] else 1
                 retry_count = 0
                 
@@ -677,46 +579,6 @@ def call_claude(prefix, suffix, deployment_info):
         return f"Error: API request failed - {str(e)}"
 
 
-# Function to call GPT-3.5 Turbo using Completions API with suffix mode
-def call_gpt35turbo_completions(prefix, suffix, deployment_info):
-    """
-    Call GPT-3.5 Turbo using the Completions API with suffix mode enabled.
-    
-    Args:
-        prefix: The code prefix
-        suffix: The code suffix
-        deployment_info: Dictionary containing model name and type
-    
-    Returns:
-        Model completion as string
-    """
-    try:
-        # Create AzureOpenAI client with token-based auth
-        client = AzureOpenAI(
-            azure_endpoint=GPT35TURBO_COMPLETIONS_ENDPOINT,
-            azure_ad_token_provider=token_provider,
-            api_version=GPT35TURBO_COMPLETIONS_API_VERSION,
-        )
-        
-        # For completions API we still need to use the prefix/suffix format
-        modified_prompt = f"{prefix}#TODO: You Code Here"
-        
-        # Use client to make the API call with suffix mode
-        response = client.completions.create(
-            model=GPT35TURBO_COMPLETIONS_DEPLOYMENT,
-            prompt=modified_prompt,
-            suffix=suffix,
-            temperature=TEMPERATURE,
-            max_tokens=800,
-            stop="<|endoftext|>",
-        )
-        
-        return response.choices[0].text.strip()
-            
-    except Exception as e:
-        print(f"Error calling GPT-3.5 Turbo Completions endpoint: {str(e)}")
-        return f"Error: API request failed - {str(e)}"
-
 # Updated function to route to appropriate API based on model type
 def call_endpoint(prefix, suffix, deployment_info):
     # Extract deployment name and type
@@ -724,7 +586,7 @@ def call_endpoint(prefix, suffix, deployment_info):
     deployment_type = deployment_info["type"]
     
     # Call appropriate endpoint based on model type
-    if deployment_type in [MODEL_TYPE_O1MINI, MODEL_TYPE_O1PREVIEW, MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3, MODEL_TYPE_MINISTRAL]:
+    if deployment_type in [MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3, MODEL_TYPE_MINISTRAL]:
         return call_inference_model(prefix, suffix, deployment_info)
     elif deployment_type == MODEL_TYPE_O3MINI:
         try:
@@ -745,17 +607,13 @@ def call_endpoint(prefix, suffix, deployment_info):
             return f"Error: API request failed - {str(e)}"
     elif deployment_type in [MODEL_TYPE_CLAUDE_35, MODEL_TYPE_CLAUDE_37]:
         return call_claude(prefix, suffix, deployment_info)
-    elif deployment_type in [MODEL_TYPE_GPT4OMINI, MODEL_TYPE_GPT45, MODEL_TYPE_GPT4O]:
+    elif deployment_type in [MODEL_TYPE_GPT4OMINI, MODEL_TYPE_GPT4O]:
         try:
             # Use new message format for chat models
             messages = get_prompt_template(prefix, suffix)
             
             # Different parameter name for tokens depending on the model
-            if deployment_type == MODEL_TYPE_GPT45:
-                token_param = {"max_completion_tokens": 800}
-                client_to_use = gpt45_client
-                model_deployment = GPT45_DEPLOYMENT
-            elif deployment_type == MODEL_TYPE_GPT4OMINI:
+            if deployment_type == MODEL_TYPE_GPT4OMINI:
                 token_param = {"max_tokens": 800}
                 client_to_use = gpt4omini_client
                 model_deployment = GPT4OMINI_DEPLOYMENT
@@ -779,8 +637,6 @@ def call_endpoint(prefix, suffix, deployment_info):
         except Exception as e:
             print(f"Error calling {deployment_name} endpoint: {str(e)}")
             return f"Error: API request failed - {str(e)}"
-    elif deployment_type == MODEL_TYPE_GPT35TURBO_COMPLETIONS:
-        return call_gpt35turbo_completions(prefix, suffix, deployment_info)
     elif deployment_type == MODEL_TYPE_GPT41MINI:
         try:
             # Use new message format for chat models
@@ -924,7 +780,6 @@ def validate_completions():
             
         # Extract deployment name more carefully from filename
         base_filename = os.path.basename(file_path)
-        # Format is typically like: "code_purpose_understanding-o1-mini.jsonl"
         # We need to find the model name part after the first hyphen
         if '-' in base_filename:
             # Get everything after the first hyphen but before the .jsonl extension

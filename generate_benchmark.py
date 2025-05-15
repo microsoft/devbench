@@ -1,5 +1,3 @@
-# Note: Before using this code, log in to Azure using the Azure CLI and set the subscription to the one you want to use.
-
 import os
 import base64
 from openai import AzureOpenAI  
@@ -1022,8 +1020,9 @@ def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="comp
     return results
 
 def main():
-    endpoint = os.getenv("ENDPOINT_URL", "https://deeppromptnorthcentralus.openai.azure.com/")  
-    deployment = os.getenv("DEPLOYMENT_NAME", "deepprompt-gpt-4o-2024-05-13")  
+    # Using GPT-4o to generate the benchmark test cases
+    endpoint = os.getenv("ENDPOINT_URL", "[ANONYMIZED-ENDPOINT-1]")  
+    deployment = os.getenv("DEPLOYMENT_NAME", "[ANONYMIZED-DEPLOYMENT-1]")  
 
     # Initialize Azure OpenAI Service client with Entra ID authentication
     token_provider = get_bearer_token_provider(  
