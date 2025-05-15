@@ -14,6 +14,8 @@ from collections import defaultdict
 from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib
+import seaborn as sns
+from matplotlib.colors import LinearSegmentedColormap
 
 matplotlib.rcParams['font.family'] = 'sans-serif'
 matplotlib.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sans']
@@ -132,7 +134,9 @@ def find_all_models(completions_dir: str, include_baseline: bool = False) -> Lis
     
     return list(models)
 
-def display_score_summary(results_dir: str, specific_model=None, generate_plot=False, filter_language=None, filter_category=None):
+def display_score_summary(results_dir: str, specific_model=None, generate_plot=False, 
+                       filter_language=None, filter_category=None, generate_heatmap=False,
+                       models_for_heatmap=None):
     """
     Display a summary of single model evaluation scores
     
@@ -142,6 +146,8 @@ def display_score_summary(results_dir: str, specific_model=None, generate_plot=F
         generate_plot: Whether to generate a comparison plot
         filter_language: Optional - if provided, generate a plot for just this language
         filter_category: Optional - if provided, generate a plot for just this category
+        generate_heatmap: Whether to generate language-category heatmaps
+        models_for_heatmap: Optional list of models to include in the heatmap
     """
     print("\n\n" + "="*80)
     print("EVALUATION SUMMARY")
@@ -151,7 +157,7 @@ def display_score_summary(results_dir: str, specific_model=None, generate_plot=F
     summary = generate_single_model_summary(results_dir)
     
     # Filter for specific model if requested
-    if specific_model and specific_model in summary:
+    if specific_model and specific_model != 'all' and specific_model in summary:
         summary = {specific_model: summary[specific_model]}
     
     # Display single model evaluation scores
@@ -220,7 +226,7 @@ def display_score_summary(results_dir: str, specific_model=None, generate_plot=F
             print(f"\nDetailed results available in: {results_dir}/{model_name}_detailed_results/")
             
         # Generate plot if requested - allow even with a single model
-        if generate_plot and len(summary) > 0:  # Changed from > 1 to > 0
+        if generate_plot and len(summary) > 0:
             # Determine output path with appropriate suffix
             if filter_language:
                 plot_path = os.path.join(results_dir, f"model_comparison_plot_{filter_language}.png")
@@ -236,6 +242,14 @@ def display_score_summary(results_dir: str, specific_model=None, generate_plot=F
                 filter_category=filter_category
             )
             print(f"Plot generated and saved to: {plot_path}")
+            
+        # Generate language-category heatmaps if requested
+        if generate_heatmap:
+            create_language_category_heatmap(
+                summary,
+                results_dir,
+                models_to_include=models_for_heatmap
+            )
             
     else:
         print("No evaluation results found.")
@@ -804,6 +818,183 @@ def create_model_comparison_plot(summary_data, output_path=None, filter_language
     # Return the figure object
     return plt.gcf()
 
+def create_language_category_heatmap(summary_data, output_dir, models_to_include=None):
+    """
+    Create heatmaps that compare scores across languages and categories for each model.
+    
+    Args:
+        summary_data: Dictionary containing model summary data
+        output_dir: Directory to save the heatmap images
+        models_to_include: Optional list of specific models to include, if None, include all
+    """
+    # Define standard language and category order for consistent visualization
+    # Languages in columns (left to right)
+    language_order = ['python', 'javascript', 'typescript', 'java', 'cpp', 'c_sharp']
+    
+    # Categories in rows (top to bottom)
+    category_order = [
+        'api_usage', 
+        'code2NL_NL2code', 
+        'code_purpose_understanding', 
+        'low_context', 
+        'pattern_matching', 
+        'syntax_completion'
+    ]
+    
+    # Display names for languages and categories
+    language_display = {
+        'python': 'Python',
+        'javascript': 'Javascript',
+        'typescript': 'Typescript',
+        'java': 'Java',
+        'cpp': 'Cpp',
+        'c_sharp': 'C_sharp'
+    }
+    
+    category_display = {
+        'api_usage': 'API Usage',
+        'code2NL_NL2code': 'Code2NL/NL2Code',
+        'code_purpose_understanding': 'Code Purpose',
+        'low_context': 'Low Context',
+        'pattern_matching': 'Pattern Matching',
+        'syntax_completion': 'Syntax Completion'
+    }
+    
+    # Create a custom colormap that better matches the reference image
+    # More orange/yellow for lower values, less intense red for higher values
+    custom_cmap = LinearSegmentedColormap.from_list('custom_orange', [
+        '#FFF0A0',  # Light yellow
+        '#FFDA75',  # Yellow
+        '#FFB347',  # Medium orange
+        '#FF8E47',  # Darker orange
+        '#FF5D3D',  # Orange-red
+        '#E5451F',  # Dark orange-red
+    ])
+    
+    # Filter models if specified
+    if models_to_include:
+        filtered_data = {k: v for k, v in summary_data.items() if k in models_to_include}
+    else:
+        filtered_data = summary_data
+    
+    # Skip individual model heatmaps and only create the combined heatmap
+    
+    # If we have multiple models, create a combined figure with all heatmaps stacked
+    if len(filtered_data) > 0:  # Changed from > 1 to > 0 to always generate the combined heatmap
+        # Sort models by overall score
+        sorted_models = sorted(
+            filtered_data.items(),
+            key=lambda x: x[1]['overall']['score'] if 'overall' in x[1] else 0,
+            reverse=True
+        )
+        
+        # Number of models to show
+        n_models = len(sorted_models)
+        
+        # Create a larger figure to accommodate all models
+        fig, axes = plt.subplots(
+            n_models, 1, 
+            figsize=(12, 6*n_models), 
+            gridspec_kw={'hspace': 0.3}
+        )
+        
+        # If we only have one model, axes won't be an array
+        if n_models == 1:
+            axes = [axes]
+        
+        # Create heatmap for each model
+        for i, (model_name, model_data) in enumerate(sorted_models):
+            # Create a clean model display name
+            model_display_name = get_display_name(model_name)
+            
+            # Get the axis for this model
+            ax = axes[i]
+            
+            # Initialize data matrix for the heatmap
+            data_matrix = np.zeros((len(category_order), len(language_order)))
+            data_matrix.fill(np.nan)  # Fill with NaN for cells without data
+            
+            # Collect all scores for this model by language and category
+            language_category_scores = {}
+            
+            # Look for detailed result files that match language_category_model patterns
+            result_files = glob.glob(f"{output_dir}/*_{model_name}_single_evaluation.json")
+            for file_path in result_files:
+                filename = os.path.basename(file_path)
+                parts = filename.split('_')
+                
+                if len(parts) < 3:
+                    continue
+                    
+                language = parts[0].lower()
+                if language not in language_order:
+                    continue
+                    
+                # Category could be multi-part (with underscores)
+                model_index = -1  # Index where the model name starts
+                for j, part in enumerate(parts):
+                    if model_name in part:
+                        model_index = j
+                        break
+                
+                if model_index > 1:  # Need at least language and category
+                    category = '_'.join(parts[1:model_index]).lower()
+                    if category not in category_order:
+                        continue
+                        
+                    try:
+                        with open(file_path, 'r') as f:
+                            eval_data = json.load(f)
+                            
+                        # Calculate average score from evaluations
+                        scores = [e['score'] for e in eval_data if e.get('score') is not None]
+                        if scores:
+                            avg_score = sum(scores) / len(scores)
+                            language_category_scores[(language, category)] = avg_score
+                    except:
+                        pass
+            
+            # Fill the data matrix with scores
+            for j, category in enumerate(category_order):
+                for k, language in enumerate(language_order):
+                    key = (language, category)
+                    if key in language_category_scores:
+                        data_matrix[j, k] = language_category_scores[key]
+            
+            # Create the heatmap with our custom colormap
+            sns.heatmap(
+                data_matrix,
+                annot=True,
+                fmt=".2f",
+                cmap=custom_cmap,
+                vmin=7.0,  # Minimum value for color scale
+                vmax=10.0,  # Maximum value for color scale
+                linewidths=2,
+                linecolor='white',
+                cbar=False,
+                ax=ax
+            )
+            
+            # Set row and column labels
+            ax.set_yticks(np.arange(len(category_order)) + 0.5)
+            ax.set_yticklabels([category_display[cat] for cat in category_order], rotation=0, fontsize=12)
+            
+            ax.set_xticks(np.arange(len(language_order)) + 0.5)
+            ax.set_xticklabels([language_display[lang] for lang in language_order], rotation=0, fontsize=12)
+            
+            # Add model name as title
+            ax.set_title(model_display_name, fontsize=14, pad=20)
+        
+        # Adjust layout
+        plt.tight_layout()
+        
+        # Save the figure
+        output_path = os.path.join(output_dir, "combined_language_category_heatmap.png")
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"Created combined language-category heatmap: {output_path}")
+
 def main():
     parser = argparse.ArgumentParser(description='Evaluate code completion models using o3 mini')
     parser.add_argument('--completions_dir', type=str, default='../completions', help='Directory containing completion files')
@@ -817,6 +1008,8 @@ def main():
     parser.add_argument('--plot', action='store_true', help='Generate a comparison plot of model scores with confidence intervals')
     parser.add_argument('--plot_language', type=str, help='Generate a plot filtered by this language')
     parser.add_argument('--plot_category', type=str, help='Generate a plot filtered by this category')
+    parser.add_argument('--heatmap', action='store_true', help='Generate language-category heatmaps for models')
+    parser.add_argument('--heatmap_models', nargs='+', help='Specify which models to include in the heatmap')
     
     args = parser.parse_args()
     
@@ -828,7 +1021,9 @@ def main():
             args.summary_only, 
             generate_plot=args.plot,
             filter_language=args.plot_language,
-            filter_category=args.plot_category
+            filter_category=args.plot_category,
+            generate_heatmap=args.heatmap,
+            models_for_heatmap=args.heatmap_models
         )
         return
         
@@ -967,7 +1162,9 @@ def main():
         args.specific_model, 
         generate_plot=args.plot,
         filter_language=args.plot_language,
-        filter_category=args.plot_category
+        filter_category=args.plot_category,
+        generate_heatmap=args.heatmap,
+        models_for_heatmap=args.heatmap_models
     )
 
 if __name__ == "__main__":
