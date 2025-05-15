@@ -23,8 +23,8 @@ matplotlib.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sa
 dotenv.load_dotenv()
 
 # o3-mini endpoint and deployment details - matching generate_completions.py
-O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "https://deepprompteastus.openai.azure.com")  # Endpoint without the deployment path
-O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "deepprompt-o3-mini-2025-01-31")  # The deployment name to use in API calls
+O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "[ANONYMIZED-ENDPOINT-2]")  # Endpoint without the deployment path
+O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "[ANONYMIZED-DEPLOYMENT-3]")  # The deployment name to use in API calls
 O3MINI_API_VERSION = "2024-12-01-preview"
 
 def bootstrap_ci(judge_results, n_bootstrap=10000, confidence=0.95):
@@ -92,13 +92,12 @@ def extract_score(response_text):
         print(f"Error extracting score: {str(e)}")
         return None
 
-def find_all_models(completions_dir: str, include_baseline: bool = False) -> List[str]:
+def find_all_models(completions_dir: str) -> List[str]:
     """
     Find all available models in the completions directory.
     
     Args:
         completions_dir: Directory containing completion files
-        include_baseline: Whether to include the baseline model in the results
         
     Returns:
         List of model names found in the directory
@@ -110,7 +109,6 @@ def find_all_models(completions_dir: str, include_baseline: bool = False) -> Lis
     all_files = glob.glob(f"{completions_dir}/**/*.jsonl", recursive=True)
     
     # Extract model names from filenames
-    baseline = "4omini_sft39_spm_fix2_5"
     for file_path in all_files:
         # Skip files that don't have a model suffix
         if "-" not in os.path.basename(file_path):
@@ -119,7 +117,7 @@ def find_all_models(completions_dir: str, include_baseline: bool = False) -> Lis
         # Extract the model name part (after the dash, before .jsonl)
         model_part = os.path.basename(file_path).split("-", 1)[1].replace(".jsonl", "")
         
-        # Skip formatted files and optionally skip the baseline model
+        # Skip formatted files
         if "_formatted" in model_part:
             continue
         
@@ -127,38 +125,29 @@ def find_all_models(completions_dir: str, include_baseline: bool = False) -> Lis
         if model_part.startswith("usage_"):
             model_part = model_part[6:]
             
-        if model_part == baseline and not include_baseline:
-            continue
-            
         models.add(model_part)
     
     return list(models)
 
-def display_score_summary(results_dir: str, specific_model=None, generate_plot=False, 
-                       filter_language=None, filter_category=None, generate_heatmap=False,
-                       models_for_heatmap=None):
+def display_score_summary(results_dir: str, generate_plot=False, generate_heatmap=False, language_filter=None):
     """
     Display a summary of single model evaluation scores
     
     Args:
         results_dir: Directory containing evaluation result files
-        specific_model: Optional - if provided, only display and save summary for this model
         generate_plot: Whether to generate a comparison plot
-        filter_language: Optional - if provided, generate a plot for just this language
-        filter_category: Optional - if provided, generate a plot for just this category
         generate_heatmap: Whether to generate language-category heatmaps
-        models_for_heatmap: Optional list of models to include in the heatmap
+        language_filter: Optional list of languages that were filtered for
     """
     print("\n\n" + "="*80)
     print("EVALUATION SUMMARY")
     print("="*80)
     
+    if language_filter:
+        print(f"\nNote: Results filtered for languages: {', '.join(language_filter)}")
+    
     # Call generate_single_model_summary to create the summary
     summary = generate_single_model_summary(results_dir)
-    
-    # Filter for specific model if requested
-    if specific_model and specific_model != 'all' and specific_model in summary:
-        summary = {specific_model: summary[specific_model]}
     
     # Display single model evaluation scores
     if summary:
@@ -228,18 +217,11 @@ def display_score_summary(results_dir: str, specific_model=None, generate_plot=F
         # Generate plot if requested - allow even with a single model
         if generate_plot and len(summary) > 0:
             # Determine output path with appropriate suffix
-            if filter_language:
-                plot_path = os.path.join(results_dir, f"model_comparison_plot_{filter_language}.png")
-            elif filter_category:
-                plot_path = os.path.join(results_dir, f"model_comparison_plot_{filter_category}.png")
-            else:
-                plot_path = os.path.join(results_dir, "model_comparison_plot.png")
+            plot_path = os.path.join(results_dir, "model_comparison_plot.png")
                 
             create_model_comparison_plot(
                 summary, 
-                plot_path,
-                filter_language=filter_language,
-                filter_category=filter_category
+                plot_path
             )
             print(f"Plot generated and saved to: {plot_path}")
             
@@ -247,14 +229,13 @@ def display_score_summary(results_dir: str, specific_model=None, generate_plot=F
         if generate_heatmap:
             create_language_category_heatmap(
                 summary,
-                results_dir,
-                models_to_include=models_for_heatmap
+                results_dir
             )
             
     else:
         print("No evaluation results found.")
 
-def evaluate_single_completion(model_file, output_file, model_name, max_evaluations=None, current_evaluations=0):
+def evaluate_single_completion(model_file, output_file, model_name, max_evaluations=None, current_evaluations=0, max_file_evaluations=None):
     """
     Evaluate a single model's completions using o3 mini.
     
@@ -264,6 +245,7 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
         model_name: Name of the model being evaluated
         max_evaluations: Maximum number of evaluations to run (for debugging)
         current_evaluations: Number of evaluations already processed
+        max_file_evaluations: Maximum number of evaluations to run per file
     
     Returns:
         Number of evaluations processed in this run
@@ -306,6 +288,22 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
                 actual_category = path_parts[i + 2]
             break
     
+    # Normalize c_sharp and api_usage combinations - don't create "sharp_api_usage"
+    # Fix the category name if it's in c_sharp folder with api_usage category
+    if actual_language == "c_sharp" and (actual_category == "api_usage" or actual_category == "sharp_api_usage"):
+        # Keep them separate, don't combine into "sharp_api_usage"
+        actual_category = "api_usage"
+    if actual_language == "c_sharp" and (actual_category == "code2NL_NL2code" or actual_category == "sharp_code2NL_NL2code"):
+        actual_category = "code2NL_NL2code"
+    if actual_language == "c_sharp" and (actual_category == "code_purpose_understanding" or actual_category == "sharp_code_purpose_understanding"):
+        actual_category = "code_purpose_understanding"
+    if actual_language == "c_sharp" and (actual_category == "low_context" or actual_category == "sharp_low_context"):
+        actual_category = "low_context"
+    if actual_language == "c_sharp" and (actual_category == "pattern_matching" or actual_category == "sharp_pattern_matching"):
+        actual_category = "pattern_matching"
+    if actual_language == "c_sharp" and (actual_category == "syntax_completion" or actual_category == "sharp_syntax_completion"):
+        actual_category = "syntax_completion"
+
     print(f"Path components: Language={actual_language}, Category={actual_category}")
 
     # Limit the number of evaluations for debugging
@@ -317,6 +315,12 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
         if len(model_data) > evaluations_left:
             print(f"Limiting to {evaluations_left} evaluations (out of {len(model_data)}) due to max_evaluations setting")
             model_data = model_data[:evaluations_left]
+    
+    # Apply max_file_evaluations limit if specified
+    if max_file_evaluations is not None and max_file_evaluations > 0:
+        if len(model_data) > max_file_evaluations:
+            print(f"Limiting to {max_file_evaluations} evaluations per file (out of {len(model_data)}) due to max_file_evaluations setting")
+            model_data = model_data[:max_file_evaluations]
 
     # Single model evaluation prompt template
     single_model_prompt_template = """You are a highly experienced software judge tasked with evaluating the quality of a model-generated code completion. For a given code prefix and suffix, your job is to evaluate a completion based on the criteria below and determine the overall final score (0-10). Assign a score (0-5) for each category. Please solely focus on the completion quality.
@@ -372,8 +376,8 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
             messages = [{"role": "user", "content": formatted_prompt}]
 
             try:
-                # Call o3-mini model with the same parameters as in generate_completions.py
                 completion = client.chat.completions.create(  
+                    max_completion_tokens=16384,
                     model=O3MINI_DEPLOYMENT,  
                     messages=messages,
                     stream=False  
@@ -385,6 +389,22 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
                 
                 # Extract score from response
                 score = extract_score(response_content)
+                
+                # Normalize c_sharp api_usage to prevent "sharp_api_usage"
+                if language == "c_sharp" and actual_category == "api_usage":
+                    actual_category = "api_usage"
+                elif language == "c_sharp" and actual_category == "sharp_api_usage":
+                    actual_category = "api_usage"
+                elif actual_language == "c_sharp" and (actual_category == "code2NL_NL2code" or actual_category == "sharp_code2NL_NL2code"):
+                    actual_category = "code2NL_NL2code"
+                elif actual_language == "c_sharp" and (actual_category == "code_purpose_understanding" or actual_category == "sharp_code_purpose_understanding"):
+                    actual_category = "code_purpose_understanding"
+                elif actual_language == "c_sharp" and (actual_category == "low_context" or actual_category == "sharp_low_context"):
+                    actual_category = "low_context"
+                elif actual_language == "c_sharp" and (actual_category == "pattern_matching" or actual_category == "sharp_pattern_matching"):
+                    actual_category = "pattern_matching"
+                elif actual_language == "c_sharp" and (actual_category == "syntax_completion" or actual_category == "sharp_syntax_completion"):
+                    actual_category = "syntax_completion"
                 
                 # Add result to our collection
                 result = {
@@ -402,6 +422,23 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
                 
             except Exception as e:
                 print(f"Error processing evaluation: {str(e)}")
+                
+                # Normalize c_sharp api_usage to prevent "sharp_api_usage"
+                if language == "c_sharp" and actual_category == "api_usage":
+                    actual_category = "api_usage"
+                elif language == "c_sharp" and actual_category == "sharp_api_usage":
+                    actual_category = "api_usage"
+                elif actual_language == "c_sharp" and (actual_category == "code2NL_NL2code" or actual_category == "sharp_code2NL_NL2code"):
+                    actual_category = "code2NL_NL2code"
+                elif actual_language == "c_sharp" and (actual_category == "code_purpose_understanding" or actual_category == "sharp_code_purpose_understanding"):
+                    actual_category = "code_purpose_understanding"
+                elif actual_language == "c_sharp" and (actual_category == "low_context" or actual_category == "sharp_low_context"):
+                    actual_category = "low_context"
+                elif actual_language == "c_sharp" and (actual_category == "pattern_matching" or actual_category == "sharp_pattern_matching"):
+                    actual_category = "pattern_matching"
+                elif actual_language == "c_sharp" and (actual_category == "syntax_completion" or actual_category == "sharp_syntax_completion"):
+                    actual_category = "syntax_completion"
+                
                 evaluation_results.append({
                     "id": entry_id,
                     "score": None,
@@ -517,6 +554,20 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
             if model_name.startswith("usage_"):
                 model_name = model_name[6:]
                 
+            # Fix for c_sharp api_usage - prevent creation of "sharp_api_usage"
+            if language_from_file == "c_sharp" and category_from_file == "sharp_api_usage":
+                category_from_file = "api_usage"
+            elif language_from_file == "c_sharp" and (category_from_file == "sharp_code2NL_NL2code"):
+                category_from_file = "code2NL_NL2code"
+            elif language_from_file == "c_sharp" and (category_from_file == "sharp_code_purpose_understanding"):
+                category_from_file = "code_purpose_understanding"
+            elif language_from_file == "c_sharp" and (category_from_file == "sharp_low_context"):
+                category_from_file = "low_context"
+            elif language_from_file == "c_sharp" and (category_from_file == "sharp_pattern_matching"):
+                category_from_file = "pattern_matching"
+            elif language_from_file == "c_sharp" and (category_from_file == "sharp_syntax_completion"):
+                category_from_file = "syntax_completion"
+                
             print(f"Processing {filename}: Model={model_name}, Language={language_from_file}, Category={category_from_file}")
             
             # Read the result file
@@ -537,6 +588,24 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
                     # Default to the ones from filename if not present
                     language = entry.get('language', language_from_file)
                     category = entry.get('category', category_from_file)
+                    
+                    # Standardize language name
+                    language = standardize_language_name(language)
+                    
+                    # Fix for c_sharp api_usage - ensure it's not stored as "sharp_api_usage"
+                    if language == "c_sharp" and category == "sharp_api_usage":
+                        category = "api_usage"
+                    elif language == "c_sharp" and (category == "sharp_code2NL_NL2code"):
+                        category = "code2NL_NL2code"
+                    elif language == "c_sharp" and (category == "sharp_code_purpose_understanding"):
+                        category = "code_purpose_understanding"
+                    elif language == "c_sharp" and (category == "sharp_low_context"):
+                        category = "low_context"
+                    elif language == "c_sharp" and (category == "sharp_pattern_matching"):
+                        category = "pattern_matching"
+                    elif language == "c_sharp" and (category == "sharp_syntax_completion"):
+                        category = "syntax_completion"
+                        
                     entry_id = entry.get('id', 'unknown')
                     
                     # Store detailed result
@@ -623,6 +692,20 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
         
         # Add all categories
         for category, data in model_info['categories'].items():
+            # Normalize any sharp_api_usage to api_usage
+            if category == "sharp_api_usage":
+                category = "api_usage"
+            elif category == "sharp_code2NL_NL2code":
+                category = "code2NL_NL2code"
+            elif category == "sharp_code_purpose_understanding":
+                category = "code_purpose_understanding"
+            elif category == "sharp_low_context":
+                category = "low_context"
+            elif category == "sharp_pattern_matching":
+                category = "pattern_matching"
+            elif category == "sharp_syntax_completion":
+                category = "syntax_completion"
+                
             final_summary[model_name][category] = data
         
         # Add language statistics
@@ -709,15 +792,13 @@ def get_display_name(model_name):
     # Return the display name if found, otherwise use the original name
     return model_display_names.get(model_name, model_name)
 
-def create_model_comparison_plot(summary_data, output_path=None, filter_language=None, filter_category=None):
+def create_model_comparison_plot(summary_data, output_path=None):
     """
     Create a bar chart comparing model scores with confidence intervals.
     
     Args:
         summary_data: Dictionary containing model summary data
         output_path: Optional path to save the plot image file
-        filter_language: Only include scores for this language
-        filter_category: Only include scores for this category
     """
     # Extract model names and scores with confidence intervals
     model_names = []  # Internal model names
@@ -734,28 +815,12 @@ def create_model_comparison_plot(summary_data, output_path=None, filter_language
     )
     
     for model_name, model_data in sorted_models:
-        # Determine what score to use based on filters
-        if filter_language and 'languages' in model_data and filter_language in model_data['languages']:
-            # Use language-specific score
-            score_data = model_data['languages'][filter_language]
-            score = score_data['score']
-            lower_ci = score_data['lower_ci']
-            upper_ci = score_data['upper_ci']
-            title_suffix = f" - {filter_language} language"
-        elif filter_category and filter_category in model_data:
-            # Use category-specific score
-            score_data = model_data[filter_category]
-            score = score_data['score']
-            lower_ci = score_data['lower_ci']
-            upper_ci = score_data['upper_ci']
-            title_suffix = f" - {filter_category} category"
-        else:
-            # Use overall score
-            score_data = model_data['overall']
-            score = score_data['score']
-            lower_ci = score_data['lower_ci']
-            upper_ci = score_data['upper_ci']
-            title_suffix = ""
+        # Use overall score
+        score_data = model_data['overall']
+        score = score_data['score']
+        lower_ci = score_data['lower_ci']
+        upper_ci = score_data['upper_ci']
+        title_suffix = ""
             
         model_names.append(model_name)
         display_names.append(get_display_name(model_name))
@@ -818,14 +883,13 @@ def create_model_comparison_plot(summary_data, output_path=None, filter_language
     # Return the figure object
     return plt.gcf()
 
-def create_language_category_heatmap(summary_data, output_dir, models_to_include=None):
+def create_language_category_heatmap(summary_data, output_dir):
     """
     Create heatmaps that compare scores across languages and categories for each model.
     
     Args:
         summary_data: Dictionary containing model summary data
         output_dir: Directory to save the heatmap images
-        models_to_include: Optional list of specific models to include, if None, include all
     """
     # Define standard language and category order for consistent visualization
     # Languages in columns (left to right)
@@ -871,11 +935,8 @@ def create_language_category_heatmap(summary_data, output_dir, models_to_include
         '#E5451F',  # Dark orange-red
     ])
     
-    # Filter models if specified
-    if models_to_include:
-        filtered_data = {k: v for k, v in summary_data.items() if k in models_to_include}
-    else:
-        filtered_data = summary_data
+    # No filtering by models - use all models from summary_data
+    filtered_data = summary_data
     
     # Skip individual model heatmaps and only create the combined heatmap
     
@@ -917,48 +978,100 @@ def create_language_category_heatmap(summary_data, output_dir, models_to_include
             # Collect all scores for this model by language and category
             language_category_scores = {}
             
-            # Look for detailed result files that match language_category_model patterns
+            # IMPORTANT: Print debug information
+            print(f"\nCollecting data for heatmap: {model_name}")
+            
+            # FIRST METHOD: Check model_data directly for category scores
+            # Only use this for data that we know is correctly categorized
+            if 'languages' in model_data:
+                print("  Languages found in model data:")
+                for language, lang_data in model_data['languages'].items():
+                    print(f"    {language}: {lang_data['score']}")
+            
+            # SECOND METHOD: Look for detailed result files
+            # This is the most reliable approach for language-specific category data
             result_files = glob.glob(f"{output_dir}/*_{model_name}_single_evaluation.json")
+            print(f"  Found {len(result_files)} evaluation files")
+            
             for file_path in result_files:
                 filename = os.path.basename(file_path)
-                parts = filename.split('_')
                 
-                if len(parts) < 3:
-                    continue
+                # Parse the filename to extract language and category
+                # Format should be: language_category_modelname_single_evaluation.json
+                filename_base = filename.replace("_single_evaluation.json", "")
+                filename_parts = filename_base.split('_')
+                
+                if len(filename_parts) < 3:
+                    continue  # Invalid format
                     
-                language = parts[0].lower()
-                if language not in language_order:
+                # First part is usually the language
+                # Special case for c_sharp which gets split into ['c', 'sharp', ...]
+                language = filename_parts[0].lower()
+                if language == 'c' and len(filename_parts) > 1 and filename_parts[1].lower() == 'sharp':
+                    language = 'c_sharp'
+                    # Adjust the remaining parts - remove the 'sharp' part since it's now part of the language
+                    filename_parts = [language] + filename_parts[2:]
+                
+                language = standardize_language_name(language)
+                if language not in [lang.lower() for lang in language_order]:
                     continue
-                    
-                # Category could be multi-part (with underscores)
-                model_index = -1  # Index where the model name starts
-                for j, part in enumerate(parts):
+                
+                # Extract model part to identify where the category ends
+                model_part_index = -1
+                for j, part in enumerate(filename_parts):
                     if model_name in part:
-                        model_index = j
+                        model_part_index = j
                         break
                 
-                if model_index > 1:  # Need at least language and category
-                    category = '_'.join(parts[1:model_index]).lower()
-                    if category not in category_order:
-                        continue
+                if model_part_index <= 1:  # Need at least language and category
+                    continue
+                    
+                # Category is everything between language and model
+                category = '_'.join(filename_parts[1:model_part_index])
+                
+                print(f"Extracted from filename '{filename}': language='{language}', category='{category}'")
+                
+                # Special case - fix "sharp_api_usage" to be recognized as "api_usage" for "c_sharp"
+                if language == "c_sharp" and category == "sharp_api_usage":
+                    category = "api_usage"
+                elif language == "c_sharp" and category == "sharp_code2NL_NL2code":
+                    category = "code2NL_NL2code"
+                elif language == "c_sharp" and category == "sharp_code_purpose_understanding":
+                    category = "code_purpose_understanding"
+                elif language == "c_sharp" and category == "sharp_low_context":
+                    category = "low_context"
+                elif language == "c_sharp" and category == "sharp_pattern_matching":
+                    category = "pattern_matching"
+                elif language == "c_sharp" and category == "sharp_syntax_completion":
+                    category = "syntax_completion"
+                    
+                
+                if category not in category_order:
+                    continue
+                
+                # Read the file and calculate average score
+                try:
+                    with open(file_path, 'r') as f:
+                        eval_data = json.load(f)
                         
-                    try:
-                        with open(file_path, 'r') as f:
-                            eval_data = json.load(f)
-                            
-                        # Calculate average score from evaluations
-                        scores = [e['score'] for e in eval_data if e.get('score') is not None]
-                        if scores:
-                            avg_score = sum(scores) / len(scores)
-                            language_category_scores[(language, category)] = avg_score
-                    except:
-                        pass
+                    scores = [e.get('score') for e in eval_data if e.get('score') is not None]
+                    if scores:
+                        avg_score = sum(scores) / len(scores)
+                        language_category_scores[(language, category)] = avg_score
+                        print(f"    Found score for {language}/{category}: {avg_score}")
+                except Exception as e:
+                    print(f"    Error reading {file_path}: {str(e)}")
             
             # Fill the data matrix with scores
             for j, category in enumerate(category_order):
                 for k, language in enumerate(language_order):
-                    key = (language, category)
-                    if key in language_category_scores:
+                    # Make language comparison case-insensitive
+                    key_matches = [(lang, cat) for lang, cat in language_category_scores.keys() 
+                                  if lang.lower() == language.lower() and cat == category]
+                    
+                    # If a matching key is found, use it
+                    if key_matches:
+                        key = key_matches[0]
                         data_matrix[j, k] = language_category_scores[key]
             
             # Create the heatmap with our custom colormap
@@ -995,35 +1108,59 @@ def create_language_category_heatmap(summary_data, output_dir, models_to_include
         
         print(f"Created combined language-category heatmap: {output_path}")
 
+def standardize_language_name(language):
+    """
+    Standardize language names to ensure consistent casing.
+    
+    Args:
+        language: Language name to standardize
+        
+    Returns:
+        Standardized language name
+    """
+    # Define standard casing for languages
+    standard_languages = {
+        'python': 'python',
+        'javascript': 'javascript', 
+        'typescript': 'typescript',
+        'java': 'java',
+        'cpp': 'cpp',
+        'c_sharp': 'c_sharp',
+        'c#': 'c_sharp',
+        'csharp': 'c_sharp'
+    }
+    
+    # Try to standardize based on lowercase name
+    lower_lang = language.lower()
+    if lower_lang in standard_languages:
+        return standard_languages[lower_lang]
+    
+    # If not found, return as is
+    return language
+
 def main():
     parser = argparse.ArgumentParser(description='Evaluate code completion models using o3 mini')
     parser.add_argument('--completions_dir', type=str, default='../completions', help='Directory containing completion files')
-    parser.add_argument('--output_dir', type=str, default='llm_judge_results_o3mini', help='Directory to save evaluation results')
-    parser.add_argument('--specific_model', type=str, help='Optional: Name of specific model to evaluate (otherwise all models will be evaluated)')
-    parser.add_argument('--model', type=str, help='Simple model name to evaluate (will find all matching files)')
+    parser.add_argument('--output_dir', type=str, default='llm_judge_results', help='Directory to save evaluation results')
     parser.add_argument('--limit', type=int, help='Optional: Limit the number of files to process per model')
     parser.add_argument('--max_evaluations', type=int, help='Optional: Limit the total number of evaluations to run')
-    parser.add_argument('--summary_only', type=str, help='Only generate summary for the specified model without running evaluations')
+    parser.add_argument('--max_file_evaluations', type=int, help='Optional: Limit the number of evaluations per file')
+    parser.add_argument('--summary_only', action='store_true', help='Only generate summary for all models without running evaluations')
     parser.add_argument('--specific_models', nargs='+', help='Evaluate only the specified list of models')
+    parser.add_argument('--language', nargs='+', help='Evaluate only files for the specified language(s)')
     parser.add_argument('--plot', action='store_true', help='Generate a comparison plot of model scores with confidence intervals')
-    parser.add_argument('--plot_language', type=str, help='Generate a plot filtered by this language')
-    parser.add_argument('--plot_category', type=str, help='Generate a plot filtered by this category')
     parser.add_argument('--heatmap', action='store_true', help='Generate language-category heatmaps for models')
-    parser.add_argument('--heatmap_models', nargs='+', help='Specify which models to include in the heatmap')
     
     args = parser.parse_args()
     
     # Check if we're only generating a summary for a specific model
     if args.summary_only:
-        print(f"Generating summary only for model: {args.summary_only}")
+        print(f"Generating summary only for all models")
         display_score_summary(
             args.output_dir, 
-            args.summary_only, 
             generate_plot=args.plot,
-            filter_language=args.plot_language,
-            filter_category=args.plot_category,
             generate_heatmap=args.heatmap,
-            models_for_heatmap=args.heatmap_models
+            language_filter=args.language
         )
         return
         
@@ -1038,36 +1175,9 @@ def main():
     if args.specific_models:
         models_to_evaluate = args.specific_models
         print(f"Evaluating specified models: {', '.join(models_to_evaluate)}")
-    elif args.model:
-        # Simple model-focused discovery
-        print(f"Looking for files containing model: {args.model}")
-        model_files = glob.glob(f"{completions_dir}/**/*-{args.model}*.jsonl", recursive=True)
-        if not model_files:
-            print(f"No files found for model pattern: {args.model}")
-            return
-            
-        # Extract the actual model name from the first file
-        models_to_evaluate = []
-        for file_path in model_files:
-            if "_formatted" in file_path:
-                continue
-                
-            model_name = os.path.basename(file_path).split("-", 1)[1].replace(".jsonl", "")
-            
-            # Remove the 'usage_' prefix if it exists
-            if model_name.startswith("usage_"):
-                model_name = model_name[6:]
-                
-            if model_name not in models_to_evaluate:
-                models_to_evaluate.append(model_name)
-        
-        print(f"Found {len(models_to_evaluate)} models: {', '.join(models_to_evaluate)}")
-    elif args.specific_model:
-        models_to_evaluate = [args.specific_model]
-        print(f"Evaluating specific model: {args.specific_model}")
     else:
         # Find all models in the completions directory
-        models_to_evaluate = find_all_models(completions_dir, include_baseline=True)
+        models_to_evaluate = find_all_models(completions_dir)
         print(f"Found {len(models_to_evaluate)} models to evaluate: {', '.join(models_to_evaluate)}")
     
     # Track total evaluations
@@ -1093,10 +1203,59 @@ def main():
             print(f"No files found for model: {model_name}")
             continue
         
-        # Apply limit if specified
+        # Filter by language if specified - do this BEFORE limiting
+        if args.language:
+            languages_to_include = [lang.lower() for lang in args.language]
+            filtered_files = []
+            
+            print(f"Filtering for languages: {languages_to_include}")
+            print(f"Processing {len(all_model_files)} files")
+            
+            for model_file in all_model_files:
+                # Extract language from the path
+                file_path = os.path.normpath(model_file)
+                path_parts = file_path.split(os.sep)
+                file_language = None
+                
+                # Print path parts for debugging
+                print(f"\nExamining file: {file_path}")
+                print(f"Path parts: {path_parts}")
+                
+                # Find the "completions" folder in the path
+                for i, part in enumerate(path_parts):
+                    if part == "completions":
+                        # Language should be the next part after "completions"
+                        if i + 1 < len(path_parts):
+                            # Check for special case of c_sharp
+                            file_language = path_parts[i + 1].lower()
+                            if file_language == "c_sharp" or file_language == "csharp" or file_language == "c#":
+                                file_language = "c_sharp"
+                                
+                            file_language = standardize_language_name(file_language)
+                            print(f"Found language in path: '{file_language}'")
+                        break
+                
+                if file_language and file_language in languages_to_include:
+                    print(f"Including file with language: {file_language}")
+                    filtered_files.append(model_file)
+                else:
+                    if file_language:
+                        print(f"Skipping file - language '{file_language}' not in filter list")
+                    else:
+                        print(f"Skipping file - could not determine language")
+            
+            print(f"Filtered to {len(filtered_files)} files for languages: {', '.join(args.language)}")
+            all_model_files = filtered_files
+            
+            if not all_model_files:
+                print(f"No files found for model {model_name} with specified language filter")
+                continue
+        
+        # Apply limit if specified - do this AFTER language filtering
         if args.limit and args.limit > 0:
+            original_count = len(all_model_files)
             all_model_files = all_model_files[:args.limit]
-            print(f"Limiting to {args.limit} model files as requested")
+            print(f"Limiting to {args.limit} model files as requested (from {original_count} matching files)")
         
         for model_file in all_model_files:
             # Check if we've hit the max evaluations limit
@@ -1125,6 +1284,23 @@ def main():
                         category = path_parts[i + 2]
                     break
             
+            # Normalize c_sharp and api_usage combinations - don't create "sharp_api_usage"
+            # Fix the category name if it's in c_sharp folder with api_usage category
+            if language == "c_sharp" and (category == "api_usage" or category == "sharp_api_usage"):
+                # Keep them separate, don't combine into "sharp_api_usage"
+                category = "api_usage"
+            elif language == "c_sharp" and (category == "code2NL_NL2code" or category == "sharp_code2NL_NL2code"):
+                category = "code2NL_NL2code"
+            elif language == "c_sharp" and (category == "code_purpose_understanding" or category == "sharp_code_purpose_understanding"):
+                category = "code_purpose_understanding"
+            elif language == "c_sharp" and (category == "low_context" or category == "sharp_low_context"):
+                category = "low_context"
+            elif language == "c_sharp" and (category == "pattern_matching" or category == "sharp_pattern_matching"):
+                category = "pattern_matching"
+            elif language == "c_sharp" and (category == "syntax_completion" or category == "sharp_syntax_completion"):
+                category = "syntax_completion"
+                
+            
             print(f"Extracted from path: language={language}, category={category}")
             
             # Extract the real model name from the file in case it uses usage_ prefix
@@ -1134,15 +1310,16 @@ def main():
                         
             # Generate output file path - include both language and category
             # Ensure no prefix is added to the model name
-            output_file = os.path.join(output_dir, f"{language}_{category}_{model_name}_single_evaluation.json")
+            output_file = os.path.join(output_dir, f"{language}_{category}_{file_model_name}_single_evaluation.json")
             
-            print(f"Evaluating {model_name} for {language}/{category}")
+            print(f"Evaluating {file_model_name} for {language}/{category}")
             evaluations_done = evaluate_single_completion(
                 model_file,
                 output_file,
                 file_model_name,  # Use the model name from file which might include usage_ prefix
                 max_evaluations=max_evaluations,
-                current_evaluations=total_evaluations
+                current_evaluations=total_evaluations,
+                max_file_evaluations=args.max_file_evaluations
             )
             
             total_evaluations += evaluations_done
@@ -1159,12 +1336,9 @@ def main():
     # Display score summary at the end
     display_score_summary(
         output_dir, 
-        args.specific_model, 
         generate_plot=args.plot,
-        filter_language=args.plot_language,
-        filter_category=args.plot_category,
         generate_heatmap=args.heatmap,
-        models_for_heatmap=args.heatmap_models
+        language_filter=args.language
     )
 
 if __name__ == "__main__":
