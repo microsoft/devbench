@@ -12,6 +12,11 @@ import argparse
 
 dotenv.load_dotenv()
 
+# o3-mini endpoint and deployment details - matching generate_completions.py
+O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "[ANONYMIZED-ENDPOINT-2]")  # Endpoint without the deployment path
+O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "[ANONYMIZED-DEPLOYMENT-3]")  # The deployment name to use in API calls
+O3MINI_API_VERSION = "2024-12-01-preview"
+
 def read_jsonl_file(file_path):
     """Read a JSONL file and return a list of parsed JSON objects."""
     data = []
@@ -142,9 +147,9 @@ def display_score_summary(results_dir: str, specific_model=None):
     else:
         print("No evaluation results found.")
 
-def evaluate_single_completion(model_file, output_file, model_name, max_evaluations=None, current_evaluations=0, judge_model="4o"):
+def evaluate_single_completion(model_file, output_file, model_name, max_evaluations=None, current_evaluations=0):
     """
-    Evaluate a single model's completions.
+    Evaluate a single model's completions using o3 mini.
     
     Args:
         model_file: Path to the model completions JSONL
@@ -152,33 +157,23 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
         model_name: Name of the model being evaluated
         max_evaluations: Maximum number of evaluations to run (for debugging)
         current_evaluations: Number of evaluations already processed
-        judge_model: Model to use for judging ("4o" or "o3")
     
     Returns:
         Number of evaluations processed in this run
     """
-    endpoint = os.getenv("ENDPOINT_URL", "https://deeppromptnorthcentralus.openai.azure.com/")  
-    
-    # Select deployment and API version based on judge_model parameter
-    if judge_model == "o3":
-        deployment = os.getenv("O3_DEPLOYMENT_NAME", "deepprompt-gpt-o3-2024-05-13")
-        api_version = "2024-12-01-preview"
-    else:  # Default to 4o
-        deployment = os.getenv("DEPLOYMENT_NAME", "deepprompt-gpt-4o-2024-05-13")
-        api_version = "2024-05-01-preview"
-    
-    print(f"Using {judge_model} model for evaluation: {deployment}")
+    print(f"Using o3 mini model for evaluation: {O3MINI_DEPLOYMENT}")
 
-    # Initialize Azure OpenAI Service client with Entra ID authentication
+    # Initialize Azure OpenAI Service client with Entra ID authentication (matching generate_completions.py)
     token_provider = get_bearer_token_provider(  
         DefaultAzureCredential(),  
         "https://cognitiveservices.azure.com/.default"
     )  
     
+    # Initialize o3-mini client exactly as in generate_completions.py
     client = AzureOpenAI(  
-        azure_endpoint=endpoint,  
+        api_version=O3MINI_API_VERSION,
+        azure_endpoint=O3MINI_ENDPOINT,
         azure_ad_token_provider=token_provider,  
-        api_version=api_version,  
     )
 
     model_data = read_jsonl_file(model_file)
@@ -244,24 +239,12 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
             messages = [{"role": "user", "content": formatted_prompt}]
 
             try:
-                if judge_model == "o3":
-                    completion = client.chat.completions.create(  
-                        model=deployment,  
-                        messages=messages,
-                        stream=False  
-                    )
-                else:
-                    completion = client.chat.completions.create(  
-                        model=deployment,  
-                        messages=messages,
-                        max_tokens=400,  
-                        temperature=0.7,  
-                        top_p=0.95,  
-                        frequency_penalty=0,  
-                        presence_penalty=0,
-                        stop=None,  
-                        stream=False  
-                    )
+                # Call o3-mini model with the same parameters as in generate_completions.py
+                completion = client.chat.completions.create(  
+                    model=O3MINI_DEPLOYMENT,  
+                    messages=messages,
+                    stream=False  
+                )
 
                 response_content = completion.choices[0].message.content
                 print(f"Evaluation result:")
@@ -446,15 +429,14 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
     return final_summary
 
 def main():
-    parser = argparse.ArgumentParser(description='Evaluate code completion models')
+    parser = argparse.ArgumentParser(description='Evaluate code completion models using o3 mini')
     parser.add_argument('--completions_dir', type=str, default='../completions', help='Directory containing completion files')
-    parser.add_argument('--output_dir', type=str, default='llm_judge_results_single_model', help='Directory to save evaluation results')
+    parser.add_argument('--output_dir', type=str, default='llm_judge_results_o3mini', help='Directory to save evaluation results')
     parser.add_argument('--specific_model', type=str, help='Optional: Name of specific model to evaluate (otherwise all models will be evaluated)')
     parser.add_argument('--model', type=str, help='Simple model name to evaluate (will find all matching files)')
     parser.add_argument('--limit', type=int, help='Optional: Limit the number of files to process per model')
     parser.add_argument('--max_evaluations', type=int, help='Optional: Limit the total number of evaluations to run')
     parser.add_argument('--summary_only', type=str, help='Only generate summary for the specified model without running evaluations')
-    parser.add_argument('--judge_model', type=str, choices=['4o', 'o3'], default='4o', help='Model to use for judging (4o or o3)')
     parser.add_argument('--specific_models', nargs='+', help='Evaluate only the specified list of models')
     
     args = parser.parse_args()
@@ -535,8 +517,7 @@ def main():
                 output_file,
                 model_name,
                 max_evaluations=max_evaluations,
-                current_evaluations=total_evaluations,
-                judge_model=args.judge_model
+                current_evaluations=total_evaluations
             )
             
             total_evaluations += evaluations_done
