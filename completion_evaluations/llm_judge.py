@@ -12,6 +12,11 @@ import argparse
 import numpy as np
 from collections import defaultdict
 from pathlib import Path
+import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.rcParams['font.family'] = 'sans-serif'
+matplotlib.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sans']
 
 dotenv.load_dotenv()
 
@@ -115,6 +120,10 @@ def find_all_models(completions_dir: str, include_baseline: bool = False) -> Lis
         # Skip formatted files and optionally skip the baseline model
         if "_formatted" in model_part:
             continue
+        
+        # Remove 'usage_' prefix if present
+        if model_part.startswith("usage_"):
+            model_part = model_part[6:]
             
         if model_part == baseline and not include_baseline:
             continue
@@ -123,13 +132,16 @@ def find_all_models(completions_dir: str, include_baseline: bool = False) -> Lis
     
     return list(models)
 
-def display_score_summary(results_dir: str, specific_model=None):
+def display_score_summary(results_dir: str, specific_model=None, generate_plot=False, filter_language=None, filter_category=None):
     """
     Display a summary of single model evaluation scores
     
     Args:
         results_dir: Directory containing evaluation result files
         specific_model: Optional - if provided, only display and save summary for this model
+        generate_plot: Whether to generate a comparison plot
+        filter_language: Optional - if provided, generate a plot for just this language
+        filter_category: Optional - if provided, generate a plot for just this category
     """
     print("\n\n" + "="*80)
     print("EVALUATION SUMMARY")
@@ -206,6 +218,25 @@ def display_score_summary(results_dir: str, specific_model=None):
                 print(f"  {category}: {cat_score_str}, Evaluations: {scores['evaluations']}")
                 
             print(f"\nDetailed results available in: {results_dir}/{model_name}_detailed_results/")
+            
+        # Generate plot if requested - allow even with a single model
+        if generate_plot and len(summary) > 0:  # Changed from > 1 to > 0
+            # Determine output path with appropriate suffix
+            if filter_language:
+                plot_path = os.path.join(results_dir, f"model_comparison_plot_{filter_language}.png")
+            elif filter_category:
+                plot_path = os.path.join(results_dir, f"model_comparison_plot_{filter_category}.png")
+            else:
+                plot_path = os.path.join(results_dir, "model_comparison_plot.png")
+                
+            create_model_comparison_plot(
+                summary, 
+                plot_path,
+                filter_language=filter_language,
+                filter_category=filter_category
+            )
+            print(f"Plot generated and saved to: {plot_path}")
+            
     else:
         print("No evaluation results found.")
 
@@ -427,12 +458,12 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
             
             found_pattern = False
             for pattern in model_patterns:
-                if pattern in file_parts:
+                if pattern.lower() in file_parts.lower():
                     # Found a known model pattern
                     found_pattern = True
                     
-                    # Find the position of the model pattern
-                    pattern_pos = file_parts.find(pattern)
+                    # Find the position of the model pattern (case insensitive)
+                    pattern_pos = file_parts.lower().find(pattern.lower())
                     
                     # Extract parts before the pattern (language_category_)
                     prefix_parts = file_parts[:pattern_pos].strip('_').split('_')
@@ -462,7 +493,16 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
                 language_from_file = parts[0]
                 category_from_file = parts[1]
                 model_name = '_'.join(parts[2:])
+                
+                # Also handle usage_ prefix in the fallback case
+                if model_name.startswith("usage_"):
+                    model_name = model_name[6:]
             
+            # Clean model name for consistency
+            # If model name has a 'usage_' prefix, remove it
+            if model_name.startswith("usage_"):
+                model_name = model_name[6:]
+                
             print(f"Processing {filename}: Model={model_name}, Language={language_from_file}, Category={category_from_file}")
             
             # Read the result file
@@ -627,6 +667,143 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
     
     return final_summary
 
+def get_display_name(model_name):
+    """
+    Convert internal model names to user-friendly display names.
+    
+    Args:
+        model_name: Internal model name (e.g., 'claude-3-7-sonnet')
+        
+    Returns:
+        User-friendly display name (e.g., 'Claude 3.7 Sonnet')
+    """
+    # Dictionary mapping internal model names to display names
+    model_display_names = {
+        "claude-3-5-sonnet": "Claude 3.5 Sonnet",
+        "claude-3-7-sonnet": "Claude 3.7 Sonnet",
+        "gpt-4.1-mini": "GPT-4.1 mini",
+        "gpt-4o": "GPT-4o",
+        "gpt-4o-mini": "GPT-4o mini",
+        "gpt-4o-copilot": "GPT-4o Copilot",
+        "gpt-4.1-nano": "GPT-4.1 nano",
+        "DeepSeek-R1": "DeepSeek-R1",
+        "DeepSeek-V3-0324": "DeepSeek-V3",
+        "o3-mini": "o3-mini",
+        "Ministral-3B": "Ministral-3B",
+    }
+    
+    # Return the display name if found, otherwise use the original name
+    return model_display_names.get(model_name, model_name)
+
+def create_model_comparison_plot(summary_data, output_path=None, filter_language=None, filter_category=None):
+    """
+    Create a bar chart comparing model scores with confidence intervals.
+    
+    Args:
+        summary_data: Dictionary containing model summary data
+        output_path: Optional path to save the plot image file
+        filter_language: Only include scores for this language
+        filter_category: Only include scores for this category
+    """
+    # Extract model names and scores with confidence intervals
+    model_names = []  # Internal model names
+    display_names = []  # User-friendly display names
+    scores = []
+    lower_cis = []
+    upper_cis = []
+    
+    # Sort models by overall score (higher first)
+    sorted_models = sorted(
+        summary_data.items(), 
+        key=lambda x: x[1]['overall']['score'], 
+        reverse=True
+    )
+    
+    for model_name, model_data in sorted_models:
+        # Determine what score to use based on filters
+        if filter_language and 'languages' in model_data and filter_language in model_data['languages']:
+            # Use language-specific score
+            score_data = model_data['languages'][filter_language]
+            score = score_data['score']
+            lower_ci = score_data['lower_ci']
+            upper_ci = score_data['upper_ci']
+            title_suffix = f" - {filter_language} language"
+        elif filter_category and filter_category in model_data:
+            # Use category-specific score
+            score_data = model_data[filter_category]
+            score = score_data['score']
+            lower_ci = score_data['lower_ci']
+            upper_ci = score_data['upper_ci']
+            title_suffix = f" - {filter_category} category"
+        else:
+            # Use overall score
+            score_data = model_data['overall']
+            score = score_data['score']
+            lower_ci = score_data['lower_ci']
+            upper_ci = score_data['upper_ci']
+            title_suffix = ""
+            
+        model_names.append(model_name)
+        display_names.append(get_display_name(model_name))
+        scores.append(score)
+        
+        # Calculate error bars (distance from score to CI bounds)
+        lower_cis.append(scores[-1] - lower_ci)  # Convert to distance from point
+        upper_cis.append(upper_ci - scores[-1])  # Convert to distance from point
+    
+    # Convert to numpy arrays
+    y_pos = np.arange(len(model_names))
+    scores = np.array(scores)
+    
+    # Create error bars format for plt.errorbar
+    # matplotlib's errorbar needs the errors in the format [lower_errors, upper_errors]
+    yerr = np.array([lower_cis, upper_cis])
+    
+    # Create the figure and axis
+    plt.figure(figsize=(10, 6))
+    
+    # Create light grid with white background
+    plt.grid(axis='y', linestyle='-', alpha=0.2)
+    
+    # Plot with blue dots and error bars
+    plt.errorbar(y_pos, scores, yerr=yerr, fmt='o', color='darkblue', capsize=5,
+                 markersize=6, elinewidth=2, capthick=2)
+    
+    # Set x-axis ticks and labels with smaller font if many models
+    if len(model_names) > 10:
+        plt.xticks(y_pos, display_names, rotation=45, ha='right', fontsize=8)
+    else:
+        plt.xticks(y_pos, display_names, rotation=45, ha='right')
+    
+    # Set plot labels and title
+    plt.xlabel('Model', fontsize=12, labelpad=10)
+    plt.ylabel('Average Score', fontsize=12)
+    
+    # Add title if filtering by language or category
+    if title_suffix:
+        plt.title(f"Model Comparison{title_suffix}")
+    
+    # Set y-axis limits with a bit of padding
+    y_min = min(scores - np.array(lower_cis)) - 0.2
+    y_max = max(scores + np.array(upper_cis)) + 0.2
+    
+    # Ensure the y-axis starts at a reasonable value but not below 0
+    y_min = max(0, y_min)
+    
+    # Adjust to have nice round limits
+    plt.ylim(y_min, min(10.0, y_max))  # Cap at 10 which is the max score
+    
+    # Make sure the plot is tight
+    plt.tight_layout()
+    
+    # Save the plot if output path is provided
+    if output_path:
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to: {output_path}")
+    
+    # Return the figure object
+    return plt.gcf()
+
 def main():
     parser = argparse.ArgumentParser(description='Evaluate code completion models using o3 mini')
     parser.add_argument('--completions_dir', type=str, default='../completions', help='Directory containing completion files')
@@ -637,13 +814,22 @@ def main():
     parser.add_argument('--max_evaluations', type=int, help='Optional: Limit the total number of evaluations to run')
     parser.add_argument('--summary_only', type=str, help='Only generate summary for the specified model without running evaluations')
     parser.add_argument('--specific_models', nargs='+', help='Evaluate only the specified list of models')
+    parser.add_argument('--plot', action='store_true', help='Generate a comparison plot of model scores with confidence intervals')
+    parser.add_argument('--plot_language', type=str, help='Generate a plot filtered by this language')
+    parser.add_argument('--plot_category', type=str, help='Generate a plot filtered by this category')
     
     args = parser.parse_args()
     
     # Check if we're only generating a summary for a specific model
     if args.summary_only:
         print(f"Generating summary only for model: {args.summary_only}")
-        display_score_summary(args.output_dir, args.summary_only)
+        display_score_summary(
+            args.output_dir, 
+            args.summary_only, 
+            generate_plot=args.plot,
+            filter_language=args.plot_language,
+            filter_category=args.plot_category
+        )
         return
         
     completions_dir = args.completions_dir
@@ -672,6 +858,11 @@ def main():
                 continue
                 
             model_name = os.path.basename(file_path).split("-", 1)[1].replace(".jsonl", "")
+            
+            # Remove the 'usage_' prefix if it exists
+            if model_name.startswith("usage_"):
+                model_name = model_name[6:]
+                
             if model_name not in models_to_evaluate:
                 models_to_evaluate.append(model_name)
         
@@ -693,14 +884,26 @@ def main():
         print(f"Evaluating model: {model_name}")
         print(f"{'='*80}")
         
-        model_files = glob.glob(f"{completions_dir}/**/*-{model_name}.jsonl", recursive=True)
+        # Search pattern should handle both regular model names and those with 'usage_' prefix
+        model_pattern = f"*-{model_name}.jsonl"
+        usage_model_pattern = f"*-usage_{model_name}.jsonl"
+        
+        model_files = glob.glob(f"{completions_dir}/**/{model_pattern}", recursive=True)
+        usage_model_files = glob.glob(f"{completions_dir}/**/{usage_model_pattern}", recursive=True)
+        
+        # Combine both sets of files
+        all_model_files = model_files + usage_model_files
+        
+        if not all_model_files:
+            print(f"No files found for model: {model_name}")
+            continue
         
         # Apply limit if specified
         if args.limit and args.limit > 0:
-            model_files = model_files[:args.limit]
+            all_model_files = all_model_files[:args.limit]
             print(f"Limiting to {args.limit} model files as requested")
         
-        for model_file in model_files:
+        for model_file in all_model_files:
             # Check if we've hit the max evaluations limit
             if max_evaluations is not None and total_evaluations >= max_evaluations:
                 print(f"Reached max evaluations limit ({max_evaluations}). Stopping.")
@@ -728,6 +931,11 @@ def main():
                     break
             
             print(f"Extracted from path: language={language}, category={category}")
+            
+            # Extract the real model name from the file in case it uses usage_ prefix
+            file_model_name = os.path.basename(model_file).split("-", 1)[1].replace(".jsonl", "")
+            if file_model_name.startswith("usage_"):
+                file_model_name = file_model_name[6:]  # Remove 'usage_' prefix
                         
             # Generate output file path - include both language and category
             # Ensure no prefix is added to the model name
@@ -737,7 +945,7 @@ def main():
             evaluations_done = evaluate_single_completion(
                 model_file,
                 output_file,
-                model_name,
+                file_model_name,  # Use the model name from file which might include usage_ prefix
                 max_evaluations=max_evaluations,
                 current_evaluations=total_evaluations
             )
@@ -754,7 +962,13 @@ def main():
             break
 
     # Display score summary at the end
-    display_score_summary(output_dir, args.specific_model)
+    display_score_summary(
+        output_dir, 
+        args.specific_model, 
+        generate_plot=args.plot,
+        filter_language=args.plot_language,
+        filter_category=args.plot_category
+    )
 
 if __name__ == "__main__":
     main()
