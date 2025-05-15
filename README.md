@@ -57,6 +57,8 @@ The code requires API keys and configuration for various language models and ser
 ENDPOINT_URL="your_endpoint_url"
 DEPLOYMENT_NAME="your_deployment_name"
 O3_DEPLOYMENT_NAME="your_o3_deployment_name"
+O3MINI_ENDPOINT="your_o3mini_endpoint"
+O3MINI_DEPLOYMENT="your_o3mini_deployment"
 AZURE_API_KEY="your_azure_api_key"
 COMPLETIONS_API_KEY="your_completions_api_key"
 
@@ -82,10 +84,11 @@ Replace the placeholder values with your actual API keys and credentials. You ma
 
 ### Important Note on Script Adaptation
 
-The scripts `generate_benchmark.py` and `generate_completions.py` were used for our specific experimental setup, which primarily uses Azure AI Foundry to access various language models. If you're using different methods to access these models, you'll need to modify these scripts accordingly:
+The scripts `generate_benchmark.py`, `generate_completions.py`, and `llm_judge.py` were used for our specific experimental setup, which primarily uses Azure AI Foundry to access various language models. If you're using different methods to access these models, you'll need to modify these scripts accordingly:
 
 - `generate_benchmark.py`: This script may need modifications in how it authenticates and calls language models to generate benchmark test cases. This script contains an anonymized endpoint (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment name (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoint and deployment name you're using.
 - `generate_completions.py`: This script contains anonymized endpoints (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment names (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoints and deployment names for each model service you're using.
+- `llm_judge.py`: This script also uses anonymized endpoints (e.g., `[ANONYMIZED-ENDPOINT-2]`) and deployment names (e.g., `[ANONYMIZED-DEPLOYMENT-3]`) for the o3-mini model used as a judge. You will need to replace these with your own valid endpoints and deployment names.
 
 These scripts should be considered templates that demonstrate the methodology rather than plug-and-play solutions. You'll need to:
 1. Replace all anonymized endpoints and deployment names with your actual values
@@ -216,6 +219,36 @@ Parameters:
 - `--results`: Path for the output results JSON file
 - `--plots`: Directory to save visualization plots
 - `--debug`: Enable debug mode to print most dissimilar test cases
+
+### Using LLM Judge for Completion Evaluation
+
+Use `llm_judge.py` to evaluate model completions using a language model (o3-mini) as a judge:
+
+```bash
+# Evaluate all model completions
+python llm_judge.py
+
+# Evaluate specific models
+python llm_judge.py --specific_models gpt-4o, claude-3-7-sonnet
+
+# Filter evaluations to specific languages
+python llm_judge.py --language python, javascript
+
+# Generate only a summary from existing evaluations
+python llm_judge.py --summary_only --plot --heatmap
+```
+
+Parameters:
+- `--completions_dir`: Directory containing completion files (default: ../completions)
+- `--output_dir`: Directory to save evaluation results (default: llm_judge_results)
+- `--limit`: Optional limit on the number of files to process per model
+- `--max_evaluations`: Optional limit on the total number of evaluations to run
+- `--max_file_evaluations`: Optional limit on the number of evaluations per file
+- `--summary_only`: Only generate summary without running evaluations
+- `--specific_models`: List of specific models to evaluate
+- `--language`: List of specific languages to evaluate
+- `--plot`: Generate a comparison plot of model scores with confidence intervals
+- `--heatmap`: Generate language-category heatmaps for models
 
 ### Comparing Model Performance Across Languages
 
