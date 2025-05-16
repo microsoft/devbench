@@ -47,6 +47,15 @@ The benchmark supports multiple programming languages:
    ```bash
    python -m pip install -r requirements.txt
    ```
+4. Install Azure CLI following the [official documentation](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+5. Authenticate with Azure:
+   ```bash
+   az login
+   ```
+6. Set your subscription:
+   ```bash
+   az account set --subscription <your-subscription-id>
+   ```
 
 ### Environment Variables Setup
 
