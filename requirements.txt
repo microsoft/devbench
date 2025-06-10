@@ -1,0 +1,14 @@
+anthropic
+matplotlib
+numpy
+openai
+pandas
+python-dotenv
+python_Levenshtein
+Requests
+scikit_learn
+seaborn
+tree-sitter==0.21.3
+tree_sitter_languages
+azure-identity
+azure-ai-inference

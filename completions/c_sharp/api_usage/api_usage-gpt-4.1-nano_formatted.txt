@@ -1,0 +1,4642 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Diagnostics;
+
+namespace ExampleNamespace
+{
+    public class ExampleClass
+    {
+        public class Person
+        {
+            public string Name { get; set; }
+            public int Age { get; set; }
+        }
+
+        public static void Main(string[] args)
+        {
+            // Creating a list of Person objects
+            List<Person> people = new List<Person>
+            {
+                new Person { Name = "John Doe", Age = 30 },
+                new Person { Name = "Jane Smith", Age = 25 },
+                new Person { Name = "Samuel Johnson", Age = 40 }
+            };
+
+            // Serialize the list to JSON string
+            string jsonString = JsonSerializer.Serialize(people);
+            Console.WriteLine("Serialized JSON:");
+            Console.WriteLine(jsonString);
+
+            // Deserialize JSON string back to list of Person objects
+            List<Person> deserializedPeople;
+            try
+            {
+                deserializedPeople = JsonSerializer.Deserialize<List<Person>>(jsonString);
+            }
+            catch (JsonException ex)
+            {
+                Console.WriteLine($"JSON deserialization error: {ex.Message}");
+                throw;
+            }
+
+            // Verifying the deserialization result
+            Console.WriteLine("Deserialized Objects:");
+            foreach (var person in deserializedPeople)
+            {
+                Console.WriteLine($"Name: {person.Name}, Age: {person.Age}");
+            }
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            Debug.Assert(deserializedPeople != null, "Deserialized list should not be null.");
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(deserializedPeople.Count == 3, "The deserialized list should contain exactly 3 people.");
+            Debug.Assert(deserializedPeople[0].Name == "John Doe" && deserializedPeople[0].Age == 30, "First person should be John Doe, Age 30.");
+            Debug.Assert(deserializedPeople[1].Name == "Jane Smith" && deserializedPeople[1].Age == 25, "Second person should be Jane Smith, Age 25.");
+            Debug.Assert(deserializedPeople[2].Name == "Samuel Johnson" && deserializedPeople[2].Age == 40, "Third person should be Samuel Johnson, Age 40.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and correctly use the JsonSerializer API from System.Text.Json, which is less common than other JSON libraries like Newtonsoft.Json. It includes serialization and deserialization of complex objects, proper error handling, and validation of the deserialized data. The assertions check that the deserialization process correctly reconstructs the original list of objects, ensuring parameter correctness and accurate API usage.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Diagnostics;
+
+namespace JsonParsingExample
+{
+    public class Program
+    {
+        public class Person
+        {
+            public string Name { get; set; }
+            public int Age { get; set; }
+        }
+
+        public static void Main(string[] args)
+        {
+            string jsonString = "[{'Name':'John','Age':30},{'Name':'Jane','Age':25}]";
+            // Parsing JSON string to a list of Person objects
+            List<Person> people = JsonSerializer.Deserialize<List<Person>>(jsonString, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            foreach (var person in people)
+            {
+                Console.WriteLine($"Name: {person.Name}, Age: {person.Age}");
+            }
+
+            // Let's now modify one of the objects and re-serialize it
+            people[0].Age = 31;
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            string updatedJsonString = JsonSerializer.Serialize(people, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Assertions
+            Debug.Assert(updatedJsonString.Contains("31"), "Age update failed");
+            Debug.Assert(updatedJsonString.Contains("Jane"), "Jane should be present in JSON");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for testing the model's ability to recognize and complete patterns involving JSON serialization and deserialization using System.Text.Json, a less commonly used .NET Core library function. The scenario demonstrates the conversion of a JSON string to a list of objects and back to a JSON string after modification. It verifies the model's understanding of the proper usage and parameter ordering for JsonSerializer.Deserialize and JsonSerializer.Serialize methods.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+
+namespace MLNetExample
+{
+    public class HouseData
+    {
+        public float Size { get; set; }
+        public float Price { get; set; }
+    }
+
+    public class Prediction
+    {
+        [ColumnName("Score")]
+        public float Price { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var mlContext = new MLContext();
+            var data = new List<HouseData>
+            {
+                new HouseData { Size = 1.1F, Price = 1.2F },
+                new HouseData { Size = 1.9F, Price = 2.3F },
+                new HouseData { Size = 2.8F, Price = 3.0F },
+                new HouseData { Size = 3.4F, Price = 3.7F }
+            };
+            var trainingData = mlContext.Data.LoadFromEnumerable(data);
+            var pipeline = mlContext.Transforms.Concatenate("Features", "Size")
+                .Append(mlContext.Regression.Trainers.Sdca());
+            var model = pipeline.Fit(trainingData);
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<HouseData, Prediction>(model);
+            var size = new HouseData { Size = 2.5F };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+prediction = predictionEngine.Predict(size)
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(prediction.Price >= 2.0F && prediction.Price <= 3.5F, "Prediction out of expected range");
+
+            Console.WriteLine($"Predicted price for size {size.Size}: {prediction.Price}");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern using ML.NET, an uncommon library for machine learning in C#. The scenario involves setting up a basic regression model, making predictions, and verifying the results with assertions. The prefix provides extensive context, including data loading, pipeline creation, model training, and prediction engine setup. The completion focuses on the prediction step, while the suffix includes assertions and output. This tests the LLM's understanding of ML.NET's API and proper usage patterns, ensuring the model can correctly predict and verify outcomes in a machine learning context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+
+namespace MLNetExample
+{
+    public class DataModel
+    {
+        [LoadColumn(0)]
+        public float Feature1;
+        [LoadColumn(1)]
+        public float Feature2;
+        [LoadColumn(2)]
+        public float Label;
+    }
+
+    public class Prediction
+    {
+        [ColumnName("Score")]
+        public float PredictedLabel;
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var mlContext = new MLContext();
+
+            // Load data
+            IDataView dataView = mlContext.Data.LoadFromTextFile<DataModel>("data.csv", separatorChar: ',', hasHeader: true);
+
+            // Split data
+            var trainTestData = mlContext.Data.TrainTestSplit(dataView, testFraction: 0.2);
+            var trainData = trainTestData.TrainSet;
+            var testData = trainTestData.TestSet;
+
+            // Define data preparation and training pipeline
+            var pipeline = mlContext.Transforms.Concatenate("Features", "Feature1", "Feature2")
+                .Append(mlContext.Transforms.NormalizeMinMax("Features"))
+                .Append(mlContext.Regression.Trainers.Sdca(labelColumnName: "Label", maximumNumberOfIterations: 100));
+
+            // Train the model
+            var model = pipeline.Fit(trainData);
+
+            // Evaluate the model
+            var predictions = model.Transform(testData);
+            var metrics = mlContext.Regression.Evaluate(predictions, labelColumnName: "Label");
+
+            Console.WriteLine($"R^2: {metrics.RSquared}");
+            Console.WriteLine($"RMS: {metrics.RootMeanSquaredError}");
+
+            // Use the model for predictions
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<DataModel, Prediction>(model);
+            var input = new DataModel { Feature1 = 1.5f, Feature2 = 2.3f };
+            var prediction = predictionEngine.Predict(input);
+            Console.WriteLine($"Predicted Label: {prediction.PredictedLabel}");
+
+            // Save the model
+            mlContext.Model.Save(model, trainData.Schema, "model.zip");
+
+            // Load the model
+            ITransformer loadedModel;
+            DataViewSchema modelSchema;
+            using (var fileStream = new FileStream("model.zip", FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                loadedModel = mlContext.Model.Load(fileStream, out modelSchema);
+            }
+
+            // Create prediction engine for loaded model
+            var loadedPredictionEngine = mlContext.Model.CreatePredictionEngine<DataModel, Prediction>(loadedModel);
+
+            // Make a single prediction
+            var newInput = new DataModel { Feature1 = 3.0f, Feature2 = 1.0f };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var newPrediction = loadedPredictionEngine.Predict(newInput);
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(newPrediction != null, "Prediction should not be null");
+            Debug.Assert(newPrediction.PredictedLabel > 0, "Predicted label should be positive");
+
+            Console.WriteLine($"Loaded Model Predicted Label: {newPrediction.PredictedLabel}");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case utilizes the ML.NET library, which is less commonly used compared to more popular machine learning libraries like TensorFlow and PyTorch. The example sets up a full machine learning pipeline from data loading, training, evaluating, saving, and reloading the model, and making predictions. The specific focus on reloading the trained model and ensuring it can still make predictions accurately is a less common but important use case. The assertions ensure that the predictions are valid and that the model behaves correctly after being loaded from disk.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.Json;
+
+namespace RareApiUsageExample
+{
+    public class Program
+    {
+        public class Person
+        {
+            public string Name { get; set; }
+            public int Age { get; set; }
+        }
+
+        public static string SerializePerson(Person person)
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            return JsonSerializer.Serialize(person, options);
+        }
+
+        public static Person DeserializePerson(string json)
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            return JsonSerializer.Deserialize<Person>(json, options);
+        }
+
+        public static void Main(string[] args)
+        {
+            var person = new Person { Name = "John Doe", Age = 30 };
+            string json = SerializePerson(person);
+            Console.WriteLine("Serialized JSON: " + json);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            Console.WriteLine("Deserialized Person: " + deserializedPerson.Name + ", Age: " + deserializedPerson.Age);
+
+SUFFIX CODE:
+----------------------------------------
+            // Deserialize the JSON string back to a Person object
+            Person deserializedPerson = DeserializePerson(json);
+            Console.WriteLine("Deserialized Person: " + deserializedPerson.Name + ", Age: " + deserializedPerson.Age);
+
+            // Assertions to verify correctness
+            Debug.Assert(deserializedPerson.Name == "John Doe", "Name should be 'John Doe'");
+            Debug.Assert(deserializedPerson.Age == 30, "Age should be 30");
+
+            // Clean up resources (if any)
+            // In this case, there are no disposable resources
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the less common usage of the System.Text.Json library, specifically testing the correct serialization and deserialization of objects with various JsonSerializerOptions. The golden completion focuses on the correct parameter ordering and usage of the JsonSerializer.Serialize method. The suffix contains assertions verifying the deserialization correctness and ensuring the API's behavior matches expectations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+
+namespace MLNetExample
+{
+    public class HouseData
+    {
+        public float Size { get; set; }
+        public float Price { get; set; }
+    }
+
+    public class Prediction
+    {
+        [ColumnName("Score")]
+        public float Price { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var mlContext = new MLContext();
+            var houseData = new List<HouseData>
+            {
+                new HouseData { Size = 1.1F, Price = 1.2F },
+                new HouseData { Size = 1.9F, Price = 2.3F },
+                new HouseData { Size = 2.8F, Price = 3.0F },
+                new HouseData { Size = 3.4F, Price = 3.7F }
+            };
+            var trainingData = mlContext.Data.LoadFromEnumerable(houseData);
+            var pipeline = mlContext.Transforms.Concatenate("Features", "Size")
+                .Append(mlContext.Regression.Trainers.Sdca());
+            var model = pipeline.Fit(trainingData);
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<HouseData, Prediction>(model);
+            // Check RSquared and MAE
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var metrics = mlContext.Regression.Evaluate(model.Transform(trainingData));
+            Console.WriteLine($"RSquared: {metrics.RSquared}");
+            Console.WriteLine($"MAE: {metrics.MeanAbsoluteError}");
+
+SUFFIX CODE:
+----------------------------------------
+            var newHouseData = new HouseData { Size = 2.5F };
+            var prediction = predictionEngine.Predict(newHouseData);
+
+            Debug.Assert(prediction.Price > 0, "The predicted price should be greater than 0");
+            Debug.Assert(prediction.Price < 5, "The predicted price should be less than 5");
+
+            // Cleanup
+            mlContext.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example uses ML.NET, a machine learning library in .NET, to build and evaluate a regression model. The example includes uncommon evaluation metrics and setup for a machine learning pipeline, testing the LLM's ability to recognize and complete the pattern correctly. Assertions verify the correctness of the predicted values and evaluation metrics, ensuring the model's performance. The prefix sets up a comprehensive context, while the completion focuses on an uncommon API usage for model evaluation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+
+namespace MLExample
+{
+    public class HouseData
+    {
+        public float Size { get; set; }
+        public float Price { get; set; }
+    }
+
+    public class Prediction
+    {
+        [ColumnName("Score")]
+        public float Price { get; set; }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var context = new MLContext();
+            var data = new List<HouseData>
+            {
+                new HouseData { Size = 1.1F, Price = 1.2F },
+                new HouseData { Size = 1.9F, Price = 2.3F },
+                new HouseData { Size = 2.8F, Price = 3.0F }
+            };
+
+            var dataView = context.Data.LoadFromEnumerable(data);
+
+            var pipeline = context.Transforms.Concatenate("Features", "Size")
+                .Append(context.Regression.Trainers.Sdca(labelColumnName: "Price", maximumNumberOfIterations: 100));
+
+            var model = pipeline.Fit(dataView);
+
+            var predictionEngine = context.Model.CreatePredictionEngine<HouseData, Prediction>(model);
+
+            var size = new HouseData { Size = 2.5F };
+
+            var prediction;
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+prediction = predictionEngine.Predict(size)
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(prediction.Price > 0, "Prediction price should be greater than 0");
+
+            Console.WriteLine($"Predicted price: {prediction.Price}");
+
+            var modelPath = "model.zip";
+            context.Model.Save(model, dataView.Schema, modelPath);
+
+            var loadedModel = context.Model.Load(modelPath, out var modelInputSchema);
+            var loadedPredictionEngine = context.Model.CreatePredictionEngine<HouseData, Prediction>(loadedModel);
+            var loadedPrediction = loadedPredictionEngine.Predict(size);
+
+            Debug.Assert(Math.Abs(loadedPrediction.Price - prediction.Price) < 0.01, "Loaded model prediction should be close to the original model prediction");
+
+            Console.WriteLine($"Loaded model predicted price: {loadedPrediction.Price}");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to work with the ML.NET library, specifically focusing on the creation and usage of a prediction engine, and the saving and loading of a trained model. It ensures the model can handle ML.NET's uncommon APIs correctly, including proper parameter usage and prediction verification.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+
+namespace MachineLearningExample
+{
+    public class HousingData
+    {
+        public float Size { get; set; }
+        public float Price { get; set; }
+    }
+
+    public class HousingPrediction
+    {
+        [ColumnName("Score")]
+        public float Price { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var mlContext = new MLContext();
+
+            // Sample data
+            var trainingData = new List<HousingData>
+            {
+                new HousingData { Size = 1.1F, Price = 1.2F },
+                new HousingData { Size = 1.9F, Price = 2.3F },
+                new HousingData { Size = 2.8F, Price = 3.0F },
+                new HousingData { Size = 3.4F, Price = 3.7F }
+            };
+
+            // Convert data to IDataView
+            var trainingDataView = mlContext.Data.LoadFromEnumerable(trainingData);
+
+            // Define data preparation and training pipeline
+            var pipeline = mlContext.Transforms.Concatenate("Features", "Size")
+                .Append(mlContext.Regression.Trainers.Sdca(labelColumnName: "Price", maximumNumberOfIterations: 100));
+
+            // Train the model
+            var model = pipeline.Fit(trainingDataView);
+
+            // Save the model
+            var modelPath = "model.zip";
+            mlContext.Model.Save(model, trainingDataView.Schema, modelPath);
+
+            // Load the model
+            ITransformer loadedModel;
+            DataViewSchema modelSchema;
+            using (var fileStream = new System.IO.FileStream(modelPath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read))
+            {
+                loadedModel = mlContext.Model.Load(fileStream, out modelSchema);
+            }
+
+            // Create prediction engine
+            var predictionEngine = mlContext.Model.CreatePredictionEngine<HousingData, HousingPrediction>(loadedModel);
+
+            // Predict
+            var size = 2.5F;
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var input = new HousingData { Size = size };
+            var prediction = predictionEngine.Predict(input);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Assertions
+            Debug.Assert(prediction.Price > 0, "Price should be greater than 0");
+            Debug.Assert(prediction.Price < 5, "Price should be less than 5");
+
+            Console.WriteLine($"Predicted price for size {size}: {prediction.Price}");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of ML.NET, an uncommon machine learning library in C#. The example includes the complete process of defining data classes, preparing training data, creating and training a model, saving and loading the model, and making predictions. The code leverages less common APIs within ML.NET, such as creating a prediction engine and using the Sdca regression trainer. The assertions validate the correctness of the prediction, ensuring the model produces reasonable output, thus covering edge cases in the machine learning pipeline.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using Microsoft.ML.Transforms;
+
+namespace MLNetExample
+{
+    public class HousingData
+    {
+        public float Size { get; set; }
+        public float Price { get; set; }
+    }
+
+    public class HousingPrediction
+    {
+        [ColumnName("Score")]
+        public float Price { get; set; }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var context = new MLContext();
+            var data = new List<HousingData>
+            {
+                new HousingData { Size = 1.1F, Price = 1.2F },
+                new HousingData { Size = 1.9F, Price = 2.3F },
+                new HousingData { Size = 2.8F, Price = 3.0F },
+                new HousingData { Size = 3.4F, Price = 3.7F }
+            };
+            var dataView = context.Data.LoadFromEnumerable(data);
+            var pipeline = context.Transforms.Concatenate("Features", "Size")
+                .Append(context.Regression.Trainers.Sdca(labelColumnName: "Price", maximumNumberOfIterations: 100));
+            var model = pipeline.Fit(dataView);
+
+            var sizeData = new List<HousingData>
+            {
+                new HousingData { Size = 2.5F },
+                new HousingData { Size = 3.0F }
+            };
+            var sizeDataView = context.Data.LoadFromEnumerable(sizeData);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var predictions = model.Transform(sizeDataView);
+            var predictedPrices = context.Data.CreateEnumerable<HousingPrediction>(predictions, reuseRowObject: false);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            var enumerator = predictedPrices.GetEnumerator();
+            enumerator.MoveNext();
+            Debug.Assert(Math.Abs(enumerator.Current.Price - 2.7F) < 0.2, "The predicted price for size 2.5 is incorrect");
+            enumerator.MoveNext();
+            Debug.Assert(Math.Abs(enumerator.Current.Price - 3.0F) < 0.2, "The predicted price for size 3.0 is incorrect");
+            enumerator.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to work with the ML.NET library, which is less commonly used compared to other machine learning libraries. The scenario includes setting up a pipeline for regression using the Sdca trainer, transforming data for predictions, and validating predictions with appropriate assertions. This demonstrates understanding of ML.NET's API and handling of predictions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Threading.Channels;
+using System.Diagnostics;
+
+namespace ChannelExample
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var cts = new CancellationTokenSource();
+            var token = cts.Token;
+            var channel = Channel.CreateUnbounded<int>();
+            var writer = channel.Writer;
+            var reader = channel.Reader;
+
+            // Start a writer task
+            var writerTask = Task.Run(async () =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    await writer.WriteAsync(i, token);
+                    await Task.Delay(100, token); // simulate work
+                }
+                writer.Complete();
+            }, token);
+
+            // Start a reader task
+            var readerTask = Task.Run(async () =>
+            {
+                await foreach (var item in reader.ReadAllAsync(token))
+                {
+                    Console.WriteLine($"Read: {item}");
+                }
+            }, token);
+
+            // Wait for the writer to complete
+            await writerTask;
+
+            // Cancel the reader
+            cts.Cancel();
+
+            // Wait for the reader to complete
+            await readerTask;
+
+            // Create another channel for more complex example
+            var boundedChannel = Channel.CreateBounded<int>(new BoundedChannelOptions(5)
+            {
+                SingleReader = true,
+                SingleWriter = true
+            });
+
+            var boundedWriter = boundedChannel.Writer;
+            var boundedReader = boundedChannel.Reader;
+
+            var boundedWriterTask = Task.Run(async () =>
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    await boundedWriter.WriteAsync(i, token);
+                    await Task.Delay(100, token); // simulate work
+                }
+                boundedWriter.Complete();
+            }, token);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            await foreach (var item in boundedReader.ReadAllAsync(token))
+            {
+                items.Add(item);
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            var boundedReaderTask = Task.Run(async () =>
+            {
+                var items = new List<int>();
+                await foreach (var item in boundedReader.ReadAllAsync(token))
+                {
+                    items.Add(item);
+                }
+                Debug.Assert(items.Count == 5, "All items should be read");
+                Debug.Assert(items[0] == 0 && items[4] == 4, "Items should be read in correct order");
+            }, token);
+
+            await boundedWriterTask;
+            await boundedReaderTask;
+
+            // Clean up resources
+            cts.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of System.Threading.Channels with bounded channels, which is an uncommon API in concurrent programming. The prefix sets up a context for writing and reading from a channel, while the golden completion involves writing the final element to the channel. The suffix contains assertions to verify the correct behavior of the channel operations, ensuring items are read in the correct order and the expected number of items are processed. This is a good test case for evaluating the model's ability to handle uncommon API usage patterns and parameter correctness in concurrent programming.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using System.Diagnostics;
+
+namespace RareApiUsageExample
+{
+    class Program
+    {
+        public class HousingData
+        {
+            public float Size { get; set; }
+            public float Price { get; set; }
+        }
+
+        public class Prediction
+        {
+            [ColumnName("Score")]
+            public float Price { get; set; }
+        }
+
+        static void Main(string[] args)
+        {
+            var context = new MLContext();
+            var data = new List<HousingData>
+            {
+                new HousingData { Size = 1.1F, Price = 1.2F },
+                new HousingData { Size = 1.9F, Price = 2.3F },
+                new HousingData { Size = 2.8F, Price = 3.0F }
+            };
+
+            var dataView = context.Data.LoadFromEnumerable(data);
+            var pipeline = context.Transforms.Concatenate("Features", "Size")
+                            .Append(context.Regression.Trainers.Sdca(labelColumnName: "Price", maximumNumberOfIterations: 100));
+
+            var model = pipeline.Fit(dataView);
+
+            var predictionFunction = context.Model.CreatePredictionEngine<HousingData, Prediction>(model);
+
+            var sizeToPredict = new HousingData { Size = 2.5F };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var predictedPrice = predictionFunction.Predict(sizeToPredict);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            Debug.Assert(predictedPrice != null, "Prediction should not be null");
+            Debug.Assert(predictedPrice.Price > 0, "Predicted price should be greater than zero");
+
+            Console.WriteLine($"Predicted price for size {sizeToPredict.Size}: {predictedPrice.Price}");
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern involving ML.NET, an uncommon library for some developers. It uses the Sdca regression trainer, which may not be as commonly used as other trainers. The pattern includes setting up the ML context, loading data, creating a pipeline, fitting a model, and using a prediction engine. The assertions verify that the prediction is not null and the predicted price is a positive number. This scenario helps ensure the LLM understands the correct usage of ML.NET for regression tasks.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading.Channels;
+
+public class ChannelExample {
+    private static async Task Producer(ChannelWriter<int> writer) {
+        for (int i = 0; i < 10; i++) {
+            await writer.WriteAsync(i);
+            await Task.Delay(100); // Simulate some asynchronous work
+        }
+        writer.Complete();
+    }
+
+    private static async Task Consumer(ChannelReader<int> reader) {
+        await foreach (var item in reader.ReadAllAsync()) {
+            Console.WriteLine(item);
+        }
+    }
+
+    public static async Task Main(string[] args) {
+        var channel = Channel.CreateUnbounded<int>();
+        var producerTask = Producer(channel.Writer);
+        var consumerTask = Consumer(channel.Reader);
+        await Task.WhenAll(producerTask, consumerTask);
+    }
+}
+
+public class TestChannelExample {
+    public static async Task TestProducerConsumer() {
+        var channel = Channel.CreateUnbounded<int>();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+        await foreach (var item in channel.Reader.ReadAllAsync()) {
+            Console.WriteLine(item);
+        }
+
+SUFFIX CODE:
+----------------------------------------
+        // Reading from the channel and validating the output
+        var reader = channel.Reader;
+        var items = new List<int>();
+        await foreach (var item in reader.ReadAllAsync()) {
+            items.Add(item);
+        }
+
+        // Assertions to verify the channel output
+        Debug.Assert(items.Count == 10, "The number of items produced should be 10.");
+        for (int i = 0; i < 10; i++) {
+            Debug.Assert(items[i] == i, $"Expected item {i} but got {items[i]}.");
+        }
+    }
+}
+
+public class Program {
+    public static async Task Main(string[] args) {
+        await TestChannelExample.TestProducerConsumer();
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete patterns involving the System.Threading.Channels library, which is less commonly used compared to other concurrent programming libraries in .NET. The pattern includes creating a producer that writes to a channel and a consumer that reads from it asynchronously. The completion demonstrates correct API usage by handling the producer and consumer tasks properly, ensuring they work together correctly. Assertions validate the behavior and correctness of the channel operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Azure;
+using Azure.AI.TextAnalytics;
+
+namespace RareApiUsageExample
+{
+    public class TextAnalyticsExample
+    {
+        private static readonly string endpoint = "https://<your-text-analytics-endpoint>.cognitiveservices.azure.com/";
+        private static readonly string apiKey = "<your-text-analytics-api-key>";
+
+        public static async Task Main(string[] args)
+        {
+            TextAnalyticsClient client = new TextAnalyticsClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
+
+            string document = "The quick brown fox jumps over the lazy dog.";
+
+            // Call the rare sentiment analysis method
+            var sentiment = await AnalyzeSentimentWithOpinionMiningAsync(client, document);
+            Console.WriteLine($"Sentiment: {sentiment.Sentiment}");
+            foreach (var sentence in sentiment.Sentences)
+            {
+                Console.WriteLine($"Text: {sentence.Text}");
+                Console.WriteLine($"Sentiment: {sentence.Sentiment}");
+                Console.WriteLine($"Opinions:");
+                foreach (var opinion in sentence.Opinions)
+                {
+                    Console.WriteLine($"Target: {opinion.Target.Text}, Sentiment: {opinion.Target.Sentiment}");
+                    foreach (var assessment in opinion.Assessments)
+                    {
+                        Console.WriteLine($"Assessment: {assessment.Text}, Sentiment: {assessment.Sentiment}");
+                    }
+                }
+            }
+        }
+
+        private static async Task<AnalyzeSentimentResult> AnalyzeSentimentWithOpinionMiningAsync(TextAnalyticsClient client, string document)
+        {
+            var options = new AnalyzeSentimentOptions
+            {
+                IncludeOpinionMining = true
+            };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            Response<DocumentSentiment> response = await client.AnalyzeSentimentAsync(document, options);
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(response.Value.Sentiment == TextSentiment.Mixed || response.Value.Sentiment == TextSentiment.Positive || response.Value.Sentiment == TextSentiment.Negative, "Sentiment should be valid");
+            Debug.Assert(response.Value.Sentences.Count > 0, "There should be at least one sentence in the response");
+            return response.Value;
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the Azure Text Analytics API with the opinion mining feature enabled, which is a less commonly used feature. The completion involves correctly using the AnalyzeSentimentAsync method with the IncludeOpinionMining option set to true. The assertions verify that the response is not null, the sentiment value is valid, and there is at least one sentence in the response, ensuring the method's correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
+
+namespace CosmosDbExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://your-cosmos-db.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "your-primary-key";
+        private static CosmosClient cosmosClient;
+        private static Database database;
+        private static Container container;
+
+        static async Task Main(string[] args)
+        {
+            try
+            {
+                cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+                database = await cosmosClient.CreateDatabaseIfNotExistsAsync("SampleDatabase");
+                container = await database.CreateContainerIfNotExistsAsync("SampleContainer", "/partitionKey");
+
+                await AddItemsToContainerAsync();
+            }
+            finally
+            {
+                cosmosClient?.Dispose();
+            }
+        }
+
+        private static async Task AddItemsToContainerAsync()
+        {
+            var newItem = new { id = "1", partitionKey = "partition1", name = "Sample Item" };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                var result = await container.CreateItemAsync(newItem, new PartitionKey(newItem.partitionKey));
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(result.StatusCode == System.Net.HttpStatusCode.Created, "Item was not created successfully");
+
+            var readItem = await container.ReadItemAsync<dynamic>(newItem.id, new PartitionKey(newItem.partitionKey));
+            Debug.Assert(readItem.Resource.name == "Sample Item", "Item name does not match");
+
+            await container.DeleteItemAsync<dynamic>(newItem.id, new PartitionKey(newItem.partitionKey));
+            Debug.Assert((await container.ReadItemAsync<dynamic>(newItem.id, new PartitionKey(newItem.partitionKey))).StatusCode == System.Net.HttpStatusCode.NotFound, "Item was not deleted successfully");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to complete a task involving the Azure Cosmos DB SDK, an uncommon library for many developers. The scenario includes the creation, validation, and deletion of an item in a Cosmos DB container. The golden completion involves the correct usage of the `CreateItemAsync` method, which is crucial for interacting with Cosmos DB. The prefix sets up the Cosmos DB client, database, and container, and the suffix includes assertions to validate the correct behavior of the API usage, ensuring the item is created, read, and deleted successfully.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace TwitterApiExample
+{
+    public class TwitterClient
+    {
+        private readonly HttpClient _httpClient;
+        private readonly string _bearerToken;
+
+        public TwitterClient(string bearerToken)
+        {
+            _httpClient = new HttpClient();
+            _bearerToken = bearerToken;
+        }
+
+        private async Task<string> GetTwitterDataAsync(string url)
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("Authorization", $"Bearer {_bearerToken}");
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<List<string>> GetRecentTweetsAsync(string username)
+        {
+            string url = $"https://api.twitter.com/2/tweets?username={username}";
+            string jsonResponse = await GetTwitterDataAsync(url);
+
+            // Simulate parsing JSON response
+            List<string> tweets = new List<string>
+            {
+                "Tweet1 from " + username,
+                "Tweet2 from " + username,
+                "Tweet3 from " + username
+            };
+
+            return tweets;
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            string bearerToken = "YOUR_TWITTER_BEARER_TOKEN";
+            TwitterClient client = new TwitterClient(bearerToken);
+            List<string> tweets = await client.GetRecentTweetsAsync("twitter");
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            Console.WriteLine("Tweets retrieved: " + string.Join(", ", tweets));
+
+SUFFIX CODE:
+----------------------------------------
+            // Assertions
+            Debug.Assert(tweets.Count == 3, "Expected 3 tweets.");
+            Debug.Assert(tweets[0].StartsWith("Tweet1 from twitter"), "First tweet does not match.");
+            Debug.Assert(tweets[1].StartsWith("Tweet2 from twitter"), "Second tweet does not match.");
+            Debug.Assert(tweets[2].StartsWith("Tweet3 from twitter"), "Third tweet does not match.");
+
+            // Cleanup
+            client.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the Twitter API to fetch recent tweets for a user using HttpClient. It includes uncommon API usage patterns, such as setting up authorization headers and parsing JSON responses. The example tests the LLM's ability to recognize and continue the pattern of HTTP requests and JSON parsing, and it includes assertions to verify the correctness of the API behavior and parameter handling.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace SemanticKernelExample
+{
+    public class SemanticKernelIntegration
+    {
+        private const string OpenAiApiKey = "your-openai-api-key";
+        private const string OpenAiApiUrl = "https://api.openai.com/v1/engines/davinci-codex/completions";
+
+        public class OpenAiResponse
+        {
+            [JsonPropertyName("id")]
+            public string Id { get; set; }
+
+            [JsonPropertyName("object")]
+            public string Object { get; set; }
+
+            [JsonPropertyName("created")]
+            public int Created { get; set; }
+
+            [JsonPropertyName("model")]
+            public string Model { get; set; }
+
+            [JsonPropertyName("choices")]
+            public List<Choice> Choices { get; set; }
+        }
+
+        public class Choice
+        {
+            [JsonPropertyName("text")]
+            public string Text { get; set; }
+
+            [JsonPropertyName("index")]
+            public int Index { get; set; }
+
+            [JsonPropertyName("logprobs")]
+            public object Logprobs { get; set; }
+
+            [JsonPropertyName("finish_reason")]
+            public string FinishReason { get; set; }
+        }
+
+        public async Task<string> GetOpenAiResponseAsync(string prompt)
+        {
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {OpenAiApiKey}");
+
+            var requestBody = new
+            {
+                prompt = prompt,
+                max_tokens = 100,
+                n = 1,
+                stop = "\n"
+            };
+
+            var content = new StringContent(JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync(OpenAiApiUrl, content);
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var openAiResponse = JsonSerializer.Deserialize<OpenAiResponse>(responseString);
+
+            return openAiResponse.Choices.FirstOrDefault()?.Text;
+        }
+    }
+}
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var semanticKernelIntegration = new SemanticKernelExample.SemanticKernelIntegration();
+        string prompt = "Explain the significance of the Turing test.";
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+        string result = await semanticKernelIntegration.GetOpenAiResponseAsync(prompt);
+
+SUFFIX CODE:
+----------------------------------------
+        Debug.Assert(!string.IsNullOrEmpty(result), "The result should not be null or empty.");
+        Debug.Assert(result.Contains("Turing"), "The result should contain the word 'Turing'.");
+        Debug.Assert(result.Length > 10, "The result should be longer than 10 characters.");
+
+        Console.WriteLine("Assertions passed successfully.");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to recognize and complete an uncommon API usage pattern involving the .NET SDK for OpenAI. The code demonstrates how to interact with the OpenAI API, parse the response, and assert the validity of the returned data. This is a good test case because it involves asynchronous programming, HTTP requests, JSON serialization, and specific API response handling, which are less commonly used in typical coding scenarios.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using Microsoft.Azure.Cosmos;
+
+namespace CosmosDBExample
+{
+    public class CosmosDBHandler
+    {
+        private CosmosClient cosmosClient;
+        private Database database;
+        private Container container;
+        private const string databaseId = "SampleDatabase";
+        private const string containerId = "SampleContainer";
+
+        public CosmosDBHandler(string endpointUri, string primaryKey)
+        {
+            cosmosClient = new CosmosClient(endpointUri, primaryKey);
+        }
+
+        public async Task InitializeAsync()
+        {
+            database = await cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+            container = await database.CreateContainerIfNotExistsAsync(containerId, "/partitionKey");
+        }
+
+        public async Task AddItemAsync<T>(T item, string partitionKey)
+        {
+            await container.CreateItemAsync(item, new PartitionKey(partitionKey));
+        }
+
+        // Prefix ends here
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+public async Task ReadItemAsync(string id, string partitionKey)
+
+SUFFIX CODE:
+----------------------------------------
+        public async Task ReadItemAsync(string id, string partitionKey)
+        {
+            try
+            {
+                ItemResponse<dynamic> response = await container.ReadItemAsync<dynamic>(id, new PartitionKey(partitionKey));
+                Debug.Assert(response.StatusCode == System.Net.HttpStatusCode.OK, "Item read successfully");
+                Console.WriteLine($"Item read: {response.Resource}");
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                Debug.Assert(false, "Item not found");
+            }
+        }
+
+        public async Task DeleteItemAsync(string id, string partitionKey)
+        {
+            try
+            {
+                ItemResponse<dynamic> response = await container.DeleteItemAsync<dynamic>(id, new PartitionKey(partitionKey));
+                Debug.Assert(response.StatusCode == System.Net.HttpStatusCode.NoContent, "Item deleted successfully");
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                Debug.Assert(false, "Item not found for deletion");
+            }
+        }
+
+        public void Dispose()
+        {
+            cosmosClient?.Dispose();
+        }
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            string endpointUri = "your-endpoint-uri";
+            string primaryKey = "your-primary-key";
+
+            CosmosDBHandler handler = new CosmosDBHandler(endpointUri, primaryKey);
+            await handler.InitializeAsync();
+
+            var sampleItem = new { id = "1", partitionKey = "sampleKey", name = "Sample Item" };
+            await handler.AddItemAsync(sampleItem, "sampleKey");
+
+            await handler.ReadItemAsync("1", "sampleKey");
+            await handler.DeleteItemAsync("1", "sampleKey");
+
+            handler.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the Azure Cosmos DB SDK for .NET, which is not a commonly used API. The focus is on testing the ability of the model to recognize and correctly implement operations such as updating an item in the Cosmos DB container. The prefix sets up the Cosmos DB client and necessary methods, while the golden completion adds the item update functionality. The suffix includes assertions to verify the behavior of the API calls, ensuring the model understands the correct parameter ordering and handles exceptions appropriately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Azure.Cosmos;
+
+namespace CosmosDBExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUri = "https://your-cosmos-db.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "your-primary-key";
+        private static CosmosClient cosmosClient;
+        private static Database database;
+        private static Container container;
+        private const string DatabaseId = "SampleDatabase";
+        private const string ContainerId = "SampleContainer";
+
+        public static async Task Main(string[] args)
+        {
+            try
+            {
+                // Initialize Cosmos Client
+                cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+                await CreateDatabaseAsync();
+                await CreateContainerAsync();
+
+                // Add an item to the container
+                var sampleItem = new SampleItem { Id = "1", Name = "Item1", Description = "This is a sample item." };
+                await AddItemToContainerAsync(sampleItem);
+
+                // Fetch the item from the container
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+fetchedItem = await GetItemFromContainerAsync("1")
+
+SUFFIX CODE:
+----------------------------------------
+                Debug.Assert(fetchedItem != null, "Fetched item should not be null");
+                Debug.Assert(fetchedItem.Id == "1", "Fetched item ID should be '1'");
+                Debug.Assert(fetchedItem.Name == "Item1", "Fetched item Name should be 'Item1'");
+                Debug.Assert(fetchedItem.Description == "This is a sample item.", "Fetched item Description should be 'This is a sample item.'");
+            }
+            finally
+            {
+                cosmosClient?.Dispose();
+            }
+        }
+
+        private static async Task CreateDatabaseAsync()
+        {
+            database = await cosmosClient.CreateDatabaseIfNotExistsAsync(DatabaseId);
+            Debug.Assert(database != null, "Database should be created");
+        }
+
+        private static async Task CreateContainerAsync()
+        {
+            container = await database.CreateContainerIfNotExistsAsync(ContainerId, "/id");
+            Debug.Assert(container != null, "Container should be created");
+        }
+
+        private static async Task AddItemToContainerAsync(SampleItem item)
+        {
+            await container.CreateItemAsync(item, new PartitionKey(item.Id));
+        }
+
+        private static async Task<SampleItem> GetItemFromContainerAsync(string id)
+        {
+            ItemResponse<SampleItem> response = await container.ReadItemAsync<SampleItem>(id, new PartitionKey(id));
+            return response.Resource;
+        }
+    }
+
+    public class SampleItem
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and correctly use the Azure Cosmos DB SDK for .NET, an uncommon API for many developers. It checks the proper usage of async methods for creating a database, container, adding items, and reading items from the container. The example includes necessary assertions to verify the correct behavior of the API and ensures that resources are properly cleaned up. The pattern of using async/await with Cosmos DB SDK is clearly established, making it a good test case for recognizing and continuing the API usage.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
+
+namespace AzureCosmosDBExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://<your-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private CosmosClient cosmosClient;
+        private Database database;
+        private Container container;
+        private string databaseId = "SampleDB";
+        private string containerId = "SampleContainer";
+
+        public async Task InitializeAsync()
+        {
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+            this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+            this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/partitionKey");
+        }
+
+        public async Task AddItemToContainerAsync()
+        {
+            var item = new { id = Guid.NewGuid().ToString(), partitionKey = "samplePartition", name = "Sample Item", description = "This is a sample item" };
+            try
+            {
+                ItemResponse<dynamic> response = await this.container.CreateItemAsync<dynamic>(item, new PartitionKey(item.partitionKey));
+                Console.WriteLine("Created item in database with id: {0}", item.id);
+                Debug.Assert(response.StatusCode == System.Net.HttpStatusCode.Created, "Item creation failed");
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Conflict)
+            {
+                Console.WriteLine("Item with id: {0} already exists", item.id);
+            }
+        }
+
+        static async Task Main(string[] args)
+        {
+            Program program = new Program();
+            await program.InitializeAsync();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await program.AddItemToContainerAsync();
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Verify that the item exists in the container
+            var sqlQueryText = "SELECT * FROM c WHERE c.partitionKey = 'samplePartition'";
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            FeedIterator<dynamic> queryResultSetIterator = program.container.GetItemQueryIterator<dynamic>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<dynamic> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                foreach (var item in currentResultSet)
+                {
+                    Debug.Assert(item.name == "Sample Item", "Item name does not match");
+                    Debug.Assert(item.description == "This is a sample item", "Item description does not match");
+                }
+            }
+
+            // Clean up resources
+            if (program.container != null) await program.container.DeleteContainerAsync();
+            if (program.database != null) await program.database.DeleteAsync();
+            if (program.cosmosClient != null) program.cosmosClient.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of Azure Cosmos DB SDK to create and query items in a container. The example provides a clear pattern of initializing the client, creating a database and container, adding an item, and querying the item. It tests the model's ability to recognize and properly use Azure Cosmos DB's API, handle exceptions, and verify results using assertions. The pattern includes correct parameter ordering, resource cleanup, and exception handling, which are crucial for robust cloud service integration.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+using MongoDB.Bson;
+using MongoDB.Driver;
+
+namespace MongoDBExample
+{
+    public class MongoDBTest
+    {
+        private readonly IMongoCollection<BsonDocument> _collection;
+
+        public MongoDBTest()
+        {
+            var client = new MongoClient("mongodb://localhost:27017");
+            var database = client.GetDatabase("testdb");
+            _collection = database.GetCollection<BsonDocument>("testcollection");
+        }
+
+        public void InsertDocument()
+        {
+            var document = new BsonDocument
+            {
+                { "name", "test" },
+                { "value", 1 }
+            };
+            _collection.InsertOne(document);
+        }
+
+        public List<BsonDocument> FindDocuments()
+        {
+            return _collection.Find(new BsonDocument()).ToList();
+        }
+
+        public void TestCRUDOperations()
+        {
+            // Insert a document
+            InsertDocument();
+
+            // Find documents
+            var documents = FindDocuments();
+            Debug.Assert(documents.Count > 0, "Documents should be present after insertion");
+
+            // Update document by setting 'value' to 2 where 'name' is 'test'
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var filter = Builders<BsonDocument>.Filter.Eq("name", "test");
+            var update = Builders<BsonDocument>.Update.Set("value", 2);
+            var updatedDocument = _collection.FindOneAndUpdate(filter, update);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Verify update
+            Debug.Assert(updatedDocument != null && updatedDocument["value"] == 2, "Document should be updated to value 2");
+
+            // Delete document
+            _collection.DeleteOne(new BsonDocument("name", "test"));
+
+            // Verify deletion
+            var deletedDocument = _collection.Find(new BsonDocument("name", "test")).FirstOrDefault();
+            Debug.Assert(deletedDocument == null, "Document should be deleted");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var test = new MongoDBTest();
+            test.TestCRUDOperations();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and correctly use MongoDB's .NET driver for CRUD operations. MongoDB APIs are less commonly used compared to other database interfaces like Entity Framework or Dapper, making this a good test case for rare API usage. The completion involves updating a document and verifying the update, which is a critical part of the CRUD operations. The assertions ensure the update operation is correctly implemented and validated, testing the model's understanding of both the API and the logical flow of operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+
+namespace WebApiIntegrationExample
+{
+    public class GitHubApiClient
+    {
+        private static readonly HttpClient client = new HttpClient();
+
+        public GitHubApiClient()
+        {
+            client.BaseAddress = new Uri("https://api.github.com/");
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
+        }
+
+        public async Task<string> GetUserRepositoriesAsync(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException("Username cannot be null or empty.", nameof(username));
+            }
+
+            HttpResponseMessage response = await client.GetAsync($"users/{username}/repos");
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public static async Task Main(string[] args)
+        {
+            try
+            {
+                var gitHubClient = new GitHubApiClient();
+                string username = "octocat";
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                string repos = await gitHubClient.GetUserRepositoriesAsync(username);
+
+SUFFIX CODE:
+----------------------------------------
+                // Verify that the response contains repositories
+                Debug.Assert(!string.IsNullOrEmpty(repos), "The response should contain repository data.");
+
+                // Additional test for another user
+                string anotherUsername = "torvalds";
+                string anotherRepos = await gitHubClient.GetUserRepositoriesAsync(anotherUsername);
+
+                Debug.Assert(!string.IsNullOrEmpty(anotherRepos), "The response should contain repository data for another user.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the large language model's ability to recognize and complete patterns in C# code involving the integration with the GitHub API using HttpClient. The prefix sets up the context by defining a GitHubApiClient class with a method to fetch user repositories. The golden completion involves invoking the method to get repositories for a specific user. The suffix contains assertions to validate the response and additional tests for robustness. This scenario tests rare API usage capabilities and ensures proper handling of HttpClient interactions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+
+namespace KeyVaultExample
+{
+    class Program
+    {
+        private static async Task Main(string[] args)
+        {
+            // Initialize KeyVault client
+            var client = new SecretClient(new Uri("https://your-keyvault-name.vault.azure.net/"), new DefaultAzureCredential());
+
+            // Simulate configuration loading from KeyVault
+            var secretName = "MySecret";
+            KeyVaultSecret secret = null;
+            try
+            {
+                secret = await client.GetSecretAsync(secretName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error retrieving secret: {ex.Message}");
+            }
+
+            // Ensure secret was retrieved
+            if (secret != null)
+            {
+                Console.WriteLine($"Secret {secretName} retrieved with value: {secret.Value}");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to retrieve secret {secretName}");
+            }
+
+            // Placeholder for additional logic using the secret value
+            // ...
+
+            // Now let's update the secret value
+            string newSecretValue = "UpdatedSecretValue";
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                var updatedSecret = await client.SetSecretAsync(secretName, newSecretValue);
+
+SUFFIX CODE:
+----------------------------------------
+            // Assertions
+            Debug.Assert(updatedSecret != null, "Updated secret should not be null");
+            Debug.Assert(updatedSecret.Value == newSecretValue, "Updated secret value should match the new value");
+
+            // Cleanup
+            try
+            {
+                await client.StartDeleteSecretAsync(secretName);
+                Console.WriteLine($"Secret {secretName} deleted");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting secret: {ex.Message}");
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the Azure KeyVault client to retrieve, update, and delete secrets. It includes error handling and assertions to ensure the secret was updated correctly. This scenario tests the LLM's ability to recognize and complete the pattern involving asynchronous API calls and proper exception handling, as well as verifying the updated value through assertions. The suffix includes assertions placed directly after the code being tested and proper cleanup of resources, ensuring the overall correctness and robustness of the example.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using System.Diagnostics;
+
+namespace AzureCosmosDBExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://<your-cosmos-db-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private DocumentClient client;
+
+        static async Task Main(string[] args)
+        {
+            Program p = new Program();
+            p.client = new DocumentClient(new Uri(EndpointUri), PrimaryKey);
+            await p.InitializeDatabaseAsync();
+        }
+
+        private async Task InitializeDatabaseAsync()
+        {
+            string databaseId = "TestDatabase";
+            string collectionId = "TestCollection";
+            await this.client.CreateDatabaseIfNotExistsAsync(new Database { Id = databaseId });
+            await this.client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri(databaseId), new DocumentCollection { Id = collectionId });
+
+            // Insert a document into the collection
+            dynamic document = new { id = Guid.NewGuid().ToString(), Name = "Azure Cosmos DB" };
+            ResourceResponse<Document> response = await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseId, collectionId), document);
+
+            // Retrieve the document we just created
+            Uri documentUri = UriFactory.CreateDocumentUri(databaseId, collectionId, document.id);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            Document retrievedDocument = await this.client.ReadDocumentAsync(documentUri);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Assertions
+            Debug.Assert(retrievedDocument != null, "Document should not be null");
+            Debug.Assert(retrievedDocument.GetPropertyValue<string>("Name") == "Azure Cosmos DB", "Document should have correct 'Name' property");
+
+            // Clean up resources
+            await this.client.DeleteDocumentAsync(documentUri);
+            await this.client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(databaseId, collectionId));
+            await this.client.DeleteDatabaseAsync(UriFactory.CreateDatabaseUri(databaseId));
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and correctly use the Azure Cosmos DB .NET SDK, specifically focusing on creating, reading, and deleting documents in a Cosmos DB collection. The example includes uncommon API usage patterns such as resource cleanup and proper parameter handling. Assertions are used to verify the correctness of the document properties, and resource cleanup ensures no leftover resources in the database.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+namespace DeprecatedApiExample
+{
+    public class FileReader
+    {
+        private static readonly string filePath = "data.json";
+
+        public static async Task<Dictionary<string, string>> ReadDataFromFileAsync()
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new FileNotFoundException($"The file {filePath} does not exist.");
+            }
+
+            string jsonData;
+            using (var reader = new StreamReader(filePath))
+            {
+                jsonData = await reader.ReadToEndAsync();
+            }
+
+            // Deserialize JSON to Dictionary
+            return DeserializeJson(jsonData);
+        }
+
+        private static Dictionary<string, string> DeserializeJson(string json)
+        {
+            // Use old API method for deserialization
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(result != null, "Deserialization returned null.");
+            Debug.Assert(result.Count > 0, "Deserialized dictionary is empty.");
+            return result;
+        }
+
+        public static async Task Main(string[] args)
+        {
+            try
+            {
+                var data = await ReadDataFromFileAsync();
+                Debug.Assert(data.ContainsKey("exampleKey"), "Key 'exampleKey' is missing in the data.");
+                Debug.Assert(data["exampleKey"] == "exampleValue", "Value for 'exampleKey' does not match.");
+            }
+            catch (Exception ex)
+            {
+                Debug.Assert(false, $"Exception thrown: {ex.Message}");
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and correctly use a deprecated API method from Newtonsoft.Json (JsonConvert.DeserializeObject) to deserialize JSON data into a Dictionary. The prefix sets up the context of reading a JSON file asynchronously and prepares for deserialization. The completion requires the LLM to use the correct method and return type. The suffix includes assertions to ensure the deserialization works as expected and the data contains specific keys and values, which verifies the API usage and parameter handling.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
+
+namespace AzureCosmosDBExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://<your-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private CosmosClient cosmosClient;
+        private Database database;
+        private Container container;
+        private string databaseId = "SampleDB";
+        private string containerId = "SampleContainer";
+
+        public async Task InitializeCosmosAsync()
+        {
+            cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+            database = await cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+            container = await database.CreateContainerIfNotExistsAsync(containerId, "/id");
+        }
+
+        public async Task AddItemToContainerAsync<T>(T item)
+        {
+            try
+            {
+                ItemResponse<T> response = await container.CreateItemAsync(item, new PartitionKey(item.GetType().GetProperty("id").GetValue(item, null).ToString()));
+                Console.WriteLine("Item added with status code: " + response.StatusCode);
+            }
+            catch (CosmosException ex)
+            {
+                Console.WriteLine($"Cosmos DB Exception with status code: {ex.StatusCode}");
+            }
+        }
+
+        public async Task QueryItemsAsync(string queryString)
+        {
+            var query = container.GetItemQueryIterator<dynamic>(new QueryDefinition(queryString));
+            while (query.HasMoreResults)
+            {
+                foreach (var item in await query.ReadNextAsync())
+                {
+                    Console.WriteLine(item);
+                }
+            }
+        }
+
+        static async Task Main(string[] args)
+        {
+            Program p = new Program();
+            await p.InitializeCosmosAsync();
+            var newItem = new { id = Guid.NewGuid().ToString(), Name = "Test Item", Description = "Description of test item" };
+            await p.AddItemToContainerAsync(newItem);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            string queryString = $"SELECT * FROM c WHERE c.id = '{newItem.id}'";
+
+SUFFIX CODE:
+----------------------------------------
+            string queryString = "SELECT * FROM c WHERE c.id = @id";
+            var query = p.container.GetItemQueryIterator<dynamic>(new QueryDefinition(queryString).WithParameter("@id", newItem.id));
+            while (query.HasMoreResults)
+            {
+                foreach (var item in await query.ReadNextAsync())
+                {
+                    Debug.Assert(item.id == newItem.id, "Queried item id does not match");
+                    Debug.Assert(item.Name == newItem.Name, "Queried item name does not match");
+                }
+            }
+
+            p.cosmosClient.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the usage of the Azure Cosmos DB SDK, which is a less commonly used API in the .NET ecosystem. The example includes initializing the Cosmos DB client, creating a database and container, adding an item to the container, and querying items from the container. The completion requires the model to understand the Cosmos DB query syntax and correctly form a query string. Assertions check the integrity of the data after querying to ensure the item was added and retrieved correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net.Http;
+
+namespace GitHubApiIntegration
+{
+    public class GitHubClient
+    {
+        private readonly HttpClient _httpClient;
+
+        public GitHubClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public async Task<string> GetRepositoryAsync(string owner, string repo)
+        {
+            var requestUrl = $"https://api.github.com/repos/{owner}/{repo}";
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
+            request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var content = await response.Content.ReadAsStringAsync();
+            return content;
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var client = new HttpClient();
+            var gitHubClient = new GitHubClient(client);
+            try
+            {
+                // Get repository details
+                string repoDetails = await gitHubClient.GetRepositoryAsync("dotnet", "runtime");
+                Console.WriteLine(repoDetails);
+                // Print the repo name and owner
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                var repoJson = System.Text.Json.JsonDocument.Parse(repoDetails);
+                var repoName = repoJson.RootElement.GetProperty("name").GetString();
+                var ownerName = repoJson.RootElement.GetProperty("owner").GetProperty("login").GetString();
+                Console.WriteLine($"Repository: {repoName}, Owner: {ownerName}");
+
+SUFFIX CODE:
+----------------------------------------
+                Debug.Assert(!string.IsNullOrEmpty(repoDetails), "Repository details should not be empty");
+                Debug.Assert(repoDetails.Contains("dotnet"), "Repository details should contain 'dotnet'");
+                Debug.Assert(repoDetails.Contains("runtime"), "Repository details should contain 'runtime'");
+            }
+            finally
+            {
+                client.Dispose();
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the use of the HttpClient class to interact with the GitHub API, which is a relatively rare and domain-specific API usage scenario. It tests the LLM's ability to correctly use the HttpClient for making web requests, handling JSON responses, and performing assertions to verify the correctness of the data retrieved. The scenario also includes proper resource cleanup and error handling, which are important best practices in API usage.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
+
+namespace AzureCosmosDBExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUri = "https://<your-cosmos-db-uri>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private static CosmosClient cosmosClient;
+        private static Database database;
+        private static Container container;
+
+        public static async Task Main(string[] args)
+        {
+            try
+            {
+                cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+                database = await cosmosClient.CreateDatabaseIfNotExistsAsync("ExampleDatabase");
+                container = await database.CreateContainerIfNotExistsAsync("ExampleContainer", "/partitionKey");
+
+                await AddItemsToContainerAsync();
+            }
+            finally
+            {
+                if (cosmosClient != null)
+                {
+                    cosmosClient.Dispose();
+                }
+            }
+        }
+
+        private static async Task AddItemsToContainerAsync()
+        {
+            var items = new List<dynamic>
+            {
+                new { id = "1", Name = "Item1", Description = "Description for Item1", partitionKey = "Item1" },
+                new { id = "2", Name = "Item2", Description = "Description for Item2", partitionKey = "Item2" }
+            };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var response1 = await container.CreateItemAsync(items[0], new PartitionKey(items[0].partitionKey));
+            var response2 = await container.CreateItemAsync(items[1], new PartitionKey(items[1].partitionKey));
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(response1.StatusCode == System.Net.HttpStatusCode.Created, "Item 1 was not created successfully");
+            Debug.Assert(response2.StatusCode == System.Net.HttpStatusCode.Created, "Item 2 was not created successfully");
+            Debug.Assert(response1.Resource.id == "1", "Item 1 ID mismatch");
+            Debug.Assert(response2.Resource.id == "2", "Item 2 ID mismatch");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the Azure Cosmos DB SDK for creating items in a container. The prefix sets up the Cosmos client, database, and container, while the completion involves creating items in the container using the CreateItemAsync method. The suffix includes assertions to verify that the items were created successfully and that their IDs match the expected values. This scenario tests the model's understanding of the Azure Cosmos DB SDK, proper parameter ordering, and handling of asynchronous operations. The use of Debug.Assert ensures that the assertions will pass if the API is used correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using MongoDB.Bson;
+using MongoDB.Driver;
+
+namespace MongoDBExample
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var connectionString = "mongodb://localhost:27017";
+            var client = new MongoClient(connectionString);
+            var database = client.GetDatabase("testdb");
+            var collection = database.GetCollection<BsonDocument>("testcollection");
+
+            // Insert a sample document
+            var document = new BsonDocument
+            {
+                { "name", "John Doe" },
+                { "age", 30 },
+                { "city", "New York" }
+            };
+            collection.InsertOne(document);
+
+            // Retrieve the document
+            var filter = Builders<BsonDocument>.Filter.Eq("name", "John Doe");
+            var result = collection.Find(filter).FirstOrDefault();
+            Console.WriteLine(result.ToString());
+
+            // Update the document
+            var update = Builders<BsonDocument>.Update.Set("age", 31);
+            collection.UpdateOne(filter, update);
+
+            // Retrieve the updated document
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            result = collection.Find(filter).FirstOrDefault();
+
+SUFFIX CODE:
+----------------------------------------
+            // Verify the update
+            var updatedAge = result["age"].AsInt32;
+            Debug.Assert(updatedAge == 31, "The age should be updated to 31");
+
+            // Clean up by deleting the document
+            collection.DeleteOne(filter);
+
+            // Ensure the document is deleted
+            var deletedResult = collection.Find(filter).FirstOrDefault();
+            Debug.Assert(deletedResult == null, "The document should be deleted");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case involves using the MongoDB .NET driver to perform common database operations such as inserting, retrieving, updating, and deleting documents. It tests the model's understanding of MongoDB's API patterns, parameter ordering, and correct usage of the MongoDB driver. The example also includes assertions to verify the correctness of the operations, making it a comprehensive test for rare API usage capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Xml;
+using System.Xml.Serialization;
+
+namespace RareApiUsageExample
+{
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        private static void SerializePersonListToXml(List<Person> people, string filePath)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Person>));
+            using (FileStream fs = new FileStream(filePath, FileMode.Create))
+            {
+                serializer.Serialize(fs, people);
+            }
+        }
+
+        private static List<Person> DeserializePersonListFromXml(string filePath)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(List<Person>));
+            using (FileStream fs = new FileStream(filePath, FileMode.Open))
+            {
+                return (List<Person>)serializer.Deserialize(fs);
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+            string xmlFilePath = "people.xml";
+            List<Person> people = new List<Person>
+            {
+                new Person { Name = "Alice", Age = 30 },
+                new Person { Name = "Bob", Age = 25 }
+            };
+            SerializePersonListToXml(people, xmlFilePath);
+
+            // Print the name and age of each person
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+foreach (var person in deserializedPeople)
+            {
+                Console.WriteLine($"Name: {person.Name}, Age: {person.Age}");
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            List<Person> deserializedPeople = DeserializePersonListFromXml(xmlFilePath);
+            Debug.Assert(deserializedPeople.Count == 2, "Deserialized people count should be 2");
+            Debug.Assert(deserializedPeople[0].Name == "Alice", "First person's name should be Alice");
+            Debug.Assert(deserializedPeople[0].Age == 30, "First person's age should be 30");
+            Debug.Assert(deserializedPeople[1].Name == "Bob", "Second person's name should be Bob");
+            Debug.Assert(deserializedPeople[1].Age == 25, "Second person's age should be 25");
+
+            // Cleanup
+            if (File.Exists(xmlFilePath))
+            {
+                File.Delete(xmlFilePath);
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to work with the XmlDocument class, an uncommon but valid API for XML manipulation. The XmlDocument class is part of the .NET Framework and provides a way to work with XML data using the DOM (Document Object Model) approach. The example includes serialization and deserialization of a list of custom objects (Person) to and from an XML file, and demonstrates how to read and query the XML file using XmlDocument. The test ensures that the model recognizes the pattern of loading an XML file, selecting nodes, and accessing their values, which is critical for working with XML in legacy systems or specific scenarios where XmlDocument is preferred.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using Azure.Identity;
+using Azure.Storage.Blobs;
+
+namespace AzureBlobStorageExample
+{
+    class Program
+    {
+        private static string connectionString = "Your_Azure_Storage_Connection_String";
+        private static string containerName = "example-container";
+        private static string blobName = "example-blob.txt";
+        private static string localFilePath = "./example-blob.txt";
+
+        static async Task Main(string[] args)
+        {
+            BlobServiceClient blobServiceClient = new BlobServiceClient(connectionString);
+            BlobContainerClient containerClient = await blobServiceClient.CreateBlobContainerAsync(containerName);
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+
+            // Upload a local file to the blob
+            Console.WriteLine("Uploading to Blob storage as blob:\n\t" + blobClient.Uri);
+            using (FileStream uploadFileStream = File.OpenRead(localFilePath))
+            {
+                await blobClient.UploadAsync(uploadFileStream, true);
+            }
+
+            // Download the blob to a local file
+            string downloadFilePath = localFilePath.Replace(".txt", "_DOWNLOADED.txt");
+            Console.WriteLine("Downloading blob to\n\t" + downloadFilePath);
+
+            // Function to download the blob
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await blobClient.DownloadToAsync(downloadFileStream);
+
+SUFFIX CODE:
+----------------------------------------
+            using (FileStream downloadFileStream = File.OpenWrite(downloadFilePath))
+            {
+                await blobClient.DownloadToAsync(downloadFileStream);
+            }
+
+            // Verify the downloaded file exists
+            Debug.Assert(File.Exists(downloadFilePath), "Downloaded file does not exist.");
+
+            // Verify the contents of the downloaded file
+            string originalContent = File.ReadAllText(localFilePath);
+            string downloadedContent = File.ReadAllText(downloadFilePath);
+            Debug.Assert(originalContent == downloadedContent, "The contents of the downloaded file do not match the original.");
+
+            // Clean up resources
+            await containerClient.DeleteIfExistsAsync();
+            File.Delete(downloadFilePath);
+            Console.WriteLine("Completed successfully.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario demonstrates the rare use of Azure Blob Storage SDK to perform file upload and download operations, including proper resource cleanup and verification of the file contents. It tests the LLM's ability to recognize and correctly complete the pattern of blob storage operations, ensuring that the downloaded file matches the uploaded content.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+
+public class FileProcessor
+{
+    private readonly string _inputFilePath;
+    private readonly string _outputFilePath;
+
+    public FileProcessor(string inputFilePath, string outputFilePath)
+    {
+        _inputFilePath = inputFilePath;
+        _outputFilePath = outputFilePath;
+    }
+
+    public async Task ProcessFileAsync()
+    {
+        try
+        {
+            var lines = await ReadLinesAsync();
+            var processedLines = new List<string>();
+
+            foreach (var line in lines)
+            {
+                processedLines.Add(ProcessLine(line));
+            }
+
+            await WriteLinesAsync(processedLines);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+        }
+    }
+
+    private async Task<IEnumerable<string>> ReadLinesAsync()
+    {
+        var lines = new List<string>();
+        using (var reader = new StreamReader(_inputFilePath))
+        {
+            string line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                lines.Add(line);
+            }
+        }
+        return lines;
+    }
+
+    private string ProcessLine(string line)
+    {
+        // Simulate line processing
+        return line.ToUpper();
+    }
+
+    private async Task WriteLinesAsync(IEnumerable<string> lines)
+    {
+        using (var writer = new StreamWriter(_outputFilePath, false))
+        {
+            foreach (var line in lines)
+            {
+                await writer.WriteLineAsync(line);
+            }
+        }
+    }
+}
+
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var processor = new FileProcessor("input.txt", "output.txt");
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await processor.ProcessFileAsync();
+
+SUFFIX CODE:
+----------------------------------------
+        Console.WriteLine("File processing completed.");
+
+        // Assertions to verify the file processing
+        var expectedLines = new List<string> { "LINE1", "LINE2", "LINE3" };
+        var actualLines = await File.ReadAllLinesAsync("output.txt");
+        Debug.Assert(expectedLines.Count == actualLines.Length, "Line count mismatch");
+        for (int i = 0; i < expectedLines.Count; i++)
+        {
+            Debug.Assert(expectedLines[i] == actualLines[i], $"Line {i} mismatch");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern involving asynchronous file reading and writing in C#. The prefix sets up the context for file processing, including reading, processing, and writing lines asynchronously. The completion requires the LLM to correctly call the ProcessFileAsync method, which is a key part of the established pattern. The suffix includes assertions to verify that the file processing completed correctly, ensuring the model understands the entire flow and can generate the correct API usage.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Azure;
+using Azure.Data.Tables;
+using Azure.Data.Tables.Models;
+
+namespace AzureTableExample
+{
+    public class Program
+    {
+        private static string connectionString = "UseDevelopmentStorage=true;";
+        private static string tableName = "SampleTable";
+
+        public static async Task Main(string[] args)
+        {
+            TableServiceClient serviceClient = new TableServiceClient(connectionString);
+            TableClient tableClient = serviceClient.GetTableClient(tableName);
+            await tableClient.CreateIfNotExistsAsync();
+
+            Console.WriteLine("Created Table");
+
+            var entity = new TableEntity("PartitionKey", "RowKey")
+            {
+                { "Name", "John Doe" },
+                { "Age", 29 }
+            };
+
+            await tableClient.AddEntityAsync(entity);
+
+            Console.WriteLine("Added Entity");
+
+            var retrievedEntity = await tableClient.GetEntityAsync<TableEntity>("PartitionKey", "RowKey");
+            Console.WriteLine($"Retrieved Entity: {retrievedEntity.Value.GetString("Name")} - {retrievedEntity.Value.GetInt32("Age")}");
+
+            // Update entity
+            retrievedEntity.Value["Age"] = 30;
+
+            // The following code demonstrates updating the entity in the Azure Table Storage
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            await tableClient.UpdateEntityAsync(retrievedEntity.Value, ETag.All, TableUpdateMode.Replace);
+
+SUFFIX CODE:
+----------------------------------------
+
+            Console.WriteLine("Updated Entity");
+
+            var updatedEntity = await tableClient.GetEntityAsync<TableEntity>("PartitionKey", "RowKey");
+            Debug.Assert(updatedEntity.Value.GetInt32("Age") == 30, "The Age should be updated to 30");
+
+            // Cleanup
+            await tableClient.DeleteEntityAsync("PartitionKey", "RowKey");
+            await tableClient.DeleteAsync();
+            Console.WriteLine("Cleaned up resources");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the usage of the Azure.Data.Tables library, specifically focusing on updating an entity in an Azure Table Storage. The test case verifies the proper usage of the UpdateEntityAsync method with correct parameters and ensures the entity's properties are updated correctly. This scenario helps in evaluating the model's ability to understand and continue patterns involving cloud services and database interfaces. It also includes necessary assertions to verify the correct behavior and handles resource cleanup properly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+
+namespace AzureCosmosDBExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://your-service-endpoint.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "your-primary-key";
+        private DocumentClient client;
+
+        static void Main(string[] args)
+        {
+            Program p = new Program();
+            p.RunAsync().Wait();
+        }
+
+        private async Task RunAsync()
+        {
+            this.client = new DocumentClient(new Uri(EndpointUri), PrimaryKey);
+            await this.client.CreateDatabaseIfNotExistsAsync(new Database { Id = "SampleDB" });
+            await this.client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("SampleDB"), new DocumentCollection { Id = "SampleCollection" });
+            await this.CreateDocumentAsync();
+        }
+
+        private async Task CreateDocumentAsync()
+        {
+            var document = new { id = "1", Name = "John Doe", Age = 30 };
+            await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri("SampleDB", "SampleCollection"), document);
+            
+            // Adding a rare API usage for retrieving a document by id in a deprecated way
+            var options = new RequestOptions { PartitionKey = new PartitionKey("1") };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var response = await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri("SampleDB", "SampleCollection", "1"), options);
+            document = response.Resource;
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(document != null, "Document should not be null");
+            Debug.Assert(document.GetPropertyValue<string>("Name") == "John Doe", "Document name should be 'John Doe'");
+            Debug.Assert(document.GetPropertyValue<int>("Age") == 30, "Document age should be 30");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and use a deprecated method for reading a document from Azure Cosmos DB using the .NET SDK. The method ReadDocumentAsync with a RequestOptions parameter is uncommon and deprecated but still valid. The pattern involves setting up a DocumentClient, creating a database and collection, adding a document, and then retrieving it using the deprecated API. Assertions check the correctness of the document retrieval, making this a good test case for verifying rare API usage capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using System.Diagnostics;
+
+namespace AzureCosmosDBExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUri = "https://<your-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private static DocumentClient client;
+
+        public static void Main(string[] args)
+        {
+            client = new DocumentClient(new Uri(EndpointUri), PrimaryKey);
+            RunDemoAsync().Wait();
+        }
+
+        private static async Task RunDemoAsync()
+        {
+            await client.CreateDatabaseIfNotExistsAsync(new Database { Id = "SampleDB" });
+            await client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("SampleDB"), new DocumentCollection { Id = "SampleCollection" });
+
+            // Insert a sample document
+            dynamic sampleDocument = new { id = "1", Name = "Sample Document", Description = "This is a sample document." };
+            await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri("SampleDB", "SampleCollection"), sampleDocument);
+
+            // Query the document using SQL
+            var queryOptions = new FeedOptions { MaxItemCount = -1 };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                var documents = await client.CreateDocumentQuery<dynamic>(
+                    UriFactory.CreateDocumentCollectionUri("SampleDB", "SampleCollection"),
+                    "SELECT * FROM c WHERE c.id = '1'",
+                    new FeedOptions { MaxItemCount = -1 }).AsDocumentQuery().ExecuteNextAsync<dynamic>();
+
+SUFFIX CODE:
+----------------------------------------
+            var document = documents.FirstOrDefault();
+            Debug.Assert(document != null, "Document should not be null");
+            Debug.Assert(document.id == "1", "Document id should be '1'");
+            Debug.Assert(document.Name == "Sample Document", "Document Name should be 'Sample Document'");
+            Debug.Assert(document.Description == "This is a sample document.", "Document Description should be 'This is a sample document.'");
+
+            Console.WriteLine("Document retrieved successfully.");
+
+            await client.DeleteDocumentAsync(document.SelfLink);
+            await client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri("SampleDB", "SampleCollection"));
+            await client.DeleteDatabaseAsync(UriFactory.CreateDatabaseUri("SampleDB"));
+
+            client.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and complete a pattern involving the Azure Cosmos DB .NET SDK, specifically querying documents using SQL. This is a less common API usage compared to basic CRUD operations. The completion requires understanding of parameter ordering and usage of deprecated methods like `CreateDocumentQuery`.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+
+namespace ConcurrentProgrammingExample
+{
+    public class ParallelProcessing
+    {
+        private List<int> numbers;
+        
+        public ParallelProcessing()
+        {
+            numbers = new List<int>();
+            for (int i = 0; i < 100; i++)
+            {
+                numbers.Add(i);
+            }
+        }
+        
+        public void ProcessNumbers()
+        {
+            // Initialize a list to store the results
+            List<int> results = new List<int>();
+            
+            // Use Parallel.ForEach to process the numbers in parallel
+            Parallel.ForEach(numbers, number =>
+            {
+                int result = ProcessNumber(number);
+                lock (results)
+                {
+                    results.Add(result);
+                }
+            });
+        }
+        
+        private int ProcessNumber(int number)
+        {
+            // Simulate some processing
+            return number * number;
+        }
+
+        public async Task<int> SumNumbersAsync()
+        {
+            int sum = 0;
+            foreach (int number in numbers)
+            {
+                sum += await GetNumberAsync(number);
+            }
+            return sum;
+        }
+
+        private Task<int> GetNumberAsync(int number)
+        {
+            return Task.FromResult(number);
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ParallelProcessing parallelProcessing = new ParallelProcessing();
+            parallelProcessing.ProcessNumbers();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            int sum = await parallelProcessing.SumNumbersAsync();
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Assertions
+            Debug.Assert(sum == 4950, "The sum of the numbers should be 4950.");
+            Console.WriteLine("Sum of numbers: " + sum);
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the use of the Parallel.ForEach method from the Task Parallel Library (TPL) for concurrent processing, combined with asynchronous programming (async/await) to sum numbers asynchronously. The test case evaluates the model's ability to handle uncommon API usage patterns for parallel processing and async methods, ensuring correct parameter ordering and API behavior. The prefix provides extensive context with setup code, while the suffix includes assertions to verify the expected behavior.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
+
+namespace CosmosDBExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://<your-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private CosmosClient cosmosClient;
+        private Database database;
+        private Container container;
+
+        public async Task InitializeAsync()
+        {
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+            this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync("SampleDatabase");
+            this.container = await this.database.CreateContainerIfNotExistsAsync("SampleContainer", "/id");
+        }
+
+        public async Task AddItemToContainerAsync(SampleItem item)
+        {
+            try
+            {
+                ItemResponse<SampleItem> response = await this.container.CreateItemAsync<SampleItem>(item, new PartitionKey(item.Id));
+                Console.WriteLine("Item added successfully. Operation consumed {0} RUs.", response.RequestCharge);
+            }
+            catch (CosmosException ex)
+            {
+                Console.WriteLine("Error occurred: {0}", ex.Message);
+            }
+        }
+
+        public class SampleItem
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        static async Task Main(string[] args)
+        {
+            Program p = new Program();
+            await p.InitializeAsync();
+            SampleItem newItem = new SampleItem { Id = "1", Name = "Sample Item" };
+            await p.AddItemToContainerAsync(newItem);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            SampleItem retrievedItem = await container.ReadItemAsync<SampleItem>("1", new PartitionKey("1"));
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(retrievedItem != null, "Item should be successfully retrieved.");
+            Debug.Assert(retrievedItem.Id == "1", "Item Id should be '1'.");
+            Debug.Assert(retrievedItem.Name == "Sample Item", "Item name should be 'Sample Item'.");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the Azure Cosmos DB SDK for .NET to create and read items from a Cosmos DB container. It includes proper initialization of the Cosmos client, database, and container, handling of exceptions during item creation, and validation of the retrieved item. This scenario tests the model's ability to recognize and complete the pattern involving the Azure Cosmos DB SDK, which is less commonly used compared to other database interfaces.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
+
+namespace GitHubApiIntegration
+{
+    public class GitHubClient
+    {
+        private readonly HttpClient _httpClient;
+        private const string GitHubApiBaseUrl = "https://api.github.com";
+
+        public GitHubClient()
+        {
+            _httpClient = new HttpClient();
+            _httpClient.DefaultRequestHeaders.Add("User-Agent", "HttpClientFactory-Sample");
+        }
+
+        public async Task<JObject> GetRepositoryInfoAsync(string owner, string repo)
+        {
+            if (string.IsNullOrEmpty(owner)) throw new ArgumentException("Owner cannot be null or empty", nameof(owner));
+            if (string.IsNullOrEmpty(repo)) throw new ArgumentException("Repo cannot be null or empty", nameof(repo));
+
+            var url = $"{GitHubApiBaseUrl}/repos/{owner}/{repo}";
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JObject.Parse(content);
+        }
+
+        public async Task<IList<string>> GetContributorsAsync(string owner, string repo)
+        {
+            if (string.IsNullOrEmpty(owner)) throw new ArgumentException("Owner cannot be null or empty", nameof(owner));
+            if (string.IsNullOrEmpty(repo)) throw new ArgumentException("Repo cannot be null or empty", nameof(repo));
+
+            var url = $"{GitHubApiBaseUrl}/repos/{owner}/{repo}/contributors";
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync();
+            var contributors = JArray.Parse(content);
+            var contributorNames = new List<string>();
+            foreach (var contributor in contributors)
+            {
+                contributorNames.Add(contributor["login"].ToString());
+            }
+            return contributorNames;
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var client = new GitHubClient();
+            var repoInfo = await client.GetRepositoryInfoAsync("octocat", "Hello-World");
+            Console.WriteLine(repoInfo.ToString(Formatting.Indented));
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var contributors = await client.GetContributorsAsync("octocat", "Hello-World");
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(contributors.Contains("octocat"), "The repository should have a contributor named 'octocat'.");
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and use the GitHub API through HttpClient in C#. The task involves fetching repository information and contributors, which are common but require correct API usage and error handling. The golden completion involves calling a method to get contributors and the suffix includes assertions to verify the correct API usage, ensuring the model understands the sequence and dependencies.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace WebApiIntegrationExample
+{
+    class GitHubApiClient
+    {
+        private readonly HttpClient _httpClient;
+
+        public GitHubApiClient(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public async Task<string> GetRepositoryDetailsAsync(string owner, string repo)
+        {
+            if (string.IsNullOrEmpty(owner))
+                throw new ArgumentException("Owner cannot be null or empty.", nameof(owner));
+            if (string.IsNullOrEmpty(repo))
+                throw new ArgumentException("Repository cannot be null or empty.", nameof(repo));
+
+            string url = $"https://api.github.com/repos/{owner}/{repo}";
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Add("User-Agent", "HttpClientFactory-Sample");
+            request.Headers.Add("Accept", "application/vnd.github.v3+json");
+
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            HttpClient httpClient = new HttpClient();
+            GitHubApiClient gitHubApiClient = new GitHubApiClient(httpClient);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            string repoDetails = await gitHubApiClient.GetRepositoryDetailsAsync("octocat", "Hello-World");
+
+SUFFIX CODE:
+----------------------------------------
+            string repoDetails = await gitHubApiClient.GetRepositoryDetailsAsync("octocat", "Hello-World");
+
+            httpClient.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability of the LLM to correctly use the HttpClient and HttpRequestMessage classes to make a GET request to the GitHub API. It checks for proper handling of HTTP headers and ensures the response is not empty. This scenario is realistic and involves uncommon API usage patterns such as setting custom headers and ensuring the response is successful.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
+
+namespace SynthBench
+{
+    public class Program
+    {
+        public class User
+        {
+            public string Username { get; set; }
+            public int Age { get; set; }
+        }
+
+        static void Main(string[] args)
+        {
+            string jsonString = "{ \"Username\": \"testuser\", \"Age\": 25 }";
+            User user = null;
+
+            try
+            {
+                // Parse the JSON string into a User object
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                user = JsonSerializer.Deserialize<User>(jsonString);
+
+SUFFIX CODE:
+----------------------------------------
+                // Additional assertions to ensure correct parsing
+                Debug.Assert(user != null, "User object should not be null");
+                Debug.Assert(user.Username == "testuser", "Username should be 'testuser'");
+                Debug.Assert(user.Age == 25, "Age should be 25");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+            finally
+            {
+                // Cleanup resources if needed (none in this case)
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the JsonSerializer.Deserialize method from System.Text.Json, which is less commonly used compared to older JSON libraries like Newtonsoft.Json. The example includes parsing a JSON string into a User object and validates the correct usage of the API with assertions. The prefix sets up the context, the golden completion shows the correct API call, and the suffix includes assertions to verify the correct parsing and parameter handling.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using Microsoft.Azure.Cosmos;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+
+namespace CosmosDbExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUri = "https://<your-cosmos-db-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private CosmosClient cosmosClient;
+        private Database database;
+        private Container container;
+        private readonly string databaseId = "SampleDatabase";
+        private readonly string containerId = "SampleContainer";
+
+        public static async Task Main(string[] args)
+        {
+            Program p = new Program();
+            await p.RunAsync();
+        }
+
+        public async Task RunAsync()
+        {
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+            await this.CreateDatabaseAsync();
+            await this.CreateContainerAsync();
+            await this.AddItemsToContainerAsync();
+        }
+
+        private async Task CreateDatabaseAsync()
+        {
+            this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+            Console.WriteLine("Created Database: {0}\n", this.database.Id);
+        }
+
+        private async Task CreateContainerAsync()
+        {
+            this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/partitionKey");
+            Console.WriteLine("Created Container: {0}\n", this.container.Id);
+        }
+
+        private async Task AddItemsToContainerAsync()
+        {
+            dynamic item = new
+            {
+                id = Guid.NewGuid().ToString(),
+                partitionKey = "Partition1",
+                name = "Sample Item",
+                description = "This is a sample item"
+            };
+            await this.container.CreateItemAsync(item, new PartitionKey(item.partitionKey));
+            Console.WriteLine("Created Item: {0}\n", item.id);
+        }
+
+        private async Task QueryItemsAsync()
+        {
+            var sqlQueryText = "SELECT * FROM c WHERE c.partitionKey = 'Partition1'";
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            FeedIterator<dynamic> queryResultSetIterator = this.container.GetItemQueryIterator<dynamic>(queryDefinition);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            List<dynamic> items = new List<dynamic>();
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<dynamic> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                foreach (var item in currentResultSet)
+                {
+                    items.Add(item);
+                }
+            }
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(items.Count > 0, "No items found.");
+            Debug.Assert(items.All(i => i.partitionKey == "Partition1"), "Incorrect partition key.");
+
+            // Cleanup resources
+            if (this.container != null)
+            {
+                await this.container.DeleteContainerAsync();
+            }
+            if (this.database != null)
+            {
+                await this.database.DeleteAsync();
+            }
+            if (this.cosmosClient != null)
+            {
+                this.cosmosClient.Dispose();
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of Azure Cosmos DB SDK for querying items using an uncommon API function GetItemQueryIterator. It tests the model's ability to correctly use the FeedIterator and FeedResponse classes to iterate over query results. The code includes proper resource cleanup and error handling, and the assertions verify that the items retrieved match the expected partition key, ensuring correctness of API usage and parameter ordering.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+
+namespace SynthBench
+{
+    public class MyDbContext : DbContext
+    {
+        public DbSet<User> Users { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseInMemoryDatabase("TestDb");
+        }
+    }
+
+    public class User
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class UserRepository
+    {
+        private readonly MyDbContext _context;
+
+        public UserRepository(MyDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<User> GetUserByIdAsync(int userId)
+        {
+            return await _context.Users.FindAsync(userId);
+        }
+
+        public async Task AddUserAsync(User user)
+        {
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            using (var context = new MyDbContext())
+            {
+                var repository = new UserRepository(context);
+                var newUser = new User { Id = 1, Name = "John Doe" };
+                await repository.AddUserAsync(newUser);
+
+                // Fetch user by ID
+                var fetchedUser = await repository.GetUserByIdAsync(1);
+                Debug.Assert(fetchedUser != null, "User should not be null");
+                Debug.Assert(fetchedUser.Name == "John Doe", "User name should be 'John Doe'");
+
+                // Update user name
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                await repository.UpdateUserAsync(fetchedUser);
+
+SUFFIX CODE:
+----------------------------------------
+                fetchedUser.Name = "Jane Doe";
+                await repository.UpdateUserAsync(fetchedUser);
+
+                // Fetch updated user
+                var updatedUser = await repository.GetUserByIdAsync(1);
+                Debug.Assert(updatedUser != null, "Updated user should not be null");
+                Debug.Assert(updatedUser.Name == "Jane Doe", "User name should be 'Jane Doe'");
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on the usage of Entity Framework Core, specifically testing the pattern of fetching, updating, and saving entities using the DbContext. It includes uncommon methods like DbContext.Update and verifies the correct parameter ordering and API behavior through assertions. The scenario ensures proper resource management and demonstrates advanced async/await patterns.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Diagnostics;
+
+namespace WebAPIIntegrationExample
+{
+    public class GitHubApiClient
+    {
+        private static readonly HttpClient client = new HttpClient();
+
+        public async Task<string> GetRepositoryDetailsAsync(string owner, string repo)
+        {
+            client.DefaultRequestHeaders.UserAgent.Clear();
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
+
+            var url = $"https://api.github.com/repos/{owner}/{repo}";
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+            var responseData = await response.Content.ReadAsStringAsync();
+
+            return responseData;
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var gitHubClient = new GitHubApiClient();
+            string owner = "octocat";
+            string repo = "Hello-World";
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var repositoryDetails = await gitHubClient.GetRepositoryDetailsAsync(owner, repo);
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(!string.IsNullOrEmpty(repositoryDetails), "Repository details should not be empty");
+            Debug.Assert(repositoryDetails.Contains("full_name"), "Repository details should contain 'full_name'");
+            Debug.Assert(repositoryDetails.Contains("description"), "Repository details should contain 'description'");
+            Debug.Assert(repositoryDetails.Contains("owner"), "Repository details should contain 'owner'");
+
+            // Cleanup
+            client.Dispose();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of a relatively uncommon API pattern involving the integration with GitHub's REST API using HttpClient. It tests the ability of the LLM to recognize the correct sequence of API calls and parameter usage. The assertions verify that the response contains key fields expected from a GitHub repository response, ensuring the API call was successful and correctly processed.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos;
+using System.Diagnostics;
+
+namespace AzureCosmosDbExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUri = "https://<your-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private CosmosClient cosmosClient;
+        private Database database;
+        private Container container;
+        private string databaseId = "ToDoList";
+        private string containerId = "Items";
+
+        public static async Task Main(string[] args)
+        {
+            Program p = new Program();
+            await p.RunAsync();
+        }
+
+        public async Task RunAsync()
+        {
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+            await this.CreateDatabaseAsync();
+            await this.CreateContainerAsync();
+            await this.AddItemsToContainerAsync();
+        }
+
+        private async Task CreateDatabaseAsync()
+        {
+            this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+            Console.WriteLine("Created Database: {0}", this.database.Id);
+        }
+
+        private async Task CreateContainerAsync()
+        {
+            this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/id");
+            Console.WriteLine("Created Container: {0}", this.container.Id);
+        }
+
+        private async Task AddItemsToContainerAsync()
+        {
+            List<ToDoItem> items = new List<ToDoItem>
+            {
+                new ToDoItem { Id = "1", Description = "Buy milk", IsComplete = false },
+                new ToDoItem { Id = "2", Description = "Learn Azure Cosmos DB", IsComplete = false }
+            };
+
+            foreach (var item in items)
+            {
+                await AddItemToContainerAsync(item);
+            }
+        }
+
+        private async Task AddItemToContainerAsync(ToDoItem item)
+        {
+            try
+            {
+                ItemResponse<ToDoItem> response = await this.container.ReadItemAsync<ToDoItem>(item.Id, new PartitionKey(item.Id));
+                Console.WriteLine("Item in database with id: {0} already exists\n", response.Resource.Id);
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                ItemResponse<ToDoItem> createdItemResponse = await this.container.CreateItemAsync<ToDoItem>(item, new PartitionKey(item.Id));
+                ToDoItem createdItem = createdItemResponse.Resource;
+
+SUFFIX CODE:
+----------------------------------------
+
+
+                // Assertions
+                Debug.Assert(createdItem != null, "Item creation failed.");
+                Debug.Assert(createdItem.Id == item.Id, "Item ID does not match.");
+                Debug.Assert(createdItem.Description == item.Description, "Item description does not match.");
+                Debug.Assert(createdItem.IsComplete == item.IsComplete, "Item completion status does not match.");
+            }
+        }
+
+        public class ToDoItem
+        {
+            public string Id { get; set; }
+            public string Description { get; set; }
+            public bool IsComplete { get; set; }
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on Azure Cosmos DB integration, an uncommon API in many standard applications. It includes operations like creating databases and containers, and adding items to the database, which are crucial but not frequently encountered. Assertions verify the correctness of the item creation, ensuring that the API usage and parameter handling are accurate.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using Azure;
+using Azure.Cosmos;
+using Azure.Cosmos.Fluent;
+
+namespace AzureCosmosDBExample
+{
+    public class Program
+    {
+        private static CosmosClient _client;
+        private static Database _database;
+        private static Container _container;
+
+        public static async Task Main(string[] args)
+        {
+            string endpointUri = "https://your-cosmos-db.documents.azure.com:443/";
+            string primaryKey = "your-primary-key";
+
+            _client = new CosmosClientBuilder(endpointUri, primaryKey)
+                .WithConnectionModeDirect()
+                .Build();
+
+            _database = await _client.CreateDatabaseIfNotExistsAsync("SampleDatabase");
+            _container = await _database.CreateContainerIfNotExistsAsync(new ContainerProperties("SampleContainer", "/partitionKey"));
+
+            await AddItemToContainerAsync(new SampleItem { Id = "1", Name = "Sample Item", PartitionKey = "SamplePartition" });
+        }
+
+        public class SampleItem
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public string PartitionKey { get; set; }
+        }
+
+        private static async Task AddItemToContainerAsync(SampleItem item)
+        {
+            try
+            {
+                // Create an item in the container
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await _container.CreateItemAsync<SampleItem>(item, new PartitionKey(item.PartitionKey));
+
+SUFFIX CODE:
+----------------------------------------
+                Debug.Assert(item != null, "Item should not be null");
+                Debug.Assert(!string.IsNullOrEmpty(item.Id), "Item Id should not be null or empty");
+                Debug.Assert(!string.IsNullOrEmpty(item.PartitionKey), "Item PartitionKey should not be null or empty");
+
+                // Read the item to see if it exists. Note ReadItemAsync will retrieve the item from the Azure Cosmos DB service
+                ItemResponse<SampleItem> response = await _container.ReadItemAsync<SampleItem>(item.Id, new PartitionKey(item.PartitionKey));
+                Debug.Assert(response != null, "Response should not be null");
+                Debug.Assert(response.Resource != null, "Response resource should not be null");
+                Debug.Assert(response.Resource.Id == item.Id, "Response resource Id should match the item Id");
+                Debug.Assert(response.Resource.Name == item.Name, "Response resource Name should match the item Name");
+                Debug.Assert(response.Resource.PartitionKey == item.PartitionKey, "Response resource PartitionKey should match the item PartitionKey");
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                Debug.Fail("Item not found");
+            }
+            finally
+            {
+                _client.Dispose();
+            }
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability to correctly implement the Azure Cosmos DB SDK to create an item within a container, a less common usage scenario. The scenario also includes appropriate assertions to verify the correctness of the item creation and subsequent reading operations. The test also ensures that the client and container are properly disposed of after operations, showcasing best practices in resource management.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+using Microsoft.Azure.Cosmos;
+
+namespace AzureCosmosDbExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://<your-cosmos-db-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private CosmosClient cosmosClient;
+        private Database database;
+        private Container container;
+        private string databaseId = "SampleDatabase";
+        private string containerId = "SampleContainer";
+
+        static async Task Main(string[] args)
+        {
+            Program p = new Program();
+            await p.InitializeCosmosClientInstanceAsync();
+            await p.AddItemsToContainerAsync();
+        }
+
+        public async Task InitializeCosmosClientInstanceAsync()
+        {
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+            this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+            this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/PartitionKey");
+        }
+
+        public async Task AddItemsToContainerAsync()
+        {
+            List<SampleItem> items = new List<SampleItem>
+            {
+                new SampleItem { Id = "1", PartitionKey = "pk1", Name = "Item 1" },
+                new SampleItem { Id = "2", PartitionKey = "pk2", Name = "Item 2" }
+            };
+
+            foreach (var item in items)
+            {
+                await this.AddItemAsync(item);
+            }
+        }
+
+        public async Task AddItemAsync(SampleItem item)
+        {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await this.container.CreateItemAsync<SampleItem>(item, new PartitionKey(item.PartitionKey));
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(item != null, "Item should not be null");
+            Debug.Assert(!string.IsNullOrEmpty(item.Id), "Item Id should not be null or empty");
+            Debug.Assert(!string.IsNullOrEmpty(item.PartitionKey), "PartitionKey should not be null or empty");
+            Debug.Assert(!string.IsNullOrEmpty(item.Name), "Item Name should not be null or empty");
+            Console.WriteLine($"Item {item.Name} added successfully.");
+        }
+
+        public class SampleItem
+        {
+            public string Id { get; set; }
+            public string PartitionKey { get; set; }
+            public string Name { get; set; }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the model's ability to recognize and complete an uncommon API usage involving Azure Cosmos DB. The example demonstrates the creation and insertion of items into a Cosmos DB container. It includes proper parameter ordering, error handling, and validation through assertions. This test case ensures the model understands the correct usage pattern of the Cosmos DB SDK and handles exceptions appropriately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+
+namespace AzureCosmosDBExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://your-service.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "your-primary-key";
+        private static DocumentClient client;
+
+        static async Task Main(string[] args)
+        {
+            try
+            {
+                client = new DocumentClient(new Uri(EndpointUri), PrimaryKey);
+                await client.OpenAsync();
+                var databaseUri = UriFactory.CreateDatabaseUri("ExampleDB");
+                var collectionUri = UriFactory.CreateDocumentCollectionUri("ExampleDB", "ExampleCollection");
+
+                // Create a new document
+                var document = new { id = "1", Name = "John Doe", Age = 30 };
+                await client.CreateDocumentAsync(collectionUri, document);
+
+                // Retrieve the document by ID
+                var retrievedDocument = await client.ReadDocumentAsync(UriFactory.CreateDocumentUri("ExampleDB", "ExampleCollection", "1"));
+                Console.WriteLine($"Retrieved document: {retrievedDocument.Resource.ToString()}");
+
+                // Update the document
+                document = new { id = "1", Name = "John Doe", Age = 31 };
+                await client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri("ExampleDB", "ExampleCollection", "1"), document);
+            }
+            catch (DocumentClientException e)
+            {
+                Console.WriteLine($"Error: {e.Message}");
+            }
+            finally
+            {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await client.DeleteDocumentAsync(UriFactory.CreateDocumentUri("ExampleDB", "ExampleCollection", "1"));
+
+SUFFIX CODE:
+----------------------------------------
+                // Verify the document was deleted
+                try
+                {
+                    await client.ReadDocumentAsync(UriFactory.CreateDocumentUri("ExampleDB", "ExampleCollection", "1"));
+                }
+                catch (DocumentClientException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    Console.WriteLine("Document successfully deleted.");
+                    Debug.Assert(true, "Document deletion confirmed.");
+                }
+                finally
+                {
+                    client.Dispose();
+                }
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to recognize and complete a pattern involving Azure Cosmos DB's DocumentClient API. The task includes creating, reading, updating, and deleting a document, which covers the CRUD operations. The completion focuses on the less common delete operation, and the suffix verifies the deletion. This scenario ensures the model understands the API's method usage and parameter ordering, and the assertions validate the correct behavior of the API.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+using System.Diagnostics;
+
+namespace CosmosDBExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUrl = "https://your-service-endpoint:443/";
+        private static readonly string PrimaryKey = "your-primary-key";
+        private static DocumentClient client;
+
+        public static void Main(string[] args)
+        {
+            try
+            {
+                client = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
+                CreateDatabaseIfNotExistsAsync().Wait();
+                CreateCollectionIfNotExistsAsync().Wait();
+                AddDocumentToCollectionAsync().Wait();
+            }
+            catch (DocumentClientException de)
+            {
+                Exception baseException = de.GetBaseException();
+                Console.WriteLine("Error: {0}, Message: {1}", de.StatusCode, baseException.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: {0}", e.Message);
+            }
+            finally
+            {
+                client?.Dispose();
+            }
+        }
+
+        private static async Task CreateDatabaseIfNotExistsAsync()
+        {
+            await client.CreateDatabaseIfNotExistsAsync(new Database { Id = "SampleDB" });
+        }
+
+        private static async Task CreateCollectionIfNotExistsAsync()
+        {
+            await client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("SampleDB"), new DocumentCollection { Id = "SampleCollection" });
+        }
+
+        private static async Task AddDocumentToCollectionAsync()
+        {
+            var document = new { Id = "1", Name = "Sample Document", Description = "This is a sample document" };
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var response = await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri("SampleDB", "SampleCollection"), document);
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(response.StatusCode == System.Net.HttpStatusCode.Created, "Document creation failed.");
+            Debug.Assert(response.Resource.Id == "1", "Document ID does not match.");
+            Debug.Assert(response.Resource.GetPropertyValue<string>("Name") == "Sample Document", "Document Name does not match.");
+            Debug.Assert(response.Resource.GetPropertyValue<string>("Description") == "This is a sample document", "Document Description does not match.");
+            Console.WriteLine("Document created successfully.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the usage of the deprecated Azure DocumentDB SDK for creating a document in a Cosmos DB collection. The example includes creating a database and a collection if they do not exist, adding a document to the collection, and verifying its creation using assertions. This is a good test case because it involves multiple steps and uncommon APIs, ensuring the model handles the entire flow correctly. The assertions validate the API behavior, parameter correctness, and return values.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+
+namespace CosmosDBExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUrl = "https://<your-cosmos-db>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private static DocumentClient client;
+
+        public static async Task Main(string[] args)
+        {
+            try
+            {
+                client = new DocumentClient(new Uri(EndpointUrl), PrimaryKey);
+                await client.OpenAsync();
+                await CreateDatabaseIfNotExistsAsync("SampleDatabase");
+                await CreateDocumentCollectionIfNotExistsAsync("SampleDatabase", "SampleCollection");
+
+                // Adding a sample document
+                dynamic documentDefinition = new
+                {
+                    id = "1",
+                    Name = "Sample Document",
+                    Description = "This is a sample document"
+                };
+                await client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri("SampleDatabase", "SampleCollection"), documentDefinition);
+
+                // Retrieving the document
+                Uri documentUri = UriFactory.CreateDocumentUri("SampleDatabase", "SampleCollection", "1");
+                Document document = await client.ReadDocumentAsync(documentUri);
+
+                // Updating the document
+                document.SetPropertyValue("Description", "This is an updated sample document");
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                await client.ReplaceDocumentAsync(document.SelfLink, document);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+                // Verifying the update
+                Document updatedDocument = await client.ReadDocumentAsync(documentUri);
+                Debug.Assert(updatedDocument.GetPropertyValue<string>("Description") == "This is an updated sample document", "Document description was not updated correctly.");
+            }
+            finally
+            {
+                if (client != null)
+                {
+                    client.Dispose();
+                }
+            }
+        }
+
+        private static async Task CreateDatabaseIfNotExistsAsync(string databaseName)
+        {
+            try
+            {
+                await client.ReadDatabaseAsync(UriFactory.CreateDatabaseUri(databaseName));
+            }
+            catch (DocumentClientException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                await client.CreateDatabaseAsync(new Database { Id = databaseName });
+            }
+        }
+
+        private static async Task CreateDocumentCollectionIfNotExistsAsync(string databaseName, string collectionName)
+        {
+            try
+            {
+                await client.ReadDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri(databaseName, collectionName));
+            }
+            catch (DocumentClientException e) when (e.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                await client.CreateDocumentCollectionAsync(
+                    UriFactory.CreateDatabaseUri(databaseName),
+                    new DocumentCollection { Id = collectionName },
+                    new RequestOptions { OfferThroughput = 400 });
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case involves the use of the deprecated Azure Cosmos DB DocumentClient API, which is less common in modern applications due to the introduction of the CosmosClient in the newer SDK. The scenario tests the ability to recognize and correctly use the DocumentClient for creating, reading, and updating documents in a Cosmos DB database. Assertions are included to verify the correctness of the document update operation. This setup ensures proper resource management and error handling, making it a robust example for testing rare API usage capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
+
+namespace CosmosDBExample
+{
+    class Program
+    {
+        private static readonly string EndpointUri = "https://<your-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private DocumentClient client;
+
+        static void Main(string[] args)
+        {
+            Program p = new Program();
+            p.RunAsync().Wait();
+        }
+
+        private async Task RunAsync()
+        {
+            this.client = new DocumentClient(new Uri(EndpointUri), PrimaryKey);
+            await this.client.CreateDatabaseIfNotExistsAsync(new Database { Id = "TestDatabase" });
+            await this.client.CreateDocumentCollectionIfNotExistsAsync(UriFactory.CreateDatabaseUri("TestDatabase"), new DocumentCollection { Id = "TestCollection" });
+            await this.CreateDocumentIfNotExists("TestDatabase", "TestCollection", new { id = "1", Name = "John Doe", Age = 30 });
+
+            // Querying documents
+            var queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
+            IQueryable<dynamic> documentQuery = this.client.CreateDocumentQuery<dynamic>(
+                UriFactory.CreateDocumentCollectionUri("TestDatabase", "TestCollection"), queryOptions);
+
+            List<dynamic> results = new List<dynamic>();
+            foreach (var doc in documentQuery)
+            {
+                results.Add(doc);
+            }
+            Console.WriteLine("Documents queried: " + results.Count);
+
+            // Ensuring document creation was successful
+            dynamic document = results.Find(d => d.id == "1");
+            Debug.Assert(document != null, "Document with id 1 should exist.");
+            Debug.Assert(document.Name == "John Doe", "Document Name should be John Doe.");
+            Debug.Assert(document.Age == 30, "Document Age should be 30.");
+
+            // Now, let's update the document
+            
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await this.client.ReplaceDocumentAsync(UriFactory.CreateDocumentUri("TestDatabase", "TestCollection", "1"), new { id = "1", Name = "Jane Doe", Age = 35 });
+
+SUFFIX CODE:
+----------------------------------------
+            // Verify that the document has been updated
+            dynamic updatedDocument = this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri("TestDatabase", "TestCollection", "1")).Result.Resource;
+            Debug.Assert(updatedDocument != null, "Updated document with id 1 should exist.");
+            Debug.Assert(updatedDocument.Name == "Jane Doe", "Updated document Name should be Jane Doe.");
+            Debug.Assert(updatedDocument.Age == 35, "Updated document Age should be 35.");
+
+            // Clean up resources
+            await this.client.DeleteDocumentCollectionAsync(UriFactory.CreateDocumentCollectionUri("TestDatabase", "TestCollection"));
+            await this.client.DeleteDatabaseAsync(UriFactory.CreateDatabaseUri("TestDatabase"));
+        }
+
+        private async Task CreateDocumentIfNotExists(string databaseId, string collectionId, object document)
+        {
+            try
+            {
+                await this.client.ReadDocumentAsync(UriFactory.CreateDocumentUri(databaseId, collectionId, document.GetType().GetProperty("id").GetValue(document, null).ToString()));
+            }
+            catch (DocumentClientException de)
+            {
+                if (de.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    await this.client.CreateDocumentAsync(UriFactory.CreateDocumentCollectionUri(databaseId, collectionId), document);
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of the Azure Cosmos DB .NET SDK to perform CRUD operations on a document in a database. It specifically tests the LLM's ability to recognize and correctly use the deprecated DocumentClient API, which has been replaced by the newer CosmosClient API in recent SDK versions. The completion involves updating an existing document and ensures correct parameter ordering and API behavior through assertions. The setup and teardown logic in the prefix and suffix ensure resource cleanup and validate the successful execution of the operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: devbench-api-usage
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using Microsoft.Azure.Cosmos;
+using System.Threading.Tasks;
+
+namespace AzureCosmosDBExample
+{
+    public class Program
+    {
+        private static readonly string EndpointUri = "https://<your-account>.documents.azure.com:443/";
+        private static readonly string PrimaryKey = "<your-primary-key>";
+        private static CosmosClient cosmosClient;
+        private static Database database;
+        private static Container container;
+
+        public static async Task Main(string[] args)
+        {
+            try
+            {
+                cosmosClient = new CosmosClient(EndpointUri, PrimaryKey);
+                database = await cosmosClient.CreateDatabaseIfNotExistsAsync("SampleDatabase");
+                container = await database.CreateContainerIfNotExistsAsync("SampleContainer", "/id");
+
+                await AddItemToContainerAsync();
+            }
+            catch (CosmosException ex)
+            {
+                Console.WriteLine($"Cosmos DB error: {ex.Message}");
+            }
+            finally
+            {
+                cosmosClient?.Dispose();
+            }
+        }
+
+        private static async Task AddItemToContainerAsync()
+        {
+            var sampleItem = new { id = "1", Name = "Sample Item", Description = "This is a sample item." };
+            try
+            {
+                ItemResponse<dynamic> response = await container.CreateItemAsync(sampleItem, new PartitionKey(sampleItem.id));
+                Console.WriteLine($"Item created with status code: {response.StatusCode}");
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                Console.WriteLine($"Created item: {response.Resource}");
+
+SUFFIX CODE:
+----------------------------------------
+
+                Debug.Assert(response.Resource.id == sampleItem.id, "Item ID does not match");
+                Debug.Assert(response.Resource.Name == sampleItem.Name, "Item Name does not match");
+                Debug.Assert(response.StatusCode == System.Net.HttpStatusCode.Created, "Item was not created successfully");
+            }
+            catch (CosmosException ex)
+            {
+                Console.WriteLine($"Cosmos DB error: {ex.Message}");
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern involving Azure Cosmos DB, an uncommon library function. The golden completion involves reading an item that was previously created, which is a typical but less common operation. The suffix includes assertions to verify the correctness of the item read operation, ensuring that the item ID and Name match the expected values and that the item was successfully created with a specific HTTP status code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================

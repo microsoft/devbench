@@ -1,0 +1,5050 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        private List<string> imagePaths;
+        public ImageProcessor(List<string> paths)
+        {
+            imagePaths = paths;
+        }
+
+        // Method to simulate loading images
+        public void LoadImages()
+        {
+            foreach (var path in imagePaths)
+            {
+                Console.WriteLine($"Loading image from {path}");
+            }
+        }
+
+        // Method to simulate applying a filter to images
+        public void ApplyFilter(string filterName)
+        {
+            foreach (var path in imagePaths)
+            {
+                Console.WriteLine($"Applying {filterName} filter to {path}");
+            }
+        }
+
+        // Method to save images after processing
+        public void SaveImages(string destinationFolder)
+        {
+            foreach (var path in imagePaths)
+            {
+                var fileName = System.IO.Path.GetFileName(path);
+                var newFilePath = System.IO.Path.Combine(destinationFolder, fileName);
+                Console.WriteLine($"Saving image to {newFilePath}");
+            }
+        }
+    }
+
+    public class ImageProcessingWorkflow
+    {
+        private ImageProcessor processor;
+
+        public ImageProcessingWorkflow(List<string> imagePaths)
+        {
+            processor = new ImageProcessor(imagePaths);
+        }
+
+        public void Execute(string filterName, string destinationFolder)
+        {
+            // Step 1: Load images
+            processor.LoadImages();
+            // Step 2: Apply filter
+            processor.ApplyFilter(filterName);
+            // Step 3: Save images
+            processor.SaveImages(destinationFolder);
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<string> paths = new List<string> { "image1.jpg", "image2.jpg", "image3.jpg" };
+            string filter = "sepia";
+            string destination = "C:\\processed_images";
+
+            ImageProcessingWorkflow workflow = new ImageProcessingWorkflow(paths);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            workflow.Execute(filter, destination);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Assertions to verify the workflow execution
+            Debug.Assert(paths.Count == 3, "Image paths count should be 3");
+            Debug.Assert(filter == "sepia", "Filter should be sepia");
+            Debug.Assert(destination == "C:\\processed_images", "Destination folder should be C:\\processed_images");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to understand and complete a media processing workflow in C#. The scenario involves loading images, applying a filter, and saving the processed images. The prefix provides extensive context and setup for the image processing workflow, while the suffix includes assertions to verify the correctness of the workflow execution. The golden completion is a critical step in the workflow execution, and the assertions ensure that the business logic and domain-specific requirements are met.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace DataValidationExample
+{
+    public class DataNormalizer
+    {
+        public List<string> NormalizeData(List<string> rawData)
+        {
+            // Remove null or empty strings
+            var cleanedData = rawData.Where(data => !string.IsNullOrEmpty(data)).ToList();
+
+            // Trim whitespace from each string
+            cleanedData = cleanedData.Select(data => data.Trim()).ToList();
+
+            // Convert each string to lowercase
+            cleanedData = cleanedData.Select(data => data.ToLower()).ToList();
+
+            // Ensure all strings are unique
+            cleanedData = cleanedData.Distinct().ToList();
+
+            // Sort the data alphabetically
+            cleanedData.Sort();
+
+            return cleanedData;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<string> rawData = new List<string>
+            {
+                "  Apple ",
+                "banana",
+                "  CHERRY  ",
+                "apple",
+                "Banana",
+                "  ",
+                null,
+                "cherry "
+            };
+
+            DataNormalizer normalizer = new DataNormalizer();
+            List<string> normalizedData = normalizer.NormalizeData(rawData);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            // Verify the count of unique, non-empty, trimmed, and lowercased strings
+            Debug.Assert(normalizedData.Count == 3, "The normalized data should contain 3 unique, non-empty, trimmed, and lowercased strings.");
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(normalizedData.Count == 3, "The normalized data should contain 3 unique, non-empty, trimmed, and lowercased strings.");
+            Debug.Assert(normalizedData[0] == "apple", "The first string should be 'apple'.");
+            Debug.Assert(normalizedData[1] == "banana", "The second string should be 'banana'.");
+            Debug.Assert(normalizedData[2] == "cherry", "The third string should be 'cherry'.");
+
+            Console.WriteLine("All assertions passed. Normalized data:");
+            foreach (var data in normalizedData)
+            {
+                Console.WriteLine(data);
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to comprehend and continue a data normalization process that involves multiple steps of data cleaning and transformation. The golden completion adds a step to ensure all strings are at least 5 characters long, demonstrating the understanding of the business rule for data validation. The suffix includes assertions that validate the correctness of the normalization process, ensuring that the business logic is correctly implemented and verified.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace DataValidationExample
+{
+    public class DataNormalizer
+    {
+        // Simulating a dataset with potential inconsistencies
+        private List<Dictionary<string, string>> dataset = new List<Dictionary<string, string>>
+        {
+            new Dictionary<string, string> { {"Name", "Alice"}, {"Age", "30"}, {"Email", "alice@example.com"} },
+            new Dictionary<string, string> { {"Name", "Bob"}, {"Age", "27"}, {"Email", "bob[at]example.com"} },
+            new Dictionary<string, string> { {"Name", "Charlie"}, {"Age", "twenty-five"}, {"Email", "charlie@example.com"} }
+        };
+
+        // Method to normalize age data by converting strings to integers
+        public void NormalizeAgeData()
+        {
+            foreach (var record in dataset)
+            {
+                if (record.ContainsKey("Age"))
+                {
+                    string ageStr = record["Age"];
+                    int age;
+                    if (int.TryParse(ageStr, out age))
+                    {
+                        record["Age"] = age.ToString();
+                    }
+                    else
+                    {
+                        // Attempt to convert written numbers to digits (simple example, limited scope)
+                        switch (ageStr.ToLower())
+                        {
+                            case "twenty-five":
+                                record["Age"] = "25";
+                                break;
+                            // Add more cases as needed
+                            default:
+                                record["Age"] = "-1"; // Placeholder for unrecognized values
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Method to correct email format
+        public void NormalizeEmailData()
+        {
+            foreach (var record in dataset)
+            {
+                if (record.ContainsKey("Email"))
+                {
+                    string email = record["Email"];
+                    if (email.Contains("[at]"))
+                    {
+                        record["Email"] = email.Replace("[at]", "@");
+                    }
+                }
+            }
+        }
+
+        // Method to normalize the dataset
+        public void NormalizeDataset()
+        {
+            NormalizeAgeData();
+            NormalizeEmailData();
+        }
+
+        public List<Dictionary<string, string>> GetNormalizedDataset()
+        {
+            return dataset;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main()
+        {
+            DataNormalizer normalizer = new DataNormalizer();
+            normalizer.NormalizeDataset();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var normalizedDataset = normalizer.GetNormalizedDataset();
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Assertions to verify the normalization
+            Debug.Assert(normalizedDataset[0]["Age"] == "30", "Alice's age should be 30.");
+            Debug.Assert(normalizedDataset[1]["Email"] == "bob@example.com", "Bob's email should be corrected to bob@example.com.");
+            Debug.Assert(normalizedDataset[2]["Age"] == "25", "Charlie's age should be corrected to 25.");
+            Debug.Assert(normalizedDataset[0]["Email"] == "alice@example.com", "Alice's email should remain alice@example.com.");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and continue code based on data validation and normalization logic within a data processing context. It includes normalization of age and email data, demonstrating practical handling of common data inconsistencies. The assertions verify that the implemented normalization correctly modifies the dataset, ensuring business logic compliance. The test checks if the LLM can correctly interpret and continue the data normalization process, making it a good benchmark for code purpose understanding.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace ScientificComputing
+{
+    public class DataAnalyzer
+    {
+        public List<double> Data { get; set; }
+
+        public DataAnalyzer(List<double> data)
+        {
+            Data = data;
+        }
+
+        // Method to normalize data
+        public List<double> NormalizeData()
+        {
+            if (Data == null || Data.Count == 0)
+            {
+                throw new InvalidOperationException("Data cannot be null or empty.");
+            }
+
+            double min = Data.Min();
+            double max = Data.Max();
+
+            if (min == max)
+            {
+                throw new InvalidOperationException("Data cannot have all identical values.");
+            }
+
+            List<double> normalizedData = new List<double>();
+
+            foreach (var value in Data)
+            {
+                normalizedData.Add((value - min) / (max - min));
+            }
+
+            return normalizedData;
+        }
+
+        // Method to compute the mean of the data
+        public double ComputeMean()
+        {
+            if (Data == null || Data.Count == 0)
+            {
+                throw new InvalidOperationException("Data cannot be null or empty.");
+            }
+
+            return Data.Average();
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<double> data = new List<double> { 10, 20, 30, 40, 50 };
+            DataAnalyzer analyzer = new DataAnalyzer(data);
+
+            // Normalize the data
+            List<double> normalizedData = analyzer.NormalizeData();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            double meanNormalized = normalizedData.Average();
+
+SUFFIX CODE:
+----------------------------------------
+            // Compute the mean of the normalized data
+            double mean = normalizedData.Average();
+
+            // Assertions
+            Debug.Assert(normalizedData.Count == data.Count, "Normalized data should have the same number of elements as the original data.");
+            Debug.Assert(mean > 0 && mean < 1, "Mean of normalized data should be between 0 and 1.");
+
+            // Print results
+            Console.WriteLine("Normalized Data: " + string.Join(", ", normalizedData));
+            Console.WriteLine("Mean of Normalized Data: " + mean);
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's understanding of LINQ/collections within the context of scientific computing, specifically data normalization and mean computation. The provided prefix sets up a realistic scenario where data is normalized and its mean is computed. The golden completion demonstrates the ability to correctly compute the mean of the original data and includes a meaningful assertion to verify the computation. The suffix continues with computing and asserting the mean of the normalized data, ensuring the model can handle both normalization and statistical analysis. This scenario tests the LLM's ability to understand and complete code with clear business logic and domain-specific requirements.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace DataValidationExample
+{
+    public class DataValidator
+    {
+        public List<string> ValidateEmails(List<string> emails)
+        {
+            // Define a list to store invalid emails
+            List<string> invalidEmails = new List<string>();
+
+            // Define a simple email validation function
+            bool IsValidEmail(string email)
+            {
+                return email.Contains("@");
+            }
+
+            // Validate each email
+            foreach (var email in emails)
+            {
+                if (!IsValidEmail(email))
+                {
+                    invalidEmails.Add(email);
+                }
+            }
+
+            return invalidEmails;
+        }
+
+        public Dictionary<string, bool> ValidateEmailsWithStatus(List<string> emails)
+        {
+            // Define a dictionary to store email validation status
+            Dictionary<string, bool> emailValidationStatus = new Dictionary<string, bool>();
+
+            // Define a simple email validation function
+            bool IsValidEmail(string email)
+            {
+                return email.Contains("@");
+            }
+
+            // Validate each email
+            foreach (var email in emails)
+            {
+                emailValidationStatus[email] = IsValidEmail(email);
+            }
+
+            return emailValidationStatus;
+        }
+
+        // This method needs to be completed
+        public List<string> NormalizeEmails(List<string> emails)
+        {
+            // Define a list to store normalized emails
+            List<string> normalizedEmails = new List<string>();
+
+            // Define a normalization function
+            string NormalizeEmail(string email)
+            {
+                // Trim leading and trailing whitespace and convert to lowercase
+                return email.Trim().ToLower();
+            }
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+normalizedEmails.Add(NormalizeEmail(email));
+
+SUFFIX CODE:
+----------------------------------------
+            // Ensure the list has the correct number of emails
+            Debug.Assert(normalizedEmails.Count == 3, "The number of normalized emails should be 3.");
+
+            // Ensure specific emails have been normalized correctly
+            Debug.Assert(normalizedEmails.Contains("test@example.com"), "The email '  Test@Example.com  ' should be normalized to 'test@example.com'.");
+            Debug.Assert(normalizedEmails.Contains("hello@world.com"), "The email 'Hello@World.com' should be normalized to 'hello@world.com'.");
+            Debug.Assert(normalizedEmails.Contains("foo@bar.com"), "The email ' FOO@BAR.COM ' should be normalized to 'foo@bar.com'.");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            DataValidator validator = new DataValidator();
+
+            List<string> emails = new List<string> { "  Test@Example.com  ", "Hello@World.com", " FOO@BAR.COM " };
+            List<string> normalizedEmails = validator.NormalizeEmails(emails);
+
+            // Additional assertions to verify the normalization behavior
+            Debug.Assert(normalizedEmails.Count == 3, "The number of normalized emails should be 3.");
+            Debug.Assert(normalizedEmails.Contains("test@example.com"), "The email '  Test@Example.com  ' should be normalized to 'test@example.com'.");
+            Debug.Assert(normalizedEmails.Contains("hello@world.com"), "The email 'Hello@World.com' should be normalized to 'hello@world.com'.");
+            Debug.Assert(normalizedEmails.Contains("foo@bar.com"), "The email ' FOO@BAR.COM ' should be normalized to 'foo@bar.com'.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it tests the LLM's understanding of both the business logic of email normalization in the context of data validation and the correct application of LINQ/collections. The prefix sets up the context by defining a class with email validation methods and introduces the NormalizeEmails method that needs completion. The golden completion involves writing code that normalizes a list of emails according to predefined rules. The suffix includes assertions to verify the correctness of the normalization process, ensuring that the LLM comprehends the business logic and achieves the desired outcome.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace AnalyticsExample
+{
+    public class MetricsCalculator
+    {
+        private List<int> data;
+
+        public MetricsCalculator(List<int> inputData)
+        {
+            data = inputData;
+        }
+
+        public double CalculateMean()
+        {
+            if (data == null || data.Count == 0)
+            {
+                throw new InvalidOperationException("Data is empty or null");
+            }
+            double sum = 0;
+            foreach (var number in data)
+            {
+                sum += number;
+            }
+            return sum / data.Count;
+        }
+
+        public int CalculateMedian()
+        {
+            if (data == null || data.Count == 0)
+            {
+                throw new InvalidOperationException("Data is empty or null");
+            }
+            data.Sort();
+            int count = data.Count;
+            if (count % 2 == 0)
+            {
+                // If even number of elements, return the average of the two middle elements
+                return (data[count / 2 - 1] + data[count / 2]) / 2;
+            }
+            else
+            {
+                // If odd number of elements, return the middle element
+                return data[count / 2];
+            }
+        }
+
+        public double CalculateStandardDeviation()
+        {
+            double mean = CalculateMean();
+            double sumOfSquares = 0;
+            foreach (var number in data)
+            {
+                sumOfSquares += Math.Pow(number - mean, 2);
+            }
+            return Math.Sqrt(sumOfSquares / data.Count);
+        }
+
+        public Dictionary<int, int> CalculateFrequencyDistribution()
+        {
+            var frequencyDict = new Dictionary<int, int>();
+            foreach (var number in data)
+            {
+                if (frequencyDict.ContainsKey(number))
+                {
+                    frequencyDict[number]++;
+                }
+                else
+                {
+                    frequencyDict[number] = 1;
+                }
+            }
+            return frequencyDict;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<int> data = new List<int> {1, 2, 2, 3, 4, 4, 4, 5, 5, 6};
+            MetricsCalculator calculator = new MetricsCalculator(data);
+            double mean = calculator.CalculateMean();
+            int median = calculator.CalculateMedian();
+            double stddev = calculator.CalculateStandardDeviation();
+            Dictionary<int, int> frequency;
+
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+frequency = calculator.CalculateFrequencyDistribution();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(mean == 3.6, "Mean calculation is incorrect");
+            Debug.Assert(median == 4, "Median calculation is incorrect");
+            Debug.Assert(Math.Abs(stddev - 1.85592) < 0.0001, "Standard deviation calculation is incorrect");
+            Debug.Assert(frequency[4] == 3, "Frequency distribution calculation is incorrect");
+            Debug.Assert(frequency[5] == 2, "Frequency distribution calculation is incorrect");
+
+            Console.WriteLine("All calculations are correct.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and complete code that calculates various statistical metrics from a dataset. The MetricsCalculator class performs operations like mean, median, standard deviation, and frequency distribution. The golden completion requires the LLM to correctly identify the need to call the CalculateFrequencyDistribution method again and store the result in the frequency variable. This scenario covers LINQ/collections and analytics, demonstrating the business purpose of analyzing data and verifying calculations with assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace DataValidationExample
+{
+    public class DataCleaner
+    {
+        public List<string> CleanData(List<string> rawData)
+        {
+            List<string> cleanedData = new List<string>();
+            foreach (var item in rawData)
+            {
+                // Remove leading and trailing whitespace
+                string trimmedItem = item.Trim();
+                // Convert to lowercase
+                string lowercasedItem = trimmedItem.ToLower();
+                // Remove any non-alphanumeric characters
+                string alphanumericItem = new string(lowercasedItem.Where(char.IsLetterOrDigit).ToArray());
+                cleanedData.Add(alphanumericItem);
+            }
+            return cleanedData;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            DataCleaner cleaner = new DataCleaner();
+            List<string> rawData = new List<string> { "  Hello World!  ", " 123 ABC ", "!@#Test@!# " };
+            List<string> cleanedData = cleaner.CleanData(rawData);
+
+            // Remove duplicates
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            cleanedData = cleanedData.Distinct().ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(cleanedData.Count == 3, "Cleaned data should have 3 items.");
+            Debug.Assert(cleanedData[0] == "helloworld", "First item should be 'helloworld'.");
+            Debug.Assert(cleanedData[1] == "123abc", "Second item should be '123abc'.");
+            Debug.Assert(cleanedData[2] == "test", "Third item should be 'test'.");
+
+            Console.WriteLine("Data cleaning process completed successfully.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to validate the model's understanding of data cleaning processes in the context of data validation. The completion involves removing duplicate entries from the cleaned data, which is a common data cleaning task. The assertions in the suffix ensure that the data has been cleaned and processed correctly according to the specified rules. This case tests the model's ability to comprehend and continue code based on its underlying business logic and domain context, ensuring the completion aligns with the prefix and satisfies the business requirements.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Collections.Generic;
+
+namespace DataValidationExample
+{
+    public class DataValidator
+    {
+        public static List<string> CleanAndNormalizeData(List<string> rawData)
+        {
+            // Step 1: Remove null or empty entries
+            List<string> cleanedData = rawData.Where(data => !string.IsNullOrEmpty(data)).ToList();
+
+            // Step 2: Trim leading and trailing whitespaces
+            cleanedData = cleanedData.Select(data => data.Trim()).ToList();
+
+            // Step 3: Convert all data to lowercase
+            cleanedData = cleanedData.Select(data => data.ToLower()).ToList();
+
+            // Step 4: Remove duplicate entries
+            cleanedData = cleanedData.Distinct().ToList();
+
+            // Step 5: Validate data format
+            cleanedData = cleanedData.Where(data => IsValidFormat(data)).ToList();
+
+            // Step 6: Remove entries shorter than 3 characters
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            cleanedData = cleanedData.Where(data => data.Length >= 3).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            // Return the cleaned and normalized data
+            return cleanedData;
+        }
+
+        // Helper method to validate the format of the data
+        private static bool IsValidFormat(string data)
+        {
+            // Simple format validation: data should be alphanumeric
+            return data.All(char.IsLetterOrDigit);
+        }
+
+        public static void Main(string[] args)
+        {
+            List<string> rawData = new List<string> { "  Hello", "world  ", "HELLO", "", null, "1234", "  test123  " };
+            List<string> expectedData = new List<string> { "hello", "world", "1234", "test123" };
+
+            List<string> result = CleanAndNormalizeData(rawData);
+
+            // Assertions to ensure the function works as expected
+            Debug.Assert(result.SequenceEqual(expectedData), "The cleaned data does not match the expected output.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand the business logic of a data validation and normalization process. The prefix sets up a multi-step data cleaning procedure, including removing empty entries, trimming whitespaces, converting to lowercase, removing duplicates, and validating formats. The golden completion adds a crucial final step of removing entries that are too short, which is a logical continuation of the cleaning process. The suffix includes assertions that verify the cleaned data matches the expected results, ensuring the function operates correctly. This scenario effectively tests the LLM's comprehension of the domain-specific logic and its ability to maintain semantic consistency.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace AnalyticsExample
+{
+    public class ReportGenerator
+    {
+        private List<int> data;
+        public ReportGenerator(List<int> inputData)
+        {
+            data = inputData;
+        }
+
+        // Method to calculate the average of the data
+        public double CalculateAverage()
+        {
+            if (data == null || data.Count == 0)
+            {
+                throw new InvalidOperationException("Data cannot be null or empty.");
+            }
+            return data.Average();
+        }
+
+        // Method to calculate the median of the data
+        public double CalculateMedian()
+        {
+            if (data == null || data.Count == 0)
+            {
+                throw new InvalidOperationException("Data cannot be null or empty.");
+            }
+            var sortedData = data.OrderBy(n => n).ToList();
+            int count = sortedData.Count;
+            if (count % 2 == 0)
+            {
+                return (sortedData[count / 2 - 1] + sortedData[count / 2]) / 2.0;
+            }
+            return sortedData[count / 2];
+        }
+
+        // Method to generate a summary report
+        public string GenerateReport()
+        {
+            double average = CalculateAverage();
+            double median = CalculateMedian();
+            return $"Average: {average}, Median: {median}";
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<int> sampleData = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            ReportGenerator generator = new ReportGenerator(sampleData);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            string report = generator.GenerateReport();
+
+SUFFIX CODE:
+----------------------------------------
+            // Assertions to verify the correctness of the report
+            Debug.Assert(report.Contains("Average: 5.5"), "Average calculation is incorrect.");
+            Debug.Assert(report.Contains("Median: 5.5"), "Median calculation is incorrect.");
+
+            Console.WriteLine(report);
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's understanding of LINQ/collections and analytics domain context. The prefix sets up a comprehensive ReportGenerator class with methods to calculate average and median values from a list of integers. The golden completion involves generating a report using these methods and asserting the correctness of the calculations. The suffix further ensures correctness with assertions and prints the report. This case effectively tests the LLM's ability to comprehend and continue code based on semantic meaning and business logic consistency.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace DataValidationExample
+{
+    public class DataValidator
+    {
+        public List<string> CleanData(List<string> rawData)
+        {
+            List<string> cleanedData = new List<string>();
+            foreach (string data in rawData)
+            {
+                string cleaned = CleanString(data);
+                if (!string.IsNullOrEmpty(cleaned))
+                {
+                    cleanedData.Add(cleaned);
+                }
+            }
+            return cleanedData;
+        }
+
+        private string CleanString(string input)
+        {
+            // Remove leading and trailing whitespace
+            input = input.Trim();
+
+            // Remove special characters
+            char[] arr = input.ToCharArray();
+            arr = Array.FindAll<char>(arr, (c => (char.IsLetterOrDigit(c) 
+                                              || char.IsWhiteSpace(c))));
+            return new string(arr);
+        }
+
+        public bool ValidateSchema(List<string> data)
+        {
+            // Ensure data matches a specific schema (e.g., non-empty, specific format)
+            foreach (var item in data)
+            {
+                if (string.IsNullOrWhiteSpace(item) || !item.Contains("@"))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            DataValidator validator = new DataValidator();
+            List<string> rawData = new List<string> { " user1@example.com ", "user2@domain.com", "invalid-email", " user3@sample.org " };
+            List<string> cleanedData = validator.CleanData(rawData);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            // Filter valid emails
+            List<string> validEmails = cleanedData.FindAll(email => email.Contains("@") && email.IndexOf("@") < email.Length - 1);
+            // Output valid emails
+            foreach (var email in validEmails)
+            {
+                Console.WriteLine(email);
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            // Test the cleaned data
+            Debug.Assert(cleanedData.Count == 3, "Cleaned data should contain 3 valid emails");
+            Debug.Assert(cleanedData.Contains("user1@example.com"), "Cleaned data should contain 'user1@example.com'");
+            Debug.Assert(cleanedData.Contains("user2@domain.com"), "Cleaned data should contain 'user2@domain.com'");
+            Debug.Assert(cleanedData.Contains("user3@sample.org"), "Cleaned data should contain 'user3@sample.org'");
+
+            // Validate the schema
+            bool isSchemaValid = validator.ValidateSchema(cleanedData);
+            Debug.Assert(isSchemaValid, "Schema should be valid for cleaned data");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it demonstrates the use of LINQ/collections in the context of data validation. The business logic requires cleaning a list of raw data and validating it against a specific schema. The golden completion focuses on removing invalid data entries that do not contain an '@' symbol, which is critical for the email validation business logic. The suffix includes assertions that ensure the cleaned data meets the expected criteria and validates the schema, making it a robust test for code purpose understanding.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace DataValidationExample
+{
+    public class DataValidator
+    {
+        private List<string> _data;
+
+        public DataValidator(List<string> data)
+        {
+            _data = data;
+        }
+
+        public bool ValidateData()
+        {
+            // This method should validate the _data list and ensure all entries are non-null, non-empty strings
+            if (_data == null || _data.Count == 0)
+            {
+                return false;
+            }
+
+            foreach (var entry in _data)
+            {
+                if (string.IsNullOrWhiteSpace(entry))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public List<string> CleanData()
+        {
+            // This method should clean the _data list by removing null or empty entries and trimming whitespace
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+_data = _data.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            // Using LINQ to filter and clean the data
+            return _data;
+        }
+
+        public static void Main(string[] args)
+        {
+            var rawData = new List<string> { "  Data1  ", "", "  Data2", null, "  ", "Data3  " };
+            var validator = new DataValidator(rawData);
+
+            // Validate the data before cleaning
+            Debug.Assert(!validator.ValidateData(), "Validation should fail with raw data");
+
+            // Clean the data
+            var cleanedData = validator.CleanData();
+
+            // Validate the data after cleaning
+            validator = new DataValidator(cleanedData);
+            Debug.Assert(validator.ValidateData(), "Validation should pass with cleaned data");
+
+            // Ensure the cleaned data is as expected
+            Debug.Assert(cleanedData.SequenceEqual(new List<string> { "Data1", "Data2", "Data3" }), "Cleaned data should match expected result");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of LINQ/collections in a data validation and cleaning context. It challenges the LLM to understand how to use LINQ to filter out invalid entries and trim whitespace, ensuring the cleaned data meets the validation criteria. The prefix sets up the context and validation logic, while the suffix includes assertions to verify the correctness of the data cleaning process. This scenario tests the LLM's comprehension of data validation and cleaning within a business context, ensuring it can correctly apply LINQ operations for data manipulation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace DataValidationExample
+{
+    public class DataNormalizer
+    {
+        private List<string> rawData;
+
+        public DataNormalizer(List<string> data)
+        {
+            rawData = data;
+        }
+
+        public List<string> NormalizeData()
+        {
+            List<string> normalizedData = new List<string>();
+            foreach (var item in rawData)
+            {
+                if (!string.IsNullOrEmpty(item))
+                {
+                    string trimmedItem = item.Trim();
+                    string lowerCaseItem = trimmedItem.ToLower();
+                    normalizedData.Add(lowerCaseItem);
+                }
+            }
+            return normalizedData;
+        }
+
+        public List<string> ValidateData(List<string> normalizedData)
+        {
+            List<string> validData = new List<string>();
+            foreach (var item in normalizedData)
+            {
+                if (item.Length >= 3 && item.Length <= 10)
+                {
+                    validData.Add(item);
+                }
+            }
+            return validData;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<string> data = new List<string> { " Apple ", "Banana", "cherry", "D", "Eggplant", "  " };
+            DataNormalizer normalizer = new DataNormalizer(data);
+            List<string> normalizedData = normalizer.NormalizeData();
+            List<string> validData;
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+validData = normalizer.ValidateData(normalizedData);
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(validData.SequenceEqual(new List<string> { "apple", "banana", "cherry" }), "Validation failed");
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand a data normalization and validation process. The golden completion requires the model to correctly invoke the ValidateData method after normalizing the data. The suffix then includes assertions to verify that the data validation logic is correct. This tests the model's comprehension of the domain-specific logic of data normalization and validation, as well as its ability to complete the code in a semantically appropriate manner.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MediaProcessing
+{
+    public class AudioProcessor
+    {
+        public List<int> NormalizeAudioLevels(List<int> audioLevels)
+        {
+            // Normalize audio levels to a range of 0 to 100
+            int maxLevel = audioLevels.Max();
+            int minLevel = audioLevels.Min();
+            List<int> normalizedLevels = new List<int>();
+
+            foreach (var level in audioLevels)
+            {
+                // Placeholder for normalization logic
+            }
+
+            return normalizedLevels;
+        }
+
+        public async Task<List<int>> ProcessAudioAsync(List<int> audioLevels)
+        {
+            // Simulate asynchronous processing
+            await Task.Delay(100);
+
+            List<int> normalizedLevels = NormalizeAudioLevels(audioLevels);
+
+            // Placeholder for further processing
+            return normalizedLevels;
+        }
+
+        public void LogAudioLevels(List<int> audioLevels)
+        {
+            foreach (var level in audioLevels)
+            {
+                Console.WriteLine($"Audio Level: {level}");
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            AudioProcessor processor = new AudioProcessor();
+            List<int> audioLevels = new List<int> { 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+            List<int> processedLevels = await processor.ProcessAudioAsync(audioLevels);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            int normalizedLevel = (int)((double)(level - minLevel) / (maxLevel - minLevel) * 100);
+            normalizedLevels.Add(normalizedLevel);
+
+SUFFIX CODE:
+----------------------------------------
+            processor.LogAudioLevels(processedLevels);
+
+            // Assertions
+            Debug.Assert(processedLevels.Count == 10, "The processed levels count should be 10.");
+            Debug.Assert(processedLevels[0] == 0, "The first level should be normalized to 0.");
+            Debug.Assert(processedLevels[9] == 100, "The last level should be normalized to 100.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to understand and continue a C# code snippet involving LINQ/collections in the context of media processing (audio normalization). The prefix sets up a method for normalizing audio levels and another for processing audio asynchronously. The golden_completion involves completing the normalization logic. The suffix includes logging the processed audio levels and assertions to verify the correctness of the normalization process. The scenario demonstrates the business logic of audio normalization and ensures the LLM comprehends the code purpose.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace DataValidationExample
+{
+    public class DataValidator
+    {
+        public List<string> ValidateEmails(List<string> emails)
+        {
+            var validEmails = new List<string>();
+            foreach (var email in emails)
+            {
+                if (IsValidEmail(email))
+                {
+                    validEmails.Add(email);
+                }
+            }
+            return validEmails;
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var emails = new List<string> { "test@example.com", "invalid-email", "user@domain.com" };
+            var validator = new DataValidator();
+            var validEmails = validator.ValidateEmails(emails);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+
+            
+
+SUFFIX CODE:
+----------------------------------------
+            Console.WriteLine("Valid Emails: " + string.Join(", ", validEmails));
+            Debug.Assert(validEmails.Count == 2, "Expected 2 valid emails.");
+            Debug.Assert(validEmails.Contains("test@example.com"), "Expected test@example.com to be valid.");
+            Debug.Assert(validEmails.Contains("user@domain.com"), "Expected user@domain.com to be valid.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to understand the purpose of email validation and deduplication in a list. The prefix sets up a DataValidator class with email validation logic and a Main method that uses this class. The golden completion demonstrates the correct implementation of deduplication using LINQ to ensure only unique valid emails are returned. The suffix contains assertions to verify that the implementation meets the business requirements of having distinct valid emails.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        private List<string> imagePaths;
+        public ImageProcessor()
+        {
+            imagePaths = new List<string>();
+        }
+
+        public void AddImage(string path)
+        {
+            if (!string.IsNullOrEmpty(path) && path.EndsWith(".jpg"))
+            {
+                imagePaths.Add(path);
+            }
+        }
+
+        public async Task<List<string>> ProcessImagesAsync()
+        {
+            List<string> results = new List<string>();
+            await Task.Run(() =>
+            {
+                results = imagePaths.Select(path => ProcessImage(path)).ToList();
+            });
+            return results;
+        }
+
+        private string ProcessImage(string path)
+        {
+            // Simulate image processing
+            return $"Processed: {path}";
+        }
+
+        public async Task<string> ProcessFirstImageAsync()
+        {
+            if (imagePaths.Count == 0)
+            {
+                throw new InvalidOperationException("No images to process.");
+            }
+
+            string firstImagePath = imagePaths.First();
+            return await ProcessSingleImageAsync(firstImagePath);
+        }
+
+        private async Task<string> ProcessSingleImageAsync(string path)
+        {
+            return await Task.Run(() => ProcessImage(path));
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            ImageProcessor processor = new ImageProcessor();
+            processor.AddImage("image1.jpg");
+            processor.AddImage("image2.jpg");
+
+            List<string> results = await processor.ProcessImagesAsync();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            string firstResult = await processor.ProcessFirstImageAsync();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(results.Count == 2, "Two images should be processed.");
+            Debug.Assert(results[0] == "Processed: image1.jpg", "First image should be processed correctly.");
+            Debug.Assert(results[1] == "Processed: image2.jpg", "Second image should be processed correctly.");
+            Debug.Assert(firstResult == "Processed: image1.jpg", "First image should be processed first.");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to understand and continue code related to asynchronous media processing using tasks. The prefix sets up an image processor that adds images and processes them asynchronously. The golden completion is focused on processing the first image asynchronously, which requires understanding the context of image processing and the use of async-await patterns. The suffix includes assertions to verify that the images are processed correctly and in the right order, ensuring that the LLM comprehends the business logic and the domain context of media processing.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace MediaProcessing
+{
+    public class VideoProcessor
+    {
+        private List<VideoFrame> _frames;
+
+        public VideoProcessor()
+        {
+            _frames = new List<VideoFrame>();
+        }
+
+        public void AddFrame(VideoFrame frame)
+        {
+            _frames.Add(frame);
+        }
+
+        public double CalculateAverageBrightness()
+        {
+            if (_frames == null || !_frames.Any())
+                throw new InvalidOperationException("No frames to process");
+
+            double totalBrightness = 0;
+            foreach (var frame in _frames)
+            {
+                totalBrightness += frame.Brightness;
+            }
+            return totalBrightness / _frames.Count;
+        }
+
+        // Additional helper methods for processing
+        public VideoFrame GetBrightestFrame()
+        {
+            if (_frames == null || !_frames.Any())
+                throw new InvalidOperationException("No frames to process");
+
+            VideoFrame brightestFrame = _frames.First();
+            foreach (var frame in _frames)
+            {
+                if (frame.Brightness > brightestFrame.Brightness)
+                {
+                    brightestFrame = frame;
+                }
+            }
+            return brightestFrame;
+        }
+
+        public VideoFrame GetDimmestFrame()
+        {
+            if (_frames == null || !_frames.Any())
+                throw new InvalidOperationException("No frames to process");
+
+            VideoFrame dimmestFrame = _frames.First();
+            foreach (var frame in _frames)
+            {
+                if (frame.Brightness < dimmestFrame.Brightness)
+                {
+                    dimmestFrame = frame;
+                }
+            }
+            return dimmestFrame;
+        }
+    }
+
+    public class VideoFrame
+    {
+        public int Id { get; set; }
+        public double Brightness { get; set; }
+
+        public VideoFrame(int id, double brightness)
+        {
+            Id = id;
+            Brightness = brightness;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            VideoProcessor processor = new VideoProcessor();
+            processor.AddFrame(new VideoFrame(1, 0.5));
+            processor.AddFrame(new VideoFrame(2, 0.7));
+            processor.AddFrame(new VideoFrame(3, 0.3));
+            processor.AddFrame(new VideoFrame(4, 0.9));
+            // Find the average brightness
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+double averageBrightness = processor.CalculateAverageBrightness();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(Math.Abs(averageBrightness - 0.6) < 0.0001, "Average brightness calculation is incorrect");
+
+            VideoFrame brightestFrame = processor.GetBrightestFrame();
+            Debug.Assert(brightestFrame.Id == 4, "Brightest frame identification is incorrect");
+
+            VideoFrame dimmestFrame = processor.GetDimmestFrame();
+            Debug.Assert(dimmestFrame.Id == 3, "Dimmest frame identification is incorrect");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates a realistic media processing scenario where a VideoProcessor class handles a collection of VideoFrame objects. The code calculates the average brightness of video frames, ensuring the correct business logic for media processing. The suffix includes assertions to verify the correctness of the calculations and frame identifications. The golden completion fills a gap in the semantic logic by calculating and asserting the average brightness, which is essential for verifying the domain-specific business logic.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace AnalyticsExample
+{
+    public class MetricsAnalyzer
+    {
+        public class Metric
+        {
+            public string Name { get; set; }
+            public double Value { get; set; }
+        }
+
+        private List<Metric> _metrics;
+
+        public MetricsAnalyzer()
+        {
+            _metrics = new List<Metric>
+            {
+                new Metric { Name = "CPU Usage", Value = 75.5 },
+                new Metric { Name = "Memory Usage", Value = 65.3 },
+                new Metric { Name = "Disk Usage", Value = 80.1 },
+                new Metric { Name = "Network Usage", Value = 55.2 }
+            };
+        }
+
+        public List<Metric> GetHighUsageMetrics(double threshold)
+        {
+            // This method should return all metrics with values above the given threshold
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            return _metrics.Where(m => m.Value > threshold).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+        }
+
+        public static void Main(string[] args)
+        {
+            MetricsAnalyzer analyzer = new MetricsAnalyzer();
+            List<Metric> highUsageMetrics = analyzer.GetHighUsageMetrics(70);
+
+            // Assertions to validate the business logic
+            Debug.Assert(highUsageMetrics.Count == 2, "There should be 2 high usage metrics");
+            Debug.Assert(highUsageMetrics.Any(m => m.Name == "CPU Usage" && m.Value == 75.5), "CPU Usage metric is missing or incorrect");
+            Debug.Assert(highUsageMetrics.Any(m => m.Name == "Disk Usage" && m.Value == 80.1), "Disk Usage metric is missing or incorrect");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and implement LINQ expressions in the context of an analytics domain. The prefix sets up a class with a list of metrics and initializes them with sample data. The golden completion involves writing a LINQ expression to filter metrics based on a threshold value. The suffix includes assertions that validate the correctness of the LINQ expression by checking the number of high usage metrics and their specific values. This scenario demonstrates clear business logic and domain-specific requirements, ensuring the LLM comprehends and correctly continues the code based on its purpose.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace AnalyticsExample
+{
+    public class MetricsCalculator
+    {
+        public List<int> DataPoints { get; set; }
+
+        public MetricsCalculator(List<int> dataPoints)
+        {
+            DataPoints = dataPoints;
+        }
+
+        public double CalculateAverage()
+        {
+            if (DataPoints == null || DataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("No data points available to calculate average.");
+            }
+
+            double sum = 0;
+            foreach (var point in DataPoints)
+            {
+                sum += point;
+            }
+            return sum / DataPoints.Count;
+        }
+
+        public int CalculateMedian()
+        {
+            if (DataPoints == null || DataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("No data points available to calculate median.");
+            }
+
+            var sortedPoints = DataPoints.OrderBy(x => x).ToList();
+            int count = sortedPoints.Count;
+            if (count % 2 == 0)
+            {
+                return (sortedPoints[count / 2 - 1] + sortedPoints[count / 2]) / 2;
+            }
+            else
+            {
+                return sortedPoints[count / 2];
+            }
+        }
+
+        public Dictionary<int, int> CalculateMode()
+        {
+            if (DataPoints == null || DataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("No data points available to calculate mode.");
+            }
+
+            Dictionary<int, int> frequencyDict = new Dictionary<int, int>();
+            foreach (var point in DataPoints)
+            {
+                if (frequencyDict.ContainsKey(point))
+                {
+                    frequencyDict[point]++;
+                }
+                else
+                {
+                    frequencyDict[point] = 1;
+                }
+            }
+
+            int maxFrequency = frequencyDict.Values.Max();
+            return frequencyDict.Where(x => x.Value == maxFrequency).ToDictionary(x => x.Key, x => x.Value);
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<int> sampleData = new List<int> { 1, 2, 2, 3, 4 };
+            MetricsCalculator calculator = new MetricsCalculator(sampleData);
+
+            // Calculate and verify average
+            double average = calculator.CalculateAverage();
+            Debug.Assert(average == 2.4, "Average calculation is incorrect");
+
+            // Calculate and verify median
+            int median = calculator.CalculateMedian();
+            Debug.Assert(median == 2, "Median calculation is incorrect");
+            // Calculate and verify mode
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var mode = calculator.CalculateMode();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(mode.Count == 1 && mode.ContainsKey(2) && mode[2] == 2, "Mode calculation is incorrect");
+
+            // Edge case: single data point
+            sampleData = new List<int> { 5 };
+            calculator = new MetricsCalculator(sampleData);
+            average = calculator.CalculateAverage();
+            Debug.Assert(average == 5, "Average calculation for single data point is incorrect");
+            median = calculator.CalculateMedian();
+            Debug.Assert(median == 5, "Median calculation for single data point is incorrect");
+            mode = calculator.CalculateMode();
+            Debug.Assert(mode.Count == 1 && mode.ContainsKey(5) && mode[5] == 1, "Mode calculation for single data point is incorrect");
+
+            // Edge case: no data points
+            try
+            {
+                calculator = new MetricsCalculator(new List<int>());
+                calculator.CalculateAverage();
+                Debug.Assert(false, "Expected exception for no data points not thrown");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Debug.Assert(ex.Message == "No data points available to calculate average.", "Incorrect exception message for no data points in average calculation");
+            }
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example as it sets up a realistic scenario where an analytics class calculates average, median, and mode from a list of integers. It tests the understanding of LINQ and collection manipulation within a domain-specific context of metrics calculation. The completion focuses on calculating the mode, a common statistical operation, and verifying the result. The suffix then continues with additional edge cases to ensure robustness and business logic correctness, making it a comprehensive test for the LLM's understanding of code purpose and semantic meaning.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        private List<string> imagePaths;
+
+        public ImageProcessor()
+        {
+            imagePaths = new List<string>();
+        }
+
+        public void AddImagePath(string path)
+        {
+            imagePaths.Add(path);
+        }
+
+        public List<string> GetImagesWithExtension(string extension)
+        {
+            // Filter images based on the provided extension
+            var filteredImages = imagePaths.Where(path => path.EndsWith(extension, StringComparison.OrdinalIgnoreCase)).ToList();
+            return filteredImages;
+        }
+
+        public int CountImagesWithExtension(string extension)
+        {
+            // Count images based on the provided extension
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            return imagePaths.Count(path => path.EndsWith(extension, StringComparison.OrdinalIgnoreCase));
+
+SUFFIX CODE:
+----------------------------------------
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            ImageProcessor processor = new ImageProcessor();
+            processor.AddImagePath("image1.jpg");
+            processor.AddImagePath("image2.png");
+            processor.AddImagePath("image3.jpg");
+            processor.AddImagePath("image4.gif");
+
+            Debug.Assert(processor.GetImagesWithExtension(".jpg").Count == 2, "There should be 2 images with .jpg extension");
+            Debug.Assert(processor.CountImagesWithExtension(".jpg") == 2, "There should be 2 images with .jpg extension");
+            Debug.Assert(processor.GetImagesWithExtension(".png").Count == 1, "There should be 1 image with .png extension");
+            Debug.Assert(processor.CountImagesWithExtension(".png") == 1, "There should be 1 image with .png extension");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and complete code that processes and filters a list of image paths based on their file extensions using LINQ. The domain context is media processing, specifically handling image files. The assertions check the correctness of filtering and counting functions, ensuring the model comprehends the business logic of filtering by file extension and accurately counts the filtered results.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace AnalyticsExample
+{
+    public class Metric
+    {
+        public string Name { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class ReportGenerator
+    {
+        private List<Metric> metrics;
+
+        public ReportGenerator()
+        {
+            metrics = new List<Metric>();
+        }
+
+        public void AddMetric(string name, double value)
+        {
+            metrics.Add(new Metric { Name = name, Value = value });
+        }
+
+        // This method calculates the average value of all metrics.
+        public double CalculateAverageMetric()
+        {
+            return metrics.Average(m => m.Value);
+        }
+
+        // This method generates a summary report
+        public string GenerateSummaryReport()
+        {
+            var report = "Summary Report:\n";
+            foreach (var metric in metrics)
+            {
+                report += $"Metric: {metric.Name}, Value: {metric.Value}\n";
+            }
+            report += $"Average Value: {CalculateAverageMetric()}\n";
+            return report;
+        }
+
+        // This method generates a detailed report
+        public string GenerateDetailedReport()
+        {
+            var report = "Detailed Report:\n";
+            foreach (var metric in metrics.OrderByDescending(m => m.Value))
+            {
+                report += $"Metric: {metric.Name}, Value: {metric.Value}\n";
+            }
+            return report;
+        }
+
+        // This method finds the metric with the highest value
+        public Metric FindMaxMetric()
+        {
+            return metrics.OrderByDescending(m => m.Value).FirstOrDefault();
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var reportGenerator = new ReportGenerator();
+            reportGenerator.AddMetric("Metric1", 10);
+            reportGenerator.AddMetric("Metric2", 20);
+            reportGenerator.AddMetric("Metric3", 30);
+
+            // Generate and print summary report
+            string summaryReport = reportGenerator.GenerateSummaryReport();
+            Console.WriteLine(summaryReport);
+            Debug.Assert(summaryReport.Contains("Average Value: 20"), "Summary report average value is incorrect");
+
+            // Generate and print detailed report
+            string detailedReport = reportGenerator.GenerateDetailedReport();
+            Console.WriteLine(detailedReport);
+            Debug.Assert(detailedReport.StartsWith("Detailed Report:\nMetric: Metric3"), "Detailed report order is incorrect");
+            // Find and print the metric with the highest value
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var maxMetric = reportGenerator.FindMaxMetric();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(maxMetric.Name == "Metric3" && maxMetric.Value == 30, "Max metric calculation is incorrect");
+
+            // Cleanup
+            reportGenerator = null;
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example provides a comprehensive setup for an analytics report generation class, including methods to add metrics, calculate averages, and generate reports. The golden completion focuses on finding and printing the metric with the highest value, which is a common operation in analytics. The suffix includes assertions to verify the correctness of the business logic, ensuring that the report generator properly calculates and orders metrics. This scenario effectively tests the LLM's ability to understand and continue code based on its semantic meaning and business context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        public List<Image> Images { get; set; } = new List<Image>();
+
+        public ImageProcessor(List<Image> images)
+        {
+            Images = images;
+        }
+
+        // Helper method to simulate image loading
+        public static List<Image> LoadImages(int count)
+        {
+            var images = new List<Image>();
+            for (int i = 0; i < count; i++)
+            {
+                images.Add(new Image { Id = i, Name = $"Image_{i}", Size = 100 + i });
+            }
+            return images;
+        }
+
+        // Method to filter images based on a given size
+        public List<Image> FilterImagesBySize(int minSize)
+        {
+            return Images.Where(img => img.Size >= minSize).ToList();
+        }
+    }
+
+    public class Image
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Size { get; set; }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var images = ImageProcessor.LoadImages(10);
+            var processor = new ImageProcessor(images);
+
+            // Filter images larger than 105
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var largeImages = processor.FilterImagesBySize(106);
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(largeImages.Count == 4, "There should be 4 images larger than 105");
+            Debug.Assert(largeImages.All(img => img.Size > 105), "All filtered images should be larger than 105");
+
+            // Additional test case
+            var mediumImages = processor.FilterImagesBySize(102);
+            Debug.Assert(mediumImages.Count == 7, "There should be 7 images larger than 102");
+            Debug.Assert(mediumImages.All(img => img.Size > 102), "All filtered images should be larger than 102");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of LINQ for filtering a collection of images based on their size, which is a common scenario in media processing. The prefix sets up the context by defining an ImageProcessor class with a method to filter images, and the suffix includes assertions to verify that the filtering logic is correct. This scenario tests the model's ability to understand and continue code that involves collections and LINQ operations within a media processing domain.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AnalyticsExample
+{
+    public class Metric
+    {
+        public string Name { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class MetricAggregator
+    {
+        private List<Metric> metrics;
+
+        public MetricAggregator()
+        {
+            metrics = new List<Metric>();
+        }
+
+        public void AddMetric(string name, double value)
+        {
+            metrics.Add(new Metric { Name = name, Value = value });
+        }
+
+        public async Task<double> CalculateAverageAsync(string metricName)
+        {
+            await Task.Delay(100); // Simulate async operation
+            var selectedMetrics = metrics.Where(m => m.Name == metricName);
+            if (!selectedMetrics.Any())
+                throw new ArgumentException("Metric not found");
+            
+            // Calculate average of selected metrics
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                double sum = selectedMetrics.Sum(m => m.Value);
+                double count = selectedMetrics.Count();
+                double average = sum / count;
+
+SUFFIX CODE:
+----------------------------------------
+            return average;
+        }
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            MetricAggregator aggregator = new MetricAggregator();
+            aggregator.AddMetric("Latency", 100);
+            aggregator.AddMetric("Latency", 200);
+            aggregator.AddMetric("Latency", 300);
+            aggregator.AddMetric("Throughput", 1000);
+
+            double avgLatency = await aggregator.CalculateAverageAsync("Latency");
+            Debug.Assert(avgLatency == 200, "Average Latency should be 200");
+
+            try
+            {
+                double avgThroughput = await aggregator.CalculateAverageAsync("Throughput");
+                Debug.Assert(avgThroughput == 1000, "Average Throughput should be 1000");
+            }
+            catch (ArgumentException ex)
+            {
+                Debug.Assert(false, "Exception should not have occurred: " + ex.Message);
+            }
+
+            try
+            {
+                double avgInvalid = await aggregator.CalculateAverageAsync("InvalidMetric");
+                Debug.Assert(false, "Exception should have occurred for invalid metric");
+            }
+            catch (ArgumentException)
+            {
+                // Expected exception
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and continue code based on its semantic meaning and domain context. The scenario involves asynchronous operations and LINQ/collections within the domain of analytics, specifically calculating the average of metric values. The prefix sets up the necessary context, including class definitions and method signatures. The golden_completion involves using LINQ to calculate the average value, which is a common operation in analytics. The suffix includes assertions to verify the correctness of the calculations, ensuring the LLM understands the business logic and can maintain consistency in the code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace AnalyticsExample
+{
+    public class MetricsProcessor
+    {
+        private readonly List<int> _metrics;
+
+        public MetricsProcessor()
+        {
+            _metrics = new List<int>();
+        }
+
+        public void AddMetric(int metric)
+        {
+            if (metric < 0)
+            {
+                throw new ArgumentException("Metric cannot be negative");
+            }
+            _metrics.Add(metric);
+        }
+
+        public double CalculateAverage()
+        {
+            if (_metrics.Count == 0)
+            {
+                throw new InvalidOperationException("No metrics to calculate average");
+            }
+            return _metrics.Average();
+        }
+
+        // This method needs to be completed to filter metrics based on a predicate
+        public IEnumerable<int> FilterMetrics(Func<int, bool> predicate)
+        {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            return _metrics.Where(predicate);
+
+SUFFIX CODE:
+----------------------------------------
+        }
+
+        public static void Main(string[] args)
+        {
+            MetricsProcessor processor = new MetricsProcessor();
+            processor.AddMetric(10);
+            processor.AddMetric(20);
+            processor.AddMetric(30);
+
+            IEnumerable<int> filteredMetrics = processor.FilterMetrics(m => m > 15);
+
+            Debug.Assert(filteredMetrics.SequenceEqual(new List<int> { 20, 30 }), "Filtered metrics should be 20 and 30");
+            
+            double average = processor.CalculateAverage();
+            Debug.Assert(average == 20, "Average should be 20");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example is a good test case because it combines LINQ/collections with an analytics domain context. The prefix sets up a realistic scenario where a MetricsProcessor class is used to manage and process metrics data. The golden completion involves implementing a method to filter the metrics using a LINQ query, demonstrating comprehension of the business logic and the correct usage of LINQ. The suffix includes assertions that test the correctness of the implementation, ensuring that the filtered metrics and the calculated average meet the expected business rules.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        public class Image
+        {
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public List<int> Pixels { get; set; }
+        }
+
+        public List<Image> Images { get; private set; }
+
+        public ImageProcessor()
+        {
+            Images = new List<Image>();
+        }
+
+        public void AddImage(int width, int height, List<int> pixels)
+        {
+            if (pixels == null || pixels.Count != width * height)
+            {
+                throw new ArgumentException("Invalid pixels array");
+            }
+
+            Images.Add(new Image { Width = width, Height = height, Pixels = pixels });
+        }
+
+        public double CalculateAverageBrightness()
+        {
+            if (Images.Count == 0)
+            {
+                throw new InvalidOperationException("No images available");
+            }
+
+            double totalBrightness = 0;
+            int totalPixels = 0;
+
+            foreach (var image in Images)
+            {
+                totalBrightness += image.Pixels.Sum();
+                totalPixels += image.Pixels.Count;
+            }
+
+            return totalBrightness / totalPixels;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ImageProcessor processor = new ImageProcessor();
+            processor.AddImage(2, 2, new List<int> { 10, 20, 30, 40 });
+            processor.AddImage(3, 3, new List<int> { 5, 15, 25, 35, 45, 55, 65, 75, 85 });
+            // Find the average brightness
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            double averageBrightness = processor.CalculateAverageBrightness();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(averageBrightness == 37.5, "Average brightness calculation failed");
+
+            processor.AddImage(1, 1, new List<int> { 100 });
+            averageBrightness = processor.CalculateAverageBrightness();
+            Debug.Assert(averageBrightness == 42.22222222222222, "Average brightness calculation failed");
+
+            processor.AddImage(2, 2, new List<int> { 50, 50, 50, 50 });
+            averageBrightness = processor.CalculateAverageBrightness();
+            Debug.Assert(averageBrightness == 45, "Average brightness calculation failed");
+
+            Console.WriteLine("All tests passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests an LLM's understanding of LINQ and collection operations within the context of media processing. The code involves calculating the average brightness of images stored in a list, which requires comprehension of collection manipulation and domain-specific logic. The scenario includes realistic methods for adding and processing images, ensuring the LLM understands both the syntax and semantics of the operations. The assertions validate the correctness of the business logic by checking the calculated average brightness against expected values, ensuring the LLM's completion maintains consistency with the provided context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class AudioProcessor
+    {
+        private List<AudioClip> audioClips;
+        private Dictionary<string, AudioClip> clipDictionary;
+
+        public AudioProcessor()
+        {
+            audioClips = new List<AudioClip>();
+            clipDictionary = new Dictionary<string, AudioClip>();
+        }
+
+        public void AddClip(AudioClip clip)
+        {
+            if (clip != null && !clipDictionary.ContainsKey(clip.Name))
+            {
+                audioClips.Add(clip);
+                clipDictionary.Add(clip.Name, clip);
+            }
+        }
+
+        public List<AudioClip> GetAllClips()
+        {
+            return audioClips;
+        }
+
+        public AudioClip FindClipByName(string name)
+        {
+            if (clipDictionary.ContainsKey(name))
+            {
+                return clipDictionary[name];
+            }
+            return null;
+        }
+    }
+
+    public class AudioClip
+    {
+        public string Name { get; set; }
+        public int Duration { get; set; } // Duration in seconds
+
+        public AudioClip(string name, int duration)
+        {
+            Name = name;
+            Duration = duration;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            AudioProcessor processor = new AudioProcessor();
+            processor.AddClip(new AudioClip("clip1", 120));
+            processor.AddClip(new AudioClip("clip2", 90));
+            processor.AddClip(new AudioClip("clip3", 150));
+
+            // Calculate the total duration of all audio clips
+            int totalDuration = processor.GetAllClips().Sum(clip => clip.Duration);
+            Console.WriteLine($"Total Duration: {totalDuration} seconds");
+
+            // Find the longest clip
+            AudioClip longestClip = 
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+processor.GetAllClips().OrderByDescending(c => c.Duration).First()
+
+SUFFIX CODE:
+----------------------------------------
+            // Assertions
+            Debug.Assert(totalDuration == 360, "Total duration should be 360 seconds");
+            Debug.Assert(longestClip.Name == "clip3", "The longest clip should be 'clip3'");
+            Debug.Assert(longestClip.Duration == 150, "The longest clip's duration should be 150 seconds");
+
+            Console.WriteLine($"Longest Clip: {longestClip.Name}, Duration: {longestClip.Duration} seconds");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates an understanding of LINQ/collections in the context of media processing. The prefix sets up a scenario where audio clips are added to a processor, and the goal is to calculate the total duration of all clips and find the longest clip. The golden completion requires correctly using LINQ to find the longest clip based on duration, and the suffix includes assertions to verify the business logic and ensure correctness. This case tests the LLM's ability to comprehend and continue code based on its semantic meaning and domain-specific logic, ensuring that it follows the business rules and properly uses LINQ methods.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace AnalyticsExample
+{
+    public class MetricsProcessor
+    {
+        private List<double> dataPoints;
+
+        public MetricsProcessor(List<double> initialData)
+        {
+            dataPoints = initialData;
+        }
+
+        public double CalculateMean()
+        {
+            if (dataPoints == null || dataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("Data points list is empty or null.");
+            }
+            return dataPoints.Average();
+        }
+
+        public double CalculateMedian()
+        {
+            if (dataPoints == null || dataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("Data points list is empty or null.");
+            }
+            var sortedData = dataPoints.OrderBy(x => x).ToList();
+            int count = sortedData.Count;
+            if (count % 2 == 0)
+            {
+                // For even number of elements, average the two middle elements
+                return (sortedData[count / 2 - 1] + sortedData[count / 2]) / 2.0;
+            }
+            else
+            {
+                // For odd number of elements, return the middle element
+                return sortedData[count / 2];
+            }
+        }
+
+        public void AddDataPoint(double dataPoint)
+        {
+            dataPoints.Add(dataPoint);
+        }
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+        public double CalculateVariance()
+        {
+            if (dataPoints == null || dataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("Data points list is empty or null.");
+            }
+            double mean = CalculateMean();
+            double variance = dataPoints.Select(x => Math.Pow(x - mean, 2)).Average();
+            return variance;
+        }
+
+SUFFIX CODE:
+----------------------------------------
+        public double CalculateStandardDeviation()
+        {
+            if (dataPoints == null || dataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("Data points list is empty or null.");
+            }
+            double mean = CalculateMean();
+            double sumSquaredDifferences = dataPoints.Select(x => Math.Pow(x - mean, 2)).Sum();
+            return Math.Sqrt(sumSquaredDifferences / dataPoints.Count);
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var initialData = new List<double> { 1, 2, 3, 4, 5 };
+            var processor = new MetricsProcessor(initialData);
+
+            double variance = processor.CalculateVariance();
+
+            // Assertions to verify correctness of CalculateVariance
+            Debug.Assert(Math.Abs(variance - 2.0) < 0.0001, "Variance calculation is incorrect.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's understanding of calculating statistical metrics, specifically variance, based on a collection of data points. The prefix sets up the necessary context by providing methods for calculating mean and median and adding data points. The golden completion requires the LLM to implement a method for calculating variance, which is a common statistical operation in analytics. The suffix includes a method for calculating standard deviation, which is conceptually similar to variance, and a main method to validate the correctness of the variance calculation with assertions. This structure ensures that the LLM understands the business logic and correctly implements the required functionality while maintaining consistency with the provided context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        private List<Image> images;
+
+        public ImageProcessor()
+        {
+            images = new List<Image>();
+        }
+
+        public void AddImage(string name, byte[] data)
+        {
+            images.Add(new Image { Name = name, Data = data });
+        }
+
+        public List<Image> FilterImagesBySize(int minSize)
+        {
+            // The LINQ query to filter images by size will be completed in golden_completion
+            return images.Where(img => img.Data.Length > minSize).ToList();
+        }
+
+        public Image GetLargestImage()
+        {
+            return images.OrderByDescending(img => img.Data.Length).FirstOrDefault();
+        }
+
+        public void PrintImageDetails()
+        {
+            foreach (var image in images)
+            {
+                Console.WriteLine($"Name: {image.Name}, Size: {image.Data.Length} bytes");
+            }
+        }
+    }
+
+    public class Image
+    {
+        public string Name { get; set; }
+        public byte[] Data { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            ImageProcessor processor = new ImageProcessor();
+            processor.AddImage("Image1", new byte[100]);
+            processor.AddImage("Image2", new byte[200]);
+            processor.AddImage("Image3", new byte[50]);
+
+            List<Image> largeImages;
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+largeImages = processor.FilterImagesBySize(100)
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(largeImages.Count == 1, "There should be only one image larger than 100 bytes.");
+            Debug.Assert(largeImages[0].Name == "Image2", "The largest image should be Image2.");
+            Debug.Assert(largestImage.Name == "Image2", "The largest image should be Image2.");
+
+            processor.PrintImageDetails();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to understand and continue a LINQ-based filtering operation in the context of media processing. The prefix sets up a class for processing images, including methods for adding images, filtering them by size, and getting the largest image. The golden completion requires the model to correctly apply a LINQ query to filter the images by size. The suffix contains assertions to verify that the filtering and sorting operations work as expected, ensuring the business logic is correctly implemented.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class VideoProcessor
+    {
+        public List<VideoFile> VideoFiles { get; set; }
+
+        public VideoProcessor()
+        {
+            VideoFiles = new List<VideoFile>();
+        }
+
+        public void AddVideoFile(string name, int durationInSeconds)
+        {
+            VideoFiles.Add(new VideoFile { Name = name, DurationInSeconds = durationInSeconds });
+        }
+
+        // Helper method to simulate processing a video file
+        private void ProcessVideo(VideoFile videoFile)
+        {
+            // Simulate processing
+            Console.WriteLine($"Processing video: {videoFile.Name}...");
+        }
+
+        // This method should filter and process video files longer than a given duration
+        public void ProcessLongVideos(int minimumDuration)
+        {
+            var longVideos = VideoFiles
+                .Where(v => v.DurationInSeconds > minimumDuration)
+                .ToList();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+foreach (var video in longVideos)
+{
+    ProcessVideo(video);
+}
+
+SUFFIX CODE:
+----------------------------------------
+        }
+    }
+
+    public class VideoFile
+    {
+        public string Name { get; set; }
+        public int DurationInSeconds { get; set; }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            VideoProcessor processor = new VideoProcessor();
+            processor.AddVideoFile("Video1", 300);
+            processor.AddVideoFile("Video2", 120);
+            processor.AddVideoFile("Video3", 600);
+
+            processor.ProcessLongVideos(200);
+
+            Debug.Assert(processor.VideoFiles.Count == 3, "Total video files count should be 3");
+            Debug.Assert(processor.VideoFiles.Count(v => v.DurationInSeconds > 200) == 2, "There should be 2 videos longer than 200 seconds");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's understanding of LINQ operations and their application in a media processing context. The prefix sets up a video processing scenario, including adding videos and defining a method to filter and process long videos. The completion requires filtering the video files using LINQ, demonstrating comprehension of collection manipulation. The suffix contains assertions to verify the correct number of videos is processed, ensuring the LLM understands the business logic and domain-specific requirements of media processing.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MediaProcessing
+{
+    public class VideoProcessor
+    {
+        private List<VideoFile> _videoFiles;
+
+        public VideoProcessor()
+        {
+            _videoFiles = new List<VideoFile>();
+        }
+
+        public void AddVideo(VideoFile video)
+        {
+            _videoFiles.Add(video);
+        }
+
+        public void ProcessVideos()
+        {
+            var tasks = _videoFiles.Select(video => ProcessVideoAsync(video)).ToArray();
+            Task.WaitAll(tasks);
+        }
+
+        private async Task ProcessVideoAsync(VideoFile video)
+        {
+            // Simulate video processing
+            await Task.Delay(1000);
+            video.IsProcessed = true;
+        }
+    }
+
+    public class VideoFile
+    {
+        public string FileName { get; set; }
+        public bool IsProcessed { get; set; }
+
+        public VideoFile(string fileName)
+        {
+            FileName = fileName;
+            IsProcessed = false;
+        }
+    }
+
+    public class TestVideoProcessor
+    {
+        public static void Main(string[] args)
+        {
+            var processor = new VideoProcessor();
+            processor.AddVideo(new VideoFile("video1.mp4"));
+            processor.AddVideo(new VideoFile("video2.mp4"));
+            processor.ProcessVideos();
+
+            // Verify that all videos are processed
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            Debug.Assert(processor._videoFiles.All(v => v.IsProcessed), "Not all videos have been processed.");
+
+SUFFIX CODE:
+----------------------------------------
+            // Additional verification
+            var unprocessedVideo = new VideoFile("video3.mp4");
+            processor.AddVideo(unprocessedVideo);
+            Debug.Assert(!unprocessedVideo.IsProcessed, "Newly added video should not be processed immediately.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests an LLM's ability to understand and complete code related to media processing using asynchronous programming with tasks. The business logic involves processing a list of video files asynchronously. The golden completion verifies that all videos have been processed correctly, which is a critical part of the business logic. The prefix sets up the necessary context, including the VideoProcessor class with methods for adding and processing videos. The suffix provides additional assertions to test the behavior of the code when new videos are added, ensuring that the LLM understands the asynchronous processing pattern and business requirements.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+
+namespace MediaProcessing
+{
+    public class VideoProcessor
+    {
+        private List<string> videoFiles;
+        private List<string> processedFiles;
+
+        public VideoProcessor()
+        {
+            videoFiles = new List<string>();
+            processedFiles = new List<string>();
+        }
+
+        public void AddVideoFile(string filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                throw new ArgumentException("File path cannot be null or empty");
+            }
+            videoFiles.Add(filePath);
+        }
+
+        public async Task ProcessVideosAsync()
+        {
+            List<Task> processingTasks = new List<Task>();
+            foreach (var file in videoFiles)
+            {
+                processingTasks.Add(Task.Run(() => ProcessVideo(file)));
+            }
+            await Task.WhenAll(processingTasks);
+        }
+
+        private void ProcessVideo(string file)
+        {
+            // Simulate video processing
+            Task.Delay(1000).Wait();
+            processedFiles.Add(file);
+        }
+
+        public List<string> GetProcessedFiles()
+        {
+            return processedFiles;
+        }
+
+        public static void Main(string[] args)
+        {
+            VideoProcessor processor = new VideoProcessor();
+            processor.AddVideoFile("video1.mp4");
+            processor.AddVideoFile("video2.mp4");
+            processor.AddVideoFile("video3.mp4");
+
+            // Start processing
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await processor.ProcessVideosAsync();
+
+SUFFIX CODE:
+----------------------------------------
+            List<string> result = processor.GetProcessedFiles();
+            Debug.Assert(result.Count == 3, "All videos should be processed");
+            Debug.Assert(result.Contains("video1.mp4"), "video1.mp4 should be processed");
+            Debug.Assert(result.Contains("video2.mp4"), "video2.mp4 should be processed");
+            Debug.Assert(result.Contains("video3.mp4"), "video3.mp4 should be processed");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's understanding of asynchronous programming in the context of media processing. The prefix sets up a video processor class that processes video files asynchronously. The golden completion involves executing the asynchronous video processing method, which is crucial for the business logic. The suffix includes assertions to ensure that all videos were processed correctly, providing a clear and meaningful test of the code's intent and business rules.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace AnalyticsApp
+{
+    public class AnalyticsProcessor
+    {
+        public class Metric
+        {
+            public string Name { get; set; }
+            public int Value { get; set; }
+        }
+
+        public List<Metric> Metrics { get; set; }
+
+        public AnalyticsProcessor()
+        {
+            Metrics = new List<Metric>();
+        }
+
+        public void AddMetric(string name, int value)
+        {
+            Metrics.Add(new Metric { Name = name, Value = value });
+        }
+
+        public void AddSampleMetrics()
+        {
+            AddMetric("PageViews", 100);
+            AddMetric("Clicks", 50);
+            AddMetric("SignUps", 5);
+        }
+
+        // This method should return the top N metrics by value
+        public List<Metric> GetTopMetrics(int topN)
+        {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            return Metrics.OrderByDescending(m => m.Value).Take(topN).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+        }
+
+        public void RunAnalytics()
+        {
+            AddSampleMetrics();
+            List<Metric> topMetrics = GetTopMetrics(2);
+            Debug.Assert(topMetrics.Count == 2, "There should be exactly 2 top metrics.");
+            Debug.Assert(topMetrics[0].Name == "PageViews", "First top metric should be PageViews.");
+            Debug.Assert(topMetrics[1].Name == "Clicks", "Second top metric should be Clicks.");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            AnalyticsProcessor processor = new AnalyticsProcessor();
+            processor.RunAnalytics();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it combines LINQ operations with an analytics domain context. The goal is to verify if the LLM can correctly implement a method that sorts and retrieves the top N metrics based on their values, which is a common task in analytics processing. The provided assertions ensure the method is returning the expected results, aligning with the business logic of prioritizing metrics by value.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace MediaProcessing
+{
+    public class VideoFrame
+    {
+        public int FrameNumber { get; set; }
+        public byte[] Data { get; set; }
+    }
+
+    public class VideoProcessor
+    {
+        private readonly List<VideoFrame> _frames;
+        private readonly object _lock = new object();
+
+        public VideoProcessor()
+        {
+            _frames = new List<VideoFrame>();
+        }
+
+        public void AddFrame(VideoFrame frame)
+        {
+            lock (_lock)
+            {
+                _frames.Add(frame);
+            }
+        }
+
+        public async Task ProcessFramesAsync(CancellationToken cancellationToken)
+        {
+            await Task.Run(() =>
+            {
+                foreach (var frame in _frames)
+                {
+                    // Simulate frame processing
+                    Thread.Sleep(10);
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                }
+            }, cancellationToken);
+        }
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var processor = new VideoProcessor();
+            var cancellationTokenSource = new CancellationTokenSource();
+
+            // Adding frames to the processor
+            for (int i = 0; i < 10; i++)
+            {
+                processor.AddFrame(new VideoFrame { FrameNumber = i, Data = new byte[1024] });
+            }
+
+            // Start processing frames asynchronously
+            var processingTask = processor.ProcessFramesAsync(cancellationTokenSource.Token);
+
+            // Simulate some condition to cancel processing
+            await Task.Delay(50);
+            cancellationTokenSource.Cancel();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            try
+            {
+                await processingTask;
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Processing was canceled.");
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Processing was canceled.");
+            }
+
+            // Assertions
+            Debug.Assert(processor != null, "Processor should not be null.");
+            Debug.Assert(processor is VideoProcessor, "Processor should be of type VideoProcessor.");
+            Debug.Assert(cancellationTokenSource.IsCancellationRequested, "Cancellation token should be requested.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand asynchronous processing in a media processing context, specifically video frame processing with support for cancellation. The prefix sets up a video processor class with methods for adding and processing frames asynchronously. The completion requires the LLM to correctly handle the asynchronous task and integrate it within the given context, ensuring the task is awaited and proper handling of cancellation is implemented. The suffix includes assertions to verify that the processor was correctly instantiated, that cancellation was requested, and demonstrates proper exception handling for the OperationCanceledException.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MediaProcessingExample
+{
+    public class ImageProcessor
+    {
+        private List<string> _imageUrls;
+        private Dictionary<string, byte[]> _imageDataCache;
+
+        public ImageProcessor(List<string> imageUrls)
+        {
+            _imageUrls = imageUrls;
+            _imageDataCache = new Dictionary<string, byte[]>();
+        }
+
+        public async Task ProcessImagesAsync()
+        {
+            var downloadTasks = _imageUrls.Select(url => DownloadImageAsync(url)).ToList();
+            var downloadedImages = await Task.WhenAll(downloadTasks);
+
+            for (int i = 0; i < _imageUrls.Count; i++)
+            {
+                _imageDataCache[_imageUrls[i]] = downloadedImages[i];
+            }
+        }
+
+        private async Task<byte[]> DownloadImageAsync(string url)
+        {
+            // Simulate image download with delay
+            await Task.Delay(1000);
+            return new byte[] { 0x1, 0x2, 0x3 }; // Placeholder image data
+        }
+
+        public byte[] GetImageData(string url)
+        {
+            if (_imageDataCache.ContainsKey(url))
+            {
+                return _imageDataCache[url];
+            }
+            else
+            {
+                throw new ArgumentException("Image not processed or URL not found.");
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var imageUrls = new List<string> { "http://example.com/image1.jpg", "http://example.com/image2.jpg" };
+            var processor = new ImageProcessor(imageUrls);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+await processor.ProcessImagesAsync();
+
+SUFFIX CODE:
+----------------------------------------
+            // Verify that image data is correctly cached
+            byte[] imageData1 = processor.GetImageData("http://example.com/image1.jpg");
+            byte[] imageData2 = processor.GetImageData("http://example.com/image2.jpg");
+            Debug.Assert(imageData1.Length == 3, "Image data length should be 3 bytes.");
+            Debug.Assert(imageData2.Length == 3, "Image data length should be 3 bytes.");
+            Debug.Assert(imageData1[0] == 0x1 && imageData1[1] == 0x2 && imageData1[2] == 0x3, "Image data content should match.");
+            Debug.Assert(imageData2[0] == 0x1 && imageData2[1] == 0x2 && imageData2[2] == 0x3, "Image data content should match.");
+
+            // Exception handling test
+            bool exceptionThrown = false;
+            try
+            {
+                processor.GetImageData("http://nonexistent.com/image.jpg");
+            }
+            catch (ArgumentException ex)
+            {
+                exceptionThrown = true;
+                Debug.Assert(ex.Message == "Image not processed or URL not found.", "Exception message should match.");
+            }
+            Debug.Assert(exceptionThrown, "Exception should be thrown for non-existent URL.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to comprehend and continue code involving asynchronous image processing using async-await pattern in the context of media processing. The scenario involves downloading images, caching them, and retrieving the cached data. The assertions verify that the images are correctly cached and that appropriate exceptions are thrown for invalid URLs. This scenario tests the model's understanding of async-await, exception handling, and collection manipulation in a real-world context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        public List<string> FilterImagesByResolution(List<string> imagePaths, int minWidth, int minHeight)
+        {
+            // Simulate a function that extracts image resolution
+            Func<string, (int width, int height)> getImageResolution = (imagePath) =>
+            {
+                // Mock image resolution extraction logic
+                var random = new Random();
+                return (random.Next(800, 1600), random.Next(600, 1200));
+            };
+
+            // Filter images based on resolution
+            List<string> filteredImages = new List<string>();
+            foreach (var imagePath in imagePaths)
+            {
+                var resolution = getImageResolution(imagePath);
+                if (resolution.width >= minWidth && resolution.height >= minHeight)
+                {
+                    filteredImages.Add(imagePath);
+                }
+            }
+
+            return filteredImages;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var imagePaths = new List<string> { "image1.jpg", "image2.jpg", "image3.jpg" };
+            var processor = new ImageProcessor();
+
+            // Define minimum resolution
+            int minWidth = 1000;
+            int minHeight = 800;
+
+            // Process images
+            var filteredImages = processor.FilterImagesByResolution(imagePaths, minWidth, minHeight);
+
+            // Continue processing
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+Console.WriteLine($"Number of images after filtering: {filteredImages.Count}");
+
+SUFFIX CODE:
+----------------------------------------
+            // Test the filtering logic
+            Debug.Assert(filteredImages.Count <= imagePaths.Count, "Filtered images should not exceed original images count.");
+            Debug.Assert(filteredImages.TrueForAll(img => img.Contains("image")), "All filtered images should be in the original list.");
+
+            // Display the filtered images
+            Console.WriteLine("Filtered images:");
+            foreach (var img in filteredImages)
+            {
+                Console.WriteLine(img);
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand code semantics in a media processing domain using LINQ/collections. The prefix sets up an image filtering function based on resolution, and the golden completion applies additional filtering using LINQ to ensure non-empty image paths. The suffix verifies business logic through assertions and outputs the results. This scenario effectively tests the model's comprehension of domain-specific filtering logic and ensures consistent application of business rules.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace AnalyticsExample
+{
+    public class MetricCalculator
+    {
+        public class Metric
+        {
+            public string Name { get; set; }
+            public double Value { get; set; }
+        }
+
+        public List<Metric> Metrics { get; private set; }
+
+        public MetricCalculator()
+        {
+            Metrics = new List<Metric>();
+        }
+
+        public void AddMetric(string name, double value)
+        {
+            Metrics.Add(new Metric { Name = name, Value = value });
+        }
+
+        public List<Metric> GetTopMetrics(int topCount)
+        {
+            // This method should return the top N metrics based on their value.
+            return Metrics
+                .OrderByDescending(m => m.Value)
+                .Take(topCount)
+                .ToList();
+        }
+
+        public List<Metric> GetMetricsAboveThreshold(double threshold)
+        {
+            // This method should return all metrics with values above the specified threshold.
+            return Metrics
+                .Where(m => m.Value > threshold)
+                .ToList();
+        }
+
+        // Method to calculate the average of all metric values
+        public double CalculateAverage()
+        {
+            if (Metrics.Count == 0)
+            {
+                throw new InvalidOperationException("No metrics available to calculate average.");
+            }
+            return Metrics.Average(m => m.Value);
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            MetricCalculator calculator = new MetricCalculator();
+            calculator.AddMetric("Metric1", 10.5);
+            calculator.AddMetric("Metric2", 20.0);
+            calculator.AddMetric("Metric3", 15.3);
+            calculator.AddMetric("Metric4", 18.7);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var highMetrics = calculator.GetMetricsAboveThreshold(18.0);
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(highMetrics.Count == 2, "Expected 2 metrics above the threshold of 18.0");
+            Debug.Assert(highMetrics.Any(m => m.Name == "Metric2" && m.Value == 20.0), "Metric2 with value 20.0 should be present");
+            Debug.Assert(highMetrics.Any(m => m.Name == "Metric4" && m.Value == 18.7), "Metric4 with value 18.7 should be present");
+
+            double average = calculator.CalculateAverage();
+            Debug.Assert(Math.Abs(average - 16.125) < 0.0001, "Expected average metric value to be 16.125");
+
+            List<MetricCalculator.Metric> topMetrics = calculator.GetTopMetrics(2);
+            Debug.Assert(topMetrics.Count == 2, "Expected 2 top metrics");
+            Debug.Assert(topMetrics[0].Name == "Metric2" && topMetrics[0].Value == 20.0, "Top metric should be Metric2 with value 20.0");
+            Debug.Assert(topMetrics[1].Name == "Metric4" && topMetrics[1].Value == 18.7, "Second top metric should be Metric4 with value 18.7");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and continue code based on its semantic meaning and business context. The prefix sets up an analytics scenario where various metrics are added, and the calculator should return top metrics and metrics above a certain threshold. The completion requires the LLM to correctly use LINQ to filter and return the desired metrics, demonstrating comprehension of the business logic. The suffix includes further operations and assertions to verify correctness, ensuring that the model can follow through with the intended logic and maintain consistency.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        public class Image
+        {
+            public int Width { get; set; }
+            public int Height { get; set; }
+            public List<int> Pixels { get; set; }
+
+            public Image(int width, int height)
+            {
+                Width = width;
+                Height = height;
+                Pixels = new List<int>(new int[width * height]);
+            }
+        }
+
+        public List<Image> Images { get; private set; }
+
+        public ImageProcessor()
+        {
+            Images = new List<Image>();
+        }
+
+        public void AddImage(Image image)
+        {
+            Images.Add(image);
+        }
+
+        public List<Image> FilterImagesBySize(int minWidth, int minHeight)
+        {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var filteredImages = Images.Where(img => img.Width >= minWidth && img.Height >= minHeight).ToList();
+            return filteredImages;
+
+SUFFIX CODE:
+----------------------------------------
+            List<Image> filteredImages = Images.Where(img => img.Width >= 50 && img.Height >= 50).ToList();
+            Debug.Assert(filteredImages.Count == 1, "Only one image should meet the criteria.");
+            Debug.Assert(filteredImages[0].Width == 100 && filteredImages[0].Height == 100, "The image should have dimensions of 100x100.");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ImageProcessor processor = new ImageProcessor();
+            processor.AddImage(new ImageProcessor.Image(100, 100));
+            processor.AddImage(new ImageProcessor.Image(40, 40));
+            processor.AddImage(new ImageProcessor.Image(60, 30));
+
+            List<ImageProcessor.Image> result = processor.FilterImagesBySize(50, 50);
+            Debug.Assert(result.Count == 1, "Only one image should meet the criteria.");
+            Debug.Assert(result[0].Width == 100 && result[0].Height == 100, "The image should have dimensions of 100x100.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to validate the LLM's understanding of LINQ and collections within the context of media processing. The prefix sets up a scenario where images are filtered based on their dimensions. The completion requires the LLM to correctly use LINQ to filter the images. The suffix tests the filtered results using assertions, ensuring that the LLM comprehends the business logic of filtering images by size.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+
+namespace MediaProcessing
+{
+    public class VideoProcessor
+    {
+        private List<string> videoFiles;
+
+        public VideoProcessor(List<string> videoFiles)
+        {
+            this.videoFiles = videoFiles;
+        }
+
+        public async Task<List<string>> ProcessVideosAsync()
+        {
+            List<string> processedVideos = new List<string>();
+
+            List<Task<string>> tasks = new List<Task<string>>();
+            foreach (var video in videoFiles)
+            {
+                tasks.Add(ProcessVideoAsync(video));
+            }
+
+            var results = await Task.WhenAll(tasks);
+            processedVideos.AddRange(results);
+
+            return processedVideos;
+        }
+
+        private async Task<string> ProcessVideoAsync(string videoFile)
+        {
+            // Simulate video processing delay
+            await Task.Delay(1000);
+            return "Processed_" + videoFile;
+        }
+    }
+}
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        List<string> videoFiles = new List<string> { "video1.mp4", "video2.mp4", "video3.mp4" };
+        VideoProcessor processor = new VideoProcessor(videoFiles);
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+        var result = await processor.ProcessVideosAsync();
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertions
+        Debug.Assert(result.Count == 3, "The number of processed videos should be 3.");
+        Debug.Assert(result[0] == "Processed_video1.mp4", "The first video should be processed correctly.");
+        Debug.Assert(result[1] == "Processed_video2.mp4", "The second video should be processed correctly.");
+        Debug.Assert(result[2] == "Processed_video3.mp4", "The third video should be processed correctly.");
+
+        // Cleanup code if necessary
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand async-await patterns in the context of media processing. The prefix establishes an asynchronous video processing scenario using tasks, and the suffix includes assertions to verify the correctness of the processed video files. The golden completion appropriately continues the async-await pattern established in the prefix, demonstrating understanding of the task-based asynchronous model in C#.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace MediaProcessing
+{
+    public class VideoProcessor
+    {
+        public class VideoClip
+        {
+            public string Name { get; set; }
+            public TimeSpan Duration { get; set; }
+        }
+
+        public List<VideoClip> Clips { get; private set; }
+
+        public VideoProcessor()
+        {
+            Clips = new List<VideoClip>
+            {
+                new VideoClip { Name = "Intro", Duration = TimeSpan.FromSeconds(30) },
+                new VideoClip { Name = "Scene1", Duration = TimeSpan.FromSeconds(120) },
+                new VideoClip { Name = "Scene2", Duration = TimeSpan.FromSeconds(180) },
+                new VideoClip { Name = "Outro", Duration = TimeSpan.FromSeconds(45) }
+            };
+        }
+
+        public TimeSpan GetTotalDuration()
+        {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+return TimeSpan.FromSeconds(Clips.Sum(clip => clip.Duration.TotalSeconds));
+
+SUFFIX CODE:
+----------------------------------------
+        }
+
+        public static void Main(string[] args)
+        {
+            var processor = new VideoProcessor();
+            TimeSpan totalDuration = processor.GetTotalDuration();
+            Debug.Assert(totalDuration == TimeSpan.FromSeconds(375), "Total duration should be 375 seconds");
+            Console.WriteLine($"Total duration of video clips: {totalDuration.TotalSeconds} seconds");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's understanding of LINQ and collections in the context of media processing. The VideoProcessor class contains a collection of VideoClip objects, each with a Name and Duration. The GetTotalDuration method needs to compute the total duration of all video clips using a LINQ Aggregate function. This scenario tests the LLM's ability to correctly use LINQ to solve a business problem in the domain of media processing, ensuring that it understands both the technical pattern and the business context. The provided assertions verify the correctness of the implementation by comparing the calculated total duration to the expected value.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace AnalyticsExample
+{
+    public class MetricsCalculator
+    {
+        public List<int> GetMetrics(List<int> data)
+        {
+            // Validate input data
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (data.Count == 0) throw new ArgumentException("Data list cannot be empty.");
+
+            // Aggregate metrics
+            List<int> metrics = new List<int>();
+            // Compute sum of elements
+            int sum = data.Sum();
+            metrics.Add(sum);
+
+            // Compute average of elements
+            double average = data.Average();
+            metrics.Add((int)average);
+
+            // Compute max of elements
+            int max = data.Max();
+            metrics.Add(max);
+
+            // Compute min of elements
+            int min = data.Min();
+            metrics.Add(min);
+
+            return metrics;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<int> data = new List<int> { 10, 20, 30, 40, 50 };
+            MetricsCalculator calculator = new MetricsCalculator();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var metrics = calculator.GetMetrics(data);
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(metrics.Count == 4, "Metrics count should be 4.");
+            Debug.Assert(metrics[0] == 150, "Sum should be 150.");
+            Debug.Assert(metrics[1] == 30, "Average should be 30.");
+            Debug.Assert(metrics[2] == 50, "Max should be 50.");
+            Debug.Assert(metrics[3] == 10, "Min should be 10.");
+
+            // Additional metrics calculation
+            List<int> moreData = new List<int> { 5, 15, 25, 35, 45, 55 };
+            List<int> moreMetrics = calculator.GetMetrics(moreData);
+            Debug.Assert(moreMetrics.Count == 4, "Metrics count should be 4.");
+            Debug.Assert(moreMetrics[0] == 180, "Sum should be 180.");
+            Debug.Assert(moreMetrics[1] == 30, "Average should be 30.");
+            Debug.Assert(moreMetrics[2] == 55, "Max should be 55.");
+            Debug.Assert(moreMetrics[3] == 5, "Min should be 5.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario is designed to test the model's ability to understand and continue code based on its semantic meaning and business context. The example involves an analytics domain where a MetricsCalculator class aggregates data metrics such as sum, average, max, and min using LINQ. The golden completion involves calling the GetMetrics method and storing the result, while the suffix includes assertions to verify the correctness of the calculations. This tests the model's ability to follow business logic related to data processing and analytics.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        private List<Image> images;
+
+        public ImageProcessor()
+        {
+            images = new List<Image>();
+        }
+
+        public void AddImage(Image image)
+        {
+            if (image == null)
+            {
+                throw new ArgumentNullException(nameof(image));
+            }
+            images.Add(image);
+        }
+
+        public Image GetImageById(int id)
+        {
+            return images.FirstOrDefault(img => img.Id == id);
+        }
+
+        public List<Image> GetImagesByResolution(int width, int height)
+        {
+            return images.Where(img => img.Width == width && img.Height == height).ToList();
+        }
+
+        // This method will filter images by tag and return the count
+        public int GetImageCountByTag(string tag)
+        {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+return images.Count(img => img.Tags.Contains(tag));
+
+SUFFIX CODE:
+----------------------------------------
+            return images.Count(img => img.Tags.Contains(tag));
+        }
+
+        public static void Main(string[] args)
+        {
+            ImageProcessor processor = new ImageProcessor();
+            processor.AddImage(new Image { Id = 1, Width = 1920, Height = 1080, Tags = new List<string> { "nature", "landscape" } });
+            processor.AddImage(new Image { Id = 2, Width = 1280, Height = 720, Tags = new List<string> { "portrait", "people" } });
+            processor.AddImage(new Image { Id = 3, Width = 1920, Height = 1080, Tags = new List<string> { "nature", "wildlife" } });
+
+            int natureCount = processor.GetImageCountByTag("nature");
+            Debug.Assert(natureCount == 2, "Nature tag count should be 2");
+
+            int portraitCount = processor.GetImageCountByTag("portrait");
+            Debug.Assert(portraitCount == 1, "Portrait tag count should be 1");
+
+            int cityCount = processor.GetImageCountByTag("city");
+            Debug.Assert(cityCount == 0, "City tag count should be 0");
+        }
+    }
+
+    public class Image
+    {
+        public int Id { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public List<string> Tags { get; set; }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it combines the use of LINQ for filtering collections with a clear business logic related to media processing. The ImageProcessor class manages a collection of images and provides functionality to filter and count images based on tags. The completion requires understanding the need for input validation, which is critical in production code to ensure robustness. The suffix includes assertions that verify the correctness of the business logic, ensuring that the filtering mechanism works as intended for different scenarios.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AnalyticsExample
+{
+    public class Metric
+    {
+        public string Name { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class MetricProcessor
+    {
+        private List<Metric> _metrics;
+
+        public MetricProcessor()
+        {
+            _metrics = new List<Metric>();
+        }
+
+        public void AddMetric(string name, double value)
+        {
+            _metrics.Add(new Metric { Name = name, Value = value });
+        }
+
+        public double CalculateAverageValue()
+        {
+            // Placeholder for golden completion
+            return 0;
+        }
+
+        public async Task LoadMetricsAsync()
+        {
+            // Simulate async loading of metrics
+            await Task.Delay(100);
+            _metrics = new List<Metric>
+            {
+                new Metric { Name = "CPU", Value = 75.5 },
+                new Metric { Name = "Memory", Value = 60.2 },
+                new Metric { Name = "Disk", Value = 80.1 }
+            };
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            MetricProcessor processor = new MetricProcessor();
+            await processor.LoadMetricsAsync();
+            processor.AddMetric("Network", 50.0);
+            double average = processor.CalculateAverageValue();
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            Console.WriteLine($"Average Metric Value: {average}");
+
+SUFFIX CODE:
+----------------------------------------
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the understanding of LINQ/collections in the context of analytics. The prefix sets up a MetricProcessor class with methods for adding metrics and calculating their average values. The golden completion correctly uses LINQ to calculate the average value of the metrics, which is a common operation in analytics. The suffix contains assertions to verify the correctness of the average calculation, ensuring the LLM understands the business logic of computing average metrics.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace MediaProcessingApp
+{
+    public class ImageProcessor
+    {
+        public List<Image> Images { get; set; }
+
+        public ImageProcessor(List<Image> images)
+        {
+            Images = images;
+        }
+
+        // Method to apply a filter to all images
+        public void ApplyFilter(Func<Image, Image> filter)
+        {
+            for (int i = 0; i < Images.Count; i++)
+            {
+                Images[i] = filter(Images[i]);
+            }
+        }
+
+        // Method to get all images of a certain type
+        public List<Image> GetImagesByType(string type)
+        {
+            return Images.Where(img => img.Type == type).ToList();
+        }
+    }
+
+    public class Image
+    {
+        public string Type { get; set; }
+        public byte[] Data { get; set; }
+
+        public Image(string type, byte[] data)
+        {
+            Type = type;
+            Data = data;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Image> images = new List<Image>
+            {
+                new Image("jpeg", new byte[] {0x01, 0x02}),
+                new Image("png", new byte[] {0x03, 0x04}),
+                new Image("jpeg", new byte[] {0x05, 0x06})
+            };
+
+            ImageProcessor processor = new ImageProcessor(images);
+
+            // Apply a dummy filter that doesn't change the image
+            processor.ApplyFilter(img => img);
+
+            // Get all JPEG images
+            List<Image> jpegImages = processor.GetImagesByType("jpeg");
+
+            // Print the types of all JPEG images
+            foreach (var image in jpegImages)
+            {
+                Console.WriteLine(image.Type);
+            }
+            // Filter images to grayscale (dummy filter for demonstration)
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+processor.ApplyFilter(img => new Image(img.Type, img.Data));
+
+SUFFIX CODE:
+----------------------------------------
+            // Apply the filter and validate the images
+            List<Image> grayscaleImages = processor.GetImagesByType("jpeg");
+            // Validate the type of the filtered images
+            foreach (var image in jpegImages)
+            {
+                Debug.Assert(image.Type == "jpeg", "Expected image type is 'jpeg'.");
+            }
+
+            // Validate the count of the JPEG images
+            Debug.Assert(jpegImages.Count == 2, "Expected 2 JPEG images.");
+
+            // Clean up resources if necessary (example, if there were any resources to dispose)
+            // In this example, there are no unmanaged resources, so no cleanup is necessary
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and continue code based on its semantic meaning and business context within a media processing domain. The prefix sets up an image processing scenario where images are filtered and queried by type using LINQ and collections. The golden completion involves applying a filter to convert images to grayscale, demonstrating the use of lambda expressions and method references. The suffix validates the business logic by checking the types and counts of the filtered images. This scenario is realistic, domain-specific, and tests comprehension of underlying code purpose and business rules.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading.Tasks;
+
+namespace AnalyticsExample
+{
+    public class MetricsProcessor
+    {
+        private List<int> _data;
+
+        public MetricsProcessor(List<int> data)
+        {
+            _data = data;
+        }
+
+        public async Task<double> CalculateAverageAsync()
+        {
+            if (_data == null || _data.Count == 0)
+            {
+                throw new InvalidOperationException("No data to process.");
+            }
+
+            return await Task.Run(() =>
+            {
+                double sum = 0;
+                foreach (var value in _data)
+                {
+                    sum += value;
+                }
+                return sum / _data.Count;
+            });
+        }
+
+        public async Task<int> FindMaxValueAsync()
+        {
+            if (_data == null || _data.Count == 0)
+            {
+                throw new InvalidOperationException("No data to process.");
+            }
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+                int max = int.MinValue;
+                foreach (var value in _data)
+                {
+                    if (value > max)
+                    {
+                        max = value;
+                    }
+                }
+                return max;
+
+SUFFIX CODE:
+----------------------------------------
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            List<int> sampleData = new List<int> { 4, 8, 15, 16, 23, 42 };
+            MetricsProcessor processor = new MetricsProcessor(sampleData);
+
+            double average = await processor.CalculateAverageAsync();
+            Debug.Assert(average == 18, "Expected average is 18.");
+
+            int maxValue = await processor.FindMaxValueAsync();
+            Debug.Assert(maxValue == 42, "Expected max value is 42.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to understand and continue a method that uses async-await and Task.Run to perform asynchronous data processing in the context of analytics. The prefix sets up a MetricsProcessor class with methods to calculate the average and find the maximum value in a list of integers asynchronously. The completion requires the LLM to implement the logic for finding the maximum value, demonstrating an understanding of async-await patterns and the business logic of processing metrics data. The suffix includes assertions that verify the correctness of the implemented methods, ensuring the business logic is upheld.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        private List<Image> images;
+        private const int MaxWidth = 1920;
+        private const int MaxHeight = 1080;
+
+        public ImageProcessor()
+        {
+            images = new List<Image>();
+        }
+
+        public void AddImage(Image image)
+        {
+            images.Add(image);
+        }
+
+        public List<Image> FilterAndResizeImages()
+        {
+            // Filter out images that are larger than the max dimensions
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var filteredImages = images.Where(image => image.Width > MaxWidth || image.Height > MaxHeight).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            // Resize the filtered images to fit within the max dimensions while maintaining aspect ratio
+            var resizedImages = filteredImages.Select(image => ResizeImage(image, MaxWidth, MaxHeight)).ToList();
+
+            // Assertions to verify the correctness of the filtering and resizing
+            Debug.Assert(filteredImages.All(image => image.Width <= MaxWidth && image.Height <= MaxHeight), "All images should be within the max dimensions");
+            Debug.Assert(resizedImages.All(image => image.Width <= MaxWidth && image.Height <= MaxHeight), "All resized images should be within the max dimensions");
+
+            return resizedImages;
+        }
+
+        private Image ResizeImage(Image image, int maxWidth, int maxHeight)
+        {
+            double aspectRatio = (double)image.Width / image.Height;
+            int newWidth = image.Width;
+            int newHeight = image.Height;
+
+            if (image.Width > maxWidth || image.Height > maxHeight)
+            {
+                if (aspectRatio > 1)
+                {
+                    newWidth = maxWidth;
+                    newHeight = (int)(maxWidth / aspectRatio);
+                }
+                else
+                {
+                    newHeight = maxHeight;
+                    newWidth = (int)(maxHeight * aspectRatio);
+                }
+            }
+
+            return new Image { Width = newWidth, Height = newHeight };
+        }
+    }
+
+    public class Image
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
+
+    public static class Program
+    {
+        public static void Main()
+        {
+            ImageProcessor processor = new ImageProcessor();
+            processor.AddImage(new Image { Width = 3000, Height = 2000 });
+            processor.AddImage(new Image { Width = 1600, Height = 900 });
+            processor.AddImage(new Image { Width = 800, Height = 600 });
+
+            List<Image> result = processor.FilterAndResizeImages();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to understand and complete a LINQ-based filtering operation in the context of image processing. The prefix sets up an ImageProcessor class with a method that filters and resizes images. The golden completion requires the LLM to correctly filter images based on their dimensions. The suffix validates the result with assertions, ensuring the business logic is correctly implemented and maintained.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class ImageProcessor
+    {
+        public List<string> ImageFiles { get; set; }
+
+        public ImageProcessor()
+        {
+            ImageFiles = new List<string> { "image1.jpg", "image2.png", "image3.bmp", "image4.tiff" };
+        }
+
+        // Method to filter image files based on their extensions
+        public List<string> FilterImagesByExtension(string extension)
+        {
+            // This method should filter the ImageFiles list to only include files with the specified extension
+            return ImageFiles.Where(file => file.EndsWith(extension, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        // Method to transform image file names to uppercase
+        public List<string> TransformImageFileNamesToUpper()
+        {
+            // This method should transform the ImageFiles list so that each file name is in uppercase
+            return ImageFiles.Select(file => file.ToUpper()).ToList();
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            ImageProcessor processor = new ImageProcessor();
+
+            // Filter images with .jpg extension
+            List<string> jpgImages = processor.FilterImagesByExtension(".jpg");
+            Debug.Assert(jpgImages.Count == 1, "There should be exactly one .jpg image");
+            Debug.Assert(jpgImages[0] == "image1.jpg", "The .jpg image should be 'image1.jpg'");
+
+            // Transform image file names to uppercase
+            List<string> upperCaseImages = processor.TransformImageFileNamesToUpper();
+            Debug.Assert(upperCaseImages.Count == 4, "There should be exactly four images after transformation");
+            Debug.Assert(upperCaseImages.All(file => file == file.ToUpper()), "All image file names should be in uppercase");
+
+            // Filter images with .png extension
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+List<string> bmpImages = processor.FilterImagesByExtension(".bmp");
+
+SUFFIX CODE:
+----------------------------------------
+            // Filter images with .bmp extension
+            List<string> bmpImages = processor.FilterImagesByExtension(".bmp");
+            Debug.Assert(bmpImages.Count == 1, "There should be exactly one .bmp image");
+            Debug.Assert(bmpImages[0] == "image3.bmp", "The .bmp image should be 'image3.bmp'");
+
+            // Filter images with .tiff extension
+            List<string> tiffImages = processor.FilterImagesByExtension(".tiff");
+            Debug.Assert(tiffImages.Count == 1, "There should be exactly one .tiff image");
+            Debug.Assert(tiffImages[0] == "image4.tiff", "The .tiff image should be 'image4.tiff'");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates a practical use of LINQ and collections in the context of media processing. The `ImageProcessor` class provides methods to filter and transform image file names using LINQ. The provided assertions test the functionality and correctness of these methods based on the business rules (e.g., filtering by extension and transforming to uppercase). This scenario is a good test case because it requires the model to understand the semantic purpose of LINQ operations and validate the business logic through accurate assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace MediaProcessing
+{
+    public class VideoProcessor
+    {
+        public List<VideoFile> Files { get; set; }
+
+        public VideoProcessor()
+        {
+            Files = new List<VideoFile>();
+        }
+
+        public void AddVideoFile(VideoFile file)
+        {
+            Files.Add(file);
+        }
+
+        public List<VideoFile> GetHighResolutionVideos(int minResolution)
+        {
+            // This method should return all video files with a resolution higher than the specified minimum resolution
+        }
+
+        public void DisplayVideoInfo()
+        {
+            foreach (var file in Files)
+            {
+                Console.WriteLine($"Video: {file.Name}, Resolution: {file.Resolution}p");
+            }
+        }
+    }
+
+    public class VideoFile
+    {
+        public string Name { get; set; }
+        public int Resolution { get; set; }
+
+        public VideoFile(string name, int resolution)
+        {
+            Name = name;
+            Resolution = resolution;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            VideoProcessor processor = new VideoProcessor();
+            processor.AddVideoFile(new VideoFile("Movie1", 1080));
+            processor.AddVideoFile(new VideoFile("Movie2", 720));
+            processor.AddVideoFile(new VideoFile("Movie3", 1440));
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var highResVideos = Files.Where(v => v.Resolution > minResolution).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            List<VideoFile> highResVideos = processor.GetHighResolutionVideos(1000);
+            Debug.Assert(highResVideos.Count == 2, "There should be 2 videos with resolution higher than 1000p");
+            Debug.Assert(highResVideos.Any(v => v.Name == "Movie1"), "Movie1 should be included in the high resolution videos");
+            Debug.Assert(highResVideos.Any(v => v.Name == "Movie3"), "Movie3 should be included in the high resolution videos");
+
+            processor.DisplayVideoInfo();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to understand and complete a LINQ-based method that filters a collection based on a specific business rule—in this case, retrieving video files with a resolution higher than a given threshold. The prefix sets up the context, including the necessary classes and methods. The golden completion demonstrates the use of LINQ to filter the collection, while the suffix includes the assertions that verify the correctness of the filtered results and outputs the video information, ensuring the logic is correctly implemented.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace AnalyticsExample
+{
+    public class MetricsCalculator
+    {
+        private List<int> dataPoints;
+
+        public MetricsCalculator()
+        {
+            dataPoints = new List<int>();
+        }
+
+        public void AddDataPoint(int value)
+        {
+            if (value < 0)
+            {
+                throw new ArgumentException("Data point value cannot be negative.");
+            }
+            dataPoints.Add(value);
+        }
+
+        public double CalculateAverage()
+        {
+            if (dataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("No data points available to calculate average.");
+            }
+            return dataPoints.Average();
+        }
+
+        public int CalculateMedian()
+        {
+            if (dataPoints.Count == 0)
+            {
+                throw new InvalidOperationException("No data points available to calculate median.");
+            }
+            var sortedData = dataPoints.OrderBy(x => x).ToList();
+            int middleIndex = sortedData.Count / 2;
+            if (sortedData.Count % 2 == 0)
+            {
+                return (sortedData[middleIndex - 1] + sortedData[middleIndex]) / 2;
+            }
+            else
+            {
+                return sortedData[middleIndex];
+            }
+        }
+
+        // Method to calculate the mode of the data points
+        public int CalculateMode()
+        {
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var groups = dataPoints.GroupBy(x => x);
+            int maxCount = groups.Max(g => g.Count());
+            return groups.First(g => g.Count() == maxCount).Key;
+
+SUFFIX CODE:
+----------------------------------------
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            MetricsCalculator calculator = new MetricsCalculator();
+            calculator.AddDataPoint(4);
+            calculator.AddDataPoint(2);
+            calculator.AddDataPoint(4);
+            calculator.AddDataPoint(3);
+            calculator.AddDataPoint(3);
+            calculator.AddDataPoint(3);
+
+            Debug.Assert(calculator.CalculateMode() == 3, "Mode calculation is incorrect.");
+            Debug.Assert(calculator.CalculateAverage() == 3.1666666666666665, "Average calculation is incorrect.");
+            Debug.Assert(calculator.CalculateMedian() == 3, "Median calculation is incorrect.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example sets up a realistic scenario in the domain of analytics, specifically focusing on calculating statistical metrics such as the average, median, and mode from a collection of data points. The use of LINQ to group and sort data points for mode calculation tests the LLM's ability to understand and apply collection operations appropriately. The prefix establishes a clear business context and initial setup, while the suffix completes the implementation and includes assertions to verify the correctness of the calculations, ensuring that the LLM comprehends the business logic and underlying purpose of the code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AnalyticsExample
+{
+    public class ReportGenerator
+    {
+        private List<int> data;
+
+        public ReportGenerator()
+        {
+            data = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        }
+
+        public async Task<Dictionary<string, double>> GenerateReportAsync()
+        {
+            // Simulate data processing delay
+            await Task.Delay(1000);
+
+            // Use LINQ to calculate metrics
+            var report = new Dictionary<string, double>
+            {
+                { "Mean", data.Average() },
+                { "Sum", data.Sum() },
+                { "Max", data.Max() },
+                { "Min", data.Min() }
+            };
+
+            // Further processing
+            return report;
+        }
+    }
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            var generator = new ReportGenerator();
+            var report = await generator.GenerateReportAsync();
+
+            // Validating the report metrics
+            Debug.Assert(report["Mean"] == 5.5, "Mean calculation is incorrect.");
+            Debug.Assert(report["Sum"] == 55, "Sum calculation is incorrect.");
+            Debug.Assert(report["Max"] == 10, "Max calculation is incorrect.");
+            Debug.Assert(report["Min"] == 1, "Min calculation is incorrect.");
+
+            // Adding additional metrics
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            var variance = data.Select(x => Math.Pow(x - report["Mean"], 2)).Average();
+            report["Variance"] = variance;
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(report["Variance"] == 8.25, "Variance calculation is incorrect.");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's understanding of LINQ operations and their application in calculating statistical metrics within an analytics context. The prefix sets up the scenario of generating a report with basic statistical metrics, and the golden completion involves calculating an additional metric (variance) using LINQ. The suffix includes assertions to verify the correctness of the calculated metrics. This tests the LLM's ability to comprehend the business logic of generating a report and correctly applying LINQ operations to extend the functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AnalyticsExample
+{
+    public class DataAnalyzer
+    {
+        private List<int> data;
+
+        public DataAnalyzer(List<int> inputData)
+        {
+            data = inputData;
+        }
+
+        public async Task<double> CalculateAverageAsync()
+        {
+            // Simulate some asynchronous data processing
+            await Task.Delay(100);
+            return data.Average();
+        }
+
+        public async Task<List<int>> GetTopNValuesAsync(int n)
+        {
+            // Simulate asynchronous data processing
+            await Task.Delay(100);
+            return data.OrderByDescending(x => x).Take(n).ToList();
+        }
+
+        // Method to find the median of the data asynchronously
+        public async Task<double> CalculateMedianAsync()
+        {
+            await Task.Delay(100);
+            var sortedData = data.OrderBy(x => x).ToList();
+            int count = sortedData.Count;
+            if (count % 2 == 0)
+            {
+                return (sortedData[count / 2 - 1] + sortedData[count / 2]) / 2.0;
+            }
+            else
+            {
+                return sortedData[count / 2];
+            }
+        }
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            List<int> sampleData = new List<int> { 5, 3, 8, 6, 2, 7, 4, 1 };
+            DataAnalyzer analyzer = new DataAnalyzer(sampleData);
+
+            double average = await analyzer.CalculateAverageAsync();
+            Console.WriteLine($"Average: {average}");
+
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+            double median = await analyzer.CalculateMedianAsync();
+
+SUFFIX CODE:
+----------------------------------------
+            List<int> top3Values = await analyzer.GetTopNValuesAsync(3);
+            Console.WriteLine("Top 3 values: " + string.Join(", ", top3Values));
+
+            // Assertions
+            Debug.Assert(average == 4.5, "Expected average is 4.5");
+            Debug.Assert(median == 4.5, "Expected median is 4.5");
+            Debug.Assert(top3Values.SequenceEqual(new List<int> { 8, 7, 6 }), "Expected top 3 values are 8, 7, 6");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good benchmark because it involves async-await and LINQ/collections to process data asynchronously, which tests the LLM's ability to understand both async programming patterns and data manipulation using LINQ. The scenario is set in the context of analytics, where the business logic involves calculating statistical metrics such as average and median, and retrieving top N values from a dataset. The provided assertions ensure that the calculated values meet the expected business rules, verifying the correctness of the implementation. By having a substantial prefix, the LLM is given enough context to understand the overall structure and purpose of the code, while the golden completion and suffix require it to continue and finalize this logic accurately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: devbench-code-purpose-understanding
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace AnalyticsMetrics
+{
+    public class MetricsAnalyzer
+    {
+        private List<int> dataPoints;
+
+        public MetricsAnalyzer()
+        {
+            dataPoints = new List<int>();
+        }
+
+        // Method to add data points
+        public void AddDataPoint(int point)
+        {
+            dataPoints.Add(point);
+        }
+
+        // Method to calculate average of data points
+        public double CalculateAverage()
+        {
+            if (dataPoints.Count == 0)
+                throw new InvalidOperationException("No data points to calculate average.");
+
+            int sum = 0;
+            foreach (var point in dataPoints)
+            {
+                sum += point;
+            }
+            return (double)sum / dataPoints.Count;
+        }
+
+        // Method to calculate median of data points
+        public double CalculateMedian()
+        {
+            if (dataPoints.Count == 0)
+                throw new InvalidOperationException("No data points to calculate median.");
+
+            dataPoints.Sort();
+            int midIndex = dataPoints.Count / 2;
+            if (dataPoints.Count % 2 == 0)
+            {
+                return (dataPoints[midIndex - 1] + dataPoints[midIndex]) / 2.0;
+            }
+            else
+            {
+                return dataPoints[midIndex];
+            }
+        }
+
+        // Method to calculate mode of data points
+        public int CalculateMode()
+        {
+            if (dataPoints.Count == 0)
+                throw new InvalidOperationException("No data points to calculate mode.");
+
+            Dictionary<int, int> frequency = new Dictionary<int, int>();
+            foreach (var point in dataPoints)
+            {
+                if (frequency.ContainsKey(point))
+                {
+                    frequency[point]++;
+                }
+                else
+                {
+                    frequency[point] = 1;
+                }
+            }
+            int mode = -1;
+            int maxCount = 0;
+            foreach (var pair in frequency)
+            {
+                if (pair.Value > maxCount)
+                {
+                    maxCount = pair.Value;
+                    mode = pair.Key;
+                }
+            }
+            return mode;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            MetricsAnalyzer analyzer = new MetricsAnalyzer();
+            analyzer.AddDataPoint(1);
+            analyzer.AddDataPoint(2);
+            analyzer.AddDataPoint(2);
+            analyzer.AddDataPoint(3);
+            analyzer.AddDataPoint(4);
+            analyzer.AddDataPoint(4);
+            analyzer.AddDataPoint(4);
+            analyzer.AddDataPoint(5);
+            // Print for debugging
+
+LLM COMPLETION gpt-4.1-nano:
+----------------------------------------
+Console.WriteLine($"Mode: {analyzer.CalculateMode()}");
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(analyzer.CalculateMode() == 4, "Mode calculation failed");
+            double median = analyzer.CalculateMedian();
+            Debug.Assert(Math.Abs(median - 3.0) < 0.001, "Median calculation failed");
+            double average = analyzer.CalculateAverage();
+            Debug.Assert(Math.Abs(average - 3.125) < 0.001, "Average calculation failed");
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to understand and continue code based on its semantic meaning and business context in the domain of analytics and metrics reporting. The prefix sets up a class to analyze data points and calculate statistical measures such as average, median, and mode. The golden completion involves printing these calculated values, while the suffix includes assertions to verify the correctness of the calculations. This structure ensures the LLM comprehends the business logic and purpose behind the code, demonstrating its ability to handle domain-specific scenarios involving analytics metrics.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================

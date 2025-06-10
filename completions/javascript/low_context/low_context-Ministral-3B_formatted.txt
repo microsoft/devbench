@@ -1,0 +1,3078 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  greet() {
+    return `Hello, my name is ${this.name}`;
+  }
+}
+
+class Employee extends Person {
+  constructor(name, age, jobTitle) {
+    super(name, age);
+    this.jobTitle = jobTitle;
+  }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+getJobTitle() {
+    return this.jobTitle;
+  }
+
+SUFFIX CODE:
+----------------------------------------
+  getJobTitle() {
+    return this.jobTitle;
+  }
+}
+
+const emp = new Employee('Alice', 30, 'Engineer');
+console.assert(emp.getJobTitle() === 'Engineer', 'Job title should be Engineer');
+console.assert(emp.greet() === 'Hello, my name is Alice', 'Greeting should mention name');
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and complete a pattern of method overriding in a class inheritance context. The prefix establishes a base class and a derived class, and the completion involves overriding a method in the derived class. The suffix provides different functionality, ensuring clear distinction and testing for correct behavior of both inherited and overridden methods.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(emp.greet() === 'Hello, my name is Alice and I am an Engineer', 'Greeting should include name and job title');
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Calculator {
+  add(a, b) {
+    return a + b;
+  }
+
+  subtract(a, b) {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  subtract(a, b) {
+    return a - b;
+  }
+
+SUFFIX CODE:
+----------------------------------------
+    return a * b;
+  }
+}
+
+const calc = new Calculator();
+console.assert(calc.add(5, 3) === 8, 'Add method failed');
+console.assert(calc.subtract(9, 4) === 5, 'Subtract method failed');
+console.assert(calc.multiply(4, 5) === 20, 'Multiply method failed');
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to recognize and complete object-oriented patterns in JavaScript, specifically class methods. The prefix defines a class with an 'add' method, and the suffix calls these methods and includes assertions. The completion requires the LLM to identify the missing 'subtract' and 'multiply' methods. This scenario focuses on clear, minimal context to test the model's pattern recognition capabilities.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(calc.add(5, 3) === 8, 'Add method failed');
+console.assert(calc.subtract(9, 4) === 5, 'Subtract method failed');
+console.assert(calc.multiply(4, 5) === 20, 'Multiply method failed');
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(`${this.name} makes a noise.`);
+  }
+}
+
+class Dog extends Animal {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+class Dog extends Animal {
+  constructor(name) {
+    super(name);
+  }
+  speak() {
+    console.log(`${this.name} barks.`);
+  }
+}
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const d = new Dog('Mitzie');
+d.speak();
+
+// Cleanup code
+console.log('Test completed.');
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case for recognizing object-oriented patterns, specifically inheritance and method overriding. The prefix establishes a base class Animal with a method speak(). The golden completion requires the LLM to recognize that the derived class Dog should override the speak() method to provide a specific behavior. The suffix demonstrates the usage of the Dog class and verifies that the overridden method works correctly.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const capturedLogs = [];
+const originalLog = console.log;
+console.log = (msg) => capturedLogs.push(msg);
+
+const d = new Dog('Mitzie');
+d.speak();
+
+assert.strictEqual(capturedLogs[0], 'Mitzie barks.');
+
+console.log = originalLog;
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(function(num) {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+const doubled = numbers.map(function(num) {
+    return num * 2;
+});
+
+SUFFIX CODE:
+----------------------------------------
+});
+
+console.log(doubled); // Output: [2, 4, 6, 8, 10]
+
+// Assertions
+const assert = require('assert');
+assert.deepStrictEqual(doubled, [2, 4, 6, 8, 10]);
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to recognize and complete a functional programming pattern using the map function on an array. The pattern of transforming each element in an array is common and should be easily identifiable with minimal context. The prefix and suffix combined are concise, ensuring a low-context scenario while the golden completion demonstrates a clear and expected transformation function. Assertions verify the correct transformation of the array.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+assert.deepStrictEqual(doubled, [2, 4, 6, 8, 10]);
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processNumbers(numbers) {
+    return numbers.map(num =>
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+function processNumbers(numbers) {
+    return numbers.map(num => num * 2);
+}
+
+const result = processNumbers([1, 2, 3, 4]);
+console.log(result);
+
+SUFFIX CODE:
+----------------------------------------
+ * 2);
+}
+
+const result = processNumbers([1, 2, 3, 4]);
+console.log(result);
+
+// Clean up if needed
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of low-context pattern matching because it requires the LLM to recognize the functional programming pattern of using the `map` method to transform an array. The completion involves a simple yet common operation within the map function, which is often seen in JavaScript code. The minimal context provided by the prefix should be sufficient for the LLM to infer the correct continuation.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const result = processNumbers([1, 2, 3, 4]);
+assert.deepStrictEqual(result, [2, 4, 6, 8]);
+console.log('All assertions passed.');
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Rectangle {
+  constructor(width, height) {
+    this.width = width;
+    this.height = height;
+  }
+
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  area() {
+    return this.width * this.height;
+  },
+  perimeter() {
+    return 2 * (this.width + this.height);
+  }
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const rect = new Rectangle(10, 20);
+console.assert(rect.area() === 200, 'Area should be 200');
+console.assert(rect.perimeter() === 60, 'Perimeter should be 60');
+
+JUSTIFICATION:
+----------------------------------------
+This test case examines the model's ability to recognize and complete object-oriented patterns, specifically adding methods to a class. The prefix provides a class definition with a constructor, and the suffix includes assertions that test the expected behavior of the methods. The minimal context provided should be sufficient for the model to infer the correct implementation of the area and perimeter methods, which are standard geometric calculations.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(rect.area() === 200, 'Area should be 200');
+console.assert(rect.perimeter() === 60, 'Perimeter should be 60');
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const numbers = [1, 2, 3, 4, 5];
+
+function doubleNumbers(arr) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+return arr.map(num => num * 2);
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const result = doubleNumbers(numbers);
+console.assert(result.length === 5, 'Result should have 5 elements');
+console.assert(result[0] === 2, 'First element should be 2');
+console.assert(result[4] === 10, 'Last element should be 10');
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to recognize a common array manipulation pattern (using map to transform array elements) with minimal context. The prefix sets up an array and a function definition, while the suffix contains assertions that check the correctness of the transformation.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(doubleNumbers([1, 2, 3, 4, 5]).length === 5, 'Result should have 5 elements');
+console.assert(doubleNumbers([1, 2, 3, 4, 5])[0] === 2, 'First element should be 2');
+console.assert(doubleNumbers([1, 2, 3, 4, 5])[4] === 10, 'Last element should be 10');
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processArray(arr) {
+  if (!Array.isArray(arr)) {
+    throw new Error('Input must be an array');
+  }
+  return arr.map((item, index) => {
+    if (typeof item !== 'number') {
+      throw new Error('Array elements must be numbers');
+    }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  return item * 2;
+
+SUFFIX CODE:
+----------------------------------------
+    return item * 2;
+  });
+}
+
+try {
+  const result = processArray([1, 2, 3]);
+  console.assert(JSON.stringify(result) === JSON.stringify([2, 4, 6]), 'Test Case 1 Failed');
+  console.log('All test cases passed');
+} catch (e) {
+  console.error(e);
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case checks the model's ability to recognize a pattern in validating and processing array elements. The prefix establishes checks for array type and numeric elements, while the golden completion adds a logical check for non-negative numbers. The suffix completes the map function and includes assertions to verify the expected behavior.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(JSON.stringify(processArray([1, 2, 3])) === JSON.stringify([2, 4, 6]), 'Positive numbers test failed');
+try {
+  processArray([-1, 2, 3]);
+} catch (e) {
+  console.assert(e.message === 'Array elements must be non-negative', 'Negative number test failed');
+}
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  greet() {
+    return `Hello, my name is ${this.name}`;
+  }
+}
+
+class Student extends Person {
+  constructor(name, age, grade) {
+    super(name, age);
+    this.grade = grade;
+  }
+
+  study() {
+    return `${this.name} is studying.`;
+  }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+getGrade() {
+    return `${this.name} is in grade ${this.grade}`;
+  }
+
+SUFFIX CODE:
+----------------------------------------
+  getGrade() {
+    return `${this.name} is in grade ${this.grade}`;
+  }
+}
+
+const student = new Student('Alice', 20, 'A');
+console.assert(student.greet() === 'Hello, my name is Alice');
+console.assert(student.study() === 'Alice is studying.');
+console.assert(student.getGrade() === 'Alice is in grade A');
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to recognize and extend class inheritance patterns in JavaScript. The minimal context ensures the model must infer the appropriate class method structure and usage based on the given class hierarchy and methods. The provided assertions verify that the extended class behaves correctly, ensuring the model's completion is both syntactically and functionally accurate.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(student.introduce() === "Hi, I'm Alice, 20 years old, and in grade A");
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+class Dog extends Animal {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  bark() {
+    return `${this.name} says woof!`;
+  }
+
+SUFFIX CODE:
+----------------------------------------
+  bark() {
+    return `${this.name} says woof!`;
+  }
+}
+
+const myDog = new Dog('Rex');
+console.assert(myDog.bark() === 'Rex says woof!', 'Dog should bark correctly');
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it checks the model's ability to recognize and complete a class inheritance pattern with minimal context. The completion involves extending a base class constructor using 'super()', which is a common and standardized pattern in object-oriented programming.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(new Dog('Max').name === 'Max', 'Dog name should be initialized correctly');
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processData(input) {
+    try {
+        if (!input) {
+            throw new Error('No input provided');
+        }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+    return input;
+
+SUFFIX CODE:
+----------------------------------------
+    } catch (e) {
+        console.error(e.message);
+        return null;
+    }
+    return input;
+}
+
+// Test cases
+console.assert(processData('data') === 'data', 'Test Case 1 Failed');
+console.assert(processData() === null, 'Test Case 2 Failed');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to check the model's ability to recognize and complete a pattern involving error handling and input processing. The prefix sets up a function with a try/catch block, and the completion should involve processing the input within the try block before the catch block handles any errors. This pattern is common in JavaScript and should be recognizable with minimal context.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(processData('  data  ') === 'data', 'Test Case 3 Failed');
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Counter {
+  constructor() {
+    this.count = 0;
+  }
+  increment() {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+this.count++;
+
+SUFFIX CODE:
+----------------------------------------
+    return this.count;
+  }
+}
+
+const counter = new Counter();
+counter.increment();
+console.assert(counter.count === 1, 'Counter should increment to 1');
+counter.increment();
+console.assert(counter.count === 2, 'Counter should increment to 2');
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case for low-context pattern matching because it involves a simple class with a method that follows a universal pattern for incrementing a value. The context is minimal, yet the pattern of incrementing a counter is widely recognizable. The prefix and suffix provide enough information to identify and complete the pattern correctly.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(counter.count === 1, 'Counter should increment to 1');
+counter.increment();
+console.assert(counter.count === 2, 'Counter should increment to 2');
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+
+  speak() {
+    console.log(`${this.name} makes a noise.`);
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);
+    this.breed = breed;
+  }
+
+  speak() {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+
+  speak() {
+    console.log(`${this.name} makes a noise.`);
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);
+    this.breed = breed;
+  }
+
+  speak() {
+    console.log(`${this.name} barks.`);
+  }
+}
+
+const dog = new Dog('Rex', 'German Shepherd');
+dog.speak(); // Expected output: 'Rex barks.'
+
+const animal = new Animal('Generic Animal');
+animal.speak(); // Expected output: 'Generic Animal makes a noise.'
+
+SUFFIX CODE:
+----------------------------------------
+    console.log(`${this.name} barks.`);
+  }
+}
+
+const dog = new Dog('Rex', 'German Shepherd');
+dog.speak(); // Expected output: 'Rex barks.'
+
+const animal = new Animal('Generic Animal');
+animal.speak(); // Expected output: 'Generic Animal makes a noise.'
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case for low-context pattern matching as it involves object-oriented patterns with classes and inheritance, where the model needs to recognize the `super` keyword usage in a subclass method. The completion requires adding a call to the parent class's method, which is a common pattern in object-oriented programming. The pattern should be recognizable with minimal context provided by the class definitions and method overrides.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+let output = '';
+const originalLog = console.log;
+console.log = (msg) => { output += msg + '\n'; };
+try {
+  const dog = new Dog('Rex', 'German Shepherd');
+  dog.speak();
+  assert(output.includes('Rex makes a noise.'));
+  assert(output.includes('Rex barks.'));
+  output = '';
+  const animal = new Animal('Generic Animal');
+  animal.speak();
+  assert.strictEqual(output, 'Generic Animal makes a noise.\n');
+} finally {
+  console.log = originalLog;
+}
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processData(input) {
+    const result = input.map(item => item.trim());
+    const filtered = result.filter(item => item.length > 0);
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+const filtered = result.filter(item => item.length > 0);
+
+SUFFIX CODE:
+----------------------------------------
+    return filtered;
+}
+
+const data = [" apple ", "", " banana ", "  ", " cherry  "];
+const output = processData(data);
+
+console.assert(output.length === 3, 'Filtered array should have 3 elements');
+console.assert(output.includes("apple"), 'Output should include "apple"');
+console.assert(output.includes("banana"), 'Output should include "banana"');
+console.assert(output.includes("cherry"), 'Output should include "cherry"');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern in data structure manipulation, specifically working with arrays. The pattern involves mapping, filtering, and removing duplicates from an array. The completion requires understanding array methods and the Set object. The minimal context provided ensures that the model needs to understand the array processing pattern with limited lines of code.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(output.length === 3, 'Filtered array should have 3 elements');
+console.assert(output.includes("apple"), 'Output should include "apple"');
+console.assert(output.includes("banana"), 'Output should include "banana"');
+console.assert(output.includes("cherry"), 'Output should include "cherry"');
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processData(data) {
+  const result = data.map(item => item * 2);
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+return result.reduce((acc, curr) => acc + curr, 0);
+
+SUFFIX CODE:
+----------------------------------------
+  return result.reduce((acc, curr) => acc + curr, 0);
+}
+
+const data = [1, 2, 3, 4];
+const output = processData(data);
+console.assert(output === 20, `Expected 20, but got ${output}`);
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize a common array manipulation pattern in JavaScript: mapping, filtering, and reducing. The completion involves filtering the mapped array, which is a recognizable and standard operation in functional programming. The prefix and suffix provide minimal context but enough to identify the pattern.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(JSON.stringify(processData([1, 2, 3, 4])) === '[4, 8]', 'Expected [4, 8] after filtering even numbers');
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const numbers = [1, 2, 3, 4, 5];
+const evens = numbers.filter(number =>
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+number % 2 === 0
+
+SUFFIX CODE:
+----------------------------------------
+);
+console.log(evens);
+console.assert(evens.length === 2, 'Should contain two elements');
+console.assert(evens[0] === 2, 'First element should be 2');
+console.assert(evens[1] === 4, 'Second element should be 4');
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it checks the LLM's ability to recognize and complete a common functional programming pattern in JavaScript: filtering an array based on a condition. The prefix provides minimal context by showing the beginning of a filter operation, and the suffix completes the pattern and includes assertions to verify correctness. The pattern is universally recognizable and requires minimal context to identify.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(evens.length === 2, 'Should contain two elements');
+console.assert(evens[0] === 2, 'First element should be 2');
+console.assert(evens[1] === 4, 'Second element should be 4');
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  sound() {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  sound() {
+    return '';
+  }
+
+SUFFIX CODE:
+----------------------------------------
+  }
+}
+
+const dog = new Animal('Dog');
+console.assert(dog.name === 'Dog');
+console.assert(typeof dog.sound === 'function');
+console.assert(dog.sound() === '');
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to recognize and complete a method inside a class. The prefix provides the class and method structure, while the suffix verifies the class instantiation and method functionality. The completion involves returning an empty string from the sound method, a simple and common pattern in object-oriented programming.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(dog.name === 'Dog');
+console.assert(typeof dog.sound === 'function');
+console.assert(dog.sound() === '');
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processStrings(strings) {
+    return strings.map(str => 
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+str.toUpperCase()
+
+SUFFIX CODE:
+----------------------------------------
+);
+}
+
+const input = ['hello', 'world'];
+const output = processStrings(input);
+console.assert(output[0] === 'HELLO', 'First string should be uppercased');
+console.assert(output[1] === 'WORLD', 'Second string should be uppercased');
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to complete a common string manipulation pattern (mapping an array to uppercase strings) with minimal context. The pattern is recognizable through the use of the map function and the common method toUpperCase. The prefix and suffix combined are concise, yet sufficient to establish the pattern and test correctness.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(output[0] === 'HELLO', 'First string should be uppercased');
+console.assert(output[1] === 'WORLD', 'Second string should be uppercased');
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Vehicle {
+  constructor(type, speed) {
+    this.type = type;
+    this.speed = speed;
+  }
+  describe() {
+    return `This ${this.type} moves at ${this.speed} mph`;
+  }
+}
+
+class Car extends Vehicle {
+  constructor(speed) {
+    super('car', speed);
+  }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+class Bike extends Vehicle {
+  constructor(speed) {
+    super('bike', speed);
+  }
+}
+
+SUFFIX CODE:
+----------------------------------------
+const bike = new Bike(15);
+console.assert(bike.describe() === 'This bike moves at 15 mph', 'Bike description failed');
+const car = new Car(120);
+console.assert(car.describe() === 'This car moves at 120 mph', 'Car description failed');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates inheritance in object-oriented programming with JavaScript classes. The low-context scenario tests the LLM's ability to recognize and extend a pattern where subclasses inherit properties and methods from a parent class. The prefix establishes the pattern with the Vehicle and Car classes, and the golden completion requires creating a similar Bike class. The assertions ensure that the describe method works correctly for both Car and Bike instances, validating the inheritance pattern.
+
+ASSERTIONS:
+----------------------------------------
+const car = new Car(120);
+console.assert(car.describe() === 'This car moves at 120 mph', 'Car description failed');
+const bike = new Bike(15);
+console.assert(bike.describe() === 'This bike moves at 15 mph', 'Bike description failed');
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+class Dog extends Animal {
+  constructor(name, breed) {
+    super(name);
+    this.breed = breed;
+  }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  bark() {
+    return `${this.name} barks!`;
+  }
+
+SUFFIX CODE:
+----------------------------------------
+  bark() {
+    return `${this.name} barks!`;
+  }
+}
+
+const myDog = new Dog('Fido', 'Labrador');
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case for recognizing and completing object-oriented patterns, specifically inheritance and method definition within a subclass. The prefix establishes a clear pattern of class extension and method definition, and the golden completion requires the model to recognize and extend this pattern by adding a new method. The minimal context tests the model's ability to infer appropriate class methods based on the established pattern.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+assert.strictEqual(myDog.getBreed(), 'Labrador');
+assert.strictEqual(myDog.bark(), 'Fido barks!');
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+    constructor(name) {
+        this.name = name;
+    }
+    speak() {
+        console.log(`${this.name} makes a noise.`);
+    }
+}
+class Dog extends Animal {
+    speak() {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+console.log(`${this.name} barks.`);
+
+SUFFIX CODE:
+----------------------------------------
+        console.log(`${this.name} barks.`);
+    }
+}
+const d = new Dog('Rex');
+d.speak();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case checks the LLM's ability to recognize and continue a common object-oriented pattern in JavaScript, specifically method overriding with super calls in class inheritance. The minimal context provided should be sufficient for the model to infer that the super call is necessary to maintain the pattern.
+
+ASSERTIONS:
+----------------------------------------
+const output = [];
+console.log = (msg) => output.push(msg);
+const d = new Dog('Rex');
+d.speak();
+console.assert(output.includes('Rex makes a noise.'), 'Base class method not called');
+console.assert(output.includes('Rex barks.'), 'Derived class method not called');
+
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  greet() {
+    return `Hello, my name is ${this.name}.`;
+  }
+}
+
+class Student extends Person {
+  constructor(name, age, grade) {
+    super(name, age);
+    this.grade = grade;
+  }
+
+  
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+study() {
+  return `${this.name} is studying.`;
+}
+
+SUFFIX CODE:
+----------------------------------------
+study() {
+    return `${this.name} is studying.`;
+  }
+}
+
+const student = new Student('Alice', 20, 'A');
+console.assert(student.greet() === 'Hello, my name is Alice.');
+console.assert(student.study() === 'Alice is studying.');
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and complete a class-based inheritance pattern in JavaScript. The completion involves adding a method to the `Student` class, which is a subclass of `Person`. The pattern is clear and follows standard object-oriented conventions, making it a good test case for low-context recognition.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(student.introduce() === 'I am Alice, a A grade student.');
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const arr = [1, 2, 3, 4, 5];
+const doubled = arr.map(
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+const doubled = arr.map(num => num * 2);
+
+SUFFIX CODE:
+----------------------------------------
+);
+console.log(doubled);
+// Output should be [2, 4, 6, 8, 10]
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a common array manipulation pattern using the map function in JavaScript. The pattern of doubling elements in an array is simple, yet requires understanding of higher-order functions and arrow functions. The context is minimal but sufficient to infer the expected transformation.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+assert.deepStrictEqual(doubled, [2, 4, 6, 8, 10]);
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const myMap = new Map();
+myMap.set('key1', 'value1');
+myMap.set('key2', 'value2');
+
+function getValueFromMap(key) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+return myMap.get(key);
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const result1 = getValueFromMap('key1');
+const result2 = getValueFromMap('key2');
+
+console.assert(result1 === 'value1', 'Test 1 Failed');
+console.assert(result2 === 'value2', 'Test 2 Failed');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize a common pattern of retrieving values from a Map object in JavaScript. The prefix sets up the Map and the function definition, and the suffix contains the function calls and assertions to check correctness. The pattern of using Map's get method is universally recognizable and requires minimal context.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(getValueFromMap('key1') === 'value1', 'Assertion Failed: key1 should return value1');
+console.assert(getValueFromMap('key2') === 'value2', 'Assertion Failed: key2 should return value2');
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const data = [1, 2, 3, 4, 5];
+
+function processData(arr) {
+    return arr.map(x => x * 2);
+}
+
+const result = 
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+result = processData(data);
+
+SUFFIX CODE:
+----------------------------------------
+;
+
+console.log(result);
+
+// Assertions
+const assert = require('assert');
+assert.deepStrictEqual(result, [2, 4, 6, 8, 10]);
+
+JUSTIFICATION:
+----------------------------------------
+This scenario involves data structure manipulation, specifically array processing. The prefix sets up a recognizable pattern of using the `map` function to transform an array. The low-context nature of the task is evident as the completion requires the model to correctly identify the use of the `processData` function with the `data` array to produce the expected result. This tests the model's ability to recognize and continue the pattern of functional programming constructs with minimal context.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+assert.deepStrictEqual(result, [2, 4, 6, 8, 10]);
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processData(array) {
+  if (!Array.isArray(array)) {
+    throw new TypeError('Expected an array');
+  }
+
+  let result = array.map(item => item * 2);
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+return result.filter(item => item > 10);
+
+SUFFIX CODE:
+----------------------------------------
+  return result.filter(item => item > 10);
+}
+
+const input = [3, 5, 7, 10, 12];
+const output = processData(input);
+console.assert(Array.isArray(output), 'Output should be an array');
+console.assert(output.length === 2, 'Output array should have two elements');
+console.assert(output[0] === 14, 'First element should be 14');
+console.assert(output[1] === 24, 'Second element should be 24');
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize a common pattern in array manipulation. The pattern involves mapping an array, applying a transformation, and then filtering based on a condition. The minimal context provides enough information to infer that another transformation should be applied before filtering. The assertions ensure that the correct transformations and filtering are applied to the array elements.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(Array.isArray(output), 'Output should be an array');
+console.assert(output.length === 2, 'Output array should have two elements');
+console.assert(output[0] === 14, 'First element should be 14');
+console.assert(output[1] === 24, 'Second element should be 24');
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class DataFetcher {
+  constructor(url) {
+    this.url = url;
+  }
+
+  async fetchData() {
+    const response = await fetch(this.url);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return await response.json();
+  }
+
+  static async fetchAll(urls) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+    const promises = urls.map(url => DataFetcher.fetchData(url));
+    return await Promise.all(promises);
+
+SUFFIX CODE:
+----------------------------------------
+    return await Promise.all(promises);
+  }
+}
+
+const urls = ['https://api.example.com/data1', 'https://api.example.com/data2'];
+DataFetcher.fetchAll(urls).then(results => {
+  console.log(results);
+}).catch(error => {
+  console.error(error);
+});
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an advanced async pattern involving Promise.all with a custom class method. The context provided is minimal but sufficient to establish the need for mapping over URLs and fetching data asynchronously. The LLM must understand how to create promises for each URL and handle them using Promise.all.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+(async () => {
+  class DataFetcher {
+    constructor(url) {
+      this.url = url;
+    }
+
+    async fetchData() {
+      const response = await fetch(this.url);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return await response.json();
+    }
+
+    static async fetchAll(urls) {
+      const promises = urls.map(url => new DataFetcher(url).fetchData());
+      return await Promise.all(promises);
+    }
+  }
+
+  const mockFetch = url => {
+    return Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ data: url })
+    });
+  };
+
+  global.fetch = mockFetch;
+
+  const urls = ['https://api.example.com/data1', 'https://api.example.com/data2'];
+  const results = await DataFetcher.fetchAll(urls);
+  assert.deepStrictEqual(results, [{ data: 'https://api.example.com/data1' }, { data: 'https://api.example.com/data2' }]);
+})();
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class DataFetcher {
+  constructor() {
+    this.cache = new Map();
+  }
+
+  async fetchData(url) {
+    if (this.cache.has(url)) {
+      return this.cache.get(url);
+    }
+    const response = await fetch(url);
+    const data = await response.json();
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  this.cache.set(url, data);
+
+SUFFIX CODE:
+----------------------------------------
+    this.cache.set(url, data);
+    return data;
+  }
+}
+
+// Test the DataFetcher class
+(async () => {
+  const fetcher = new DataFetcher();
+  const data = await fetcher.fetchData('https://api.example.com/data');
+  console.assert(data !== null, 'Data should not be null');
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an async pattern within a class method. The pattern involves fetching data from a URL, handling potential errors, and caching the results. The low-context nature of the code snippet requires the model to understand async/await, error handling, and Map usage within a class structure. This scenario is non-trivial and requires genuine understanding of JavaScript language semantics.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const fetch = require('node-fetch');
+
+(async () => {
+  const fetcher = new DataFetcher();
+  try {
+    const data = await fetcher.fetchData('https://api.example.com/data');
+    assert(data !== null, 'Data should not be null');
+  } catch (error) {
+    assert(error.message.includes('HTTP error!'), 'Should throw an HTTP error on fetch failure');
+  }
+})();
+
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.running = false;
+  }
+
+  async runTask(task) {
+    this.running = true;
+    await task();
+    this.running = false;
+    this.next();
+  }
+
+  next() {
+    if (this.queue.length > 0 && !this.running) {
+      const nextTask = this.queue.shift();
+      this.runTask(nextTask);
+    }
+  }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+enqueue(task) {
+  this.queue.push(task);
+}
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const queue = new AsyncQueue();
+queue.enqueue(async () => {
+  await new Promise(resolve => setTimeout(resolve, 100));
+  console.log('Task 1 done');
+});
+queue.enqueue(async () => {
+  await new Promise(resolve => setTimeout(resolve, 50));
+  console.log('Task 2 done');
+});
+queue.enqueue(async () => {
+  await new Promise(resolve => setTimeout(resolve, 150));
+  console.log('Task 3 done');
+});
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an async pattern involving an asynchronous queue implementation. The pattern includes managing a task queue, handling async execution, and ensuring tasks are run sequentially without overlap. The minimal context requires understanding of async/await, queue management, and method implementation in a class.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const log = console.log;
+console.log = () => {};
+const logs = [];
+console.log = (msg) => logs.push(msg);
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+(async () => {
+  await delay(400); // Wait enough time for all tasks to complete
+  assert.strictEqual(logs[0], 'Task 1 done');
+  assert.strictEqual(logs[1], 'Task 2 done');
+  assert.strictEqual(logs[2], 'Task 3 done');
+  console.log = log; // Restore original console.log
+})();
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class RateLimiter {
+  constructor(limit) {
+    this.limit = limit;
+    this.queue = [];
+    this.activeCount = 0;
+  }
+
+  enqueue(promiseFn) {
+    return new Promise((resolve, reject) => {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  this.queue.push({ promiseFn, resolve, reject });
+
+SUFFIX CODE:
+----------------------------------------
+      this.queue.push({ promiseFn, resolve, reject });
+      this.dequeue();
+    });
+  }
+
+  dequeue() {
+    if (this.activeCount < this.limit && this.queue.length > 0) {
+      const { promiseFn, resolve, reject } = this.queue.shift();
+      this.activeCount++;
+      promiseFn().then(resolve, reject).finally(() => {
+        this.activeCount--;
+        this.dequeue();
+      });
+    }
+  }
+}
+
+const limiter = new RateLimiter(2);
+
+const task = (id) => () => new Promise(resolve => {
+  console.log(`Task ${id} started`);
+  setTimeout(() => {
+    console.log(`Task ${id} finished`);
+    resolve(id);
+  }, 1000);
+});
+
+Promise.all([
+  limiter.enqueue(task(1)),
+  limiter.enqueue(task(2)),
+  limiter.enqueue(task(3)),
+  limiter.enqueue(task(4)),
+]).then(results => {
+  console.log('All tasks finished:', results);
+});
+
+JUSTIFICATION:
+----------------------------------------
+This example is a good test case for low-context pattern recognition because it requires understanding of advanced async patterns, specifically a custom rate limiter using Promises. The model must recognize the enqueue-dequeue logic and correctly implement the rate limiting control flow. This scenario involves executing Promises in a controlled manner, ensuring only a limited number of Promises run concurrently. This requires deeper comprehension of JavaScript's async capabilities and proper handling of Promise resolution and rejection.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const limiter = new RateLimiter(2);
+const results = [];
+const task = (id) => () => new Promise(resolve => {
+  setTimeout(() => resolve(id), 1000);
+});
+Promise.all([
+  limiter.enqueue(task(1)),
+  limiter.enqueue(task(2)),
+  limiter.enqueue(task(3)),
+  limiter.enqueue(task(4)),
+]).then(res => {
+  results.push(...res);
+  assert.deepStrictEqual(results, [1, 2, 3, 4], 'All tasks should complete in order');
+});
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.processing = false;
+  }
+
+  enqueue(promiseFunction) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ promiseFunction, resolve, reject });
+      this.process();
+    });
+  }
+
+  async process() {
+    if (this.processing) return;
+    this.processing = true;
+    while (this.queue.length > 0) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+    const { promiseFunction, resolve, reject } = this.queue.shift();
+    try {
+      const result = await promiseFunction();
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    }
+
+SUFFIX CODE:
+----------------------------------------
+      const { resolve, reject } = this.queue.shift();
+      try {
+        const result = await promiseFunction();
+        resolve(result);
+      } catch (error) {
+        reject(error);
+      }
+    }
+    this.processing = false;
+  }
+}
+
+// Test the AsyncQueue
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+const queue = new AsyncQueue();
+
+queue.enqueue(() => delay(100).then(() => 'Task 1')).then(console.log);
+queue.enqueue(() => delay(50).then(() => 'Task 2')).then(console.log);
+queue.enqueue(() => delay(150).then(() => 'Task 3')).then(console.log);
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to recognize and complete an advanced async pattern involving a custom asynchronous queue. The pattern involves managing a queue of promise-returning functions and processing them sequentially. The challenge lies in correctly extracting and invoking the promise function from the queue with proper error handling. This is a realistic scenario that requires understanding of both async/await and promise mechanics, making it a good test case for low-context pattern matching.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+
+(async () => {
+  const results = [];
+  const originalLog = console.log;
+  console.log = (msg) => results.push(msg);
+
+  await queue.enqueue(() => delay(100).then(() => 'Task 1'));
+  await queue.enqueue(() => delay(50).then(() => 'Task 2'));
+  await queue.enqueue(() => delay(150).then(() => 'Task 3'));
+
+  console.log = originalLog;
+
+  assert.deepStrictEqual(results, ['Task 1', 'Task 2', 'Task 3']);
+})();
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class RateLimiter {
+  constructor(limit) {
+    this.limit = limit;
+    this.queue = [];
+    this.activeCount = 0;
+  }
+
+  async _next() {
+    if (this.queue.length === 0) return;
+    if (this.activeCount >= this.limit) return;
+
+    const { fn, resolve, reject } = this.queue.shift();
+    this.activeCount++;
+    try {
+      const result = await fn();
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    } finally {
+      this.activeCount--;
+      this._next();
+    }
+  }
+
+  enqueue(fn) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+enqueue(fn) {
+  return new Promise((resolve, reject) => {
+    this.queue.push({ fn, resolve, reject });
+    this._next();
+  });
+}
+
+SUFFIX CODE:
+----------------------------------------
+  }
+}
+
+async function testRateLimiter() {
+  const limiter = new RateLimiter(2);
+  let results = [];
+  for (let i = 0; i < 5; i++) {
+    results.push(limiter.enqueue(() => new Promise((resolve) => setTimeout(() => resolve(i), 100))));
+  }
+  results = await Promise.all(results);
+  console.assert(results.length === 5, 'Expected 5 results');
+  console.assert(results.every((val, index) => val === index), 'Results should match indices');
+}
+testRateLimiter();
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates an advanced async pattern with a custom implementation of a rate limiter using promises. The pattern involves enqueuing functions and processing them with a concurrency limit, which is non-trivial and requires understanding of promises, async/await, and control flow. The minimal context tests the model's ability to complete the implementation of the `enqueue` method correctly.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(typeof RateLimiter === 'function', 'RateLimiter should be a function');
+console.assert(typeof RateLimiter.prototype.enqueue === 'function', 'RateLimiter should have an enqueue method');
+console.assert(RateLimiter.prototype._next.length === 0, '_next method should not take any arguments');
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class RateLimiter {
+  constructor(limit) {
+    this.limit = limit;
+    this.queue = [];
+    this.activeCount = 0;
+  }
+
+  _next() {
+    if (this.queue.length > 0 && this.activeCount < this.limit) {
+      const { fn, resolve, reject } = this.queue.shift();
+      this.activeCount++;
+      fn().then(resolve).catch(reject).finally(() => {
+        this.activeCount--;
+        this._next();
+      });
+    }
+  }
+
+  schedule(fn) {
+    return new Promise((resolve, reject) => {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  this.queue.push({ fn, resolve, reject });
+  this._next();
+
+SUFFIX CODE:
+----------------------------------------
+    });
+  }
+}
+
+const limiter = new RateLimiter(2);
+
+const asyncTask = (taskName, delay) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(taskName);
+    }, delay);
+  });
+};
+
+const tasks = [
+  () => asyncTask('task1', 100),
+  () => asyncTask('task2', 200),
+  () => asyncTask('task3', 300),
+  () => asyncTask('task4', 400)
+];
+
+(async () => {
+  const results = await Promise.all(tasks.map(task => limiter.schedule(task)));
+  console.log(results); // Should print ['task1', 'task2', 'task3', 'task4']
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a rate limiting pattern using Promises and async control flow. The RateLimiter class is designed to handle concurrent tasks with a limit, pushing tasks into a queue and processing them as slots become available. The golden completion involves correctly enqueuing a task and invoking the _next method to process the queue. This scenario requires understanding of advanced JavaScript features like Promises, async control flow, and method binding, making it a challenging and realistic test case.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+
+(async () => {
+  const limiter = new RateLimiter(2);
+
+  const asyncTask = (taskName, delay) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(taskName);
+      }, delay);
+    });
+  };
+
+  const tasks = [
+    () => asyncTask('task1', 100),
+    () => asyncTask('task2', 200),
+    () => asyncTask('task3', 300),
+    () => asyncTask('task4', 400)
+  ];
+
+  const results = await Promise.all(tasks.map(task => limiter.schedule(task)));
+  assert.deepStrictEqual(results, ['task1', 'task2', 'task3', 'task4']);
+})();
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.isProcessing = false;
+  }
+
+  enqueue(promiseFunc) {
+    this.queue.push(promiseFunc);
+    this.processQueue();
+  }
+
+  async processQueue() {
+    if (this.isProcessing) return;
+    this.isProcessing = true;
+
+    while (this.queue.length > 0) {
+      const promiseFunc = this.queue.shift();
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+    await promiseFunc();
+  }
+
+SUFFIX CODE:
+----------------------------------------
+
+    }
+
+    this.isProcessing = false;
+  }
+}
+
+// Test the AsyncQueue
+const queue = new AsyncQueue();
+let result = 0;
+queue.enqueue(() => new Promise(resolve => setTimeout(() => { result += 1; resolve(); }, 100)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => { result += 2; resolve(); }, 50)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => { result += 3; resolve(); }, 10)));
+
+setTimeout(() => { console.assert(result === 6, 'Result should be 6'); }, 200);
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a custom async queue implementation using advanced JavaScript features such as async functions and queue management. The minimal context provided in the prefix and suffix requires the model to understand the pattern of processing asynchronous tasks in a queue, handling errors, and ensuring proper execution flow. The complexity of managing asynchronous control flow and error handling within the queue makes this a suitable test for low-context pattern recognition.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(result === 6, 'Result should be 6');
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.pendingPromise = false;
+  }
+
+  enqueue(task) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ task, resolve, reject });
+      this.dequeue();
+    });
+  }
+
+  async dequeue() {
+    if (this.pendingPromise || this.queue.length === 0) return;
+    this.pendingPromise = true;
+    const { task, resolve, reject } = this.queue.shift();
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  try {
+    await task();
+    resolve();
+  } catch (error) {
+    reject(error);
+  }
+
+SUFFIX CODE:
+----------------------------------------
+    } catch (error) {
+      reject(error);
+    } finally {
+      this.pendingPromise = false;
+      this.dequeue();
+    }
+  }
+}
+
+const queue = new AsyncQueue();
+
+queue.enqueue(async () => {
+  return 'Task 1';
+}).then(result => console.log(result));
+
+queue.enqueue(async () => {
+  throw new Error('Task 2 failed');
+}).catch(error => console.log(error.message));
+
+setTimeout(() => {
+  queue.enqueue(async () => {
+    return 'Task 3';
+  }).then(result => console.log(result));
+}, 100);
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an advanced async pattern in JavaScript. The `AsyncQueue` class is designed to handle enqueuing and dequeuing tasks with proper async control flow, error handling, and resource management. The completion requires understanding of promises, async/await, and queue management. The context provided is minimal but sufficient for a senior developer to infer the correct pattern. The suffix demonstrates usage and testing of the pattern, ensuring the completion must fit seamlessly.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+(async () => {
+  const queue = new AsyncQueue();
+  const results = [];
+  queue.enqueue(async () => 'Task 1').then(result => results.push(result));
+  queue.enqueue(async () => { throw new Error('Task 2 failed'); }).catch(error => results.push(error.message));
+  await new Promise(resolve => setTimeout(resolve, 150));
+  queue.enqueue(async () => 'Task 3').then(result => results.push(result));
+  await new Promise(resolve => setTimeout(resolve, 150));
+  assert.deepStrictEqual(results, ['Task 1', 'Task 2 failed', 'Task 3']);
+})();
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function asyncRateLimit(fn, limit) {
+  let calls = [];
+  let active = 0;
+  async function executeNext() {
+    if (active < limit && calls.length > 0) {
+      active++;
+      const { resolve, reject, args } = calls.shift();
+      try {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  try {
+    const result = await fn(...args);
+    resolve(result);
+  }
+
+SUFFIX CODE:
+----------------------------------------
+      } catch (error) {
+        reject(error);
+      } finally {
+        active--;
+        executeNext();
+      }
+    }
+  }
+  return function(...args) {
+    return new Promise((resolve, reject) => {
+      calls.push({ resolve, reject, args });
+      executeNext();
+    });
+  };
+}
+
+// Test cases
+const limitedFn = asyncRateLimit(async (x) => x * 2, 2);
+(async () => {
+  let results = await Promise.all([limitedFn(1), limitedFn(2), limitedFn(3), limitedFn(4)]);
+  console.log(results); // Should be [2, 4, 6, 8]
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to complete a complex async pattern involving rate limiting with a custom Promise implementation. It includes advanced async control flow and requires understanding of how to manage concurrency with async/await. The pattern is non-trivial and recognizable to experienced JavaScript developers, making it a good test for low-context pattern matching. The completion demonstrates correct usage of async/await within a custom executor function, and the assertions validate the rate limiting behavior.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+(async () => {
+  const limitedFn = asyncRateLimit(async (x) => x * 2, 2);
+  let results = await Promise.all([limitedFn(1), limitedFn(2), limitedFn(3), limitedFn(4)]);
+  assert.deepStrictEqual(results, [2, 4, 6, 8]);
+})();
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.pendingPromise = false;
+  }
+
+  enqueue(task) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ task, resolve, reject });
+      this.processQueue();
+    });
+  }
+
+  async processQueue() {
+    if (this.pendingPromise) return;
+    if (this.queue.length === 0) return;
+    const { task, resolve, reject } = this.queue.shift();
+    this.pendingPromise = true;
+    try {
+      const result = await task();
+      resolve(result);
+    } catch (error) {
+      reject(error);
+    } finally {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+this.pendingPromise = false;
+
+SUFFIX CODE:
+----------------------------------------
+    }
+  }
+}
+
+// Test case
+(async () => {
+  const queue = new AsyncQueue();
+  const results = [];
+  results.push(await queue.enqueue(() => Promise.resolve(1)));
+  results.push(await queue.enqueue(() => Promise.resolve(2)));
+  console.assert(results[0] === 1, 'First task should resolve to 1');
+  console.assert(results[1] === 2, 'Second task should resolve to 2');
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and complete an async pattern involving an async queue implementation. The pattern involves maintaining state across asynchronous operations and ensuring tasks are processed in sequence. This requires understanding of Promises, async/await, and queue management, which are advanced JavaScript concepts.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(results[0] === 1, 'First task should resolve to 1');
+console.assert(results[1] === 2, 'Second task should resolve to 2');
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.processing = false;
+  }
+
+  async processQueue() {
+    if (this.processing) return;
+    this.processing = true;
+    while (this.queue.length > 0) {
+      const task = this.queue.shift();
+      await task();
+    }
+    this.processing = false;
+  }
+
+  enqueue(task) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+this.queue.push(task);
+
+SUFFIX CODE:
+----------------------------------------
+    this.processQueue();
+  }
+}
+
+const queue = new AsyncQueue();
+let result = [];
+queue.enqueue(async () => { result.push(1); });
+queue.enqueue(async () => { result.push(2); });
+queue.enqueue(async () => { result.push(3); });
+
+setTimeout(() => {
+  console.log(result); // Expect [1, 2, 3]
+  console.assert(JSON.stringify(result) === JSON.stringify([1, 2, 3]), 'Tasks did not execute in order');
+}, 1000);
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it involves an advanced async pattern, specifically implementing an asynchronous queue. The task demonstrates understanding of async/await, queue data structure, and proper handling of async control flow. The minimal context provided should be enough to recognize the pattern of enqueuing tasks and processing them sequentially.
+
+ASSERTIONS:
+----------------------------------------
+setTimeout(() => { console.assert(JSON.stringify(result) === JSON.stringify([1, 2, 3]), 'Tasks did not execute in order'); }, 1000);
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class RateLimiter {
+  constructor(limit) {
+    this.limit = limit;
+    this.queue = [];
+    this.activeCount = 0;
+  }
+
+  async _next() {
+    if (this.queue.length === 0 || this.activeCount >= this.limit) {
+      return;
+    }
+    this.activeCount++;
+    const { resolve } = this.queue.shift();
+    resolve();
+  }
+
+  async run(task) {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+this.activeCount--;
+
+SUFFIX CODE:
+----------------------------------------
+    this.activeCount--;
+    this._next();
+  }
+}
+
+const limiter = new RateLimiter(2);
+
+const task = async (id) => {
+  console.log(`Starting task ${id}`);
+  await new Promise(resolve => setTimeout(resolve, 100));
+  console.log(`Finished task ${id}`);
+};
+
+(async () => {
+  await Promise.all([
+    limiter.run(() => task(1)),
+    limiter.run(() => task(2)),
+    limiter.run(() => task(3)),
+    limiter.run(() => task(4))
+  ]);
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability to recognize and complete an async pattern involving custom rate limiting. The task involves understanding how to queue tasks and manage concurrency limits using Promises. This requires a deep understanding of JavaScript's async/await and Promise mechanisms, making it a good test case for advanced pattern recognition.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+let taskOrder = [];
+const originalConsoleLog = console.log;
+console.log = (msg) => taskOrder.push(msg);
+
+(async () => {
+  await Promise.all([
+    limiter.run(() => task(1)),
+    limiter.run(() => task(2)),
+    limiter.run(() => task(3)),
+    limiter.run(() => task(4))
+  ]);
+
+  assert.strictEqual(taskOrder.length, 8, 'Expected 8 log entries');
+  assert.strictEqual(taskOrder.filter(msg => msg.startsWith('Starting')).length, 4, 'Expected 4 Starting log entries');
+  assert.strictEqual(taskOrder.filter(msg => msg.startsWith('Finished')).length, 4, 'Expected 4 Finished log entries');
+  console.log = originalConsoleLog;
+})();
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Queue {
+  constructor() {
+    this.items = [];
+  }
+  enqueue(element) {
+    this.items.push(element);
+  }
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  dequeue() {
+    if(this.isEmpty()) {
+      throw new Error('Queue is empty');
+    }
+    return this.items.shift();
+  }
+
+SUFFIX CODE:
+----------------------------------------
+  dequeue() {
+    if(this.isEmpty()) {
+      throw new Error('Queue is empty');
+    }
+    return this.items.shift();
+  }
+  isEmpty() {
+    return this.items.length === 0;
+  }
+}
+
+// Test the Queue implementation
+const q = new Queue();
+q.enqueue(1);
+q.enqueue(2);
+q.enqueue(3);
+console.assert(q.dequeue() === 1, 'Dequeue should return 1');
+console.assert(q.dequeue() === 2, 'Dequeue should return 2');
+console.assert(q.dequeue() === 3, 'Dequeue should return 3');
+console.assert(q.isEmpty(), 'Queue should be empty after dequeuing all items');
+
+JUSTIFICATION:
+----------------------------------------
+This test case challenges the LLM to recognize the pattern of a queue data structure and implement a 'peek' method that returns the first element without removing it. The context is minimal, but the pattern of a queue class with enqueue, dequeue, and isEmpty methods is clear. The completion requires understanding of class methods, error handling, and array operations.
+
+ASSERTIONS:
+----------------------------------------
+console.assert((new Queue()).peek === undefined, 'peek method should be defined');
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.processing = false;
+  }
+
+  async processQueue() {
+    if (this.processing) return;
+    this.processing = true;
+
+    while (this.queue.length > 0) {
+      const { task, resolve, reject } = this.queue.shift();
+      try {
+        const result = await task();
+        resolve(result);
+      } catch (err) {
+        reject(err);
+      }
+    }
+
+    this.processing = false;
+  }
+
+  enqueue(task) {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+this.processQueue();
+
+SUFFIX CODE:
+----------------------------------------
+    this.processQueue();
+  }
+}
+
+const q = new AsyncQueue();
+q.enqueue(async () => 'Task 1 complete').then(console.log).catch(console.error);
+q.enqueue(async () => { throw new Error('Task 2 failed'); }).then(console.log).catch(console.error);
+
+setTimeout(() => {
+  q.enqueue(async () => 'Task 3 complete').then(console.log).catch(console.error);
+}, 1000);
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a custom async pattern involving a queue, Promises, and async/await. The prefix sets up an AsyncQueue class with a processQueue method and an incomplete enqueue method. The completion involves adding tasks to the queue and returning a Promise. This requires understanding of asynchronous control flow, Promises, and task scheduling. The suffix demonstrates the usage and handling of the queue with assertions verifying correct task processing and error handling. The combined length of prefix and suffix is within the 10-20 lines limit, providing low-context yet challenging scenario.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const q = new AsyncQueue();
+
+q.enqueue(async () => 'Task 1').then(result => assert.strictEqual(result, 'Task 1')).catch(() => assert.fail('Task 1 should not fail'));
+q.enqueue(async () => { throw new Error('Task 2'); }).then(() => assert.fail('Task 2 should fail')).catch(err => assert.strictEqual(err.message, 'Task 2'));
+
+setTimeout(() => {
+  q.enqueue(async () => 'Task 3').then(result => assert.strictEqual(result, 'Task 3')).catch(() => assert.fail('Task 3 should not fail'));
+}, 1000);
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.processing = false;
+  }
+
+  enqueue(promiseFactory) {
+    this.queue.push(promiseFactory);
+    if (!this.processing) {
+      this.processing = true;
+      this.processQueue();
+    }
+  }
+
+  async processQueue() {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+this.processing = false;
+
+SUFFIX CODE:
+----------------------------------------
+    this.processing = false;
+  }
+}
+
+// Test the AsyncQueue with a mock async function
+const queue = new AsyncQueue();
+const results = [];
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve(1), 100)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve(2), 50)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve(3), 150)));
+
+setTimeout(() => {
+  assert.deepStrictEqual(results, [1, 2, 3], 'Queue did not process items in order');
+  console.log('All tests passed.');
+}, 400);
+
+JUSTIFICATION:
+----------------------------------------
+This test case challenges the LLM with a custom async pattern implementation using promises and an async queue. It requires understanding of async control flow, proper error handling, and queue management. The pattern is complex and realistic, demonstrating advanced JavaScript features. The low-context nature is maintained by keeping the prefix and suffix concise while ensuring the completion requires genuine understanding of the pattern.
+
+ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(results, [1, 2, 3], 'Queue did not process items in order');
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+
+  on(event, listener) {
+    if (!this.events[event]) {
+      this.events[event] = [];
+    }
+    this.events[event].push(listener);
+  }
+
+  emit(event, ...args) {
+    if (this.events[event]) {
+      this.events[event].forEach(listener => listener(...args));
+    }
+  }
+
+  off(event, listenerToRemove) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+off(event, listenerToRemove) {
+  if (this.events[event]) {
+    this.events[event] = this.events[event].filter(listener => listener !== listenerToRemove);
+  }
+}
+
+SUFFIX CODE:
+----------------------------------------
+  }
+}
+
+const emitter = new EventEmitter();
+const listener = (msg) => console.log(msg);
+emitter.on('message', listener);
+emitter.emit('message', 'Hello, World!');
+emitter.off('message', listener);
+emitter.emit('message', 'This should not be logged');
+
+console.log('All tests passed');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an object-oriented pattern involving an EventEmitter class with methods for adding and removing event listeners. The 'off' method's correct implementation requires understanding advanced JavaScript concepts like array filtering and event handling. The low context provided ensures the LLM must infer the correct pattern from minimal code.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const emitter = new EventEmitter();
+const listener = (msg) => console.log(msg);
+emitter.on('message', listener);
+emitter.emit('message', 'Hello, World!');
+emitter.off('message', listener);
+assert.strictEqual(emitter.events['message'].length, 0);
+emitter.emit('message', 'This should not be logged');
+assert.ok(true, 'No message should be logged after listener is removed');
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class RateLimiter {
+  constructor(limit) {
+    this.limit = limit;
+    this.queue = [];
+    this.activeCount = 0;
+  }
+
+  async enqueue(task) {
+    if (this.activeCount < this.limit) {
+      this.activeCount++;
+      task().finally(() => {
+        this.activeCount--;
+        if (this.queue.length > 0) {
+          const nextTask = this.queue.shift();
+          this.enqueue(nextTask);
+        }
+      });
+    } else {
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+this.queue.push(task);
+
+SUFFIX CODE:
+----------------------------------------
+      this.queue.push(task);
+    }
+  }
+}
+
+async function taskFn(taskName) {
+  console.log(`${taskName} started`);
+  return new Promise(resolve => setTimeout(() => {
+    console.log(`${taskName} completed`);
+    resolve();
+  }, 1000));
+}
+
+const limiter = new RateLimiter(2);
+limiter.enqueue(() => taskFn('Task 1'));
+limiter.enqueue(() => taskFn('Task 2'));
+limiter.enqueue(() => taskFn('Task 3'));
+limiter.enqueue(() => taskFn('Task 4'));
+
+setTimeout(() => { limiter.enqueue(() => taskFn('Task 5')); }, 2000);
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an async pattern involving a custom rate limiter implementation. The prefix sets up a class with methods for handling task queuing and concurrency control, while the suffix contains usage examples that test the rate limiter. The pattern involves managing task execution limits and enqueuing additional tasks as necessary, which requires understanding of async control flow, promises, and task queuing.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+async function runTests() {
+  const results = [];
+  const limiter = new RateLimiter(2);
+  const taskNames = ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5'];
+  for (const name of taskNames) {
+    results.push(limiter.enqueue(() => taskFn(name)));
+  }
+  await Promise.all(results);
+  assert.strictEqual(results.length, 5, 'All tasks should be enqueued and processed');
+  console.log('All assertions passed');
+}
+runTests().catch(err => console.error('Test failed', err));
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class RateLimiter {
+  constructor(maxRequests, interval) {
+    this.maxRequests = maxRequests;
+    this.interval = interval;
+    this.queue = [];
+    this.currentRequests = 0;
+    setInterval(() => {
+      this.currentRequests = 0;
+    }, this.interval);
+  }
+
+  async request(fn) {
+    if (this.currentRequests < this.maxRequests) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  this.currentRequests++;
+
+SUFFIX CODE:
+----------------------------------------
+    } else {
+      return new Promise((resolve) => {
+        this.queue.push(() => resolve(this.request(fn)));
+      });
+    }
+  }
+}
+
+// Test the RateLimiter class
+const limiter = new RateLimiter(2, 1000);
+async function testLimiter() {
+  let results = [];
+  for (let i = 0; i < 5; i++) {
+    results.push(await limiter.request(() => i));
+  }
+  return results;
+}
+
+(async () => {
+  const results = await testLimiter();
+  console.assert(results.length === 5, 'Should have 5 results');
+  console.assert(results[0] === 0, 'First result should be 0');
+  console.assert(results[1] === 1, 'Second result should be 1');
+  console.assert(results[2] === 2, 'Third result should be 2');
+  console.assert(results[3] === 3, 'Fourth result should be 3');
+  console.assert(results[4] === 4, 'Fifth result should be 4');
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an advanced async pattern involving rate limiting with a custom implementation of request queuing. The prefix sets up the RateLimiter class with a request method that manages the number of concurrent requests within a given interval. The suffix demonstrates the use of this class and verifies its behavior with assertions. The golden completion fills in the logic to increment the request count and execute the provided function, which is a crucial part of the rate limiting logic. This requires understanding of async patterns, queue handling, and interval-based logic.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(results.length === 5, 'Should have 5 results');
+console.assert(results[0] === 0, 'First result should be 0');
+console.assert(results[1] === 1, 'Second result should be 1');
+console.assert(results[2] === 2, 'Third result should be 2');
+console.assert(results[3] === 3, 'Fourth result should be 3');
+console.assert(results[4] === 4, 'Fifth result should be 4');
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.processing = false;
+  }
+
+  enqueue(promiseFunc) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ promiseFunc, resolve, reject });
+      this.processQueue();
+    });
+  }
+
+  async processQueue() {
+    if (this.processing) return;
+    this.processing = true;
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+    this.queue.forEach(item => {
+      item.promiseFunc().then(item.resolve, item.reject);
+    });
+  }
+
+SUFFIX CODE:
+----------------------------------------
+    this.processing = false;
+  }
+}
+
+const queue = new AsyncQueue();
+
+async function testQueue() {
+  const results = await Promise.all([
+    queue.enqueue(() => Promise.resolve(1)),
+    queue.enqueue(() => new Promise(res => setTimeout(() => res(2), 100))),
+    queue.enqueue(() => Promise.resolve(3))
+  ]);
+  return results;
+}
+
+(async () => {
+  const results = await testQueue();
+  console.assert(results[0] === 1, 'First result should be 1');
+  console.assert(results[1] === 2, 'Second result should be 2');
+  console.assert(results[2] === 3, 'Third result should be 3');
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an advanced async pattern involving a custom async queue with proper error handling and control flow. The pattern is recognizable with minimal context but requires understanding of async/await, Promises, and queue processing logic. The completion involves processing a queue of promise-returning functions, ensuring each is executed in sequence, with proper error handling.
+
+ASSERTIONS:
+----------------------------------------
+const queue = new AsyncQueue();
+
+async function testQueue() {
+  const results = await Promise.all([
+    queue.enqueue(() => Promise.resolve(1)),
+    queue.enqueue(() => new Promise(res => setTimeout(() => res(2), 100))),
+    queue.enqueue(() => Promise.resolve(3))
+  ]);
+  return results;
+}
+
+(async () => {
+  const results = await testQueue();
+  console.assert(results[0] === 1, 'First result should be 1');
+  console.assert(results[1] === 2, 'Second result should be 2');
+  console.assert(results[2] === 3, 'Third result should be 3');
+})();
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const timeoutPromise = (ms) => {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Timeout')), ms);
+  });
+};
+
+const fetchData = async (url) => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const fetchPromise = fetch(url, { signal });
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+  if (response.ok) {
+    const data = await response.json();
+    console.log(data);
+  } else {
+    console.error('Fetch error:', response.statusText);
+  }
+
+SUFFIX CODE:
+----------------------------------------
+
+  try {
+    const response = await Promise.race([fetchPromise, timeoutPromise(5000)]);
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+};
+
+fetchData('https://api.example.com/data');
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates a complex async pattern involving a custom Promise implementation, async control flow with Promise.race, and the use of AbortController to handle fetch timeouts. It requires understanding of advanced JavaScript features such as Promises, async/await, and the AbortController API. The pattern is non-trivial and would be found in production code handling network requests with timeouts.
+
+ASSERTIONS:
+----------------------------------------
+const timeoutPromise = (ms) => {
+  return new Promise((_, reject) => {
+    setTimeout(() => reject(new Error('Timeout')), ms);
+  });
+};
+
+const fetchData = async (url) => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const fetchPromise = fetch(url, { signal });
+  setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await Promise.race([fetchPromise, timeoutPromise(5000)]);
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Fetch error:', error);
+  }
+};
+
+fetchData('https://api.example.com/data');
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class RateLimiter {
+  constructor(limit) {
+    this.limit = limit;
+    this.queue = [];
+    this.activeCount = 0;
+  }
+
+  _next() {
+    if (this.queue.length > 0 && this.activeCount < this.limit) {
+      const { fn, resolve, reject } = this.queue.shift();
+      this.activeCount++;
+      fn().then(resolve, reject).finally(() => {
+        this.activeCount--;
+        this._next();
+      });
+    }
+  }
+
+  limit(fn) {
+    return new Promise((resolve, reject) => {
+      this.queue.push({ fn, resolve, reject });
+      this._next();
+    });
+  }
+}
+
+const limiter = new RateLimiter(2);
+
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+limiter.limit(() => Promise.resolve('Task 1')).then(console.log);
+
+SUFFIX CODE:
+----------------------------------------
+limiter.limit(() => Promise.resolve('Task 1')).then(console.log);
+limiter.limit(() => Promise.resolve('Task 2')).then(console.log);
+limiter.limit(() => Promise.resolve('Task 3')).then(console.log);
+limiter.limit(() => Promise.resolve('Task 4')).then(console.log);
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to recognize and complete an advanced async pattern using a custom rate limiter that controls concurrency with Promises. The minimal context provided should challenge the model to understand the pattern and insert a valid task without exceeding the concurrency limit. The use of asynchronous control flow and promise handling demonstrates a realistic and production-quality scenario.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const outputs = [];
+const originalLog = console.log;
+console.log = (msg) => outputs.push(msg);
+
+limiter.limit(() => Promise.resolve('Task 1')).then(console.log);
+limiter.limit(() => Promise.resolve('Task 2')).then(console.log);
+limiter.limit(() => Promise.resolve('Task 3')).then(console.log);
+limiter.limit(() => Promise.resolve('Task 4')).then(console.log);
+limiter.limit(() => new Promise((resolve) => setTimeout(() => resolve('Task 5'), 1000))).then(console.log);
+
+setTimeout(() => {
+  assert.strictEqual(outputs.length, 5);
+  assert.strictEqual(outputs[0], 'Task 1');
+  assert.strictEqual(outputs[1], 'Task 2');
+  assert.strictEqual(outputs[2], 'Task 3');
+  assert.strictEqual(outputs[3], 'Task 4');
+  assert.strictEqual(outputs[4], 'Task 5');
+  console.log = originalLog;
+}, 2000);
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class AsyncQueue {
+  constructor() {
+    this.queue = [];
+    this.processing = false;
+  }
+
+  enqueue(promiseGenerator) {
+    this.queue.push(promiseGenerator);
+    this.processQueue();
+  }
+
+  async processQueue() {
+    if (this.processing) return;
+    this.processing = true;
+    while (this.queue.length > 0) {
+      const promiseGenerator = this.queue.shift();
+      try {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+    await promiseGenerator();
+    result.push(await promiseGenerator());
+
+SUFFIX CODE:
+----------------------------------------
+      } catch (err) {
+        console.error('Error processing queue item:', err);
+      }
+    }
+    this.processing = false;
+  }
+}
+
+const queue = new AsyncQueue();
+let result = [];
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('first'), 1000)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('second'), 500)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('third'), 1500)));
+setTimeout(() => {
+  console.log(result);
+  // Expect ['first', 'second', 'third']
+}, 3000);
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's understanding of async patterns specifically within custom async queue implementations. The model needs to recognize that the promise returned by `promiseGenerator` should be awaited and handled appropriately. This requires understanding of async functions, the `await` keyword, and proper error handling, which are advanced JavaScript patterns. The minimal context provided ensures that the model must infer the correct pattern without extensive surrounding code.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+const queue = new AsyncQueue();
+let results = [];
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('first'), 1000)).then(res => results.push(res)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('second'), 500)).then(res => results.push(res)));
+queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('third'), 1500)).then(res => results.push(res)));
+setTimeout(() => {
+  assert.deepStrictEqual(results, ['first', 'second', 'third']);
+  console.log('All assertions passed.');
+}, 3000);
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: devbench-low-context
+Language: javascript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function asyncTimeout(ms) { return new Promise((resolve, reject) => { const id = setTimeout(() => { resolve(); }, ms); }); }
+
+async function fetchData(url) {
+
+LLM COMPLETION Ministral-3B:
+----------------------------------------
+const response = await fetch(url);
+
+SUFFIX CODE:
+----------------------------------------
+  return response.json();
+}
+
+(async () => {
+  try {
+    const data = await fetchData('https://api.example.com/data');
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to recognize an async pattern with a timeout using Promises and the Fetch API with AbortController. The pattern is complex and involves understanding both async/await and how to handle fetch with a signal. The prefix sets up the async function and the suffix shows an example usage, leaving the middle part where the fetch call is made to be completed.
+
+ASSERTIONS:
+----------------------------------------
+const fetch = require('node-fetch');
+const assert = require('assert');
+
+(async () => {
+  try {
+    const data = await fetchData('https://jsonplaceholder.typicode.com/todos/1');
+    assert(data.userId === 1);
+    assert(data.id === 1);
+    assert(data.title);
+  } catch (err) {
+    console.error(err);
+  }
+})();
+================================================================================

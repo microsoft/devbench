@@ -1,0 +1,5281 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+import path from 'path';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+interface Response<T> {
+    data: T;
+    status: number;
+    error?: string;
+}
+
+function fetchDataFromFile(filePath: string): Promise<Response<User[]>> {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                reject({ data: [], status: 500, error: err.message });
+                return;
+            }
+            try {
+                const users: User[] = JSON.parse(data);
+                resolve({ data: users, status: 200 });
+            } catch (parseErr) {
+                reject({ data: [], status: 500, error: parseErr.message });
+            }
+        });
+    });
+}
+
+async function processUserData(filePath: string): Promise<void> {
+    try {
+        const response = await fetchDataFromFile(filePath);
+        if (response.status === 200) {
+            for (const user of response.data) {
+                console.log(`Processing user: ${user.name}`);
+                if (user.email.endsWith('@example.com')) {
+                    console.log(`User ${user.name} has a valid email.`);
+                } else {
+                    console.log(`User ${user.name} has an invalid email.`);
+                }
+            }
+        } else {
+            console.error(`Failed to fetch data: ${response.error}`);
+        }
+    } catch (err) {
+        console.error(`Error processing user data: ${err}`);
+    }
+}
+
+// Example usage
+const filePath = path.join(__dirname, 'users.json');
+processUserData(filePath)
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+.then(() => {
+    console.log('User data processing complete.');
+    fs.unlink(filePath, (err) => {
+        if (err) {
+            console.error(`Error deleting file: ${err.message}`);
+        } else {
+            console.log('Temporary file deleted successfully.');
+        }
+    });
+}).catch(err => {
+    console.error(`Error processing user data: ${err}`);
+});
+
+SUFFIX CODE:
+----------------------------------------
+
+console.log('User data processing complete.');
+fs.unlink(filePath, (err) => {
+    if (err) {
+        console.error(`Error deleting file: ${err.message}`);
+    } else {
+        console.log('Temporary file deleted successfully.');
+    }
+});
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to handle nested control structures, including async/await patterns with proper typing, and error handling in Promise chains. The setup involves reading from a file, parsing JSON data, iterating over the data, and performing conditional checks, followed by appropriate logging and error handling. The completion requires the model to correctly chain a Promise with then/catch blocks and maintain proper indentation and syntax.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+async function testProcessUserData() {
+    const filePath = path.join(__dirname, 'users.json');
+    fs.writeFileSync(filePath, JSON.stringify([{ id: 1, name: 'John Doe', email: 'john@example.com' }, { id: 2, name: 'Jane Smith', email: 'jane@invalid.com' }]));
+
+    let consoleOutput: string[] = [];
+    const originalConsoleLog = console.log;
+    const originalConsoleError = console.error;
+
+    console.log = (message: string) => { consoleOutput.push(message); };
+    console.error = (message: string) => { consoleOutput.push(message); };
+
+    await processUserData(filePath);
+
+    assert(consoleOutput.includes('Processing user: John Doe'), 'Should log processing John Doe');
+    assert(consoleOutput.includes('User John Doe has a valid email.'), 'Should log valid email for John Doe');
+    assert(consoleOutput.includes('Processing user: Jane Smith'), 'Should log processing Jane Smith');
+    assert(consoleOutput.includes('User Jane Smith has an invalid email.'), 'Should log invalid email for Jane Smith');
+
+    console.log = originalConsoleLog;
+    console.error = originalConsoleError;
+
+    assert(fs.existsSync(filePath), 'The file should exist before deletion');
+
+    fs.unlinkSync(filePath);
+}
+
+testProcessUserData().then(() => console.log('All tests passed')).catch(err => console.error(`Test failed: ${err.message}`));
+
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as assert from 'assert';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+interface Admin extends User {
+    role: 'admin';
+}
+
+interface Guest extends User {
+    role: 'guest';
+}
+
+type Person = Admin | Guest;
+
+function isAdmin(person: Person): person is Admin {
+    return person.role === 'admin';
+}
+
+function isGuest(person: Person): person is Guest {
+    return person.role === 'guest';
+}
+
+const people: Person[] = [
+    { id: 1, name: 'Alice', email: 'alice@example.com', role: 'admin' },
+    { id: 2, name: 'Bob', email: 'bob@example.com', role: 'guest' },
+    { id: 3, name: 'Charlie', email: 'charlie@example.com', role: 'admin' },
+    { id: 4, name: 'Dave', email: 'dave@example.com', role: 'guest' }
+];
+
+function getEmailsOfAdmins(people: Person[]): string[] {
+    return people
+        .filter(isAdmin)
+        .map((admin) => admin.email);
+}
+
+function getEmailsOfGuests(people: Person[]): string[] {
+    return people
+        .filter(isGuest)
+        .map((guest) => guest.email);
+}
+
+// Usage
+const adminEmails = getEmailsOfAdmins(people);
+const guestEmails = getEmailsOfGuests(people);
+
+// Assertions
+assert.deepStrictEqual(adminEmails, ['alice@example.com', 'charlie@example.com']);
+assert.deepStrictEqual(guestEmails, ['bob@example.com', 'dave@example.com']);
+
+// Now, we will add a nested control structure that processes both admins and guests differently
+function processPeople(people: Person[]): void {
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    for (const person of people) {
+        if (isAdmin(person)) {
+            console.log(`Processing admin: ${person.name}`);
+        } else if (isGuest(person)) {
+            console.log(`Processing guest: ${person.name}`);
+        }
+    }
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+// Call the function
+processPeople(people);
+
+// Assertions to verify the nested control structures work as expected
+assert.strictEqual(console.log.calledWith('Processing admin: Alice'), true);
+assert.strictEqual(console.log.calledWith('Processing guest: Bob'), true);
+assert.strictEqual(console.log.calledWith('Processing admin: Charlie'), true);
+assert.strictEqual(console.log.calledWith('Processing guest: Dave'), true);
+
+// Cleanup
+console.log.restore();
+
+JUSTIFICATION:
+----------------------------------------
+This test case is an excellent example to benchmark syntax completion capabilities, as it involves nested control structures (if/else conditions within a loop) and proper type guarding with TypeScript type predicates. It demonstrates the need for maintaining correct indentation, syntax, and type annotations within the nested blocks, ensuring that the completion integrates seamlessly with both preceding and following code. Additionally, assertions verify that the completion correctly processes and logs the intended output, making it a comprehensive test for structural integrity and correctness.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(console.log.calledWith('Processing admin: Alice'), true);
+assert.strictEqual(console.log.calledWith('Processing guest: Bob'), true);
+assert.strictEqual(console.log.calledWith('Processing admin: Charlie'), true);
+assert.strictEqual(console.log.calledWith('Processing guest: Dave'), true);
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import assert from 'assert';
+
+// Define a custom error class
+class CustomError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+// Utility function that may throw an error
+function riskyOperation(flag: boolean): string {
+    if (flag) {
+        throw new CustomError('An error occurred during riskyOperation');
+    }
+    return 'Operation successful';
+}
+
+// A function that performs multiple risky operations
+async function performOperations(): Promise<string[]> {
+    const results: string[] = [];
+    for (let i = 0; i < 3; i++) {
+        try {
+            const result = riskyOperation(i % 2 === 0);
+            results.push(result);
+        } catch (error) {
+            if (error instanceof CustomError) {
+                console.error('Caught custom error:', error.message);
+                results.push('Custom error handled');
+            } else {
+                console.error('Caught unknown error:', error);
+                throw error;
+            }
+        } finally {
+            console.log('Cleanup resources for iteration:', i);
+        }
+    }
+    return results;
+}
+
+// Main function to run the operations
+async function main() {
+    let finalResults: string[] = [];
+    try {
+        finalResults = await performOperations();
+    } catch (error) {
+        console.error('Error in main function:', error);
+    }
+
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    assert.deepStrictEqual(finalResults, ['Custom error handled', 'Operation successful', 'Custom error handled']);
+
+SUFFIX CODE:
+----------------------------------------
+
+    console.log('Operations completed with results:', finalResults);
+}
+
+// Execute the main function
+main();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates nested control structures, including try/catch with multiple catch/finally blocks, in a realistic scenario. It verifies the LLM's ability to handle complex error handling patterns and nested loops. The assertions ensure that the expected behavior and types are correct, making it a comprehensive test for syntax completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+assert(Array.isArray(finalResults), 'Expected finalResults to be an array');
+assert(finalResults.length === 3, 'Expected three results in finalResults');
+assert(finalResults[0] === 'Operation successful', 'First result should be successful');
+assert(finalResults[1] === 'Custom error handled', 'Second result should handle custom error');
+assert(finalResults[2] === 'Operation successful', 'Third result should be successful');
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { assert } from 'chai';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+    roles: string[];
+}
+
+interface Admin extends User {
+    adminSince: Date;
+}
+
+interface Guest extends User {
+    guestExpiration: Date;
+}
+
+type UserType = Admin | Guest;
+
+function isAdmin(user: UserType): user is Admin {
+    return (user as Admin).adminSince !== undefined;
+}
+
+function isGuest(user: UserType): user is Guest {
+    return (user as Guest).guestExpiration !== undefined;
+}
+
+const users: UserType[] = [
+    { id: 1, name: 'Alice', email: 'alice@example.com', roles: ['user'], adminSince: new Date('2020-01-01') },
+    { id: 2, name: 'Bob', email: 'bob@example.com', roles: ['guest'], guestExpiration: new Date('2022-01-01') },
+    { id: 3, name: 'Charlie', email: 'charlie@example.com', roles: ['user', 'admin'], adminSince: new Date('2019-06-15') },
+    { id: 4, name: 'David', email: 'david@example.com', roles: ['guest'], guestExpiration: new Date('2021-12-31') }
+];
+
+function getUserRoles(user: UserType): string {
+    if (isAdmin(user)) {
+        return `Admin since: ${user.adminSince.toDateString()}`;
+    } else if (isGuest(user)) {
+        return `Guest until: ${user.guestExpiration.toDateString()}`;
+    } else {
+        return 'Regular User';
+    }
+}
+
+// The following code needs to be completed to handle more complex conditions
+function getUserInfo(user: UserType): string {
+    let info = `User Info: ${user.name} (${user.email})\nRoles: ${user.roles.join(', ')}`;
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    if (isAdmin(user)) {
+        info += `\nAdmin since: ${user.adminSince.toDateString()}`;
+    } else if (isGuest(user)) {
+        info += `\nGuest until: ${user.guestExpiration.toDateString()}`;
+    }
+
+SUFFIX CODE:
+----------------------------------------
+
+    return info;
+}
+
+// Test cases
+const userInfo1 = getUserInfo(users[0]);
+assert.include(userInfo1, 'Admin since', 'Admin user should display admin information');
+const userInfo2 = getUserInfo(users[1]);
+assert.include(userInfo2, 'Guest until', 'Guest user should display guest information');
+const userInfo3 = getUserInfo(users[2]);
+assert.include(userInfo3, 'Admin since', 'Admin user should display admin information');
+const userInfo4 = getUserInfo(users[3]);
+assert.include(userInfo4, 'Guest until', 'Guest user should display guest information');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to complete nested control structures, specifically if/else conditions with type guards, within a TypeScript function. The completion must handle different user types (Admin and Guest) and append relevant information to the user info string accordingly. This scenario tests the LLM's understanding of TypeScript-specific syntax, type guards, and correct handling of conditional logic based on type checks.
+
+ASSERTIONS:
+----------------------------------------
+assert.include(getUserInfo(users[0]), 'Admin since', 'Admin user should display admin information');
+assert.include(getUserInfo(users[1]), 'Guest until', 'Guest user should display guest information');
+assert.include(getUserInfo(users[2]), 'Admin since', 'Admin user should display admin information');
+assert.include(getUserInfo(users[3]), 'Guest until', 'Guest user should display guest information');
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Utility function to simulate a delayed promise
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Custom error classes
+class NetworkError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'NetworkError';
+    }
+}
+
+class DatabaseError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'DatabaseError';
+    }
+}
+
+// Example function that simulates network and database operations
+async function fetchData(): Promise<string> {
+    await delay(1000); // Simulate network delay
+    if (Math.random() > 0.5) {
+        throw new NetworkError('Failed to fetch data from the network');
+    }
+    return 'Network data';
+}
+
+async function saveData(data: string): Promise<void> {
+    await delay(500); // Simulate database delay
+    if (Math.random() > 0.5) {
+        throw new DatabaseError('Failed to save data to the database');
+    }
+}
+
+// Main function demonstrating nested try/catch with multiple catch blocks
+async function processData() {
+    let data: string = '';
+    try {
+        data = await fetchData();
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    } catch (error) {
+        if (error instanceof NetworkError) {
+            console.error('Network error:', error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+    }
+
+SUFFIX CODE:
+----------------------------------------
+    } catch (error) {
+        if (error instanceof NetworkError) {
+            console.error('Network error:', error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+    }
+    if (data) {
+        try {
+            await saveData(data);
+            console.log('Data saved successfully');
+        } catch (error) {
+            if (error instanceof DatabaseError) {
+                console.error('Database error:', error.message);
+            } else {
+                console.error('Unexpected error:', error);
+            }
+        }
+    }
+}
+
+// Execute the main function and handle any unexpected errors
+processData().catch(error => console.error('Unhandled error:', error));
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of nested control structures in TypeScript, specifically demonstrating nested try/catch blocks with multiple catch conditions. It tests the model's ability to handle complex error handling patterns while maintaining proper syntax and indentation. The use of custom error classes and asynchronous functions adds realism to the scenario, making it a comprehensive test of the model's completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+(async function testProcessData() {
+    let consoleOutput: string[] = [];
+    const originalConsoleError = console.error;
+    const originalConsoleLog = console.log;
+    console.error = (message: string) => consoleOutput.push(`error: ${message}`);
+    console.log = (message: string) => consoleOutput.push(`log: ${message}`);
+
+    try {
+        await processData();
+        assert(consoleOutput.includes('log: Data saved successfully') || consoleOutput.some(msg => msg.startsWith('error: Network error:')) || consoleOutput.some(msg => msg.startsWith('error: Database error:')));
+    } finally {
+        console.error = originalConsoleError;
+        console.log = originalConsoleLog;
+    }
+})();
+
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+interface User {
+	id: number;
+	name: string;
+	email: string;
+}
+
+interface ApiResponse<T> {
+	status: number;
+	data: T;
+}
+
+function fetchUser(userId: number): Promise<ApiResponse<User>> {
+	return new Promise((resolve, reject) => {
+		// Simulating an API call
+		setTimeout(() => {
+			if (userId === 1) {
+				resolve({ status: 200, data: { id: 1, name: 'John Doe', email: 'john.doe@example.com' } });
+			} else {
+				reject(new Error('User not found'));
+			}
+		}, 1000);
+	});
+}
+
+async function getUserData(userId: number): Promise<string> {
+	try {
+		const response = await fetchUser(userId);
+		if (response.status === 200) {
+			return `User: ${response.data.name}, Email: ${response.data.email}`;
+		} else {
+			throw new Error('Failed to fetch user data');
+		}
+	} catch (error) {
+		if (error instanceof Error) {
+			return `Error: ${error.message}`;
+		} else {
+			return 'Unknown error occurred';
+		}
+	} finally {
+		console.log('Fetch user data attempt completed');
+	}
+}
+
+async function main() {
+	const userId = 1;
+	const result = await getUserData(userId);
+	assert.strictEqual(result, 'User: John Doe, Email: john.doe@example.com');
+	console.log(result);
+}
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+main().catch(err => console.error(err));
+
+SUFFIX CODE:
+----------------------------------------
+
+
+async function anotherUserFunction() {
+	const userId = 2;
+	const result = await getUserData(userId);
+	assert.strictEqual(result, 'Error: User not found');
+	console.log(result);
+}
+anotherUserFunction().catch(err => console.error(err));
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it demonstrates the use of nested control structures, including try/catch blocks with async/await patterns, proper error handling with typed errors, and promise handling. The code also includes assertions to verify the correctness of the results. The completion must maintain proper indentation and syntax consistency. It checks the LLM's ability to handle nested and complex control flow structures unique to TypeScript.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(await getUserData(1), 'User: John Doe, Email: john.doe@example.com');
+assert.strictEqual(await getUserData(2), 'Error: User not found');
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Define a basic interface with generics
+interface Response<T> {
+    data: T;
+    status: number;
+    error?: string;
+}
+
+// Create a function that fetches data and returns a Promise<Response<T>>
+async function fetchData<T>(url: string): Promise<Response<T>> {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (response.ok) {
+        return {
+            data,
+            status: response.status,
+        };
+    } else {
+        return {
+            data: data as T,
+            status: response.status,
+            error: data.message,
+        };
+    }
+}
+
+// A function that performs some business logic and handles async/await
+async function processData(url: string) {
+    try {
+        const result = await fetchData<{name: string; age: number;}>(url);
+        if (result.error) {
+            throw new Error(result.error);
+        }
+        return result.data;
+    } catch (error) {
+        console.error('Error processing data:', error);
+        throw error;
+    }
+}
+
+// A utility function to validate the fetched data
+function validateData(data: {name: string; age: number;}): boolean {
+    return typeof data.name === 'string' && typeof data.age === 'number';
+}
+
+// Example usage of the processData function with error handling
+(async () => {
+    const testUrl = 'https://api.example.com/user';
+    try {
+        const userData = await processData(testUrl);
+        if (validateData(userData)) {
+            console.log('User data is valid:', userData);
+        } else {
+            console.error('Invalid user data:', userData);
+        }
+        
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+console.log('Data processing complete');
+
+SUFFIX CODE:
+----------------------------------------
+console.log('Data processing complete');
+    } catch (e) {
+        console.error('Failed to process data:', e);
+    }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete an async/await pattern with proper typing. It includes error handling and type validation, which are critical in TypeScript. The example ensures that the LLM understands the context of validating fetched data and asserting its correctness before proceeding. The assertion verifies type correctness and structural integrity of the fetched data.
+
+ASSERTIONS:
+----------------------------------------
+assert(validateData({ name: 'John Doe', age: 30 }), 'Static data validation failed');
+(async () => {
+    const testUrl = 'https://api.example.com/user';
+    const userData = await processData(testUrl);
+    assert(validateData(userData), 'Fetched data validation failed');
+})();
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { assert } from 'assert';
+
+interface User {
+	id: number;
+	name: string;
+	age: number;
+}
+
+interface Admin extends User {
+	role: string;
+}
+
+class Person {
+	protected name: string;
+	protected age: number;
+
+	constructor(name: string, age: number) {
+		this.name = name;
+		this.age = age;
+	}
+
+	getDetails(): string {
+		return `${this.name}, ${this.age} years old`;
+	}
+}
+
+class Administrator extends Person implements Admin {
+	id: number;
+	role: string;
+
+	constructor(id: number, name: string, age: number, role: string) {
+		super(name, age);
+		this.id = id;
+		this.role = role;
+	}
+
+	getDetails(): string {
+		return `${super.getDetails()}, Role: ${this.role}`;
+	}
+}
+
+const person = new Person('Alice', 30);
+const admin = new Administrator(1, 'Bob', 40, 'Manager');
+
+console.log(person.getDetails()); // Output: Alice, 30 years old
+console.log(admin.getDetails()); // Output: Bob, 40 years old, Role: Manager
+
+function isAdmin(user: User): user is Admin {
+	return (user as Admin).role !== undefined;
+}
+
+const users: User[] = [
+	{id: 1, name: 'Alice', age: 30},
+	{id: 2, name: 'Bob', age: 40, role: 'Manager'} as Admin,
+	{id: 3, name: 'Charlie', age: 35}
+];
+
+const adminUsers = users.filter(isAdmin);
+console.log(adminUsers); // Output: [{id: 2, name: 'Bob', age: 40, role: 'Manager'}]
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+const nonAdminUsers = users.filter(user => !isAdmin(user));
+
+SUFFIX CODE:
+----------------------------------------
+console.log(nonAdminUsers); // Output: [{id: 1, name: 'Alice', age: 30}, {id: 3, name: 'Charlie', age: 35}]
+
+// Assertions
+declare const assert: any;
+assert(adminUsers.length === 1);
+assert(adminUsers[0].role === 'Manager');
+assert(nonAdminUsers.length === 2);
+assert(nonAdminUsers[0].name === 'Alice');
+assert(nonAdminUsers[1].name === 'Charlie');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of complex TypeScript syntax patterns involving class inheritance, type guards, and array filtering with type predicates. It tests the model's ability to handle advanced TypeScript features like type assertions, type guards, and interfaces with extending classes. The assertions verify the correctness of filtering logic and type guard application.
+
+ASSERTIONS:
+----------------------------------------
+assert(adminUsers.length === 1);
+assert(adminUsers[0].role === 'Manager');
+assert(nonAdminUsers.length === 2);
+assert(nonAdminUsers[0].name === 'Alice');
+assert(nonAdminUsers[1].name === 'Charlie');
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+interface User {
+    id: number;
+    name: string;
+    email: string;
+}
+
+interface Admin extends User {
+    role: 'admin';
+}
+
+interface Guest extends User {
+    role: 'guest';
+}
+
+// Type guard to check if the user is an Admin
+function isAdmin(user: User): user is Admin {
+    return (user as Admin).role === 'admin';
+}
+
+// Type guard to check if the user is a Guest
+function isGuest(user: User): user is Guest {
+    return (user as Guest).role === 'guest';
+}
+
+class UserManager {
+    private users: User[] = [];
+
+    constructor(initialUsers: User[]) {
+        this.users = initialUsers;
+    }
+
+    addUser(user: User): void {
+        this.users.push(user);
+    }
+
+    getUserById(id: number): User | undefined {
+        return this.users.find(user => user.id === id);
+    }
+
+    getAdmins(): Admin[] {
+        return this.users.filter(isAdmin);
+    }
+
+    getGuests(): Guest[] {
+        return this.users.filter(isGuest);
+    }
+}
+
+const initialUsers: User[] = [
+    { id: 1, name: 'Alice', email: 'alice@example.com', role: 'admin' },
+    { id: 2, name: 'Bob', email: 'bob@example.com', role: 'guest' },
+    { id: 3, name: 'Charlie', email: 'charlie@example.com', role: 'admin' }
+];
+
+const userManager = new UserManager(initialUsers);
+
+// Check initial state of users
+assert.strictEqual(userManager.getAdmins().length, 2);
+assert.strictEqual(userManager.getGuests().length, 1);
+
+// Add a new user
+const newUser: User = { id: 4, name: 'Dave', email: 'dave@example.com', role: 'guest' };
+userManager.addUser(newUser);
+
+// Assertions after adding a new user
+assert.strictEqual(userManager.getUserById(4)?.name, 'Dave');
+assert.strictEqual(userManager.getGuests().length, 2);
+
+// Testing type guards
+const adminUser: User = { id: 5, name: 'Eve', email: 'eve@example.com', role: 'admin' };
+const guestUser: User = { id: 6, name: 'Frank', email: 'frank@example.com', role: 'guest' };
+
+assert.strictEqual(isAdmin(adminUser), true);
+assert.strictEqual(isGuest(guestUser), true);
+assert.strictEqual(isAdmin(guestUser), false);
+
+// Start of golden completion
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+const testUser: User = { id: 8, name: 'Hannah', email: 'hannah@example.com', role: 'admin' };
+userManager.addUser(testUser);
+assert.strictEqual(userManager.getAdmins().length, 3);
+assert.strictEqual(userManager.getUserById(8)?.name, 'Hannah');
+
+SUFFIX CODE:
+----------------------------------------
+
+
+// Add another user and check
+const anotherUser: User = { id: 7, name: 'George', email: 'george@example.com', role: 'guest' };
+userManager.addUser(anotherUser);
+assert.strictEqual(userManager.getGuests().length, 3);
+assert.strictEqual(userManager.getUserById(7)?.email, 'george@example.com');
+
+console.log('All assertions passed.');
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a comprehensive examination of advanced type operations and type guards in TypeScript. By defining interfaces with type guards and testing them with various user roles, it checks the LLM's ability to correctly implement and utilize type guards. The scenario includes nested and complex type annotations with extensive assertions to ensure type correctness and proper implementation. The completion section focuses on filling in additional assertions to test type guard functionality, which is crucial for verifying the LLM's understanding of TypeScript's type system.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(isGuest(adminUser), false);
+assert.strictEqual(isAdmin({ id: 8, name: 'Hank', email: 'hank@example.com', role: 'guest' }), false);
+assert.strictEqual(isGuest({ id: 9, name: 'Ivy', email: 'ivy@example.com', role: 'admin' }), false);
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+interface User {
+	id: number;
+	name: string;
+	email: string;
+}
+
+interface Admin extends User {
+	adminSince: Date;
+}
+
+interface Guest extends User {
+	visitDate: Date;
+}
+
+type UserType = Admin | Guest;
+
+function isUserType(user: any): user is UserType {
+	return 'id' in user && 'name' in user && 'email' in user && ('adminSince' in user || 'visitDate' in user);
+}
+
+class UserManager<T extends UserType> {
+	private users: T[] = [];
+
+	addUser(user: T): void {
+		if (isUserType(user)) {
+			this.users.push(user);
+		} else {
+			throw new Error('Invalid user type');
+		}
+	}
+
+	getUserById(id: number): T | undefined {
+		return this.users.find(user => user.id === id);
+	}
+
+	removeUser(id: number): void {
+		this.users = this.users.filter(user => user.id !== id);
+	}
+
+	listUsers(): T[] {
+		return this.users;
+	}
+}
+
+const adminManager = new UserManager<Admin>();
+const guestManager = new UserManager<Guest>();
+
+adminManager.addUser({ id: 1, name: 'Alice', email: 'alice@example.com', adminSince: new Date() });
+guestManager.addUser({ id: 2, name: 'Bob', email: 'bob@example.com', visitDate: new Date() });
+
+try {
+	const adminUser = adminManager.getUserById(1);
+	const guestUser = guestManager.getUserById(2);
+	if (adminUser) {
+		console.log('Admin User:', adminUser);
+	}
+	if (guestUser) {
+		console.log('Guest User:', guestUser);
+	}
+	adminManager.removeUser(1);
+	guestManager.removeUser(2);
+	console.log('Users after removal:');
+	console.log('Admins:', adminManager.listUsers());
+	console.log('Guests:', guestManager.listUsers());
+} catch (error) {
+	console.error('An error occurred:', error);
+}
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+export {};
+
+SUFFIX CODE:
+----------------------------------------
+
+console.log('All operations completed.');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case checks the understanding of TypeScript's advanced type operations (unions, intersections, type guards) and class inheritance with typed parameters. The prefix sets up a complex scenario with multiple interfaces, type guards, and class methods, which are extended by the golden completion. The suffix continues with different operations, ensuring that the completion is distinct and properly integrated within the existing structure.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+const adminUser = adminManager.getUserById(3);
+const guestUser = guestManager.getUserById(4);
+
+assert(adminUser !== undefined, 'Admin user should be defined');
+assert(adminUser?.name === 'Charlie', 'Admin user name should be Charlie');
+assert(guestUser !== undefined, 'Guest user should be defined');
+assert(guestUser?.name === 'Dave', 'Guest user name should be Dave');
+
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Define a generic interface for a repository
+interface Repository<T> {
+    getById(id: string): T | null;
+    save(item: T): void;
+}
+
+// Define a User type
+interface User {
+    id: string;
+    name: string;
+    email: string;
+}
+
+// Implement a UserRepository using the Repository interface
+class UserRepository implements Repository<User> {
+    private users: User[] = [];
+
+    getById(id: string): User | null {
+        return this.users.find(user => user.id === id) || null;
+    }
+
+    save(user: User): void {
+        const existingUserIndex = this.users.findIndex(u => u.id === user.id);
+        if (existingUserIndex !== -1) {
+            this.users[existingUserIndex] = user;
+        } else {
+            this.users.push(user);
+        }
+    }
+}
+
+// Define a generic service class
+class Service<T> {
+    constructor(protected repository: Repository<T>) {}
+
+    getById(id: string): T | null {
+        return this.repository.getById(id);
+    }
+
+    save(item: T): void {
+        this.repository.save(item);
+    }
+}
+
+// Implement a UserService extending the generic Service class
+class UserService extends Service<User> {
+    constructor(repository: UserRepository) {
+        super(repository);
+    }
+
+    // Custom method to find users by email
+    findByEmail(email: string): User | null {
+        return this.repository.getById(email) as User;
+    }
+}
+
+// Instantiate UserRepository and UserService
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
+
+// Add some users to the repository
+userService.save({ id: '1', name: 'Alice', email: 'alice@example.com' });
+userService.save({ id: '2', name: 'Bob', email: 'bob@example.com' });
+
+// Use the service to fetch users
+const user1 = userService.getById('1');
+const user2 = userService.getById('2');
+
+// Find by email
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+const user3 = userService.findByEmail('charlie@example.com');
+
+SUFFIX CODE:
+----------------------------------------
+const user3 = userService.getById('3');
+
+// Assertions
+assert(user1 !== null && user1.name === 'Alice');
+assert(user2 !== null && user2.name === 'Bob');
+assert(user3 === null);
+
+// Clean up resources
+userService.save = function () {};
+userRepository.save = function () {};
+userRepository.getById = function () { return null; };
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to handle complex TypeScript syntax involving class inheritance, generic types, and method overriding. The prefix sets up a realistic scenario with a generic repository and service pattern, while the golden completion requires the LLM to correctly implement and use a method specific to the subclass. This tests not only syntactic correctness but also an understanding of TypeScript's type system and class inheritance.
+
+ASSERTIONS:
+----------------------------------------
+assert(userByEmail !== null && userByEmail.name === 'Alice');
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Define a generic interface for a key-value pair
+interface KeyValuePair<K, V> {
+    key: K;
+    value: V;
+}
+
+// Define a class that implements the KeyValuePair interface
+class Pair<K, V> implements KeyValuePair<K, V> {
+    constructor(public key: K, public value: V) {}
+}
+
+// Define a generic function that takes two pairs and returns a new pair with merged keys and values
+function mergePairs<K1, V1, K2, V2>(pair1: KeyValuePair<K1, V1>, pair2: KeyValuePair<K2, V2>): KeyValuePair<[K1, K2], [V1, V2]> {
+    return new Pair(
+        [pair1.key, pair2.key],
+        [pair1.value, pair2.value]
+    );
+}
+
+// Define a class that holds a collection of pairs
+class PairCollection<K, V> {
+    private pairs: KeyValuePair<K, V>[] = [];
+
+    // Add a pair to the collection
+    addPair(pair: KeyValuePair<K, V>): void {
+        this.pairs.push(pair);
+    }
+
+    // Get a pair by index
+    getPair(index: number): KeyValuePair<K, V> | undefined {
+        return this.pairs[index];
+    }
+
+    // Merge all pairs in the collection
+    mergeAllPairs(): KeyValuePair<K[], V[]> {
+        const keys: K[] = [];
+        const values: V[] = [];
+        for (const pair of this.pairs) {
+            keys.push(pair.key);
+            values.push(pair.value);
+        }
+        return new Pair(keys, values);
+    }
+}
+
+// Create some pairs
+const pair1 = new Pair('key1', 1);
+const pair2 = new Pair('key2', 2);
+const pair3 = new Pair('key3', 3);
+
+// Create a pair collection and add pairs to it
+const pairCollection = new PairCollection<string, number>();
+pairCollection.addPair(pair1);
+pairCollection.addPair(pair2);
+pairCollection.addPair(pair3);
+
+// Merge all pairs in the collection
+const mergedPair = pairCollection.mergeAllPairs();
+
+// Assertions to verify the correctness of the merged pair
+assert.deepStrictEqual(mergedPair.key, ['key1', 'key2', 'key3']);
+assert.deepStrictEqual(mergedPair.value, [1, 2, 3]);
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+console.log('All assertions passed successfully.');
+
+SUFFIX CODE:
+----------------------------------------
+
+
+// Create a new merged pair from two existing pairs
+const newMergedPair = mergePairs(pair1, pair2);
+assert.deepStrictEqual(newMergedPair.key, ['key1', 'key2']);
+assert.deepStrictEqual(newMergedPair.value, [1, 2]);
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of complex TypeScript syntax features, including generics in interfaces and classes, along with advanced type operations. The prefix sets up a comprehensive context with type definitions, class implementations, and a generic function. The completion requires understanding of how to work with these types and maintain proper typing and structure. Assertions ensure that the behavior is correct, and the suffix continues with additional assertions to verify the integrity of the entire structure.
+
+ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(mergedPair.key, ['key1', 'key2', 'key3']);
+assert.deepStrictEqual(mergedPair.value, [1, 2, 3]);
+assert.deepStrictEqual(pairCollection.getPair(0), pair1);
+assert.deepStrictEqual(pairCollection.getPair(1), pair2);
+assert.deepStrictEqual(pairCollection.getPair(2), pair3);
+assert.deepStrictEqual(newMergedPair.key, ['key1', 'key2']);
+assert.deepStrictEqual(newMergedPair.value, [1, 2]);
+
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as fs from 'fs';
+
+interface FileWriter {
+	write(content: string): FileWriter;
+	append(content: string): FileWriter;
+	close(): void;
+}
+
+class FileWriterImpl implements FileWriter {
+	private fileDescriptor: number;
+
+	constructor(filePath: string) {
+		this.fileDescriptor = fs.openSync(filePath, 'w');
+	}
+
+	write(content: string): FileWriter {
+		fs.writeSync(this.fileDescriptor, content);
+		return this;
+	}
+
+	append(content: string): FileWriter {
+		fs.writeSync(this.fileDescriptor, content);
+		return this;
+	}
+
+	close(): void {
+		fs.closeSync(this.fileDescriptor);
+	}
+}
+
+function createFileWriter(filePath: string): FileWriter {
+	return new FileWriterImpl(filePath);
+}
+
+// Usage example
+const writer = createFileWriter('example.txt');
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+writer.write('Hello, World!').append(' More text.').close();
+
+SUFFIX CODE:
+----------------------------------------
+writer.append(' More text.').close();
+
+// Assertions
+import assert from 'assert';
+
+const writtenContent = fs.readFileSync('example.txt', 'utf8');
+assert.strictEqual(writtenContent, 'Hello, World! More text.');
+
+// Cleanup
+fs.unlinkSync('example.txt');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case checks the ability of the LLM to handle fluent interface structures with proper return types. The prefix sets up a file writer class with a fluent interface, allowing method chaining. The golden completion requires the LLM to correctly use method chaining to write content to a file. The suffix verifies the correctness of the written content and performs cleanup. This scenario tests the LLM's understanding of method chaining, type inference, and proper resource management.
+
+ASSERTIONS:
+----------------------------------------
+const writtenContent = fs.readFileSync('example.txt', 'utf8');
+assert.strictEqual(writtenContent, 'Hello, World! More text.');
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as assert from 'assert';
+
+// Define a custom error class hierarchy
+class CustomError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+class NotFoundError extends CustomError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'NotFoundError';
+    }
+}
+
+class ValidationError extends CustomError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'ValidationError';
+    }
+}
+
+// Function that simulates some operations and may throw custom errors
+function riskyOperation(shouldFail: boolean): string {
+    if (shouldFail) {
+        throw new ValidationError('Validation failed');
+    }
+    return 'Success';
+}
+
+// Function to handle errors and perform transformations
+function handleError(error: unknown): string {
+    if (error instanceof ValidationError) {
+        return `Handled ValidationError: ${error.message}`;
+    } else if (error instanceof NotFoundError) {
+        return `Handled NotFoundError: ${error.message}`;
+    } else if (error instanceof CustomError) {
+        return `Handled CustomError: ${error.message}`;
+    }
+    return 'Unhandled error';
+}
+
+// Function that wraps the risky operation and handles errors
+function performOperation(shouldFail: boolean): string {
+    try {
+        const result = riskyOperation(shouldFail);
+        return result;
+    } catch (error) {
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        return handleError(error);
+
+SUFFIX CODE:
+----------------------------------------
+    }
+}
+
+// Assertions to verify the behavior of the performOperation function
+assert.strictEqual(performOperation(false), 'Success', 'Expected operation to succeed');
+assert.strictEqual(performOperation(true), 'Handled ValidationError: Validation failed', 'Expected a handled validation error');
+
+// Cleanup code (if any) would go here
+
+console.log('All assertions passed.');
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it covers custom error handling with a hierarchy of errors, and it includes proper type guards and error transformation patterns. The golden completion demonstrates a complex multi-line try/catch structure, error transformation, and nesting. Assertions validate that the function handles both success and error cases correctly, ensuring type safety and proper exception management.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(performOperation(false), 'Success', 'Expected operation to succeed');
+assert.strictEqual(performOperation(true), 'Handled ValidationError: Validation failed', 'Expected a handled validation error');
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Define a custom error class hierarchy
+class CustomError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'CustomError';
+	}
+}
+
+class NotFoundError extends CustomError {
+	constructor(message: string) {
+		super(message);
+		this.name = 'NotFoundError';
+	}
+}
+
+class ValidationError extends CustomError {
+	constructor(message: string) {
+		super(message);
+		this.name = 'ValidationError';
+	}
+}
+
+// Error transformation function
+function transformError(error: any): CustomError {
+	if (error instanceof NotFoundError) {
+		return new CustomError(`Resource not found: ${error.message}`);
+	} else if (error instanceof ValidationError) {
+		return new CustomError(`Validation failed: ${error.message}`);
+	} else {
+		return new CustomError(`Unknown error: ${error.message}`);
+	}
+}
+
+// Simulated function that may throw different errors
+function riskyOperation(value: string): string {
+	if (value === 'notfound') {
+		throw new NotFoundError('The requested item was not found');
+	} else if (value === 'invalid') {
+		throw new ValidationError('The provided value is invalid');
+	}
+	return `Processed value: ${value}`;
+}
+
+// Function that handles errors from riskyOperation
+function handleRiskyOperation(value: string): string {
+	try {
+		return riskyOperation(value);
+	} catch (error) {
+		const transformedError = transformError(error);
+		throw transformedError;
+	} finally {
+		console.log('Cleanup resources if any');
+	}
+}
+
+// Test cases
+try {
+	assert.strictEqual(handleRiskyOperation('valid'), 'Processed value: valid');
+} catch (error) {
+	assert.fail(`Unexpected error: ${error.message}`);
+}
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+try {
+	handleRiskyOperation('notfound');
+	assert.fail('Expected error was not thrown');
+} catch (error) {
+	assert.strictEqual(error instanceof CustomError, true);
+	assert.strictEqual(error.message, 'Resource not found: The requested item was not found');
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+try {
+	assert.strictEqual(handleRiskyOperation('invalid'), '');
+} catch (error) {
+	assert.strictEqual(error instanceof CustomError, true);
+	assert.strictEqual(error.message, 'Validation failed: The provided value is invalid');
+}
+
+console.log('All tests passed');
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to complete complex syntactical structures related to custom error hierarchies and error transformation patterns with type guards. It ensures proper handling of different error types, transforming them accordingly, and includes assertions to validate the correctness of the transformation and error handling logic. The completion requires understanding of custom error classes, try/catch/finally blocks, and type guards, making it a robust test for TypeScript syntax and type system comprehension.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(handleRiskyOperation('valid'), 'Processed value: valid');
+try {
+	handleRiskyOperation('notfound');
+} catch (error) {
+	assert.strictEqual(error instanceof CustomError, true);
+	assert.strictEqual(error.message, 'Resource not found: The requested item was not found');
+}
+try {
+	handleRiskyOperation('invalid');
+} catch (error) {
+	assert.strictEqual(error instanceof CustomError, true);
+	assert.strictEqual(error.message, 'Validation failed: The provided value is invalid');
+}
+console.log('All assertions passed');
+
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import * as fs from 'fs';
+
+interface Config {
+	path: string;
+	encoding: BufferEncoding;
+}
+
+class FileManager {
+	private config: Config;
+
+	constructor(config: Config) {
+		this.config = config;
+	}
+
+	public read(): Promise<string> {
+		return new Promise((resolve, reject) => {
+			fs.readFile(this.config.path, this.config.encoding, (err, data) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(data);
+				}
+			});
+		});
+	}
+
+	public write(data: string): Promise<void> {
+		return new Promise((resolve, reject) => {
+			fs.writeFile(this.config.path, data, this.config.encoding, (err) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		});
+	}
+}
+
+const config: Config = {
+	path: './test.txt',
+	encoding: 'utf-8'
+};
+
+const fileManager = new FileManager(config);
+
+// Usage example
+async function example() {
+	try {
+		await fileManager.write('Hello, World!');
+		const content = await fileManager.read();
+		console.log(content);
+	} catch (error) {
+		console.error('Error:', error);
+	}
+}
+
+example();
+
+// Cleanup
+function cleanup() {
+	fs.unlinkSync(config.path);
+}
+
+process.on('exit', cleanup);
+process.on('SIGINT', cleanup);
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+async function testErrorHandling() {
+	try {
+		await fileManager.write('This should trigger an error');
+		await fileManager.read();
+	} catch (error) {
+		if (error instanceof Error) {
+			console.log('Caught error:', error.message);
+		} else {
+			console.log('Caught unknown error');
+		}
+	} finally {
+		console.log('Cleaning up resources...');
+		cleanup();
+	}
+}
+
+testErrorHandling();
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to assess an LLM's capability to complete a complex TypeScript pattern involving async/await, proper error handling, and resource cleanup using try/catch/finally blocks. The completion should demonstrate understanding of error handling and resource management patterns, including the use of proper type annotations and the correct sequencing of operations. The prefix provides extensive context with a FileManager class, config setup, and an example usage. The suffix tests error handling with a different scenario, ensuring no duplication of the golden completion.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+async function runTests() {
+	const config: Config = {
+		path: './test.txt',
+		encoding: 'utf-8'
+	};
+	const fileManager = new FileManager(config);
+
+	await fileManager.write('Test Content');
+	const content = await fileManager.read();
+	assert.equal(content, 'Test Content');
+
+	try {
+		await fileManager.write('Error Test');
+		await fileManager.read();
+	} catch (error) {
+		assert.ok(error instanceof Error);
+	}
+}
+
+runTests().then(() => console.log('All tests passed')).catch(err => console.error('Tests failed', err));
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from "assert";
+
+class ApiError extends Error {
+    public code: number;
+    constructor(message: string, code: number) {
+        super(message);
+        this.code = code;
+        this.name = "ApiError";
+    }
+}
+
+class NotFoundError extends ApiError {
+    constructor(message: string) {
+        super(message, 404);
+    }
+}
+
+class ValidationError extends ApiError {
+    constructor(message: string) {
+        super(message, 400);
+    }
+}
+
+class User {
+    constructor(public id: number, public name: string) {}
+}
+
+class UserService {
+    private users: User[] = [];
+
+    addUser(user: User): this {
+        this.users.push(user);
+        return this;
+    }
+
+    getUser(id: number): User {
+        const user = this.users.find(u => u.id === id);
+        if (!user) {
+            throw new NotFoundError(`User with id ${id} not found`);
+        }
+        return user;
+    }
+
+    validateUser(user: User): void {
+        if (!user.name) {
+            throw new ValidationError("User name is required");
+        }
+    }
+
+    saveUser(user: User): this {
+        this.validateUser(user);
+        return this.addUser(user);
+    }
+}
+
+const userService = new UserService();
+
+try {
+    userService
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+.saveUser(new User(1, "Alice"))
+
+SUFFIX CODE:
+----------------------------------------
+.getUser(1);
+} catch (error) {
+    if (error instanceof NotFoundError) {
+        console.error(`NotFoundError: ${error.message}`);
+    } else if (error instanceof ValidationError) {
+        console.error(`ValidationError: ${error.message}`);
+    } else {
+        console.error(`Unexpected error: ${error.message}`);
+    }
+} finally {
+    console.log("Operation complete");
+}
+
+assert(userService instanceof UserService);
+assert(userService.getUser(1) === undefined);
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a multi-line syntax pattern with method chaining and type inference in TypeScript. The prefix includes class definitions and a service class that uses method chaining to add, validate, and save users, with error handling for not found and validation errors. The completion focuses on adding a user using method chaining, and the suffix tests retrieving the user with proper error handling. This scenario ensures the LLM can handle method chaining with type inference and proper indentation.
+
+ASSERTIONS:
+----------------------------------------
+assert(userService.getUser(1).name === "John Doe");
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+class QueryBuilder {
+	private query: string = '';
+
+	public select(fields: string[]): this {
+		this.query += `SELECT ${fields.join(', ')} `;
+		return this;
+	}
+
+	public from(table: string): this {
+		this.query += `FROM ${table} `;
+		return this;
+	}
+
+	public where(condition: string): this {
+		this.query += `WHERE ${condition} `;
+		return this;
+	}
+
+	public orderBy(field: string, direction: 'ASC' | 'DESC' = 'ASC'): this {
+		this.query += `ORDER BY ${field} ${direction} `;
+		return this;
+	}
+
+	public build(): string {
+		return this.query.trim() + ';';
+	}
+}
+
+// Usage example
+const query = new QueryBuilder()
+	.select(['name', 'age'])
+	.from('users')
+	.where('age > 18')
+	.orderBy('name')
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+	.build();
+
+SUFFIX CODE:
+----------------------------------------
+const anotherQuery = new QueryBuilder()
+	.select(['id', 'email'])
+	.from('subscribers')
+	.where('subscribed = true')
+	.orderBy('email', 'DESC')
+	.build();
+
+assert.strictEqual(anotherQuery, 'SELECT id, email FROM subscribers WHERE subscribed = true ORDER BY email DESC;');
+
+console.log('All assertions passed!');
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a multi-line syntax pattern using the fluent interface structure with proper return types. The QueryBuilder class methods return 'this' to allow method chaining. The completion involves properly chaining and building a SQL query string, which tests the LLM's ability to handle multi-line method chaining and type inference. Assertions verify the correctness of the built query strings.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(query, 'SELECT name, age FROM users WHERE age > 18 ORDER BY name ASC;');
+assert.strictEqual(anotherQuery, 'SELECT id, email FROM subscribers WHERE subscribed = true ORDER BY email DESC;');
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import assert from 'assert';
+
+// Define a custom error class hierarchy
+class CustomError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+class NotFoundError extends CustomError {
+    constructor(resource: string) {
+        super(`Resource not found: ${resource}`);
+        this.name = 'NotFoundError';
+    }
+}
+
+class ValidationError extends CustomError {
+    constructor(field: string, message: string) {
+        super(`Validation error on ${field}: ${message}`);
+        this.name = 'ValidationError';
+    }
+}
+
+// Function that throws different types of errors
+function riskyOperation(action: string): void {
+    if (action === 'notfound') {
+        throw new NotFoundError('Item');
+    } else if (action === 'invalid') {
+        throw new ValidationError('Field', 'Invalid value');
+    } else {
+        throw new CustomError('Unknown error occurred');
+    }
+}
+
+// Error transformation function
+function transformError(error: Error): CustomError {
+    if (error instanceof NotFoundError) {
+        return new CustomError(`Transformed: ${error.message}`);
+    } else if (error instanceof ValidationError) {
+        return new CustomError(`Transformed: ${error.message}`);
+    }
+    return new CustomError('Transformed: General error');
+}
+
+// Function to handle errors
+function handleError(action: string): string {
+    try {
+        riskyOperation(action);
+        return 'Operation successful';
+    } catch (error) {
+        const transformedError = transformError(error);
+        return transformedError.message;
+    }
+}
+
+// Test cases
+const testCases = [
+    { action: 'notfound', expected: 'Transformed: Resource not found: Item' },
+    { action: 'invalid', expected: 'Transformed: Validation error on Field: Invalid value' },
+    { action: 'unknown', expected: 'Transformed: Unknown error occurred' }
+];
+
+// Run test cases
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+for (const testCase of testCases) {
+    const result = handleError(testCase.action);
+    assert.strictEqual(result, testCase.expected);
+}
+
+SUFFIX CODE:
+----------------------------------------
+// Cleanup code (if any) would go here
+console.log('All assertions passed.');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a multi-line syntax pattern involving custom error hierarchies, error transformation, and error handling in TypeScript. The code includes detailed setup with multiple error classes, a function to simulate risky operations, an error transformation function, and the main error handling function. The test cases verify that the error handling and transformation logic work correctly. This scenario is complex due to the nested structures, custom error types, and comprehensive error handling logic, making it a good test for syntax completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(handleError('notfound'), 'Transformed: Resource not found: Item');
+assert.strictEqual(handleError('invalid'), 'Transformed: Validation error on Field: Invalid value');
+assert.strictEqual(handleError('unknown'), 'Transformed: Unknown error occurred');
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import assert from 'assert';
+
+interface Widget {
+	type: string;
+	color: string;
+	size: number;
+}
+
+class WidgetBuilder {
+	private widget: Widget;
+
+	constructor() {
+		this.widget = { type: '', color: '', size: 0 };
+	}
+
+	setType(type: string): this {
+		this.widget.type = type;
+		return this;
+	}
+
+	setColor(color: string): this {
+		this.widget.color = color;
+		return this;
+	}
+
+	setSize(size: number): this {
+		this.widget.size = size;
+		return this;
+	}
+
+	build(): Widget {
+		return this.widget;
+	}
+}
+
+// Helper function to create a default Widget
+function createDefaultWidget(): Widget {
+	return new WidgetBuilder()
+		.setType('default')
+		.setColor('blue')
+		.setSize(10)
+		.build();
+}
+
+const defaultWidget = createDefaultWidget();
+
+// Assertions to ensure the default widget is created properly
+assert.strictEqual(defaultWidget.type, 'default');
+assert.strictEqual(defaultWidget.color, 'blue');
+assert.strictEqual(defaultWidget.size, 10);
+
+// Now let's create a customized widget
+const customWidgetBuilder = new WidgetBuilder();
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+customWidgetBuilder.setType('custom').setColor('red').setSize(20);
+
+SUFFIX CODE:
+----------------------------------------
+
+const customWidget = customWidgetBuilder.build();
+
+// Assertions to ensure the custom widget is created properly
+assert.strictEqual(customWidget.type, 'custom');
+assert.strictEqual(customWidget.color, 'red');
+assert.strictEqual(customWidget.size, 20);
+
+// Cleanup code if any
+// (In this example, there's no resource cleanup needed)
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a method chaining pattern with type inference in TypeScript. It requires understanding of builder patterns and ensuring correct type and method chaining. The prefix provides a comprehensive setup, including class definitions and helper functions, and the suffix tests the created instance. The completion must correctly infer types and maintain the chaining structure.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(customWidget.type, 'custom');
+assert.strictEqual(customWidget.color, 'red');
+assert.strictEqual(customWidget.size, 20);
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+interface Builder<T> {
+    setPropertyA(value: string): this;
+    setPropertyB(value: number): this;
+    setPropertyC(value: boolean): this;
+    build(): T;
+}
+
+class ComplexObject {
+    propertyA: string;
+    propertyB: number;
+    propertyC: boolean;
+
+    constructor(propertyA: string, propertyB: number, propertyC: boolean) {
+        this.propertyA = propertyA;
+        this.propertyB = propertyB;
+        this.propertyC = propertyC;
+    }
+}
+
+class ComplexObjectBuilder implements Builder<ComplexObject> {
+    private propertyA: string = '';
+    private propertyB: number = 0;
+    private propertyC: boolean = false;
+
+    setPropertyA(value: string): this {
+        this.propertyA = value;
+        return this;
+    }
+
+    setPropertyB(value: number): this {
+        this.propertyB = value;
+        return this;
+    }
+
+    setPropertyC(value: boolean): this {
+        this.propertyC = value;
+        return this;
+    }
+
+    build(): ComplexObject {
+        return new ComplexObject(this.propertyA, this.propertyB, this.propertyC);
+    }
+}
+
+// Example usage of the builder pattern
+const builder = new ComplexObjectBuilder();
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+const completeObject = builder.setPropertyA('Test').setPropertyB(42).setPropertyC(true).build();
+
+SUFFIX CODE:
+----------------------------------------
+const incompleteObject = builder.setPropertyA('Test');
+
+try {
+    assert.strictEqual(incompleteObject.build().propertyA, 'Test');
+    assert.strictEqual(incompleteObject.build().propertyB, 0);
+    assert.strictEqual(incompleteObject.build().propertyC, false);
+} finally {
+    // Cleanup if necessary
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on the builder pattern implementation with typed interfaces, a common multi-line syntax pattern in TypeScript. It ensures that the model can correctly complete method chaining with proper type inference and return types. The provided prefix sets up the context with a builder pattern, while the golden_completion demonstrates the correct use of chaining methods to construct a complex object. The suffix contains different assertions to verify the initial state of the object. This test case is effective in evaluating the model's ability to handle multi-line method chaining with correct typing and syntax.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(completeObject.propertyA, 'Test');
+assert.strictEqual(completeObject.propertyB, 42);
+assert.strictEqual(completeObject.propertyC, true);
+assert.strictEqual(incompleteObject.build().propertyA, 'Test');
+assert.strictEqual(incompleteObject.build().propertyB, 0);
+assert.strictEqual(incompleteObject.build().propertyC, false);
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+interface User {
+	id: number;
+	name: string;
+	email: string;
+}
+
+class UserBuilder {
+	private user: Partial<User> = {};
+
+	setId(id: number): this {
+		this.user.id = id;
+		return this;
+	}
+
+	setName(name: string): this {
+		this.user.name = name;
+		return this;
+	}
+
+	setEmail(email: string): this {
+		this.user.email = email;
+		return this;
+	}
+
+	build(): User {
+		if (!this.user.id || !this.user.name || !this.user.email) {
+			throw new Error('Missing required fields');
+		}
+		return this.user as User;
+	}
+}
+
+// Helper function to create and validate a user
+function createUser(userBuilder: UserBuilder): User {
+	const user = userBuilder.build();
+	if (user.id <= 0) {
+		throw new Error('Invalid user ID');
+	}
+	return user;
+}
+
+// Example usage of UserBuilder
+const userBuilder = new UserBuilder();
+userBuilder.setId(1).setName('John Doe')
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+.setEmail('john.doe@example.com')
+
+SUFFIX CODE:
+----------------------------------------
+.build();
+
+// Assertions
+import { strict as assert } from 'assert';
+
+try {
+	const user = createUser(userBuilder);
+	assert.equal(user.id, 1);
+	assert.equal(user.name, 'John Doe');
+} catch (error) {
+	console.error('Error creating user:', error);
+}
+
+// Cleanup (not required in this example but illustrating the point)
+console.log('Test completed');
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the Builder pattern in TypeScript with method chaining and type inference. The prefix sets up the context by defining a User interface and a UserBuilder class with various setter methods. The golden completion involves completing the method chaining by adding the setEmail method. The suffix includes assertions to verify the created user object. This scenario tests the LLM's ability to correctly infer types, follow method chaining patterns, and maintain proper syntax and formatting.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+try {
+	const user = createUser(userBuilder);
+	assert.equal(user.id, 1);
+	assert.equal(user.name, 'John Doe');
+	assert.equal(user.email, 'john.doe@example.com');
+} catch (error) {
+	console.error('Error creating user:', error);
+}
+
+console.log('Test completed');
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+import { promisify } from 'util';
+
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+
+interface User {
+	id: number;
+	name: string;
+	email: string;
+}
+
+interface UserBuilder {
+	setId(id: number): this;
+	setName(name: string): this;
+	setEmail(email: string): this;
+	build(): User;
+}
+
+class ConcreteUserBuilder implements UserBuilder {
+	private user: Partial<User> = {};
+
+	setId(id: number): this {
+		this.user.id = id;
+		return this;
+	}
+
+	setName(name: string): this {
+		this.user.name = name;
+		return this;
+	}
+
+	setEmail(email: string): this {
+		this.user.email = email;
+		return this;
+	}
+
+	build(): User {
+		if (!this.user.id || !this.user.name || !this.user.email) {
+			throw new Error('Missing properties to build User');
+		}
+		return this.user as User;
+	}
+}
+
+async function getUserData(filePath: string): Promise<User> {
+	try {
+		const data = await readFile(filePath, 'utf8');
+		const json = JSON.parse(data);
+		const builder = new ConcreteUserBuilder();
+		// This is where the builder pattern comes into play
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+		const user = builder
+			.setId(json.id)
+			.setName(json.name)
+			.setEmail(json.email)
+			.build();
+
+SUFFIX CODE:
+----------------------------------------
+		return user;
+	} catch (error) {
+		throw new Error('Failed to read user data');
+	}
+}
+
+(async () => {
+	const user = await getUserData('./user.json');
+	console.log(user);
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This test case effectively evaluates the LLM's capability to understand and complete a builder pattern implementation in TypeScript. The prefix provides extensive context with class definitions, method chaining, and type assertions. The completion requires correctly continuing the builder pattern with proper method chaining and returning the final built object. The suffix verifies the completion by using the built user object. Assertions are included to ensure the correctness of the builder pattern usage and the final object structure.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+(async () => {
+	const user = await getUserData('./user.json');
+	assert.strictEqual(typeof user.id, 'number');
+	assert.strictEqual(typeof user.name, 'string');
+	assert.strictEqual(typeof user.email, 'string');
+})();
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Type definitions for a builder pattern
+interface Car {
+	make: string;
+	model: string;
+	year: number;
+	color: string;
+}
+
+class CarBuilder {
+	private car: Partial<Car> = {};
+
+	setMake(make: string): this {
+		this.car.make = make;
+		return this;
+	}
+
+	setModel(model: string): this {
+		this.car.model = model;
+		return this;
+	}
+
+	setYear(year: number): this {
+		this.car.year = year;
+		return this;
+	}
+
+	setColor(color: string): this {
+		this.car.color = color;
+		return this;
+	}
+
+	build(): Car {
+		if (!this.car.make || !this.car.model || !this.car.year || !this.car.color) {
+			throw new Error('Missing properties to build the car');
+		}
+		return this.car as Car;
+	}
+}
+
+// Function to create a Car using the builder
+function createCar(): Car {
+	const carBuilder = new CarBuilder();
+	const car = carBuilder
+		.setMake('Tesla')
+		.setModel('Model S')
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+		.setYear(2023)
+
+SUFFIX CODE:
+----------------------------------------
+		.setColor('Red')
+		.build();
+	return car;
+}
+
+const myCar = createCar();
+
+assert.strictEqual(myCar.make, 'Tesla');
+assert.strictEqual(myCar.model, 'Model S');
+assert.strictEqual(myCar.year, 2023); // Note: this will fail without the completion part
+assert.strictEqual(myCar.color, 'Red');
+
+console.log('All assertions passed!');
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a complex multi-line syntax pattern involving the builder pattern implementation in TypeScript. The prefix sets up an extensive context with type definitions, class implementation, and partial method chaining. The completion involves adding a missing method call in the chain, maintaining the correct types and fluent interface structure. The suffix completes the chain and includes assertions to validate the correctness of the built object, ensuring the entire pattern is correctly understood and implemented.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(myCar.make, 'Tesla');
+assert.strictEqual(myCar.model, 'Model S');
+assert.strictEqual(myCar.year, 2023);
+assert.strictEqual(myCar.color, 'Red');
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from "assert";
+
+// Define a class with a fluent interface structure
+class QueryBuilder {
+	private query: string = "";
+
+	select(fields: string[]): this {
+		this.query += `SELECT ${fields.join(", ")} `;
+		return this;
+	}
+
+	from(table: string): this {
+		this.query += `FROM ${table} `;
+		return this;
+	}
+
+	where(condition: string): this {
+		this.query += `WHERE ${condition} `;
+		return this;
+	}
+
+	orderBy(field: string, direction: "ASC" | "DESC" = "ASC"): this {
+		this.query += `ORDER BY ${field} ${direction} `;
+		return this;
+	}
+
+	build(): string {
+		return this.query.trim() + ";";
+	}
+}
+
+// Instantiate the QueryBuilder
+const queryBuilder = new QueryBuilder();
+
+// Building a query using the fluent interface
+const query = queryBuilder
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+.select(["id", "name"]).from("users").where("age > 18").orderBy("name", "ASC")
+
+SUFFIX CODE:
+----------------------------------------
+.build();
+
+// Assertions to verify the query structure
+assert.equal(query, "SELECT id, name FROM users WHERE age > 18 ORDER BY name ASC;");
+
+console.log("Query built successfully:", query);
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to complete a complex multi-line fluent interface structure with proper return types. The fluent interface pattern requires method chaining, which needs to return the correct type (the instance itself) to allow for subsequent calls. The completion must maintain the correct order and syntax for chaining methods and ensure proper type inference throughout the chain. This verifies the model's understanding of method chaining, type inference, and the overall structure of a fluent interface in TypeScript.
+
+ASSERTIONS:
+----------------------------------------
+assert.equal(queryBuilder.select(["id", "name"]).from("users").where("age > 18").orderBy("name", "ASC").build(), "SELECT id, name FROM users WHERE age > 18 ORDER BY name ASC;");
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Define a custom error class hierarchy
+class AppError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'AppError';
+    }
+}
+
+class NotFoundError extends AppError {
+    constructor(resource: string) {
+        super(`Resource not found: ${resource}`);
+        this.name = 'NotFoundError';
+    }
+}
+
+class ValidationError extends AppError {
+    constructor(details: string) {
+        super(`Validation error: ${details}`);
+        this.name = 'ValidationError';
+    }
+}
+
+// Function that simulates an operation that could throw different types of errors
+function riskyOperation(resource: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (resource === 'valid') {
+                resolve('Operation successful');
+            } else if (resource === 'missing') {
+                reject(new NotFoundError(resource));
+            } else {
+                reject(new ValidationError('Invalid resource provided'));
+            }
+        }, 100);
+    });
+}
+
+// Utility function for logging errors
+function logError(error: AppError): void {
+    console.error(`Error: ${error.name} - ${error.message}`);
+}
+
+// Main function to perform an operation with error handling
+async function main() {
+    const resource = 'missing';
+    try {
+        const result = await riskyOperation(resource);
+        console.log(result);
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    } catch (error) {
+        if (error instanceof AppError) {
+            logError(error);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+
+SUFFIX CODE:
+----------------------------------------
+    } finally {
+        console.log('Operation completed');
+    }
+}
+
+main();
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to handle complex multi-line syntax patterns, specifically try/catch/finally combinations with typed errors and custom error hierarchies. The example includes various error types and demonstrates proper error handling and transformation. The completion involves catching different error types, handling them accordingly, and maintaining proper indentation and code structure. This tests the LLM's understanding of TypeScript's type system, error handling, and syntax formatting.
+
+ASSERTIONS:
+----------------------------------------
+assert.doesNotThrow(() => main(), Error, 'Main function should not throw unhandled errors');
+assert.rejects(riskyOperation('missing'), NotFoundError, 'Should reject with NotFoundError for missing resource');
+assert.rejects(riskyOperation('invalid'), ValidationError, 'Should reject with ValidationError for invalid resource');
+assert.doesNotReject(riskyOperation('valid'), 'Should resolve successfully for valid resource');
+
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import assert from 'assert';
+
+// Utility function to simulate an asynchronous operation
+async function fetchData(url: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (url === 'https://valid.url') {
+                resolve('Data from ' + url);
+            } else {
+                reject(new Error('Invalid URL'));
+            }
+        }, 1000);
+    });
+}
+
+// Custom error classes
+class AppError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'AppError';
+    }
+}
+
+class NetworkError extends AppError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'NetworkError';
+    }
+}
+
+// Function that processes data and handles errors
+async function processData(url: string): Promise<string> {
+    try {
+        const data = await fetchData(url);
+        return `Processed: ${data}`;
+    } catch (error) {
+        if (error instanceof Error && error.message === 'Invalid URL') {
+            throw new NetworkError('Failed to fetch data due to invalid URL');
+        }
+        throw new AppError('An unexpected error occurred');
+    }
+}
+
+// Test cases to validate the behavior of processData function
+async function runTests() {
+    try {
+        // Valid URL case
+        const result1 = await processData('https://valid.url');
+        assert.strictEqual(result1, 'Processed: Data from https://valid.url');
+
+        // Invalid URL case
+        await processData('https://invalid.url');
+    } catch (error) {
+        if (error instanceof NetworkError) {
+            assert.strictEqual(error.message, 'Failed to fetch data due to invalid URL');
+        } else {
+            throw error;
+        }
+    }
+}
+
+// Run the tests
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+runTests().then(() => {
+    console.log('Tests passed');
+}).catch((error) => {
+    console.error('Test failed', error);
+});
+
+SUFFIX CODE:
+----------------------------------------
+
+// Additional test case for an unexpected error
+async function runAdditionalTests() {
+    try {
+        // Simulate an unexpected error
+        const result2 = await processData('https://unexpected.error');
+    } catch (error) {
+        if (error instanceof AppError) {
+            assert.strictEqual(error.message, 'An unexpected error occurred');
+        } else {
+            throw error;
+        }
+    }
+}
+
+// Run additional tests
+runAdditionalTests().then(() => {
+    console.log('Additional tests passed');
+}).catch((error) => {
+    console.error('Additional test failed', error);
+});
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of Promise error handling with proper typing and custom error hierarchies in TypeScript. The code includes asynchronous operations, error handling using try/catch blocks, and custom error classes with specific error messages. The assertions verify correct error handling behavior and message integrity, ensuring that the TypeScript compiler and runtime correctly interpret the nested error handling structures.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(result1, 'Processed: Data from https://valid.url');
+assert.strictEqual(error.message, 'Failed to fetch data due to invalid URL');
+assert.strictEqual(error.message, 'An unexpected error occurred');
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+interface User {
+	name: string;
+	email: string;
+	age: number;
+}
+
+class UserBuilder {
+	private user: User;
+
+	constructor() {
+		this.user = { name: '', email: '', age: 0 };
+	}
+
+	setName(name: string): this {
+		this.user.name = name;
+		return this;
+	}
+
+	setEmail(email: string): this {
+		this.user.email = email;
+		return this;
+	}
+
+	setAge(age: number): this {
+		this.user.age = age;
+		return this;
+	}
+
+	build(): User {
+		return this.user;
+	}
+}
+
+// Helper function to validate email format
+function isValidEmail(email: string): boolean {
+	const re = /^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+\.)+[^<>()[\]\\.,;:\s@\"]{2,})$/i;
+	return re.test(String(email).toLowerCase());
+}
+
+// Creating a user with the builder pattern
+const userBuilder = new UserBuilder();
+const user = userBuilder.setName('John Doe')
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+.setEmail('').setAge(0)
+
+SUFFIX CODE:
+----------------------------------------
+.build();
+
+// Assertion to check the user object
+console.assert(user.name === 'John Doe', 'User name should be John Doe');
+console.assert(user.email === '', 'User email should be empty');
+console.assert(user.age === 0, 'User age should be 0');
+
+// Cleanup (if any resources to be cleaned up, this is where it would happen)
+
+console.log('All assertions passed.');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a method chaining pattern using the builder pattern in TypeScript. The builder pattern is a complex multi-line syntax pattern with type inference. The completion should correctly chain methods and maintain proper return types. The suffix contains different code to ensure distinction, and the assertions verify the correctness of the completion. This tests the LLM's understanding of complex TypeScript patterns, proper chaining, and type correctness.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(user.email === 'john.doe@example.com', 'User email should be john.doe@example.com');
+console.assert(user.age === 30, 'User age should be 30');
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import assert from 'assert';
+
+interface HttpResponse {
+    statusCode: number;
+    body: string;
+}
+
+class HttpError extends Error {
+    constructor(public statusCode: number, message: string) {
+        super(message);
+        this.name = 'HttpError';
+    }
+}
+
+function fetchData(url: string): Promise<HttpResponse> {
+    return new Promise((resolve, reject) => {
+        // Simulating an HTTP request
+        setTimeout(() => {
+            if (url === 'https://api.example.com/data') {
+                resolve({ statusCode: 200, body: 'Success' });
+            } else {
+                reject(new HttpError(404, 'Not Found'));
+            }
+        }, 1000);
+    });
+}
+
+async function getData(url: string): Promise<string> {
+    try {
+        const response = await fetchData(url);
+        if (response.statusCode !== 200) {
+            throw new HttpError(response.statusCode, 'Failed to fetch data');
+        }
+        return response.body;
+    } catch (error) {
+        if (error instanceof HttpError) {
+            // Transforming the error with a custom message
+            throw new HttpError(error.statusCode, `Custom Message: ${error.message}`);
+        }
+        throw error;
+    }
+}
+
+async function main() {
+    const validUrl = 'https://api.example.com/data';
+    const invalidUrl = 'https://api.example.com/invalid';
+
+    // Valid URL test
+    let result;
+    try {
+        result = await getData(validUrl);
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        assert.strictEqual(result, 'Success');
+
+SUFFIX CODE:
+----------------------------------------
+        assert.strictEqual(result, 'Error: Custom Message: Not Found');
+    } catch (error) {
+        assert.strictEqual(error.message, 'Error: Custom Message: Not Found');
+    }
+    console.log('All tests passed');
+}
+
+main().catch(console.error);
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to complete a complex error handling pattern involving asynchronous functions, promises, and custom error types in TypeScript. The scenario includes nested try/catch blocks, custom error transformation, and type guards, which are critical for ensuring robust error handling and type safety. The completion must correctly handle different outcomes (valid and invalid URLs) and maintain proper nesting and indentation. Assertions verify the correctness of the function's behavior and error handling logic.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(result, 'Success');
+assert.strictEqual(result, 'Error: Custom Message: Not Found');
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { assert } from 'chai';
+
+// Sample data structure to hold user information
+interface User {
+	id: number;
+	name: string;
+	email: string;
+	age?: number;
+}
+
+// A utility class to build user objects
+class UserBuilder {
+	private user: Partial<User> = {};
+
+	setId(id: number): this {
+		this.user.id = id;
+		return this;
+	}
+
+	setName(name: string): this {
+		this.user.name = name;
+		return this;
+	}
+
+	setEmail(email: string): this {
+		this.user.email = email;
+		return this;
+	}
+
+	setAge(age: number): this {
+		this.user.age = age;
+		return this;
+	}
+
+	build(): User {
+		if (!this.user.id || !this.user.name || !this.user.email) {
+			throw new Error('Missing required user properties');
+		}
+		return this.user as User;
+	}
+}
+
+// Function to create a new user using the builder pattern
+function createUser(id: number, name: string, email: string, age?: number): User {
+	const builder = new UserBuilder();
+	return builder.setId(id).setName(name).setEmail(email)
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+		age !== undefined ? builder.setAge(age) : builder
+
+SUFFIX CODE:
+----------------------------------------
+.build();
+}
+
+// Testing the createUser function
+const user1 = createUser(1, 'Alice', 'alice@example.com', 25);
+const user2 = createUser(2, 'Bob', 'bob@example.com');
+
+assert.equal(user1.id, 1);
+assert.equal(user1.name, 'Alice');
+assert.equal(user1.email, 'alice@example.com');
+assert.equal(user1.age, 25);
+
+assert.equal(user2.id, 2);
+assert.equal(user2.name, 'Bob');
+assert.equal(user2.email, 'bob@example.com');
+assert.isUndefined(user2.age);
+
+console.log('All assertions passed');
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to complete a complex builder pattern implementation with method chaining and type inference. The prefix sets up an incomplete user creation function using the builder pattern, and the golden completion requires the correct invocation of the setAge method to complete the user object. This tests the model's understanding of method chaining and correct usage of the builder pattern.
+
+ASSERTIONS:
+----------------------------------------
+assert.equal(user1.id, 1);
+assert.equal(user1.name, 'Alice');
+assert.equal(user1.email, 'alice@example.com');
+assert.equal(user1.age, 25);
+
+assert.equal(user2.id, 2);
+assert.equal(user2.name, 'Bob');
+assert.equal(user2.email, 'bob@example.com');
+assert.isUndefined(user2.age);
+
+console.log('All assertions passed');
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import assert from 'assert';
+
+// A simple interface and class to demonstrate the builder pattern
+interface ICar {
+	color: string;
+	engine: string;
+	wheels: number;
+	build(): Car;
+}
+
+class Car implements ICar {
+	color: string = '';
+	engine: string = '';
+	wheels: number = 0;
+
+	setColor(color: string): Car {
+		this.color = color;
+		return this;
+	}
+
+	setEngine(engine: string): Car {
+		this.engine = engine;
+		return this;
+	}
+
+	setWheels(wheels: number): Car {
+		this.wheels = wheels;
+		return this;
+	}
+
+	build(): Car {
+		// Validation logic to ensure car is properly built
+		if (!this.color || !this.engine || this.wheels <= 0) {
+			throw new Error('Invalid car configuration');
+		}
+		return this;
+	}
+}
+
+// Helper function to demonstrate the builder pattern
+function createSportsCar(): Car {
+	return new Car()
+		.setColor('red')
+		.setEngine('V8')
+		.setWheels(4)
+		.build();
+}
+
+// Another function to create a different type of car
+function createFamilyCar(): Car {
+	return new Car()
+		.setColor('blue')
+		.setEngine('V6')
+		.setWheels(4)
+		.build();
+}
+
+// Test the builder pattern implementation
+const sportsCar = createSportsCar();
+const familyCar = createFamilyCar();
+
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+console.log(sportsCar);
+console.log(familyCar);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+// Assertions to verify the builder pattern implementation
+assert.strictEqual(sportsCar.color, 'red');
+assert.strictEqual(sportsCar.engine, 'V8');
+assert.strictEqual(sportsCar.wheels, 4);
+
+assert.strictEqual(familyCar.color, 'blue');
+assert.strictEqual(familyCar.engine, 'V6');
+assert.strictEqual(familyCar.wheels, 4);
+
+console.log('All assertions passed.');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the builder pattern implementation in TypeScript, which involves method chaining with type inference. The prefix sets up the context with helper functions and class methods. The golden completion adds a new method chain to create a different type of car, adhering to the builder pattern. The suffix includes assertions to verify the correctness of the implementation, ensuring that the language model can handle multi-line syntax patterns and proper type inference.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(electricCar.color, 'green');
+assert.strictEqual(electricCar.engine, 'Electric');
+assert.strictEqual(electricCar.wheels, 4);
+
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+interface User {
+	id: number;
+	name: string;
+	email: string;
+}
+
+class UserBuilder {
+	private user: User;
+
+	constructor() {
+		this.user = { id: 0, name: '', email: '' };
+	}
+
+	setId(id: number): this {
+		this.user.id = id;
+		return this;
+	}
+
+	setName(name: string): this {
+		this.user.name = name;
+		return this;
+	}
+
+	setEmail(email: string): this {
+		this.user.email = email;
+		return this;
+	}
+
+	build(): User {
+		return this.user;
+	}
+}
+
+// Helper function to simulate user creation
+function createUser(id: number, name: string, email: string): User {
+	return new UserBuilder()
+		.setId(id)
+		.setName(name)
+		.setEmail(email)
+		.build();
+}
+
+// Example usage of the builder pattern
+const newUser = createUser(1, 'John Doe', 'john.doe@example.com');
+console.log(newUser);
+
+// Function to write user data to a file
+function writeUserToFile(user: User, filePath: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		fs.writeFile(filePath, JSON.stringify(user, null, 2), (err) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve();
+			}
+		});
+	});
+}
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+writeUserToFile(newUser, filePath)
+	.then(() => {
+		console.log('User data written to file successfully.');
+		return fs.promises.readFile(filePath, 'utf-8');
+	})
+	.then((data) => {
+		const userFromFile: User = JSON.parse(data);
+		console.log('Read user from file:', userFromFile);
+	})
+	.catch((err) => console.error('Failed to write or read user data:', err));
+
+SUFFIX CODE:
+----------------------------------------
+
+
+const filePath = 'user.json';
+
+writeUserToFile(newUser, filePath)
+	.then(() => console.log('User data written to file successfully.'))
+	.catch((err) => console.error('Failed to write user data to file:', err));
+
+// Cleanup: Remove the file after assertions
+fs.unlink(filePath, (err) => {
+	if (err) console.error('Failed to delete file:', err);
+	else console.log('File deleted successfully.');
+});
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of the builder pattern implementation with typed interfaces in TypeScript. It demonstrates the ability to chain methods with proper type inference and return types. The completion involves method chaining and proper error handling using Promises. The assertions ensure that the file writing operation completes successfully and the user data is correctly serialized and written to the file.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+import fs from 'fs';
+
+const filePath = 'user.json';
+const userJson = fs.readFileSync(filePath, 'utf-8');
+const user: User = JSON.parse(userJson);
+
+assert.strictEqual(user.id, 1, 'User ID should be 1');
+assert.strictEqual(user.name, 'John Doe', 'User name should be John Doe');
+assert.strictEqual(user.email, 'john.doe@example.com', 'User email should be john.doe@example.com');
+
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+// Define a custom error class for typed errors
+class CustomError extends Error {
+    constructor(public code: number, message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+// Function that may throw a CustomError
+function riskyOperation(success: boolean): string {
+    if (!success) {
+        throw new CustomError(404, 'Resource not found');
+    }
+    return 'Operation successful';
+}
+
+// Utility function to handle errors
+function handleErrors(err: unknown): string {
+    if (err instanceof CustomError) {
+        return `Error: ${err.message} (Code: ${err.code})`;
+    }
+    return 'Unknown error occurred';
+}
+
+// Main function demonstrating try/catch/finally
+function main(success: boolean): string {
+    let result: string;
+    try {
+        result = riskyOperation(success);
+    } catch (err) {
+        result = handleErrors(err);
+    } finally {
+        console.log('Cleanup resources');
+    }
+    return result;
+}
+
+// Test the main function with both success and failure scenarios
+const successResult = main(true);
+const failureResult = main(false);
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+console.log('Logging success and failure results');
+console.log('Success result:', successResult);
+console.log('Failure result:', failureResult);
+
+// Cleanup resources can be handled here if needed
+
+
+JUSTIFICATION:
+----------------------------------------
+This example is a good test case because it demonstrates the use of try/catch/finally blocks with typed errors in TypeScript. The scenario includes custom error classes, error handling functions, and a main function that integrates these components. The assertions verify the expected outcomes of both successful and failed operations, ensuring the LLM can complete complex syntactical structures and maintain proper formatting.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(successResult, 'Operation successful');
+assert.strictEqual(failureResult, 'Error: Resource not found (Code: 404)');
+console.log('All assertions passed');
+
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+interface User {
+	id: number;
+	name: string;
+	email: string;
+}
+
+class UserBuilder {
+	private user: User;
+
+	constructor() {
+		this.user = { id: 0, name: '', email: '' };
+	}
+
+	setId(id: number): this {
+		this.user.id = id;
+		return this;
+	}
+
+	setName(name: string): this {
+		this.user.name = name;
+		return this;
+	}
+
+	setEmail(email: string): this {
+		this.user.email = email;
+		return this;
+	}
+
+	build(): User {
+		return this.user;
+	}
+}
+
+// Example usage
+const userBuilder = new UserBuilder();
+const user = userBuilder
+	.setId(1)
+	.setName('John Doe')
+	.setEmail('john.doe@example.com')
+	.build();
+
+assert.equal(user.id, 1);
+assert.equal(user.name, 'John Doe');
+assert.equal(user.email, 'john.doe@example.com');
+
+// Additional builder pattern for more complex object
+interface Address {
+	street: string;
+	city: string;
+	zip: string;
+}
+
+class AddressBuilder {
+	private address: Address;
+
+	constructor() {
+		this.address = { street: '', city: '', zip: '' };
+	}
+
+	setStreet(street: string): this {
+		this.address.street = street;
+		return this;
+	}
+
+	setCity(city: string): this {
+		this.address.city = city;
+		return this;
+	}
+
+	setZip(zip: string): this {
+		this.address.zip = zip;
+		return this;
+	}
+
+	build(): Address {
+		return this.address;
+	}
+}
+
+// Example usage
+const addressBuilder = new AddressBuilder();
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+const address2 = addressBuilder
+	.setStreet('456 Elm St')
+	.setCity('Othertown')
+	.setZip('67890')
+	.build();
+
+assert.equal(address2.street, '456 Elm St');
+assert.equal(address2.city, 'Othertown');
+assert.equal(address2.zip, '67890');
+
+console.log('All assertions passed.');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good benchmark for syntax completion capabilities because it involves a multi-line method chaining pattern within the builder pattern implementation. The code tests the LLM's ability to complete a complex syntactical structure while maintaining proper formatting and type correctness. The example includes extensive setup and context in the prefix, demonstrating the builder pattern for both User and Address objects. Assertions verify that the constructed objects have the expected properties, ensuring the completion is correct.
+
+ASSERTIONS:
+----------------------------------------
+assert.equal(address.street, '123 Main St');
+assert.equal(address.city, 'Anytown');
+assert.equal(address.zip, '12345');
+assert.equal(address2.street, '456 Elm St');
+assert.equal(address2.city, 'Othertown');
+assert.equal(address2.zip, '67890');
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+class CustomError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'CustomError';
+  }
+}
+
+class FileReadError extends CustomError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FileReadError';
+  }
+}
+
+class FileWriteError extends CustomError {
+  constructor(message: string) {
+    super(message);
+    this.name = 'FileWriteError';
+  }
+}
+
+function readFileAsync(filePath: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filePath, 'utf8', (err, data) => {
+      if (err) {
+        reject(new FileReadError(`Failed to read file: ${filePath}`));
+        return;
+      }
+      resolve(data);
+    });
+  });
+}
+
+function writeFileAsync(filePath: string, data: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath, data, 'utf8', (err) => {
+      if (err) {
+        reject(new FileWriteError(`Failed to write to file: ${filePath}`));
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
+async function processFile(filePath: string): Promise<void> {
+  try {
+    const data = await readFileAsync(filePath);
+    // Process data here
+    const processedData = data.toUpperCase();
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    await writeFileAsync(filePath, processedData);
+
+SUFFIX CODE:
+----------------------------------------
+    console.log('File processed successfully.');
+  } catch (error) {
+    if (error instanceof FileReadError) {
+      console.error('Error reading file:', error.message);
+    } else if (error instanceof FileWriteError) {
+      console.error('Error writing file:', error.message);
+    } else {
+      console.error('Unknown error:', error);
+    }
+  } finally {
+    console.log('Cleanup resources if any.');
+  }
+}
+
+// Test the processFile function
+(async () => {
+  const testFilePath = './test.txt';
+  try {
+    await writeFileAsync(testFilePath, 'Sample data');
+    await processFile(testFilePath);
+  } catch (error) {
+    console.error('Test failed:', error);
+  }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it demonstrates the use of custom error hierarchies, promise-based asynchronous file operations, and proper error handling with type guards. The golden completion requires the model to correctly handle nested async/await syntax, error propagation, and resource cleanup. It also tests the model's ability to maintain the context and indentation established in the prefix.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+(async () => {
+  const testFilePath = './test.txt';
+  await writeFileAsync(testFilePath, 'Sample data');
+  try {
+    await processFile(testFilePath);
+    const result = await readFileAsync(testFilePath);
+    assert.equal(result, 'SAMPLE DATA');
+  } catch (error) {
+    assert.fail(`Unexpected error: ${error.message}`);
+  }
+})();
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+
+class CustomError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+class ResourceError extends CustomError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'ResourceError';
+    }
+}
+
+interface Resource {
+    name: string;
+    open(): void;
+    close(): void;
+}
+
+class FileResource implements Resource {
+    name: string;
+    private filePath: string;
+    private fileContent: string | null = null;
+
+    constructor(name: string, filePath: string) {
+        this.name = name;
+        this.filePath = filePath;
+    }
+
+    open(): void {
+        try {
+            this.fileContent = readFileSync(this.filePath, 'utf-8');
+        } catch (error) {
+            throw new ResourceError(`Failed to open resource: ${this.name}`);
+        }
+    }
+
+    close(): void {
+        // Placeholder for resource cleanup logic
+    }
+}
+
+function processResource(resource: Resource): void {
+    try {
+        resource.open();
+        // Placeholder for processing logic
+    } catch (error) {
+        if (error instanceof ResourceError) {
+            console.error(error.message);
+        } else {
+            console.error('An unexpected error occurred:', error);
+        }
+    } finally {
+        resource.close();
+    }
+}
+
+const resource = new FileResource('TestResource', join(__dirname, 'test.txt'));
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+processResource(resource);
+
+SUFFIX CODE:
+----------------------------------------
+
+// Additional processing code
+
+console.log('Resource processing complete.');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of error handling patterns in TypeScript. It demonstrates the use of custom error classes with inheritance, try/catch/finally blocks for error handling and resource management, and proper typing. The prefix sets up the necessary context with class definitions, interfaces, and error handling logic. The completion focuses on invoking the processResource function, which encapsulates the error handling pattern. The suffix adds additional processing code, ensuring a clear distinction from the completion.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+try {
+    processResource(resource);
+    console.log('Resource processed successfully.');
+} catch (error) {
+    assert.fail('Error should be handled within processResource function');
+}
+
+assert.strictEqual(resource.name, 'TestResource', 'Resource name should be TestResource');
+
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { readFileSync, writeFileSync } from 'fs';
+
+class CustomError extends Error {
+    constructor(public message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+class FileReadError extends CustomError {
+    constructor(public filePath: string, message: string) {
+        super(message);
+        this.name = 'FileReadError';
+    }
+}
+
+class FileWriteError extends CustomError {
+    constructor(public filePath: string, message: string) {
+        super(message);
+        this.name = 'FileWriteError';
+    }
+}
+
+function readFile(filePath: string): string {
+    try {
+        const data = readFileSync(filePath, 'utf-8');
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new FileReadError(filePath, error.message);
+        }
+        throw error;
+    }
+}
+
+function writeFile(filePath: string, data: string): void {
+    try {
+        writeFileSync(filePath, data, 'utf-8');
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new FileWriteError(filePath, error.message);
+        }
+        throw error;
+    }
+}
+
+async function processFile(inputPath: string, outputPath: string): Promise<void> {
+    let data: string = '';
+    try {
+        data = readFile(inputPath);
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        data = data.toUpperCase();
+
+SUFFIX CODE:
+----------------------------------------
+        writeFile(outputPath, data);
+    } catch (error) {
+        console.error('An error occurred:', error);
+    } finally {
+        console.log('Process completed');
+    }
+}
+
+// Example usage:
+(async () => {
+    const inputPath = 'input.txt';
+    const outputPath = 'output.txt';
+    await processFile(inputPath, outputPath);
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to complete a try/catch/finally block with proper error handling, nested within an async function. The scenario involves custom error classes with inheritance, and the completion requires the LLM to correctly handle a specific error condition and maintain proper indentation and syntax.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+(async () => {
+    const inputPath = 'input.txt';
+    const outputPath = 'output.txt';
+    try {
+        await processFile(inputPath, outputPath);
+    } catch (error) {
+        assert.fail('The process should not throw an error');
+    }
+    const outputData = readFileSync(outputPath, 'utf-8');
+    assert.equal(outputData, readFileSync(inputPath, 'utf-8'), 'Output data should match input data');
+})();
+
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+// Custom Error Hierarchy
+class AppError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'AppError';
+    }
+}
+
+class FileNotFoundError extends AppError {
+    constructor(filePath: string) {
+        super(`File not found: ${filePath}`);
+        this.name = 'FileNotFoundError';
+    }
+}
+
+class PermissionDeniedError extends AppError {
+    constructor(filePath: string) {
+        super(`Permission denied: ${filePath}`);
+        this.name = 'PermissionDeniedError';
+    }
+}
+
+// Utility function to read a file
+async function readFile(filePath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    reject(new FileNotFoundError(filePath));
+                } else if (err.code === 'EACCES') {
+                    reject(new PermissionDeniedError(filePath));
+                } else {
+                    reject(new AppError('An unknown error occurred'));
+                }
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+// Function to process a file
+async function processFile(filePath: string): Promise<void> {
+    try {
+        const content = await readFile(filePath);
+        console.log('File content:', content);
+    } catch (error) {
+        if (error instanceof FileNotFoundError) {
+            console.error('Handling file not found error:', error.message);
+        } else if (error instanceof PermissionDeniedError) {
+            console.error('Handling permission denied error:', error.message);
+        } else if (error instanceof AppError) {
+            console.error('Handling general app error:', error.message);
+        } else {
+            console.error('Handling unknown error:', error);
+        }
+    } finally {
+        console.log('Cleanup and resource management');
+    }
+}
+
+// Test case
+async function testProcessFile() {
+    const testFilePath = './test.txt';
+    let fileExists = false;
+    try {
+        await fs.promises.access(testFilePath);
+        fileExists = true;
+    } catch {}
+    if (fileExists) {
+        await fs.promises.unlink(testFilePath);
+    }
+    fs.writeFileSync(testFilePath, 'Sample content');
+    await processFile(testFilePath);
+    // Assertions will be added here
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    try {
+        await processFile('./nonexistent.txt');
+    } catch (error) {
+        if (error instanceof FileNotFoundError) {
+            console.log('Test passed: FileNotFoundError thrown as expected');
+        } else {
+            console.error('Test failed: Unexpected error type', error);
+        }
+    }
+
+SUFFIX CODE:
+----------------------------------------
+
+    await fs.promises.unlink(testFilePath);
+}
+
+testProcessFile().catch(console.error);
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of complex error handling patterns with custom error hierarchies, proper typing, and cleanup logic. It includes a try/catch/finally block, demonstrates type checking with instanceof, and handles resource management. The completion focuses on reading a file and asserting its content, which tests the LLM's ability to understand error handling, proper typing, and assertion placement.
+
+ASSERTIONS:
+----------------------------------------
+    const content = await readFile(testFilePath);
+    console.assert(content === 'Sample content', 'File content should match the written content');
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { assert } from 'assert';
+
+class BaseError extends Error {
+    constructor(public message: string) {
+        super(message);
+        this.name = 'BaseError';
+    }
+}
+
+class ValidationError extends BaseError {
+    constructor(public message: string) {
+        super(message);
+        this.name = 'ValidationError';
+    }
+}
+
+class NotFoundError extends BaseError {
+    constructor(public message: string) {
+        super(message);
+        this.name = 'NotFoundError';
+    }
+}
+
+function validateInput(input: string): void {
+    if (input === '') {
+        throw new ValidationError('Input cannot be empty');
+    }
+}
+
+function findResource(id: number): string {
+    if (id !== 1) {
+        throw new NotFoundError('Resource not found');
+    }
+    return 'Resource data';
+}
+
+async function processResource(input: string, id: number): Promise<string> {
+    try {
+        validateInput(input);
+        const resource = findResource(id);
+        return `Processed ${resource}`;
+    } catch (error) {
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        if (error instanceof ValidationError) {
+            throw error;
+        } else if (error instanceof NotFoundError) {
+            throw error;
+        } else {
+            throw new BaseError('Unknown error occurred');
+        }
+
+SUFFIX CODE:
+----------------------------------------
+    }
+}
+
+async function main() {
+    try {
+        const result = await processResource('valid input', 1);
+        console.log(result);
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            console.error('Validation failed:', error.message);
+        } else if (error instanceof NotFoundError) {
+            console.error('Resource lookup failed:', error.message);
+        } else {
+            console.error('An unexpected error occurred:', error.message);
+        }
+    } finally {
+        console.log('Cleanup resources if any');
+    }
+}
+
+main();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a try/catch/finally block with typed errors, including proper type guards and nested error handling. The completion requires understanding of custom error classes, type guards, and handling multiple error types. It also demonstrates correct usage of TypeScript's type system and ensures that the LLM can maintain proper indentation and syntax within complex nested structures.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+(async () => {
+    try {
+        const result = await processResource('', 1);
+        assert.fail('Expected ValidationError was not thrown');
+    } catch (error) {
+        assert(error instanceof ValidationError, 'Error should be instance of ValidationError');
+        assert.strictEqual(error.message, 'Input cannot be empty');
+    }
+
+    try {
+        const result = await processResource('valid input', 2);
+        assert.fail('Expected NotFoundError was not thrown');
+    } catch (error) {
+        assert(error instanceof NotFoundError, 'Error should be instance of NotFoundError');
+        assert.strictEqual(error.message, 'Resource not found');
+    }
+
+    try {
+        const result = await processResource('valid input', 1);
+        assert.strictEqual(result, 'Processed Resource data');
+    } catch (error) {
+        assert.fail('Unexpected error was thrown');
+    }
+})();
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+class BaseError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'BaseError';
+    }
+}
+
+class FileNotFoundError extends BaseError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'FileNotFoundError';
+    }
+}
+
+class PermissionError extends BaseError {
+    constructor(message: string) {
+        super(message);
+        this.name = 'PermissionError';
+    }
+}
+
+function readFileAsync(filePath: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    reject(new FileNotFoundError('File not found'));
+                } else if (err.code === 'EACCES') {
+                    reject(new PermissionError('Permission denied'));
+                } else {
+                    reject(new BaseError('Unknown error'));
+                }
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+async function readFileContents(filePath: string): Promise<string | null> {
+    try {
+        const data = await readFileAsync(filePath);
+        return data;
+    } catch (error) {
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        if (error instanceof FileNotFoundError) {
+            console.error('Error: File not found.');
+        } else if (error instanceof PermissionError) {
+            console.error('Error: Permission denied.');
+        } else if (error instanceof BaseError) {
+            console.error('Error: Unknown error occurred.');
+        } else {
+            console.error('Error:', error);
+        }
+
+SUFFIX CODE:
+----------------------------------------
+        return null;
+    }
+}
+
+(async () => {
+    const filePath = 'example.txt';
+    const content = await readFileContents(filePath);
+    if (content) {
+        console.log('File Content:', content);
+    } else {
+        console.log('Failed to read file.');
+    }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to handle complex error handling patterns with custom error hierarchies and type guards. It includes a nested try/catch block with specific error types and proper typing. The completion requires understanding of inheritance, proper error typing, and the ability to handle different error cases correctly. The assertions ensure that the correct error messages are logged based on the type of error encountered.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+import { execSync } from 'child_process';
+
+const result = execSync('ts-node <path_to_this_file>').toString();
+assert(result.includes('File not found:') || result.includes('Permission denied:') || result.includes('Error reading file:'));
+
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+class CustomError extends Error {
+    constructor(public message: string, public code: number) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+class FileReadError extends CustomError {
+    constructor(message: string) {
+        super(message, 1001);
+        this.name = 'FileReadError';
+    }
+}
+
+class FileParseError extends CustomError {
+    constructor(message: string) {
+        super(message, 1002);
+        this.name = 'FileParseError';
+    }
+}
+
+function parseJson(data: string): any {
+    try {
+        return JSON.parse(data);
+    } catch (e) {
+        throw new FileParseError('Failed to parse JSON');
+    }
+}
+
+async function readFile(filePath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                reject(new FileReadError('Failed to read file'));
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+async function processFile(filePath: string): Promise<any> {
+    let fileContent: string | null = null;
+    try {
+        fileContent = await readFile(filePath);
+        const jsonData = parseJson(fileContent);
+        return jsonData;
+    } catch (error) {
+        if (error instanceof FileReadError) {
+            console.error('Error reading file:', error.message);
+        } else if (error instanceof FileParseError) {
+            console.error('Error parsing file:', error.message);
+        } else {
+            console.error('Unknown error:', error.message);
+        }
+        throw error;
+    } finally {
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        // No additional cleanup needed here
+
+SUFFIX CODE:
+----------------------------------------
+        console.log('Finished processing file:', filePath);
+    }
+}
+
+// Usage example
+(async () => {
+    try {
+        const data = await processFile('path/to/file.json');
+        console.log('Parsed data:', data);
+    } catch (e) {
+        console.error('Failed to process file:', e.message);
+    }
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This example effectively tests the LLM's ability to handle try/catch/finally blocks with typed errors, including custom error hierarchies and proper resource management. It demonstrates how to handle different error types and ensures proper cleanup within the finally block, which is a critical aspect of robust TypeScript programming. The scenario includes complex nesting and type annotations, providing a realistic and challenging test case.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+(async () => {
+    try {
+        let data = await processFile('path/to/file.json');
+        assert(data !== null, 'Data should not be null');
+    } catch (e) {
+        assert(e instanceof CustomError, 'Error should be an instance of CustomError');
+        assert(e.message !== '', 'Error message should not be empty');
+    }
+})();
+
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+// Custom error classes
+class FileNotFoundError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'FileNotFoundError';
+    }
+}
+
+class PermissionError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'PermissionError';
+    }
+}
+
+// Utility function to read a file
+async function readFile(filePath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                if (err.code === 'ENOENT') {
+                    reject(new FileNotFoundError(`File not found: ${filePath}`));
+                } else if (err.code === 'EACCES') {
+                    reject(new PermissionError(`Permission denied: ${filePath}`));
+                } else {
+                    reject(new Error(`Unknown error: ${err.message}`));
+                }
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+// Function to process a file and handle errors
+async function processFile(filePath: string): Promise<void> {
+    try {
+        const data = await readFile(filePath);
+        console.log('File data:', data);
+    } catch (error) {
+        if (error instanceof FileNotFoundError) {
+            console.error('Handling file not found error:', error.message);
+        } else if (error instanceof PermissionError) {
+            console.error('Handling permission error:', error.message);
+        } else {
+            console.error('Handling unknown error:', error.message);
+        }
+    }
+}
+
+// Test function to demonstrate error handling and resource cleanup
+async function testErrorHandling() {
+    const testFilePath = './nonexistentfile.txt';
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+    try {
+        await processFile(testFilePath);
+    } finally {
+        // Resource cleanup if needed
+    }
+
+SUFFIX CODE:
+----------------------------------------
+    await processFile(testFilePath);
+    console.log('Test completed.');
+}
+
+testErrorHandling().then(() => console.log('All done.')).catch(console.error);
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it demonstrates complex error handling patterns in TypeScript, including custom error classes, try/catch/finally blocks, and nested promise handling. The extensive prefix provides a realistic and complete context for the completion, which involves properly handling errors and ensuring resource cleanup. The assertions ensure that errors are caught and handled appropriately, and the resources are cleaned up after the operation.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+(async function test() {
+    let caughtError = false;
+    try {
+        await processFile('./nonexistentfile.txt');
+    } catch (error) {
+        caughtError = true;
+        assert(error instanceof FileNotFoundError, 'Expected FileNotFoundError');
+    }
+    assert(caughtError, 'Expected an error to be caught');
+    console.log('Assertions passed.');
+})();
+
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+// Custom error classes
+class FileNotFoundError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'FileNotFoundError';
+    }
+}
+
+class PermissionError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'PermissionError';
+    }
+}
+
+// Function to read a file and process its content
+async function readFileAndProcess(filePath: string): Promise<void> {
+    let fileHandle: fs.promises.FileHandle | null = null;
+    try {
+        fileHandle = await fs.promises.open(filePath, 'r');
+        const content = await fileHandle.readFile({ encoding: 'utf-8' });
+        console.log('File content:', content);
+        // Process the file content here
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            throw new FileNotFoundError(`File not found: ${filePath}`);
+        } else if (error.code === 'EACCES') {
+            throw new PermissionError(`Permission denied: ${filePath}`);
+        } else {
+            throw error;
+        }
+    } finally {
+        if (fileHandle) {
+            await fileHandle.close();
+        }
+    }
+}
+
+// Mock test function
+async function testReadFileAndProcess() {
+    try {
+        await readFileAndProcess('/path/to/test/file.txt');
+        console.log('File processed successfully');
+    } catch (error) {
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        if (error instanceof FileNotFoundError) {
+            console.error('Custom error caught:', error.message);
+        } else if (error instanceof PermissionError) {
+            console.error('Custom error caught:', error.message);
+        } else {
+            console.error('Unexpected error:', error);
+        }
+
+SUFFIX CODE:
+----------------------------------------
+    }
+}
+
+testReadFileAndProcess();
+
+// Assertions
+import { strict as assert } from 'assert';
+
+(async () => {
+    let testError: Error | null = null;
+    try {
+        await readFileAndProcess('/invalid/path/to/file.txt');
+    } catch (error) {
+        testError = error;
+    }
+    assert(testError instanceof FileNotFoundError, 'Expected a FileNotFoundError');
+
+    testError = null;
+    try {
+        await readFileAndProcess('/path/without/permission.txt');
+    } catch (error) {
+        testError = error;
+    }
+    assert(testError instanceof PermissionError, 'Expected a PermissionError');
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This scenario demonstrates complex error handling patterns, including try/catch/finally with typed custom errors, proper resource management, and comprehensive error handling logic. It tests the LLM's ability to complete nested error handling blocks and ensure syntactic correctness. The assertions verify that specific errors are thrown under different conditions, ensuring type correctness and proper error transformation.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+(async () => {
+    let testError: Error | null = null;
+    try {
+        await readFileAndProcess('/invalid/path/to/file.txt');
+    } catch (error) {
+        testError = error;
+    }
+    assert(testError instanceof FileNotFoundError, 'Expected a FileNotFoundError');
+
+    testError = null;
+    try {
+        await readFileAndProcess('/path/without/permission.txt');
+    } catch (error) {
+        testError = error;
+    }
+    assert(testError instanceof PermissionError, 'Expected a PermissionError');
+})();
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+class CustomError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'CustomError';
+	}
+}
+
+class Resource {
+	private resource: fs.FileHandle | null = null;
+
+	async open(filePath: string): Promise<void> {
+		try {
+			this.resource = await fs.promises.open(filePath, 'r');
+		} catch (error) {
+			throw new CustomError('Failed to open file');
+		}
+	}
+
+	async read(): Promise<string> {
+		if (!this.resource) {
+			throw new CustomError('Resource not opened');
+		}
+		try {
+			const buffer = Buffer.alloc(1024);
+			const { bytesRead } = await this.resource.read(buffer, 0, 1024, 0);
+			return buffer.toString('utf-8', 0, bytesRead);
+		} catch (error) {
+			throw new CustomError('Failed to read file');
+		}
+	}
+
+	async close(): Promise<void> {
+		if (this.resource) {
+			await this.resource.close();
+			this.resource = null;
+		}
+	}
+}
+
+async function processFile(filePath: string): Promise<string> {
+	const resource = new Resource();
+	try {
+		await resource.open(filePath);
+		const content = await resource.read();
+		return content;
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+	} finally {
+		await resource.close();
+	}
+
+SUFFIX CODE:
+----------------------------------------
+	} finally {
+		await resource.close();
+	}
+}
+
+(async () => {
+	const filePath = 'testfile.txt';
+	try {
+		const content = await processFile(filePath);
+		console.log(content);
+	} catch (error) {
+		if (error instanceof CustomError) {
+			console.error('Custom error occurred:', error.message);
+		} else {
+			console.error('An unexpected error occurred:', error);
+		}
+	}
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to correctly handle nested try/catch/finally blocks with typed errors and custom error hierarchies. It demonstrates proper resource management and error transformation patterns with type guards, making it a robust test for understanding complex TypeScript syntax and type safety.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+async function testProcessFile() {
+	const filePath = 'nonexistentfile.txt';
+	try {
+		await processFile(filePath);
+		assert.fail('Expected error was not thrown');
+	} catch (error) {
+		assert(error instanceof CustomError, 'Error is not an instance of CustomError');
+		assert.strictEqual(error.message, 'Failed to open file', 'Error message mismatch');
+	}
+}
+
+testProcessFile().then(() => console.log('All assertions passed')).catch(err => console.error('Assertions failed', err));
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+class CustomError extends Error {
+    constructor(public message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+class FileReadError extends CustomError {
+    constructor(public filePath: string, message: string) {
+        super(message);
+        this.name = 'FileReadError';
+    }
+}
+
+class FileProcessingError extends CustomError {
+    constructor(public fileName: string, message: string) {
+        super(message);
+        this.name = 'FileProcessingError';
+    }
+}
+
+async function readFile(filePath: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                reject(new FileReadError(filePath, `Error reading file: ${err.message}`));
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+async function processFile(filePath: string): Promise<string> {
+    try {
+        const fileContent = await readFile(filePath);
+        if (fileContent.includes('error')) {
+            throw new FileProcessingError(filePath, 'File contains error text');
+        }
+        return `Processed: ${fileContent}`;
+    } catch (error) {
+        if (error instanceof FileReadError) {
+            console.error(`File read error: ${error.message}`);
+        } else if (error instanceof FileProcessingError) {
+            console.error(`File processing error: ${error.message}`);
+        } else {
+            console.error(`Unexpected error: ${error.message}`);
+        }
+        throw error;
+    }
+}
+
+// Helper function for testing
+function simulateFileRead(filePath: string, content: string, shouldError: boolean): void {
+    jest.spyOn(fs, 'readFile').mockImplementation((path, encoding, callback) => {
+        if (shouldError) {
+            callback(new Error('Simulated read error'), null);
+        } else {
+            callback(null, content);
+        }
+    });
+}
+
+// Test cases
+const testFilePath = 'test.txt';
+simulateFileRead(testFilePath, 'This is a test file.', false);
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+processFile(testFilePath).then(result => {
+    expect(result).toBe('Processed: This is a test file.');
+});
+
+SUFFIX CODE:
+----------------------------------------
+jest.restoreAllMocks();
+
+simulateFileRead(testFilePath, 'This file contains an error.', false);
+processFile(testFilePath).catch(err => {
+    expect(err).toBeInstanceOf(FileProcessingError);
+    expect(err.message).toBe('File contains error text');
+});
+
+jest.restoreAllMocks();
+
+simulateFileRead(testFilePath, '', true);
+processFile(testFilePath).catch(err => {
+    expect(err).toBeInstanceOf(FileReadError);
+    expect(err.message).toBe('Error reading file: Simulated read error');
+});
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand complex error handling patterns with custom error hierarchies, proper typing, and error transformation. The completion involves nested try/catch blocks, type guards, and resource cleanup, ensuring the LLM can handle TypeScript's type system and asynchronous error handling correctly. The test case includes assertions for different error scenarios and verifies that the correct custom error types are thrown and handled, making it an excellent benchmark for syntax completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+simulateFileRead(testFilePath, 'This is a test file.', false);
+await processFile(testFilePath).then(result => {
+    expect(result).toBe('Processed: This is a test file.');
+}).catch(err => {
+    throw err;
+});
+
+jest.restoreAllMocks();
+
+simulateFileRead(testFilePath, 'This file contains an error.', false);
+processFile(testFilePath).catch(err => {
+    expect(err).toBeInstanceOf(FileProcessingError);
+    expect(err.message).toBe('File contains error text');
+});
+
+jest.restoreAllMocks();
+
+simulateFileRead(testFilePath, '', true);
+processFile(testFilePath).catch(err => {
+    expect(err).toBeInstanceOf(FileReadError);
+    expect(err.message).toBe('Error reading file: Simulated read error');
+});
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+class CustomError extends Error {
+    constructor(public message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+class FileReadError extends CustomError {
+    constructor(public filePath: string) {
+        super(`Failed to read file: ${filePath}`);
+        this.name = 'FileReadError';
+    }
+}
+
+class FileParseError extends CustomError {
+    constructor(public filePath: string, public innerError: Error) {
+        super(`Failed to parse file: ${filePath} due to ${innerError.message}`);
+        this.name = 'FileParseError';
+    }
+}
+
+function readFile(filePath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, 'utf8', (err, data) => {
+            if (err) {
+                reject(new FileReadError(filePath));
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+function parseFileContent(content: string): object {
+    try {
+        return JSON.parse(content);
+    } catch (error) {
+        throw new Error(`Invalid JSON format: ${error.message}`);
+    }
+}
+
+async function processFile(filePath: string): Promise<void> {
+    try {
+        const content = await readFile(filePath);
+        const data = parseFileContent(content);
+        console.log('File data:', data);
+    } catch (error) {
+        if (error instanceof FileReadError) {
+            console.error('Error reading file:', error.message);
+        } else if (error instanceof Error) {
+            console.error('Unexpected error:', error.message);
+        } else {
+            console.error('Unknown error');
+        }
+    }
+}
+
+// Test the processFile function with a valid file
+(async () => {
+    await processFile('./validFile.json');
+    
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+})();
+
+SUFFIX CODE:
+----------------------------------------
+})();
+
+// Test the processFile function with an invalid file
+(async () => {
+    await processFile('./invalidFile.json');
+})();
+
+// Assertions
+import assert from 'assert';
+
+(async () => {
+    try {
+        await processFile('./testFile.json');
+        assert(true, 'processFile should not throw an error with valid file');
+    } catch (e) {
+        assert.fail('processFile threw an error with valid file');
+    }
+
+    try {
+        await processFile('./nonExistentFile.json');
+        assert.fail('processFile did not throw an error with non-existent file');
+    } catch (e) {
+        assert(e instanceof FileReadError, 'processFile should throw FileReadError with non-existent file');
+    }
+})();
+
+JUSTIFICATION:
+----------------------------------------
+This test case assesses the LLM's ability to complete a complex try/catch/finally error handling pattern, including the proper usage of custom error classes with inheritance. The example demonstrates nested structures, type annotations, and proper resource management. The assertions test the function's behavior with both valid and invalid inputs, ensuring that the error handling works as expected and that the types are correctly checked. This makes it a robust test for syntax completion capabilities in TypeScript.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+(async () => {
+    try {
+        await processFile('./testFile.json');
+        assert(true, 'processFile should not throw an error with valid file');
+    } catch (e) {
+        assert.fail('processFile threw an error with valid file');
+    }
+
+    try {
+        await processFile('./nonExistentFile.json');
+        assert.fail('processFile did not throw an error with non-existent file');
+    } catch (e) {
+        assert(e instanceof FileReadError, 'processFile should throw FileReadError with non-existent file');
+    }
+})();
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import { assert } from 'chai';
+
+interface Product {
+	name: string;
+	price: number;
+	category: string;
+}
+
+class ProductBuilder {
+	private product: Product;
+
+	constructor() {
+		this.product = { name: '', price: 0, category: '' };
+	}
+
+	setName(name: string): this {
+		this.product.name = name;
+		return this;
+	}
+
+	setPrice(price: number): this {
+		this.product.price = price;
+		return this;
+	}
+
+	setCategory(category: string): this {
+		this.product.category = category;
+		return this;
+	}
+
+	build(): Product {
+		return this.product;
+	}
+}
+
+const builder = new ProductBuilder();
+const product = builder
+	.setName('Laptop')
+	.setPrice(1500)
+	.setCategory('Electronics')
+	.build();
+
+assert.strictEqual(product.name, 'Laptop');
+assert.strictEqual(product.price, 1500);
+assert.strictEqual(product.category, 'Electronics');
+
+// Now let's add a discount feature to the ProductBuilder
+ProductBuilder.prototype.setDiscount = function (discount: number): this {
+	if (discount < 0 || discount > 100) {
+		throw new Error('Discount must be between 0 and 100');
+	}
+	this.product.price = this.product.price * (1 - discount / 100);
+	return this;
+};
+
+// Rebuild the product with the discount applied
+const discountedProduct = builder
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+	.setName('Laptop').setPrice(1500).setCategory('Electronics')
+
+SUFFIX CODE:
+----------------------------------------
+.setDiscount(10).build();
+
+assert.strictEqual(discountedProduct.price, 1350);
+
+// Clean up any resources if needed (not applicable in this scenario)
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of a builder pattern implementation with typed interfaces. The prefix sets up the context of creating a ProductBuilder class with method chaining for setting product properties. The golden completion continues this pattern by adding methods to set the product's name, price, and category, maintaining proper type inference and method chaining. The suffix applies a discount to the product and verifies the final price using assertions. This scenario tests the LLM's ability to handle complex multi-line method chaining patterns with proper type inference and maintain syntactic correctness and proper nesting.
+
+ASSERTIONS:
+----------------------------------------
+assert.strictEqual(discountedProduct.name, 'Laptop');
+assert.strictEqual(discountedProduct.price, 1350);
+assert.strictEqual(discountedProduct.category, 'Electronics');
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import assert from 'assert';
+
+// Utility function to simulate async operation
+async function asyncOperation(value: number): Promise<number> {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (value < 0) {
+                reject(new Error('Negative value not allowed'));
+            } else {
+                resolve(value * 2);
+            }
+        }, 1000);
+    });
+}
+
+// Custom error class for specific error handling
+class CustomError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'CustomError';
+    }
+}
+
+// Function that performs an async operation and handles errors
+async function processValue(value: number): Promise<number> {
+    try {
+        const result = await asyncOperation(value);
+        return result;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new CustomError(`Processing error: ${error.message}`);
+        } else {
+            throw new CustomError('Unknown error');
+        }
+    }
+}
+
+// Function to test the error handling pattern
+async function testErrorHandling(): Promise<void> {
+    try {
+        const positiveResult = await processValue(5);
+        assert.strictEqual(positiveResult, 10);
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+        await processValue(-1);
+
+SUFFIX CODE:
+----------------------------------------
+    } catch (error) {
+        if (error instanceof CustomError) {
+            assert.strictEqual(error.message, 'Processing error: Negative value not allowed');
+        } else {
+            throw error;
+        }
+    } finally {
+        console.log('Cleanup resources if any');
+    }
+}
+
+testErrorHandling().then(() => console.log('Test completed')).catch(console.error);
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete complex error handling patterns, including try/catch/finally blocks with typed errors, and nested error handling with custom error classes. It also verifies the model's capability to maintain proper indentation and syntactical correctness in a multi-line context.
+
+ASSERTIONS:
+----------------------------------------
+assert.doesNotReject(testErrorHandling);
+assert.rejects(async () => processValue(-5), CustomError, 'Processing error: Negative value not allowed');
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+// Interface for the FileHandlerBuilder
+interface FileHandlerBuilder {
+	source(path: string): this;
+	encoding(enc: BufferEncoding): this;
+	read(): string;
+	write(content: string): void;
+}
+
+// Concrete implementation of the FileHandlerBuilder
+class ConcreteFileHandlerBuilder implements FileHandlerBuilder {
+	private filePath: string = '';
+	private fileEncoding: BufferEncoding = 'utf-8';
+
+	source(path: string): this {
+		this.filePath = path;
+		return this;
+	}
+
+	encoding(enc: BufferEncoding): this {
+		this.fileEncoding = enc;
+		return this;
+	}
+
+	read(): string {
+		if (!this.filePath) {
+			throw new Error('File path must be set');
+		}
+		return fs.readFileSync(this.filePath, { encoding: this.fileEncoding });
+	}
+
+	write(content: string): void {
+		if (!this.filePath) {
+			throw new Error('File path must be set');
+		}
+		fs.writeFileSync(this.filePath, content, { encoding: this.fileEncoding });
+	}
+}
+
+// Test Case Setup
+const testFilePath = 'testfile.txt';
+const testContent = 'This is a test.';
+const testEncoding: BufferEncoding = 'utf-8';
+
+// Initialize FileHandlerBuilder
+const fileHandler = new ConcreteFileHandlerBuilder();
+
+// Write initial content to file
+fileHandler.source(testFilePath).encoding(testEncoding).write(testContent);
+
+// Read and verify the content
+const readContent = fileHandler.source(testFilePath).encoding(testEncoding).read();
+
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+console.assert(readContent === testContent, 'Read content does not match written content');
+
+SUFFIX CODE:
+----------------------------------------
+
+// Clean up the test file
+fs.unlinkSync(testFilePath);
+
+// Additional check to ensure the file is deleted
+try {
+	fs.accessSync(testFilePath);
+	throw new Error('File should have been deleted');
+} catch (err) {
+	if (err.code !== 'ENOENT') {
+		throw err;
+	}
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it demonstrates a complex multi-line syntax pattern with method chaining and type inference within a builder pattern. It ensures that the LLM can handle nested method calls and type constraints correctly. The assertions verify that the file content read matches the content written, which is a meaningful test of the FileHandlerBuilder's functionality. The cleanup code ensures that resources are managed appropriately after the assertions.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(readContent === testContent, 'File content should match the written content');
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: devbench-syntax-completion
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import fs from 'fs';
+
+// Custom error class for file operations
+class FileError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = 'FileError';
+	}
+}
+
+// Function to read a file and return its content as a string
+async function readFile(filePath: string): Promise<string> {
+	return new Promise((resolve, reject) => {
+		fs.readFile(filePath, 'utf8', (err, data) => {
+			if (err) {
+				reject(new FileError(`Failed to read file: ${filePath}`));
+			} else {
+				resolve(data);
+			}
+		});
+	});
+}
+
+// Function to write data to a file
+async function writeFile(filePath: string, data: string): Promise<void> {
+	return new Promise((resolve, reject) => {
+		fs.writeFile(filePath, data, 'utf8', (err) => {
+			if (err) {
+				reject(new FileError(`Failed to write to file: ${filePath}`));
+			} else {
+				resolve();
+			}
+		});
+	});
+}
+
+// Function to process file content
+async function processFileContent(filePath: string, transform: (content: string) => string): Promise<string> {
+	try {
+		const content = await readFile(filePath);
+		const transformedContent = transform(content);
+		await writeFile(filePath, transformedContent);
+		return transformedContent;
+	} catch (error) {
+		if (error instanceof FileError) {
+			throw error;
+		} else {
+			throw new FileError('An unknown error occurred during file processing');
+		}
+	}
+}
+
+// Example usage
+const filePath = 'example.txt';
+const toUpperCase = (content: string) => content.toUpperCase();
+
+(async () => {
+	try {
+		const result = await processFileContent(filePath, toUpperCase);
+		console.log('File processed successfully:', result);
+		
+
+LLM COMPLETION gpt-4.1-mini:
+----------------------------------------
+	} catch (error) {
+
+SUFFIX CODE:
+----------------------------------------
+console.error('An error occurred:', error);
+	} finally {
+		// Cleanup code here if needed
+	}
+})();
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to assess the model's capability to handle complex multi-line error handling patterns, specifically try/catch/finally blocks with custom error classes and proper type inference. The prefix sets up the context with file operations, custom error handling, and an async function that processes file content. The completion requires the model to insert a specific pattern of logging the result and handling errors correctly, maintaining the context and indentation. The suffix ensures that the error handling and cleanup code are distinct and follow the proper sequence.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+(async () => {
+	let caughtError = null;
+	try {
+		await processFileContent('nonexistent.txt', toUpperCase);
+	} catch (error) {
+		caughtError = error;
+	}
+	assert(caughtError instanceof FileError, 'Expected a FileError to be thrown');
+	assert.strictEqual(caughtError.message, 'Failed to read file: nonexistent.txt', 'Error message should match');
+})();
+
+(async () => {
+	const testFilePath = 'test.txt';
+	fs.writeFileSync(testFilePath, 'hello world');
+	const result = await processFileContent(testFilePath, toUpperCase);
+	assert.strictEqual(result, 'HELLO WORLD', 'Content should be transformed to upper case');
+	const fileContent = fs.readFileSync(testFilePath, 'utf8');
+	assert.strictEqual(fileContent, 'HELLO WORLD', 'File content should be updated to upper case');
+	fs.unlinkSync(testFilePath); // Cleanup
+})();
+================================================================================

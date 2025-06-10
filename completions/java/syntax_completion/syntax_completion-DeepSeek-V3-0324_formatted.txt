@@ -1,0 +1,3679 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamExample {
+
+    public static class Person {
+        private String name;
+        private int age;
+
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<Person> persons = Arrays.asList(
+            new Person("John", 25),
+            new Person("Jane", 20),
+            new Person("Tom", 30),
+            new Person("Lucy", 25)
+        );
+
+        // Using Stream API to filter and collect
+        Map<Integer, List<String>> personsByAge = persons.stream()
+            .collect(Collectors.groupingBy(
+                Person::getAge,
+                Collectors.mapping(Person::getName, Collectors.toList())
+            ));
+
+        // Print the result
+        personsByAge.forEach((age, names) -> {
+            System.out.println("Age " + age + ": " + names);
+        });
+
+        // More complex Stream API operations
+        List<String> sortedNames = persons.stream()
+            .filter(p -> p.getAge() > 20)
+            .map(Person::getName)
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            .sorted()
+            .collect(Collectors.toList());
+        sortedNames
+
+SUFFIX CODE:
+----------------------------------------
+            .forEach(System.out::println);
+
+        // Assertions to verify the stream operations
+        assert sortedNames.size() == 3 : "Expected 3 names after filtering";
+        assert sortedNames.get(0).equals("John") : "Expected John as the first name";
+        assert sortedNames.get(1).equals("Lucy") : "Expected Lucy as the second name";
+        assert sortedNames.get(2).equals("Tom") : "Expected Tom as the third name";
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on the complex syntax of Java's Stream API, specifically involving filtering, mapping, and sorting operations. The prefix provides extensive setup with data initialization and intermediate stream operations, while the golden completion requires the model to correctly insert a sorting step in the stream pipeline. This scenario tests the model's ability to handle multi-line method chaining and maintain proper indentation and syntax.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+import java.util.function.Function;
+
+public class User {
+    private String name;
+    private String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public String toString() {
+        return "User{name='" + name + "', email='" + email + "'}";
+    }
+}
+
+public class UserService {
+    public Optional<User> findUserByEmail(String email) {
+        // Imagine this method queries a database or external service
+        if ("example@example.com".equals(email)) {
+            return Optional.of(new User("John Doe", "example@example.com"));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public String getUserNameByEmail(String email) {
+        return findUserByEmail(email)
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+                .map(User::getName)
+
+SUFFIX CODE:
+----------------------------------------
+                .orElse(new User("Unknown", "unknown@unknown.com"))
+                .getName();
+    }
+
+    public static void main(String[] args) {
+        UserService userService = new UserService();
+        String userName = userService.getUserNameByEmail("example@example.com");
+        assert "John Doe".equals(userName) : "Test failed: Expected John Doe, got " + userName;
+
+        userName = userService.getUserNameByEmail("nonexistent@example.com");
+        assert "Unknown".equals(userName) : "Test failed: Expected Unknown, got " + userName;
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to complete a complex Java syntax pattern involving the Optional class and method references. The prefix sets up a realistic context with a User and UserService class, demonstrating usage of Optional to handle potentially missing values. The golden completion involves using the map method with a method reference to transform the Optional value. This tests the LLM's understanding of method references, Optional usage, and chaining method calls. The assertions verify that the correct user names are returned based on the input email, ensuring the completion's correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+
+public class ComplexStreamExample {
+
+    private List<String> stringList;
+
+    public ComplexStreamExample(List<String> stringList) {
+        this.stringList = stringList;
+    }
+
+    public void processStrings() {
+        // Prefix: Setup context for processing strings
+        // Assume stringList is already populated
+        System.out.println("Processing strings...");
+        // Stream operation to filter, map, and collect strings
+        List<String> result = stringList.stream()
+            .filter(s -> s.length() > 3)
+            .map(String::toUpperCase)
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            .distinct()
+
+SUFFIX CODE:
+----------------------------------------
+            .sorted()
+            .collect(Collectors.toList());
+
+        // Assert the result size and content
+        assert result.size() == 2 : "Expected result size to be 2";
+        assert result.contains("HELLO") : "Expected result to contain 'HELLO'";
+        assert result.contains("WORLD") : "Expected result to contain 'WORLD'";
+
+        // Cleanup resources (none in this case)
+        System.out.println("Completed processing strings.");
+    }
+
+    public static void main(String[] args) {
+        List<String> sampleStrings = Arrays.asList("hi", "hello", "world");
+        ComplexStreamExample example = new ComplexStreamExample(sampleStrings);
+        example.processStrings();
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the language model's ability to complete a complex Stream API operation with collectors in Java. It tests whether the model can correctly insert the 'distinct()' method in the appropriate place within a chain of stream operations. The prefix sets up the context and the stream operations, while the suffix contains different code that follows after the completion. The assertions verify the correctness of the completion by checking the size and content of the result list.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamApiExample {
+
+    static class Person {
+        String name;
+        int age;
+
+        Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<Person> people = Arrays.asList(
+            new Person("Alice", 30),
+            new Person("Bob", 25),
+            new Person("Charlie", 35),
+            new Person("David", 40)
+        );
+
+        // Filter out people younger than 30
+        List<Person> filteredList = people.stream()
+            .filter(p -> p.getAge() >= 30)
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            .filter(p -> p.getAge() >= 30)
+
+SUFFIX CODE:
+----------------------------------------
+
+            .collect(Collectors.toList());
+
+        // Assertions
+        assert filteredList.size() == 3 : "Filtered list should contain 3 people";
+        assert filteredList.get(0).getName().equals("Alice") : "First person should be Alice";
+        assert filteredList.get(1).getName().equals("Charlie") : "Second person should be Charlie";
+        assert filteredList.get(2).getName().equals("David") : "Third person should be David";
+
+        System.out.println("All assertions passed.");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the Stream API with method references, specifically focusing on the ability to filter and map elements within a stream. It requires the LLM to understand complex Java syntax including lambda expressions, method references, and stream operations. The completion involves a method reference that transforms the stream of Person objects into a stream of their names, which tests the LLM's ability to correctly apply and format such transformations within the Stream API.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+
+public class User {
+    private String name;
+    private String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+}
+
+public class UserService {
+    private Optional<User> findUserByEmail(String email) {
+        // Simulate database lookup
+        if ("test@example.com".equals(email)) {
+            return Optional.of(new User("Test User", email));
+        }
+        return Optional.empty();
+    }
+
+    public String getUserNameOrDefault(String email) {
+        Optional<User> userOpt = findUserByEmail(email);
+        
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        return userOpt.map(User::getName).orElse("Unknown User");
+
+SUFFIX CODE:
+----------------------------------------
+
+    }
+
+    public static void main(String[] args) {
+        UserService userService = new UserService();
+        String userName = userService.getUserNameOrDefault("test@example.com");
+        assert userName.equals("Test User") : "Expected 'Test User', but got " + userName;
+        userName = userService.getUserNameOrDefault("unknown@example.com");
+        assert userName.equals("Unknown User") : "Expected 'Unknown User', but got " + userName;
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case as it demonstrates the usage of Optional<T> with method chaining and lambda expressions to handle the potential absence of a value, ensuring the syntax completion can handle multi-line patterns and Optional usage correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.io.*;
+import org.junit.Assert;
+
+public class ResourceManagementExample {
+    public static void main(String[] args) {
+        // Initialize resources
+        String filePath = "example.txt";
+        String contentToWrite = "Hello, World!";
+
+        // Writing content to file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            writer.write(contentToWrite);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Reading content from file
+        StringBuilder contentRead = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                contentRead.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Using nested try-with-resources pattern
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+             BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            writer.write("Additional content.");
+            writer.flush();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                contentRead.append(line);
+            }
+            // Assertions
+            Assert.assertTrue(contentRead.toString().contains("Hello, World!"));
+            Assert.assertTrue(contentRead.toString().contains("Additional content."));
+
+SUFFIX CODE:
+----------------------------------------
+            writer.write("Additional content.");
+            writer.flush();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                contentRead.append(line);
+            }
+            // Assertions
+            Assert.assertTrue(contentRead.toString().contains("Hello, World!"));
+            Assert.assertTrue(contentRead.toString().contains("Additional content."));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle nested try-with-resources statements, which are an important aspect of Java's resource management. The correct completion involves properly writing and reading from a file within nested try-with-resources blocks, ensuring resources are managed correctly. The assertions verify that the content is written and read as expected.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class StreamApiExample {
+    public static class Person {
+        String name;
+        int age;
+
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        @Override
+        public String toString() {
+            return "Person{" + "name='" + name + '\'' + ", age=" + age + '}';
+        }
+    }
+
+    public static List<Person> getPersonList() {
+        List<Person> people = new ArrayList<>();
+        people.add(new Person("John", 30));
+        people.add(new Person("Jane", 25));
+        people.add(new Person("Jack", 20));
+        people.add(new Person("Jill", 35));
+        people.add(new Person("James", 40));
+        return people;
+    }
+
+    public static void main(String[] args) {
+        List<Person> people = getPersonList();
+        // Filter people above age 25
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        people = people.stream().filter(p -> p.getAge() > 25).collect(Collectors.toList());
+
+SUFFIX CODE:
+----------------------------------------
+        List<String> names = people.stream().map(Person::getName).collect(Collectors.toList());
+        assert names.size() == 5 : "Expected 5 names";
+        assert names.contains("John") : "Names should contain John";
+        assert names.contains("Jane") : "Names should contain Jane";
+        assert names.contains("Jack") : "Names should contain Jack";
+        assert names.contains("Jill") : "Names should contain Jill";
+        assert names.contains("James") : "Names should contain James";
+
+        List<Person> sortedByAge = people.stream().sorted(Comparator.comparingInt(Person::getAge)).collect(Collectors.toList());
+        assert sortedByAge.get(0).getName().equals("Jack") : "First person should be Jack";
+        assert sortedByAge.get(4).getName().equals("James") : "Last person should be James";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a complex syntax pattern involving the Stream API operations with collectors. The prefix provides context by defining a Person class and a list of Person objects. The golden_completion requires filtering the stream and collecting the results, followed by assertions to verify the correctness of the operation. The suffix continues with additional stream operations and assertions to ensure proper functionality. This scenario tests understanding of stream operations, lambda expressions, method references, and proper use of assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamApiExample {
+
+    private static class Person {
+        String name;
+        int age;
+
+        Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+    }
+
+    public static void main(String[] args) {
+        List<Person> people = Arrays.asList(
+            new Person("Alice", 30),
+            new Person("Bob", 25),
+            new Person("Charlie", 35),
+            new Person("David", 28)
+        );
+
+        // Complex nested Stream API operations
+        // Step 1: Filter people older than 28
+        // Step 2: Sort by name
+        // Step 3: Collect names into a List
+        List<String> names = people.stream()
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            .filter(p -> p.getAge() > 28)
+            .sorted(Comparator.comparing(Person::getName))
+            .map(Person::getName)
+            .collect(Collectors.toList());
+        names
+
+SUFFIX CODE:
+----------------------------------------
+        .forEach(System.out::println);
+        assert names.size() == 2 : "Expected 2 names, but got " + names.size();
+        assert names.contains("Alice") : "List does not contain Alice";
+        assert names.contains("Charlie") : "List does not contain Charlie";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's understanding of nested Stream API operations. The prefix sets up a list of people and demonstrates filtering, sorting, and mapping operations in a chain. The completion involves using Stream API methods correctly while maintaining proper indentation and structure. Assertions in the suffix validate the correctness of the operations by checking the size and contents of the resulting list.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+import java.util.function.*;
+
+public class StreamExample {
+
+    // Helper method to generate a list of random integers
+    private static List<Integer> generateRandomIntegers(int count, int min, int max) {
+        Random random = new Random();
+        return IntStream.range(0, count)
+                .map(i -> random.nextInt((max - min) + 1) + min)
+                .boxed()
+                .collect(Collectors.toList());
+    }
+
+    // Helper method to print a list
+    private static void printList(List<Integer> list) {
+        list.forEach(System.out::println);
+    }
+
+    public static void main(String[] args) {
+        // Generating a list of 20 random integers between 1 and 100
+        List<Integer> numbers = generateRandomIntegers(20, 1, 100);
+
+        // Using Stream API to filter, map, and collect results
+        List<Integer> filteredNumbers = numbers.stream()
+            .filter(n -> n % 2 == 0)
+            .map(n -> n * 2)
+            .
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+collect(Collectors.toList())
+
+SUFFIX CODE:
+----------------------------------------
+
+        // Print the original and filtered lists
+        System.out.println("Original numbers:");
+        printList(numbers);
+        
+        System.out.println("\nFiltered and mapped numbers:");
+        printList(filteredNumbers);
+        
+        // Assertions
+        // Check that the filtered list contains only even numbers doubled
+        for (Integer n : filteredNumbers) {
+            assert n % 4 == 0 : "Filtered list contains a number not divisible by 4";
+        }
+        
+        // Check that the size of the filtered list is correct
+        long expectedSize = numbers.stream().filter(n -> n % 2 == 0).count();
+        assert filteredNumbers.size() == expectedSize : "Size of filtered list does not match expected size";
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability to complete a complex Stream API operation, including the usage of filter, map, and collect methods. The prefix provides extensive context, including helper methods and the setup of a Stream operation. The golden completion focuses on the final collect operation, which is crucial for converting the stream back to a list. The suffix includes assertions that verify the correctness of the stream operations, ensuring that the list contains only even numbers doubled and that the size of the filtered list matches the expected size.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class FileProcessor {
+    public static void main(String[] args) {
+        String filePath = "testfile.txt";
+        readFile(filePath);
+    }
+
+    public static void readFile(String filePath) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void testReadFile() {
+        // Test reading an existing file
+        String testFilePath = "testfile.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(testFilePath))) {
+            String firstLine = br.readLine();
+            assert firstLine != null : "First line should not be null";
+            assert firstLine.equals("This is a test file.") : "First line should match expected content";
+        } catch (IOException e) {
+            assert false : "IOException should not occur";
+        }
+    }
+}
+
+// Create a test file for demonstration purposes
+public class FileCreator {
+    public static void main(String[] args) {
+        try (java.io.PrintWriter writer = new java.io.PrintWriter(new java.io.FileWriter("testfile.txt"))) {
+            writer.println("This is a test file.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle nested try-with-resources blocks, a complex Java syntax feature. It demonstrates proper resource management and error handling within nested structures, maintaining correct indentation and syntax throughout. The assertions in the suffix validate the functionality and ensure the code behaves as expected.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class StreamAPITest {
+
+    // Sample data class
+    static class Person {
+        String name;
+        int age;
+
+        Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        String getName() { return name; }
+        int getAge() { return age; }
+    }
+
+    // Sample method to generate a list of people
+    static List<Person> generatePeople() {
+        return Arrays.asList(
+            new Person("Alice", 30),
+            new Person("Bob", 25),
+            new Person("Charlie", 35),
+            new Person("David", 40),
+            new Person("Eve", 22)
+        );
+    }
+
+    public static void main(String[] args) {
+        List<Person> people = generatePeople();
+
+        // Using Stream API to filter, map, and collect
+        List<String> namesOfAdults = people.stream()
+            .filter(person -> person.getAge() >= 30)
+            .map(Person::getName)
+            .collect(Collectors.toList());
+
+        // Expected result: ["Alice", "Charlie", "David"]
+        System.out.println(namesOfAdults);
+
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        assert namesOfAdults.size() == 3 : "There should be 3 adults";
+        assert namesOfAdults.contains("Alice") : "Alice should be in the list";
+        assert namesOfAdults.contains("Charlie") : "Charlie should be in the list";
+        assert namesOfAdults.contains("David") : "David should be in the list";
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertions
+        assert namesOfAdults.size() == 3 : "There should be 3 adults";
+        assert namesOfAdults.contains("Alice") : "Alice should be in the list";
+        assert namesOfAdults.contains("Charlie") : "Charlie should be in the list";
+        assert namesOfAdults.contains("David") : "David should be in the list";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of Java's Stream API with a combination of filtering, mapping, and collecting operations. It tests the model's ability to complete a complex, multi-line stream operation with proper syntax and chaining. The assertions ensure that the stream operations produce the correct results based on the given input data, making it a robust test case for syntax completion and logical correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class StreamApiExample {
+
+    public static List<String> transformList(List<String> inputList) {
+        // Example setup code
+        List<String> processedList = inputList.stream()
+            .filter(Objects::nonNull)
+            .map(String::trim)
+            .collect(Collectors.toList());
+        return processedList;
+    }
+
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList(" Alice ", " Bob ", " Charlie ", null, " David ");
+        List<String> transformedNames = transformList(names);
+
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        // Assertions to validate the transformation
+        assert transformedNames.size() == 4 : "The size of the list should be 4";
+        assert transformedNames.contains("Alice") : "The list should contain 'Alice'";
+        assert transformedNames.contains("Bob") : "The list should contain 'Bob'";
+        assert transformedNames.contains("Charlie") : "The list should contain 'Charlie'";
+        assert transformedNames.contains("David") : "The list should contain 'David'";
+
+        // Further processing using Stream API
+        List<String> upperCaseNames = transformedNames.stream()
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+
+        // Assertions to validate the further processing
+        assert upperCaseNames.size() == 4 : "The size of the list should be 4 after converting to uppercase";
+        assert upperCaseNames.contains("ALICE") : "The list should contain 'ALICE'";
+        assert upperCaseNames.contains("BOB") : "The list should contain 'BOB'";
+        assert upperCaseNames.contains("CHARLIE") : "The list should contain 'CHARLIE'";
+        assert upperCaseNames.contains("DAVID") : "The list should contain 'DAVID'";
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertions to validate the transformation
+        assert transformedNames.size() == 4 : "The size of the list should be 4";
+        assert transformedNames.contains("Alice") : "The list should contain 'Alice'";
+        assert transformedNames.contains("Bob") : "The list should contain 'Bob'";
+        assert transformedNames.contains("Charlie") : "The list should contain 'Charlie'";
+        assert transformedNames.contains("David") : "The list should contain 'David'";
+
+        // Further processing using Stream API
+        List<String> upperCaseNames = transformedNames.stream()
+            .map(String::toUpperCase)
+            .collect(Collectors.toList());
+
+        // Assertions to validate the further processing
+        assert upperCaseNames.size() == 4 : "The size of the list should be 4 after converting to uppercase";
+        assert upperCaseNames.contains("ALICE") : "The list should contain 'ALICE'";
+        assert upperCaseNames.contains("BOB") : "The list should contain 'BOB'";
+        assert upperCaseNames.contains("CHARLIE") : "The list should contain 'CHARLIE'";
+        assert upperCaseNames.contains("DAVID") : "The list should contain 'DAVID'";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the Stream API with collectors in Java, focusing on complex stream operations and nested method calls. It includes multiple stages of stream processing, such as filtering, mapping, and collecting, which test the model's ability to understand and complete complex Java syntax patterns. The assertions validate the correctness of each stage, ensuring the proper transformation and filtering of the list.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class StreamExample {
+
+    // Helper method to generate a list of integers
+    private static List<Integer> generateList(int size) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            list.add(i);
+        }
+        return list;
+    }
+
+    // Helper method to check if a number is even
+    private static boolean isEven(int number) {
+        return number % 2 == 0;
+    }
+
+    // Helper method to square a number
+    private static int square(int number) {
+        return number * number;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> numbers = generateList(10);
+
+        // Use Stream API to filter even numbers, square them and collect to a list
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        List<Integer> result = numbers.stream()
+            .filter(StreamExample::isEven)
+            .map(StreamExample::square)
+            .collect(Collectors.toList());
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertion to check if the resulting list contains the expected values
+        List<Integer> expected = Arrays.asList(0, 4, 16, 36, 64);
+        assert result.equals(expected) : "The resulting list does not match the expected values";
+
+        // Print the result
+        System.out.println(result);
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete complex Stream API operations with method references. It requires understanding of chaining operations such as filter, map, and collect, as well as the use of method references. The prefix provides a comprehensive setup with helper methods and a list generation, while the suffix includes assertions to verify the correctness of the stream operations. This scenario effectively evaluates the LLM's capability to handle multi-line method chaining and maintain syntactic correctness within nested structures.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.ArrayList;
+import java.util.List;
+
+public class NestedControlStructures {
+    public static void main(String[] args) {
+        // Initialize a list of integers
+        List<Integer> numbers = new ArrayList<>();
+        for (int i = 1; i <= 100; i++) {
+            numbers.add(i);
+        }
+        // Define threshold values
+        int lowerThreshold = 30;
+        int upperThreshold = 70;
+
+        // Initialize counters
+        int countLower = 0;
+        int countUpper = 0;
+        int countOther = 0;
+
+        // Process the list with nested control structures
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        for (int num : numbers) {
+            if (num < lowerThreshold) {
+                countLower++;
+            } else if (num >= upperThreshold) {
+                countUpper++;
+            } else {
+                countOther++;
+            }
+        }
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertions
+        assert countLower == 29 : "Expected 29 numbers lower than 30, but got " + countLower;
+        assert countUpper == 30 : "Expected 30 numbers greater than or equal to 70, but got " + countUpper;
+        assert countOther == 41 : "Expected 41 numbers between 30 and 70, but got " + countOther;
+
+        System.out.println("All assertions passed.");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle nested control structures, specifically multiple levels of if/else conditions within a for-each loop. The scenario includes initialization and processing of a list with nested conditions, making it a good test for understanding and completing complex syntax patterns. The assertions validate the correct categorization of numbers, ensuring the nested control structure is implemented correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class StreamAPIExample {
+
+	public static void main(String[] args) {
+		List<String> names = Arrays.asList("Alice", "Bob", "Charlie", "David", "Eve");
+		List<String> filteredNames;
+
+		// We want to filter names that start with 'A' and convert them to uppercase using Stream API
+		// This is the setup code for the scenario
+		// The golden completion will complete the stream operations
+		filteredNames = names.stream()
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+			.filter(name -> name.startsWith("A"))
+			.map(String::toUpperCase)
+
+SUFFIX CODE:
+----------------------------------------
+            .collect(Collectors.toList());
+
+		// Assertions
+		List<String> expectedNames = Arrays.asList("ALICE");
+		assert filteredNames.equals(expectedNames) : "Filtered names do not match expected names";
+
+		System.out.println("All assertions passed.");
+	}
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case checks the model's ability to complete a Stream API operation with multiple intermediate operations including filtering and mapping. It tests the understanding of lambda expressions, method references, and the stream pipeline structure. The assertions ensure that the filtering and mapping are correctly applied and the final list contains the expected results.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FileProcessor {
+
+    public static void main(String[] args) {
+        FileProcessor processor = new FileProcessor();
+        List<String> results = processor.processFile("testfile.txt");
+        for (String line : results) {
+            System.out.println(line);
+        }
+    }
+
+    public List<String> processFile(String fileName) {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.contains("ERROR")) {
+                    lines.add("Error found: " + line);
+                } else if (line.contains("WARNING")) {
+                    lines.add("Warning: " + line);
+                } else if (line.contains("INFO")) {
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+                    lines.add("Info: " + line);
+
+SUFFIX CODE:
+----------------------------------------
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // Assertions to validate the content
+        assert lines != null : "Lines should not be null";
+        assert !lines.isEmpty() : "Lines should not be empty";
+        assert lines.get(0).contains("Error found") : "First line should contain 'Error found'";
+        return lines;
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is an excellent example of nested control structures within a try-with-resources block. The nested if/else conditions and the proper handling of the BufferedReader resource using try-with-resources demonstrate complex syntax patterns. The assertions in the suffix ensure that the processed file contents are as expected and validate the integrity of the nested control structures and resource management.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.ArrayList;
+import java.util.List;
+
+public class NestedControlStructureTest {
+
+    public static List<Integer> filterAndDoubleEvenNumbers(List<Integer> numbers) {
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < numbers.size(); i++) {
+            int number = numbers.get(i);
+            if (number % 2 == 0) {
+                if (number > 10) {
+                    if (number < 50) {
+                        result.add(number * 2);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        List<Integer> numbers = new ArrayList<>();
+        numbers.add(5);
+        numbers.add(12);
+        numbers.add(25);
+        numbers.add(30);
+        numbers.add(48);
+        numbers.add(50);
+
+        List<Integer> expected = new ArrayList<>();
+        expected.add(24);
+        expected.add(60);
+        expected.add(96);
+
+        
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        List<Integer> actual = filterAndDoubleEvenNumbers(numbers);
+
+SUFFIX CODE:
+----------------------------------------
+
+        assert actual.equals(expected) : "The filtered and doubled even numbers do not match the expected results";
+
+        System.out.println("Test passed!");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the handling of nested control structures, specifically multiple levels of if conditions within a loop. The golden completion requires understanding the nested if conditions and correctly using the filtering and doubling logic, as well as accurately forming the assertions to verify the expected results. This tests the LLM's ability to maintain proper indentation and logical flow within nested structures.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.io.*;
+
+class ResourceHandler {
+    public String readFile(String fileName) throws IOException {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        }
+        return content.toString();
+    }
+
+    public void writeFile(String fileName, String content) throws IOException {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
+            bw.write(content);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ResourceHandler resourceHandler = new ResourceHandler();
+        String readFileName = "input.txt";
+        String writeFileName = "output.txt";
+        String contentToWrite = "This is a sample content.";
+
+        try {
+            // Reading content from input file
+            String content = resourceHandler.readFile(readFileName);
+            System.out.println("File content read: " + content);
+
+            // Writing content to output file
+            resourceHandler.writeFile(writeFileName, contentToWrite);
+            System.out.println("File content written: " + contentToWrite);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+    }
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertions
+        try {
+            String readContent = resourceHandler.readFile(writeFileName);
+            assert readContent.equals(contentToWrite + "\n") : "Content mismatch";
+            System.out.println("Assertion passed: File content matches");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case uses the try-with-resources syntax pattern to handle reading from and writing to files. It ensures that the LLM can correctly complete nested try-with-resources structures and handle IOException properly. Additionally, it includes assertions to verify that the file content matches the expected output, testing the LLM's ability to manage resources and perform accurate file operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.Collectors;
+
+public class StreamApiExample {
+
+	public static void main(String[] args) {
+		List<String> items = Arrays.asList("apple", "banana", "cherry", "date", "elderberry", "fig", "grape");
+
+		// Filter items starting with 'a' or 'b' and convert to uppercase
+		List<String> filteredItems = items.stream()
+			.filter(item -> item.startsWith("a") || item.startsWith("b"))
+			.map(String::toUpperCase)
+			.collect(Collectors.toList());
+
+		// Print filtered items
+		System.out.println("Filtered Items: " + filteredItems);
+
+		// Group items by their first letter
+		Map<Character, List<String>> groupedItems = items.stream()
+			.collect(Collectors.groupingBy(item -> item.charAt(0)));
+
+		// Print grouped items
+		System.out.println("Grouped Items: " + groupedItems);
+
+		// Test case setup
+		List<String> testItems = Arrays.asList("kiwi", "lemon", "mango", "nectarine", "orange", "papaya", "quince");
+		Map<Character, List<String>> expectedGrouping = new HashMap<>();
+		expectedGrouping.put('k', Arrays.asList("kiwi"));
+		expectedGrouping.put('l', Arrays.asList("lemon"));
+		expectedGrouping.put('m', Arrays.asList("mango"));
+		expectedGrouping.put('n', Arrays.asList("nectarine"));
+		expectedGrouping.put('o', Arrays.asList("orange"));
+		expectedGrouping.put('p', Arrays.asList("papaya"));
+		expectedGrouping.put('q', Arrays.asList("quince"));
+
+		// Group test items by their first letter
+		Map<Character, List<String>> testGroupedItems = testItems.stream()
+			.collect(Collectors.groupingBy(item -> item.charAt(0)));
+
+		// Assertions
+		assert testGroupedItems.equals(expectedGrouping) : "Test grouping does not match expected result";
+
+		// Additional Stream API operation: Joining items with a comma
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+		String itemsStartingWithVowel = items.stream()
+			.filter(item -> item.matches("^[aeiou].*"))
+			.collect(Collectors.joining(", "));
+
+SUFFIX CODE:
+----------------------------------------
+
+		// Print items starting with a vowel
+		System.out.println("Items Starting with Vowel: " + itemsStartingWithVowel);
+
+		// Assertion for items starting with a vowel
+		assert itemsStartingWithVowel.equals("apple, elderberry") : "Items starting with vowel do not match expected result";
+		String joinedItems = items.stream()
+			.collect(Collectors.joining(", "));
+
+		// Print joined items
+		System.out.println("Joined Items: " + joinedItems);
+
+		// Assertion for joined items
+		assert joinedItems.equals("apple, banana, cherry, date, elderberry, fig, grape") : "Joined items do not match expected result";
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for benchmarking an LLM's ability to complete complex Stream API operations in Java. It involves multiple stream transformations, including filtering, mapping, collecting, and joining. The golden completion requires understanding how to filter items based on a condition and join the results into a string. The scenario tests the LLM's ability to maintain proper syntax, indentation, and logical flow in a multi-step stream processing pipeline. Assertions verify the correctness of the stream operations, ensuring the LLM generates syntactically and semantically accurate code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class FileProcessor {
+
+    public static void main(String[] args) {
+        String filePath = "testfile.txt";
+        processFile(filePath);
+    }
+
+    public static void processFile(String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                processLine(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void processLine(String line) {
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        if (line.startsWith("ERROR")) {
+            System.out.println("Error encountered: " + line);
+        } else if (line.startsWith("WARN")) {
+            System.out.println("Warning: " + line);
+        } else {
+            System.out.println("Info: " + line);
+        }
+
+SUFFIX CODE:
+----------------------------------------
+        if (line.startsWith("ERROR")) {
+            System.out.println("Error encountered: " + line);
+        } else if (line.startsWith("WARN")) {
+            System.out.println("Warning: " + line);
+        } else {
+            System.out.println("Info: " + line);
+        }
+    }
+}
+
+// Test case to ensure proper execution
+public class FileProcessorTest {
+    public static void main(String[] args) {
+        // Mock file content
+        String[] lines = {"INFO: All systems operational", "WARN: Disk space low", "ERROR: Unable to connect to server"};
+        for (String line : lines) {
+            FileProcessor.processLine(line);
+        }
+        // Assertions
+        assert "INFO: All systems operational".equals(lines[0]);
+        assert "WARN: Disk space low".equals(lines[1]);
+        assert "ERROR: Unable to connect to server".equals(lines[2]);
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to complete nested if/else conditions correctly. The prefix establishes a scenario where lines from a file are processed, and the golden completion requires the model to correctly identify and handle lines starting with 'INFO'. The suffix includes additional conditions for 'ERROR' and 'WARN', along with assertions to verify the correctness of the code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class StreamExample {
+    public static void main(String[] args) {
+        List<String> items = new ArrayList<>();
+        items.add("apple");
+        items.add("banana");
+        items.add("orange");
+        items.add("grape");
+        items.add("watermelon");
+
+        // Transform the list to uppercase and filter items that contain 'a'
+        List<String> result = items.stream()
+                .map(String::toUpperCase)
+                .filter(item -> item.contains("A"))
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+                .collect(Collectors.toList());
+
+SUFFIX CODE:
+----------------------------------------
+        // Verify the result
+        assert result.size() == 4 : "Size should be 4";
+        assert result.contains("APPLE") : "Result should contain 'APPLE'";
+        assert result.contains("BANANA") : "Result should contain 'BANANA'";
+        assert result.contains("GRAPE") : "Result should contain 'GRAPE'";
+        assert result.contains("WATERMELON") : "Result should contain 'WATERMELON'";
+
+        // Output the result
+        result.forEach(System.out::println);
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it evaluates the LLM's ability to complete a complex Stream API operation, ensuring proper syntax for method chaining and the use of collectors. The completion is critical to transforming the stream back into a list, and the suffix verifies the correctness of the operation through assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+class Employee {
+	private String name;
+	private int age;
+
+	public Employee(String name, int age) {
+		this.name = name;
+		this.age = age;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public int getAge() {
+		return age;
+	}
+}
+
+public class EmployeeProcessor {
+	private List<Employee> employees;
+
+	public EmployeeProcessor() {
+		employees = new ArrayList<>();
+		employees.add(new Employee("Alice", 30));
+		employees.add(new Employee("Bob", 25));
+		employees.add(new Employee("Charlie", 35));
+	}
+
+	public List<String> getEmployeeNamesOverAge(int age) {
+		// Use Stream API to filter and collect employee names based on age
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+		return employees.stream()
+			.filter(e -> e.getAge() > age)
+			.map(Employee::getName)
+			.collect(Collectors.toList());
+
+SUFFIX CODE:
+----------------------------------------
+
+	}
+
+	public static void main(String[] args) {
+		EmployeeProcessor processor = new EmployeeProcessor();
+		List<String> namesOver30 = processor.getEmployeeNamesOverAge(30);
+		assert namesOver30.size() == 1 : "There should be only one employee over age 30";
+		assert namesOver30.contains("Charlie") : "Charlie should be in the list of employees over age 30";
+		List<String> namesOver20 = processor.getEmployeeNamesOverAge(20);
+		assert namesOver20.size() == 3 : "There should be three employees over age 20";
+		assert namesOver20.contains("Alice") : "Alice should be in the list of employees over age 20";
+		assert namesOver20.contains("Bob") : "Bob should be in the list of employees over age 20";
+		assert namesOver20.contains("Charlie") : "Charlie should be in the list of employees over age 20";
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to complete a method using the Stream API with collectors, a complex Java syntax feature. The prefix sets up a class with a list of employees and a method to filter and collect employee names based on age. The golden completion requires the LLM to correctly use stream operations, including filtering, mapping, and collecting. The suffix includes assertions to verify the correctness of the method implementation, ensuring that the stream operations are performed as expected. This scenario tests the LLM's understanding of stream operations, lambda expressions, method references, and the ability to maintain proper nesting and indentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class StreamExample {
+
+	public static void main(String[] args) {
+		List<String> items = new ArrayList<>();
+		items.add("apple");
+		items.add("banana");
+		items.add("orange");
+		items.add("banana");
+		items.add("apple");
+
+		// We want to filter the list to only include unique items and convert them to uppercase
+
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+		List<String> result = items.stream().distinct().map(String::toUpperCase).collect(Collectors.toList());
+
+SUFFIX CODE:
+----------------------------------------
+
+		System.out.println(result); // Expected output: [APPLE, BANANA, ORANGE]
+
+		// Assertions to ensure the correctness of the result
+		assert result.size() == 3 : "Expected size 3, but got " + result.size();
+		assert result.contains("APPLE") : "Missing APPLE";
+		assert result.contains("BANANA") : "Missing BANANA";
+		assert result.contains("ORANGE") : "Missing ORANGE";
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to correctly implement Java Stream API operations using collectors. The scenario involves filtering a list to include only unique elements, converting them to uppercase, and collecting the result into a new list. The assertions check the size and content of the resulting list, ensuring the model understands how to use distinct(), map(), and collect() methods correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+
+// A class to demonstrate the use of Stream API operations with collectors
+public class StreamOperations {
+
+    // A method to generate a list of random integers
+    public static List<Integer> generateRandomIntegers(int count) {
+        Random random = new Random();
+        return random.ints(count, 0, 100).boxed().collect(Collectors.toList());
+    }
+
+    // A method to filter even numbers from a list
+    public static List<Integer> filterEvenNumbers(List<Integer> numbers) {
+        return numbers.stream()
+                .filter(n -> n % 2 == 0)
+                .collect(Collectors.toList());
+    }
+
+    // A method to find the maximum number in a list
+    public static Optional<Integer> findMaxNumber(List<Integer> numbers) {
+        return numbers.stream().max(Integer::compareTo);
+    }
+
+    // A method to sum all the numbers in a list
+    public static int sumNumbers(List<Integer> numbers) {
+        return numbers.stream().mapToInt(Integer::intValue).sum();
+    }
+
+    // A method to demonstrate the use of collectors
+    public static Map<Boolean, List<Integer>> partitionNumbers(List<Integer> numbers) {
+        return numbers.stream().collect(Collectors.partitioningBy(n -> n % 2 == 0));
+    }
+
+    public static void main(String[] args) {
+        List<Integer> numbers = generateRandomIntegers(10);
+        System.out.println("Generated numbers: " + numbers);
+
+        List<Integer> evenNumbers = filterEvenNumbers(numbers);
+        System.out.println("Even numbers: " + evenNumbers);
+
+        Optional<Integer> maxNumber = findMaxNumber(numbers);
+        maxNumber.ifPresent(max -> System.out.println("Max number: " + max));
+
+        int sum = sumNumbers(numbers);
+        System.out.println("Sum of numbers: " + sum);
+
+        Map<Boolean, List<Integer>> partitionedNumbers = partitionNumbers(numbers);
+        System.out.println("Partitioned numbers: " + partitionedNumbers);
+
+        // Now to demonstrate the use of the collect method to join strings
+        List<String> strings = Arrays.asList("apple", "banana", "cherry", "date");
+        System.out.println("Strings: " + strings);        // Use the collect method to join strings with a delimiter
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        String joinedStrings = strings.stream().collect(Collectors.joining(", "));
+        System.out.println("Joined strings: " + joinedStrings);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+        // Assertions to verify the functionality
+        assert joinedStrings.equals("apple, banana, cherry, date") : "String joining failed";
+        assert evenNumbers.stream().allMatch(n -> n % 2 == 0) : "Not all numbers are even";
+        assert maxNumber.isPresent() && maxNumber.get() >= 0 && maxNumber.get() < 100 : "Max number is out of expected range";
+        assert sum >= 0 && sum < 1000 : "Sum is out of expected range";
+        assert partitionedNumbers.get(true).stream().allMatch(n -> n % 2 == 0) : "Partitioned even numbers are incorrect";
+        assert partitionedNumbers.get(false).stream().allMatch(n -> n % 2 != 0) : "Partitioned odd numbers are incorrect";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case effectively checks the LLM's ability to complete complex Java Stream API operations using collectors. The prefix sets up various stream operations and the suffix includes assertions to verify the correct behavior of the code. The golden_completion requires the model to correctly use the collect method with a joining collector, demonstrating understanding of stream syntax and collector usage.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+
+public class StreamOperations {
+
+    public static void main(String[] args) {
+        List<String> names = Arrays.asList("Alice", "Bob", "Charlie", "David", "Eve");
+        
+        // Filter names that start with 'A' or 'D', convert to uppercase, and sort
+        List<String> result = names.stream()
+            .filter(name -> name.startsWith("A") || name.startsWith("D"))
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            .map(String::toUpperCase)
+
+SUFFIX CODE:
+----------------------------------------
+            .sorted()
+            .collect(Collectors.toList());
+
+        // Assertions to verify the correctness of the stream operations
+        assert result.size() == 2 : "Result list should contain 2 names";
+        assert result.get(0).equals("ALICE") : "First name should be 'ALICE'";
+        assert result.get(1).equals("DAVID") : "Second name should be 'DAVID'";
+
+        System.out.println("All assertions passed.");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a complex stream operation in Java. The prefix includes the setup for a stream pipeline, and the completion requires the correct use of the map function with a method reference to convert strings to uppercase. The suffix includes sorting, collecting the results, and assertions to verify the correctness of the operations. This tests the LLM's understanding of the Stream API, method references, and proper chaining of intermediate and terminal operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+import java.util.NoSuchElementException;
+
+public class OptionalExample {
+
+    public static Optional<String> findValue(boolean present) {
+        if (present) {
+            return Optional.of("Found");
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static void main(String[] args) {
+        // Test case 1: Present value
+        Optional<String> presentValue = findValue(true);
+        // Test case 2: Absent value
+        Optional<String> absentValue = findValue(false);
+
+        try {
+            // Test case 3: Handle optional with present value
+            String result1 = presentValue.orElseThrow();
+            // Assertion for present value
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            System.out.println("Present value test passed: " + result1);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Test case 4: Handle optional with absent value
+            try {
+                String result2 = absentValue.orElseThrow();
+            } catch (NoSuchElementException e) {
+                System.out.println("Absent value test passed.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("All tests completed.");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case effectively evaluates the LLM's ability to handle Optional usage patterns in Java, including proper handling of present and absent values, exception handling with NoSuchElementException, and ensuring assertions pass for both scenarios. The use of Optional, try-catch blocks, and assertions provides a comprehensive scenario to test syntax completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+import java.util.Objects;
+
+public class ResourceHandler {
+
+    public String readDataFromResource(String resourceName) throws CustomException {
+        if (resourceName == null || resourceName.isEmpty()) {
+            throw new CustomException("Resource name cannot be null or empty");
+        }
+        try (Resource resource = Resource.open(resourceName)) {
+            return resource.readData();
+        } catch (ResourceNotFoundException e) {
+            throw new CustomException("Resource not found: " + resourceName, e);
+        } catch (ResourceReadException e) {
+            throw new CustomException("Error reading resource: " + resourceName, e);
+        }
+    }
+
+    public Optional<String> safelyReadData(String resourceName) {
+        try {
+            return Optional.ofNullable(readDataFromResource(resourceName));
+        } catch (CustomException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public static void main(String[] args) {
+        ResourceHandler handler = new ResourceHandler();
+        String validResource = "validResource.txt";
+        String invalidResource = "invalidResource.txt";
+        Optional<String> result = handler.safelyReadData(validResource);
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        System.out.println(result.orElse("No data"));
+        assert result.isPresent() : "Expected data to be present";
+
+SUFFIX CODE:
+----------------------------------------
+
+
+        Optional<String> result2 = handler.safelyReadData(invalidResource);
+        System.out.println(result2.orElse("No data"));
+        assert !result2.isPresent() : "Expected data to be absent";
+    }
+}
+
+class CustomException extends Exception {
+    public CustomException(String message) {
+        super(message);
+    }
+
+    public CustomException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
+
+class Resource implements AutoCloseable {
+    private String resourceName;
+
+    private Resource(String resourceName) {
+        this.resourceName = resourceName;
+    }
+
+    public static Resource open(String resourceName) throws ResourceNotFoundException {
+        if ("invalidResource.txt".equals(resourceName)) {
+            throw new ResourceNotFoundException("Resource not found: " + resourceName);
+        }
+        return new Resource(resourceName);
+    }
+
+    public String readData() throws ResourceReadException {
+        if ("validResource.txt".equals(resourceName)) {
+            return "Resource data";
+        }
+        throw new ResourceReadException("Error reading resource: " + resourceName);
+    }
+
+    @Override
+    public void close() {
+        System.out.println("Resource closed");
+    }
+}
+
+class ResourceNotFoundException extends Exception {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+
+class ResourceReadException extends Exception {
+    public ResourceReadException(String message) {
+        super(message);
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle complex Java syntax features such as try-with-resources, Optional usage, and custom exception handling. It includes intricate nested structures and proper error handling, making it an excellent test case for syntax completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.*;
+import java.util.stream.*;
+import org.junit.Assert;
+
+class Person {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+}
+
+public class StreamExample {
+    public static void main(String[] args) {
+        List<Person> people = Arrays.asList(
+            new Person("Alice", 30),
+            new Person("Bob", 25),
+            new Person("Charlie", 35),
+            new Person("David", 40)
+        );
+
+        // Using Stream API to filter and collect
+        List<String> namesOfPeopleAbove30 = people.stream()
+            .filter(person -> person.getAge() > 30)
+            .map(Person::getName)
+            .collect(Collectors.toList());
+
+        // Expected names
+        List<String> expectedNames = Arrays.asList("Charlie", "David");
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        Assert.assertEquals(expectedNames, namesOfPeopleAbove30);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+        // Using Stream API to sort and collect
+        List<Person> sortedPeople = people.stream()
+            .sorted(Comparator.comparing(Person::getAge))
+            .collect(Collectors.toList());
+
+        Assert.assertEquals("Bob", sortedPeople.get(0).getName());
+        Assert.assertEquals("Alice", sortedPeople.get(1).getName());
+        Assert.assertEquals("Charlie", sortedPeople.get(2).getName());
+        Assert.assertEquals("David", sortedPeople.get(3).getName());
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of complex Java syntax features including Stream API operations with collectors. It sets up a context with a list of Person objects and uses stream operations to filter, map, and collect data. The test case verifies the ability of the LLM to correctly complete the stream operation and maintain proper formatting and structure. The assertions in the suffix ensure the completion is correct and the expected results are produced.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+
+public class ComplexSyntaxExample {
+
+    // A method that performs a risky operation and returns an Optional result
+    public Optional<String> riskyOperation(boolean succeed) {
+        if (succeed) {
+            return Optional.of("Success");
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    // A method that handles the result of riskyOperation using Optional
+    public void handleResult(boolean succeed) {
+        Optional<String> result = riskyOperation(succeed);
+        result.ifPresentOrElse(
+            value -> System.out.println("Operation succeeded with value: " + value),
+            () -> System.out.println("Operation failed")
+        );
+    }
+
+    // Main method for testing the functionality
+    public static void main(String[] args) {
+        ComplexSyntaxExample example = new ComplexSyntaxExample();
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        example.handleResult(true);
+
+SUFFIX CODE:
+----------------------------------------
+        example.handleResult(false);
+        assert example.riskyOperation(false).isEmpty() : "Expected operation to fail";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of Optional<T> to handle potential null values safely. It includes complex syntax features such as lambda expressions and method references with Optional's ifPresentOrElse method. The test case verifies the correct handling of both successful and failed operations using assertions, ensuring structural integrity and proper error handling.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class ResourceManagementExample {
+
+    public static void main(String[] args) {
+        ResourceManagementExample example = new ResourceManagementExample();
+        example.readFile("example.txt");
+    }
+
+    public void readFile(String fileName) {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+public void readFileWithResources(String fileName) {
+    try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+SUFFIX CODE:
+----------------------------------------
+
+
+// Assertions
+public static void main(String[] args) {
+    ResourceManagementExample example = new ResourceManagementExample();
+    example.readFileWithResources("example.txt");
+    // The output should be the content of "example.txt" printed to the console
+    // Ensure no resources are leaked and exceptions are handled properly
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the try-with-resources statement for resource management, which is a critical pattern in Java for ensuring that resources are properly closed after use. The prefix sets up a typical resource handling scenario using traditional try-catch-finally blocks, while the golden completion and suffix show the modern approach using try-with-resources. The assertions in the suffix ensure that the code correctly reads a file, handles exceptions, and closes resources without leaks.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+
+public class OptionalUsageExample {
+    public static void main(String[] args) {
+        String possibleNullValue = getNullableString();
+        Optional<String> optionalValue = Optional.ofNullable(possibleNullValue);
+        
+        // Check if the value is present and print it
+        if (optionalValue.isPresent()) {
+            System.out.println("Value is present: " + optionalValue.get());
+        } else {
+            System.out.println("Value is absent");
+        }
+        
+        // Now use a method that will definitely return a non-null value
+        String nonNullValue = getNonNullableString();
+        optionalValue = Optional.of(nonNullValue);
+        // Use an ifPresent() method to handle the value if present
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        optionalValue.ifPresent(value -> System.out.println("Value is present: " + value));
+
+SUFFIX CODE:
+----------------------------------------
+
+        // Use orElse() to provide a default value
+        String result = optionalValue.orElse("Default value");
+        System.out.println("Result: " + result);
+        // Assertions
+        assert optionalValue.isPresent() : "Expected value to be present";
+        assert optionalValue.get().equals("Non-null value") : "Expected value to match 'Non-null value'";
+
+        // Cleanup (not necessary for Optional, just for demonstration)
+        optionalValue = Optional.empty();
+        assert !optionalValue.isPresent() : "Expected value to be absent after cleanup";
+    }
+
+    private static String getNullableString() {
+        // Simulate a method that may return null
+        return null;
+    }
+
+    private static String getNonNullableString() {
+        // Simulate a method that always returns a non-null value
+        return "Non-null value";
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of using Optional<T> in Java, demonstrating both the presence and absence handling of optional values. It includes methods that can return nullable and non-nullable values, and uses Optional's methods like ifPresent() and orElse() to handle these cases. The assertions check the presence and correctness of the values, ensuring the LLM can complete the syntax accurately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+
+public class OptionalExample {
+
+    public static Optional<String> findNameById(int id) {
+        if (id == 1) {
+            return Optional.of("Alice");
+        } else if (id == 2) {
+            return Optional.of("Bob");
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static void main(String[] args) {
+        // Example usage of findNameById
+        int userId1 = 1;
+        int userId2 = 2;
+        int userId3 = 3;
+
+        Optional<String> name1 = findNameById(userId1);
+        Optional<String> name2 = findNameById(userId2);
+        Optional<String> name3 = findNameById(userId3);
+
+        // Check the names found
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        System.out.println("Name1: " + name1.isPresent() ? name1.get() : "Not found");
+        System.out.println("Name2: " + name2.isPresent() ? name2.get() : "Not found");
+        System.out.println("Name3: " + name3.isPresent() ? name3.get() : "Not found");
+
+SUFFIX CODE:
+----------------------------------------
+
+        assert name1.isPresent() && name1.get().equals("Alice");
+        assert name2.isPresent() && name2.get().equals("Bob");
+        assert !name3.isPresent();
+
+        // Demonstrate additional Optional usage
+        String defaultName = "Unknown";
+        String nameOrDefault1 = name1.orElse(defaultName);
+        String nameOrDefault2 = name3.orElse(defaultName);
+
+        // Assertions for default values
+        assert nameOrDefault1.equals("Alice");
+        assert nameOrDefault2.equals("Unknown");
+
+        // Handle Optional in a functional style
+        name1.ifPresent(name -> System.out.println("Name1: " + name));
+        name2.ifPresent(name -> System.out.println("Name2: " + name));
+        name3.ifPresentOrElse(
+            name -> System.out.println("Name3: " + name),
+            () -> System.out.println("Name3 not found")
+        );
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand and complete complex multi-line syntax patterns using Optional<T> in Java. The use of Optional<T> for error handling and functional style programming requires proper nesting and indentation. The assertions verify the correct behavior of the Optional methods, ensuring the LLM can handle these patterns correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+
+public class OptionalExample {
+
+    public static void main(String[] args) {
+        String possibleNullValue = getNullableValue();
+        
+        // Example of using Optional to handle a nullable value
+        Optional<String> optionalValue = Optional.ofNullable(possibleNullValue);
+        // Print the value if present, state otherwise
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        optionalValue.ifPresentOrElse(
+            value -> System.out.println("Value is present: " + value),
+            () -> System.out.println("Value is not present")
+        );
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertions
+        assert optionalValue.isPresent() : "Expected optionalValue to be present";
+        assert "Hello, World!".equals(optionalValue.get()) : "Expected value to be 'Hello, World!'";
+
+        System.out.println("All assertions passed.");
+    }
+
+    private static String getNullableValue() {
+        return "Hello, World!";  // Simulating a non-null value
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle Optional<T> usage patterns in Java. It demonstrates how to properly check for the presence of a value in an Optional and handle both cases (present and absent). The inclusion of assertions ensures the correctness of the code, and the scenario provides a realistic context for the use of Optional with nullable values.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FileProcessor {
+
+    private String filePath;
+
+    public FileProcessor(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public List<String> readLines() throws IOException {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                lines.add(line);
+            }
+        }
+        return lines;
+    }
+
+    public static void main(String[] args) {
+        FileProcessor processor = new FileProcessor("example.txt");
+        List<String> lines = null;
+        try {
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            lines = processor.readLines();
+
+SUFFIX CODE:
+----------------------------------------
+            assert lines != null : "Lines should not be null";
+            assert lines.size() > 0 : "Lines should not be empty";
+            assert lines.get(0).equals("First line of the file") : "First line should match expected content";
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to complete a try-with-resources pattern for reading lines from a file, ensuring proper exception handling and resource management. The completion demonstrates correct placement of the readLines() method call within the try block and proper handling of IOException. The assertions verify that the lines read from the file are not null, not empty, and match expected content.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+
+public class OptionalUsageExample {
+    public static void main(String[] args) {
+        OptionalUsageExample example = new OptionalUsageExample();
+        example.runExample();
+    }
+
+    public void runExample() {
+        // Example usage of Optional
+        String value = "test";
+        Optional<String> optionalValue = Optional.of(value);
+
+        // Nested Optional usage
+        Optional<Optional<String>> result = Optional.of(optionalValue);
+
+        // Complex Optional chaining (length more than 3 and upper case string)
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        result = optionalValue.filter(v -> v.length() > 3).map(String::toUpperCase);
+
+SUFFIX CODE:
+----------------------------------------
+
+
+        // Assertions
+        if (!result.isPresent()) {
+            throw new AssertionError("Result should be present");
+        }
+        if (!"TEST".equals(result.get())) {
+            throw new AssertionError("Expected TEST but got " + result.get());
+        }
+
+        System.out.println("All assertions passed.");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of complex syntactical structures involving nested Optional usage and method chaining. It tests the model's ability to handle multi-line syntax patterns and maintain proper formatting and indentation. The assertions ensure that the code works as expected and that the Optional chaining produces the correct result.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+
+public class OptionalExample {
+
+    public static void main(String[] args) {
+        Optional<String> nonEmptyOptional = Optional.of("I am present");
+        Optional<String> emptyOptional = Optional.empty();
+
+        // Use of Optional to avoid null checks
+        String result1 = nonEmptyOptional.map(String::toUpperCase).orElse("Default");
+        String result2 = emptyOptional.map(String::toUpperCase).orElse("Default");
+
+        System.out.println("Result 1: " + result1);
+        System.out.println("Result 2: " + result2);
+
+        // Complex nesting of Optional usage
+        Optional<String> nestedOptional = Optional.of("nested value");
+        Optional<String> emptyNestedOptional = Optional.empty();
+
+        String nestedResult1 = 
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+            nestedOptional.flatMap(value -> Optional.of(value.toUpperCase())).orElse("Nested Default");
+
+SUFFIX CODE:
+----------------------------------------
+        String nestedResult2 = emptyNestedOptional.flatMap(value -> Optional.of(value.toUpperCase())).orElse("Nested Default");
+
+        System.out.println("Nested Result 1: " + nestedResult1);
+        System.out.println("Nested Result 2: " + nestedResult2);
+
+        // Assertions
+        assert "NESTED VALUE".equals(nestedResult1) : "Nested Result 1 is incorrect";
+        assert "Nested Default".equals(nestedResult2) : "Nested Result 2 is incorrect";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to handle multi-line syntax patterns, specifically the usage of Optional<T> with nested method chaining. The provided prefix sets up the context with examples of Optional usage and introduces a complex nested structure. The golden completion involves a nested Optional usage with flatMap and orElse method chaining. The suffix includes assertions to verify the correct behavior of the completed code. This scenario tests the model's understanding of Optional<T> usage and ensures proper syntax and indentation are maintained in complex nested structures.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class FileProcessor {
+    public static void main(String[] args) {
+        String filePath = "example.txt";
+        try {
+            processFile(filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void processFile(String filePath) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+    }
+
+    public static void readFileWithResources(String filePath) throws IOException {
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+
+SUFFIX CODE:
+----------------------------------------
+        System.out.println("File processing completed.");
+    }
+
+    public static void readFile(String filePath) throws IOException {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(filePath));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+        } finally {
+            if (reader != null) {
+                reader.close();
+            }
+        }
+    }
+}
+
+class TestFileProcessor {
+    public static void main(String[] args) {
+        try {
+            FileProcessor.readFileWithResources("example.txt");
+            System.out.println("Assertion: File read successfully with resources.");
+        } catch (IOException e) {
+            System.err.println("Assertion failed: " + e.getMessage());
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to complete a try-with-resources block for managing file reading, ensuring proper resource management and error handling. The prefix sets up the context of file processing, and the suffix includes assertions to verify that the file is read correctly using the try-with-resources pattern. This tests the model's understanding of resource management and exception handling in Java.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+import java.util.NoSuchElementException;
+
+public class OptionalExample {
+
+    public static void main(String[] args) {
+        OptionalExample example = new OptionalExample();
+        example.runExample();
+    }
+
+    public void runExample() {
+        // Simulate getting a value that may or may not be present
+        Optional<String> possibleValue = getPossibleValue(true);
+
+        // Handle the possible value using ifPresentOrElse
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        possibleValue.ifPresentOrElse(
+            value -> System.out.println("Value is present: " + value),
+            () -> System.out.println("Value is not present")
+        );
+
+SUFFIX CODE:
+----------------------------------------
+        String result = possibleValue.orElse("Default Value");
+
+        // Assertions
+        assert result.equals("Present Value");
+
+        // Another scenario where the value is not present
+        possibleValue = getPossibleValue(false);
+        result = possibleValue.orElse("Default Value");
+
+        // Assertions
+        assert result.equals("Default Value");
+    }
+
+    private Optional<String> getPossibleValue(boolean isPresent) {
+        if (isPresent) {
+            return Optional.of("Present Value");
+        } else {
+            return Optional.empty();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete complex Optional<T> usage patterns, specifically the ifPresentOrElse method, which requires understanding of lambda expressions and proper handling of Optional values. The completion needs to maintain the correct syntax and nesting to ensure proper functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.*;
+import java.util.Scanner;
+
+public class FileProcessor {
+
+    private String filePath;
+
+    public FileProcessor(String filePath) {
+        this.filePath = filePath;
+    }
+
+    public String readFile() {
+        StringBuilder content = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(this.filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return content.toString();
+    }
+
+    public void processFile() {
+        // Custom processing logic here
+        System.out.println("Processing file: " + this.filePath);
+    }
+
+    public void handleFile() {
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        readFile();
+
+SUFFIX CODE:
+----------------------------------------
+        processFile();
+        System.out.println("File content:");
+        System.out.println(readFile());
+    }
+
+    public static void main(String[] args) {
+        FileProcessor processor = new FileProcessor("testfile.txt");
+        processor.handleFile();
+
+        // Assertions
+        assert processor.filePath.equals("testfile.txt");
+        assert !processor.readFile().isEmpty();
+    }
+
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a try-with-resources statement for file writing, ensuring proper resource management and exception handling. The context involves reading and processing a file, making it an ideal scenario for testing nested structures and resource cleanup. The golden completion specifically focuses on adding a new line to the file within a try-with-resources block, which is a common pattern in Java for managing resources safely.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.util.Optional;
+import java.util.function.Function;
+
+public class OptionalExample {
+
+    public static Optional<String> getValue(Optional<String> optionalString) {
+        return optionalString.map(String::toUpperCase)
+                             .flatMap(OptionalExample::appendExclamation)
+                             .filter(s -> s.length() > 3);
+    }
+
+    private static Optional<String> appendExclamation(String s) {
+        return Optional.of(s + "!");
+    }
+
+    public static void main(String[] args) {
+        Optional<String> optionalString1 = Optional.of("hello");
+        Optional<String> optionalString2 = Optional.empty();
+
+        // Example usage of getValue method
+        Optional<String> result1 = getValue(optionalString1);
+        Optional<String> result2 = getValue(optionalString2);
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        System.out.println("Result1: " + result1);
+        System.out.println("Result2: " + result2);
+
+SUFFIX CODE:
+----------------------------------------
+        // Assertions
+        assert result1.isPresent() : "Result1 should be present";
+        assert result1.get().equals("HELLO!") : "Result1 should be 'HELLO!'";
+        assert !result2.isPresent() : "Result2 should not be present";
+
+        // Additional tests
+        Optional<String> optionalString3 = Optional.of("hi");
+        Optional<String> result3 = getValue(optionalString3);
+        assert !result3.isPresent() : "Result3 should not be present as length is less than 3";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to handle multi-line syntax patterns with Optional<T> usage patterns, method chaining, and nested functional operations. It requires the model to complete the code with appropriate syntactic structure and maintain consistency with the established patterns in the prefix. The assertions verify the correctness of the Optional operations and their outcomes.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+public class FileProcessor {
+	public static Optional<String> readFirstLine(String filePath) {
+		Optional<String> firstLine = Optional.empty();
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			firstLine = Optional.ofNullable(br.readLine());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return firstLine;
+	}
+
+	public static void main(String[] args) {
+		String filePath = "test.txt";
+		Optional<String> result = readFirstLine(filePath);
+        // Use ternary to print the line if present, declare an error otherwise
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+		System.out.println(result.isPresent() ? result.get() : "Error reading file");
+
+SUFFIX CODE:
+----------------------------------------
+
+		assert result.isPresent() : "The file should contain at least one line";
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to handle Optional<T> usage patterns in Java, particularly in the context of reading from a file and handling potential IOException. The code requires proper nesting and indentation, especially within try-with-resources and if-else blocks. The completion demonstrates how to check and use the value within an Optional, and the suffix includes assertions to verify the behavior.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class FileProcessor {
+
+	public static String readFile(String filePath) {
+		StringBuilder content = new StringBuilder();
+		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				content.append(line).append("\n");
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading the file: " + e.getMessage());
+		}
+		return content.toString();
+	}
+
+	public static void main(String[] args) {
+		String filePath = "test.txt";
+		String fileContent = readFile(filePath);
+
+		System.out.println("File content:");
+		System.out.println(fileContent);
+		// Throw an exception if the file is empty
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+		if (fileContent.isEmpty()) {
+			new RuntimeException("File is empty");
+		}
+
+SUFFIX CODE:
+----------------------------------------
+
+		// Assertions
+		assert fileContent != null : "File content should not be null";
+		assert !fileContent.isEmpty() : "File content should not be empty";
+		assert fileContent.contains("Test") : "File content should contain 'Test'";
+
+		// Clean up resources if needed (none in this case)
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle complex error handling patterns in Java, including try-with-resources for resource management and custom exception handling. The scenario includes nested code blocks and proper indentation, making it a good test case for syntax completion capabilities. The prefix provides extensive context, while the suffix includes assertions that verify the correctness of the code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+public class FileProcessor {
+
+	public static Optional<String> readFile(String filePath) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			StringBuilder content = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				content.append(line).append("\n");
+			}
+			return Optional.of(content.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return Optional.empty();
+		}
+	}
+
+	public static void main(String[] args) {
+		String filePath = "test.txt";
+		Optional<String> fileContent = readFile(filePath);
+		// Print content if present
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+		fileContent.ifPresentOrElse(
+			content -> {
+				System.out.println(content);
+			},
+			() -> System.out.println("File not found or could not be read.")
+		);
+
+SUFFIX CODE:
+----------------------------------------
+		if (fileContent.isPresent()) {
+			System.out.println("File content read successfully.");
+			assert fileContent.get().contains("test"): "Content does not contain expected text.";
+		} else {
+			System.out.println("Failed to read file content.");
+			assert false: "File reading should not fail.";
+		}
+	}
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle Optional usage patterns correctly within a try-with-resources block and demonstrates proper exception handling. The code requires the LLM to correctly complete the code block using Optional's ifPresent method, which is a common Java 8+ idiom. The prefix sets up a file reading scenario, the golden completion demonstrates the correct use of Optional, and the suffix includes assertions to verify the file content and proper handling of the Optional.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+import org.junit.Assert;
+
+public class FileProcessor {
+	public static Optional<String> readFile(String filePath) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			StringBuilder content = new StringBuilder();
+			String line;
+			while ((line = reader.readLine()) != null) {
+				content.append(line).append("\n");
+			}
+			return Optional.of(content.toString());
+		} catch (IOException e) {
+			return Optional.empty();
+		}
+	}
+
+	public static void main(String[] args) {
+		Optional<String> content = readFile("test.txt");
+		if (content.isPresent()) {
+			System.out.println("File content:");
+			System.out.println(content.get());
+		} else {
+			System.out.println("Failed to read file.");
+		}
+		// Simulate file reading error
+		Optional<String> errorContent = readFile("nonexistent.txt");
+		// Assertion to check for content
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+		Assert.assertTrue("File reading should succeed for test file", content.isPresent());
+
+SUFFIX CODE:
+----------------------------------------
+
+		Assert.assertFalse("File reading should fail for nonexistent file", errorContent.isPresent());
+		// Cleanup resources
+		System.out.println("Test completed.");
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of try-with-resources for resource management and proper handling of optional values in Java. The prefix sets up a scenario where a file is read using BufferedReader, and the content is wrapped in an Optional. The golden completion includes an assertion to verify the successful reading of a file, while the suffix handles the error case and includes another assertion to ensure that the file reading fails for a nonexistent file. This tests the LLM's ability to complete complex syntactical patterns with nested structures and correct indentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+public class FileProcessor {
+    public static void main(String[] args) {
+        // Example file path
+        String filePath = "example.txt";
+        Optional<String> fileContent = readFile(filePath);
+        
+        // Validate file content
+        if (fileContent.isPresent()) {
+            System.out.println("File content successfully read.");
+        } else {
+            System.out.println("Failed to read file content.");
+        }
+    }
+
+    public static Optional<String> readFile(String filePath) {
+        StringBuilder contentBuilder = new StringBuilder();
+        // Resource management using try-with-resources
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String currentLine;
+            while ((currentLine = br.readLine()) != null) {
+                contentBuilder.append(currentLine).append("\n");
+            }
+
+SUFFIX CODE:
+----------------------------------------
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+
+        return Optional.of(contentBuilder.toString());
+    }
+
+    // Test the readFile method
+    public static void testReadFile() {
+        String testFilePath = "testfile.txt";
+        Optional<String> testContent = readFile(testFilePath);
+
+        // Assertion
+        assert testContent.isPresent() : "File content should be present";
+        System.out.println("Test passed: File content is present.");
+    }
+
+    public static void main(String[] args) {
+        testReadFile();
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the usage of try-with-resources for resource management and handling of checked exceptions with proper nesting and indentation. The provided code verifies the ability to read file content and handle potential IOException. Assertions ensure the correctness of the method under test.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+public class FileProcessor {
+
+    public static Optional<String> readFirstLineFromFile(String path) {
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            return Optional.ofNullable(br.readLine());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public static void main(String[] args) {
+        String filePath = "testfile.txt";
+        Optional<String> line = readFirstLineFromFile(filePath);
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        line.ifPresentOrElse(
+            l -> System.out.println("First line: " + l),
+            () -> System.out.println("File is empty or an error occurred.")
+        );
+
+SUFFIX CODE:
+----------------------------------------
+        if (line.isPresent()) {
+            System.out.println("First line: " + line.get());
+        } else {
+            System.out.println("File is empty or an error occurred.");
+        }
+
+        // Assertions
+        assert line != null : "Optional should never be null";
+        if (!line.isPresent()) {
+            assert !new java.io.File(filePath).exists() || new java.io.File(filePath).length() == 0 : "File should be empty or not exist if Optional is empty";
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of using try-with-resources for resource management in Java. It also demonstrates proper use of Optional<T> to handle potential null values in a clean and expressive way. The prefix sets up the context by defining a method that reads the first line from a file, and the suffix includes assertions to verify the correctness of the operation and simulate a real-world file reading scenario. This complex pattern tests the LLM's ability to handle nested structures, proper resource management, and error handling.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import org.junit.Assert;
+
+public class FileProcessor {
+	public static String readFirstLine(String filePath) throws IOException {
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			return reader.readLine();
+		} catch (IOException e) {
+			throw new IOException("Failed to read the first line from file", e);
+		}
+	}
+
+	public static void main(String[] args) {
+		String filePath = "testfile.txt";
+		try {
+			// Attempt to read the first line of the file
+			String firstLine = readFirstLine(filePath);
+			// Assertion that first line is not null
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+			Assert.assertNotNull(firstLine);
+
+SUFFIX CODE:
+----------------------------------------
+
+			Assert.assertTrue(firstLine.length() > 0);
+			System.out.println("First line: " + firstLine);
+		} catch (IOException e) {
+			System.err.println("An error occurred: " + e.getMessage());
+		}
+	}
+}
+
+// Ensure the assertions pass when the code is run with a valid file path
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for syntax completion as it involves error handling with try-with-resources, nested try/catch blocks, and assertions to verify the behavior. It checks the model's ability to complete the code with correct syntax and handle exceptions appropriately.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+public class FileProcessor {
+    public static Optional<String> readFileFirstLine(String filePath) {
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(filePath));
+            return Optional.ofNullable(reader.readLine());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        String path = "example.txt";
+        Optional<String> firstLine = readFileFirstLine(path);
+        firstLine.ifPresent(System.out::println);
+    }
+}
+
+class CustomFileProcessor extends FileProcessor {
+    public static Optional<String> readFileFirstLineWithResources(String filePath) {
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            Optional<String> firstLine = Optional.ofNullable(reader.readLine());
+            return firstLine;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+
+SUFFIX CODE:
+----------------------------------------
+        firstLine.orElseThrow(() -> new RuntimeException("File is empty or not found"));
+    }
+
+    public static void main(String[] args) {
+        String path = "example.txt";
+        Optional<String> firstLine = readFileFirstLineWithResources(path);
+        firstLine.ifPresent(line -> System.out.println("First line: " + line));
+        // Assertions
+        assert firstLine.isPresent() : "First line should be present";
+        assert firstLine.orElseThrow().equals("Expected content") : "First line content does not match";
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example because it demonstrates the use of try-with-resources for resource management, which is a common and important pattern in Java. It also includes nested try/catch blocks and uses Optional<T> to handle the possibility of a missing value. The suffix includes assertions to verify the correctness of the code, ensuring that the first line of the file is read correctly and matches the expected content. Proper error handling and resource management are critical in real-world applications, making this a valuable test case.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+public class FileProcessor {
+	public static Optional<String> readFileFirstLine(String filePath) throws CustomCheckedException {
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			String firstLine = reader.readLine();
+			if (firstLine == null) {
+				throw new CustomCheckedException("File is empty");
+			}
+			return Optional.of(firstLine);
+		} catch (IOException e) {
+			throw new CustomCheckedException("IO Exception occurred", e);
+		}
+	}
+
+	public static void main(String[] args) {
+		String filePath = "test.txt";
+		try {
+			Optional<String> result = readFileFirstLine(filePath);
+
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+			if (result.isPresent()) {
+				System.out.println("First line: " + result.get());
+			} else {
+				System.out.println("File is empty");
+			}
+
+SUFFIX CODE:
+----------------------------------------
+			assert result.isPresent() : "Result should be present";
+			assert result.get().equals("First line content") : "First line content does not match";
+		} catch (CustomCheckedException e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+class CustomCheckedException extends Exception {
+	public CustomCheckedException(String message) {
+		super(message);
+	}
+
+	public CustomCheckedException(String message, Throwable cause) {
+		super(message, cause);
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle complex error handling patterns, including try-with-resources, custom exception handling, and use of Optional<T>. The completion involves checking if the Optional is present and throwing a custom exception if not, demonstrating understanding of Java's Optional and exception handling mechanisms.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: devbench-syntax-completion
+Language: java
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Optional;
+
+public class FileProcessor {
+
+	public static void main(String[] args) {
+		String filePath = "example.txt";
+		Optional<String> line;
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+			
+
+LLM COMPLETION DeepSeek-V3-0324:
+----------------------------------------
+			line = Optional.ofNullable(reader.readLine());
+
+SUFFIX CODE:
+----------------------------------------
+			if (line.isPresent()) {
+				System.out.println("First line: " + line.get());
+			} else {
+				System.out.println("File is empty.");
+			}
+		} catch (IOException e) {
+			System.err.println("Error reading file: " + e.getMessage());
+		}
+
+		assert line.isPresent() : "Line should be present";
+		assert line.get().equals("This is the first line") : "Line content mismatch";
+	}
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to complete a try-with-resources block with proper error handling and Optional usage. The prefix sets up the reading of a file and the suffix includes assertions to validate the content read from the file. The completion focuses on capturing the first line from the file using streams and Optional, a common Java pattern. It ensures that the model can correctly integrate try-with-resources, stream processing, and Optional handling.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================

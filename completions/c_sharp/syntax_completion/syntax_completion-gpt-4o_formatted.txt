@@ -1,0 +1,4389 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace ExampleNamespace
+{
+    public class ExampleClass
+    {
+        public void ComplexMethod()
+        {
+            List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+            var result = from number in numbers
+                         where number % 2 == 0
+                         select number;
+
+            try
+            {
+                foreach (var num in result)
+                {
+                    Console.WriteLine(num);
+                    if (num == 2)
+                    {
+                        throw new ArgumentException("Number cannot be 2");
+                    }
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine("Caught ArgumentException: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Caught Exception: " + ex.Message);
+            }
+            finally
+            {
+                Console.WriteLine("Final cleanup");
+            }
+
+            using (var resource = new Resource())
+            {
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                resource.UseResource();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(numbers.Count == 5, "The list should contain 5 elements");
+            Debug.Assert(result.Count() == 2, "There should be 2 even numbers in the result");
+            Debug.Assert(result.Contains(2), "Result should contain the number 2");
+        }
+    }
+
+    public class Resource : IDisposable
+    {
+        public void UseResource()
+        {
+            Console.WriteLine("Using resource");
+        }
+
+        public void Dispose()
+        {
+            Console.WriteLine("Disposing resource");
+        }
+    }
+
+    public static class Program
+    {
+        public static void Main()
+        {
+            ExampleClass example = new ExampleClass();
+            example.ComplexMethod();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle nested control structures, including a try/catch block with multiple catch clauses, using statements for resource management, and LINQ query expressions. The structure also includes proper cleanup and error handling, making it a comprehensive test of complex C# syntax patterns.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+namespace SyntaxCompletionTest
+{
+    public class ResourceHandler
+    {
+        public string ResourceName { get; private set; }
+        public ResourceHandler(string resourceName)
+        {
+            ResourceName = resourceName;
+        }
+        public void Open()
+        {
+            Console.WriteLine($"Opening resource: {ResourceName}");
+        }
+        public void Close()
+        {
+            Console.WriteLine($"Closing resource: {ResourceName}");
+        }
+    }
+    
+    public class ComplexSyntaxTest
+    {
+        public static void Main(string[] args)
+        {
+            var resourceHandlers = new List<ResourceHandler>
+            {
+                new ResourceHandler("Resource1"),
+                new ResourceHandler("Resource2"),
+                new ResourceHandler("Resource3")
+            };
+
+            try
+            {
+                foreach (var handler in resourceHandlers)
+                {
+                    handler.Open();
+                }
+
+                // Nested control structures start here
+                if (resourceHandlers.Count > 2)
+                {
+                    Console.WriteLine("More than two resources available.");
+                    for (int i = 0; i < resourceHandlers.Count; i++)
+                    {
+                        if (resourceHandlers[i].ResourceName.Contains("1"))
+                        {
+                            Console.WriteLine("Handling Resource1");
+                        }
+                        else if (resourceHandlers[i].ResourceName.Contains("2"))
+                        {
+                            Console.WriteLine("Handling Resource2");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Handling other resources");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Two or fewer resources available.");
+                }
+            }
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            finally
+            {
+                foreach (var handler in resourceHandlers)
+                {
+                    handler.Close();
+                }
+            }
+
+            Debug.Assert(resourceHandlers.Count == 3, "Resource handlers count should be 3");
+            Debug.Assert(resourceHandlers[0].ResourceName == "Resource1", "First resource should be 'Resource1'");
+            Debug.Assert(resourceHandlers[1].ResourceName == "Resource2", "Second resource should be 'Resource2'");
+            Debug.Assert(resourceHandlers[2].ResourceName == "Resource3", "Third resource should be 'Resource3'");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a try/catch/finally block with nested control structures and resource management using statements. The golden completion demonstrates proper error handling with a catch block that logs exceptions, while the prefix and suffix establish context with resource handling and assertions to verify the structure and behavior of the code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexNestedControlStructures
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Initialize some test data
+            var list = new List<int> { 1, 2, 3, 4, 5 };
+            var results = new List<string>();
+
+            // Nested loop structure
+            for (int i = 0; i < list.Count; i++)
+            {
+                for (int j = i; j < list.Count; j++)
+                {
+                    if (list[i] % 2 == 0)
+                    {
+                        if (list[j] % 2 == 0)
+                        {
+                            results.Add($"Both {list[i]} and {list[j]} are even");
+                        }
+                        else
+                        {
+                            results.Add($"{list[i]} is even, but {list[j]} is odd");
+                        }
+                    }
+                    else
+                    {
+                        if (list[j] % 2 != 0)
+                        {
+                            results.Add($"Both {list[i]} and {list[j]} are odd");
+                        }
+                        else
+                        {
+                            results.Add($"{list[i]} is odd, but {list[j]} is even");
+                        }
+                    }
+                }
+            }
+            // Complex nested if/else structure
+            if (results.Count > 0)
+            {
+                foreach (var result in results)
+                {
+                    if (result.Contains("even"))
+                    {
+                        if (result.Contains("odd"))
+                        {
+                            Console.WriteLine("Mixed even and odd detected");
+                        }
+                        else
+                        {
+                            Console.WriteLine("All even detected");
+                        }
+                    }
+                    else
+                    {
+                        if (result.Contains("odd"))
+                        {
+                            Console.WriteLine("All odd detected");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("No results");
+            }
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            Debug.Assert(results.Count == 15, "There should be 15 results.");
+            Debug.Assert(results[0] == "1 is odd, but 1 is odd", "Check the first result.");
+            Debug.Assert(results[14] == "5 is odd, but 5 is odd", "Check the last result.");
+
+SUFFIX CODE:
+----------------------------------------
+            // Assertions
+            Debug.Assert(results.Count == 15, "There should be 15 results.");
+            Debug.Assert(results[0] == "1 is odd, but 1 is odd", "Check the first result.");
+            Debug.Assert(results[14] == "5 is odd, but 5 is odd", "Check the last result.");
+
+            // Cleanup code
+            list.Clear();
+            results.Clear();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a complex nested control structure involving multiple levels of if/else conditions and nested loops. The prefix sets up the initial conditions and the main nested loop/if structures, while the golden completion adds an additional layer of nested control logic. The suffix contains assertions to verify the correctness of the results and ensures proper resource cleanup. This scenario tests the LLM's ability to handle deeply nested and interdependent code blocks, maintain proper syntax, and ensure logical correctness.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace NestedControlStructures
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+            List<int> evenNumbers = new List<int>();
+            List<int> oddNumbers = new List<int>();
+
+            foreach (int number in numbers)
+            {
+                if (number % 2 == 0)
+                {
+                    evenNumbers.Add(number);
+                }
+                else
+                {
+                    oddNumbers.Add(number);
+                }
+            }
+
+            int sum = 0;
+            int product = 1;
+            foreach (int number in evenNumbers)
+            {
+                sum += number;
+            }
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            foreach (int number in oddNumbers)
+            {
+                product *= number;
+            }
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            Debug.Assert(sum == 6, "Sum of even numbers should be 6");
+            Debug.Assert(product == 15, "Product of odd numbers should be 15");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle nested control structures, particularly nested foreach loops and conditional statements. The context provided in the prefix sets up lists of numbers and separates them into even and odd categories. The completion requires the correct implementation of iterating through the odd numbers and calculating the product. The suffix includes assertions to verify the correctness of the sum and product calculations, ensuring that the nested structures are implemented properly. This scenario is a good test case because it involves multiple levels of nesting and requires maintaining proper indentation and syntax.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+namespace SyntaxCompletionTest
+{
+    public class ResourceHandler
+    {
+        public void HandleResources()
+        {
+            List<string> resources = new List<string> { "Resource1", "Resource2", "Resource3" };
+            foreach (var resource in resources)
+            {
+                try
+                {
+                    Console.WriteLine($"Processing {resource}");
+                    if (resource == "Resource1")
+                    {
+                        Console.WriteLine("Special handling for Resource1");
+                    }
+                    else
+                    {
+                        Console.WriteLine("General handling");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing {resource}: {ex.Message}");
+                }
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            ResourceHandler handler = new ResourceHandler();
+            handler.HandleResources();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            // Additional processing or clean up if needed
+
+SUFFIX CODE:
+----------------------------------------
+            // Additional processing or clean up if needed
+            Console.WriteLine("Finished processing all resources.");
+            Debug.Assert(true, "Completion and suffix executed successfully.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case involves nested control structures within a method, including a try/catch block, if/else conditions, and a using statement for resource management. The completion requires the LLM to insert a using statement correctly within the established context, demonstrating its understanding of resource cleanup and proper indentation. The suffix adds assertions to verify the correct execution of the code and the handling of resources.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace SyntaxCompletionTest
+{
+    public class ResourceManager
+    {
+        public string ResourceName { get; set; }
+
+        public ResourceManager(string resourceName)
+        {
+            ResourceName = resourceName;
+        }
+
+        public void Open()
+        {
+            Console.WriteLine($"Opening resource: {ResourceName}");
+        }
+
+        public void Close()
+        {
+            Console.WriteLine($"Closing resource: {ResourceName}");
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            string result = "";
+            try
+            {
+                using (var resource1 = new ResourceManager("Resource1"))
+                {
+                    resource1.Open();
+                    result += "Resource1 opened\n";
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                    using (var resource2 = new ResourceManager("Resource2"))
+                    {
+                        resource2.Open();
+                        result += "Resource2 opened\n";
+                    }
+                    using (var resource3 = new ResourceManager("Resource3"))
+                    {
+                        resource3.Open();
+                        result += "Resource3 opened\n";
+                    }
+
+SUFFIX CODE:
+----------------------------------------
+                    Debug.Assert(result.Contains("Resource2 opened"), "Resource2 should be opened");
+                    Debug.Assert(result.Contains("Resource3 opened"), "Resource3 should be opened");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception: {ex.Message}");
+            }
+            finally
+            {
+                Console.WriteLine("Final cleanup code");
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to handle nested using statements for resource management, which is a complex syntactical pattern in C#. The prefix establishes a context with a custom ResourceManager class and a partially implemented Main method. The golden_completion requires the LLM to correctly nest using statements and maintain proper indentation and resource handling. The suffix includes assertions to verify that the resources are opened correctly and ensures proper cleanup after the assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxTest
+{
+    public class ResourceHandler
+    {
+        public string ResourceName { get; set; }
+        public ResourceHandler(string name)
+        {
+            ResourceName = name;
+        }
+        public void Open()
+        {
+            Console.WriteLine($"Opening resource: {ResourceName}");
+        }
+        public void Close()
+        {
+            Console.WriteLine($"Closing resource: {ResourceName}");
+        }
+    }
+
+    public class ComplexSyntaxExample
+    {
+        public void Execute()
+        {
+            List<ResourceHandler> resources = new List<ResourceHandler>
+            {
+                new ResourceHandler("Resource1"),
+                new ResourceHandler("Resource2"),
+                new ResourceHandler("Resource3")
+            };
+
+            foreach (var resource in resources)
+            {
+                resource.Open();
+            }
+
+            try
+            {
+                // Simulate some work with resources
+                foreach (var resource in resources)
+                {
+                    if (resource.ResourceName == "Resource2")
+                    {
+                        throw new InvalidOperationException("Simulated exception");
+                    }
+                    Console.WriteLine($"Working with {resource.ResourceName}");
+                }
+            }
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Caught exception: {ex.Message}");
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            catch (InvalidOperationException ex)
+            {
+                Console.WriteLine($"Caught exception: {ex.Message}");
+            }
+            finally
+            {
+                foreach (var resource in resources)
+                {
+                    resource.Close();
+                }
+            }
+
+            Debug.Assert(resources.Count == 3, "Resource count should be 3");
+            Debug.Assert(resources[1].ResourceName == "Resource2", "Second resource should be Resource2");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ComplexSyntaxExample example = new ComplexSyntaxExample();
+            example.Execute();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle complex nested control structures, including try/catch blocks with multiple catch statements. It also verifies proper resource management with using statements and ensures that the correct exception handling and resource cleanup patterns are followed. The assertions confirm that the resources are managed correctly and that exceptions are handled as expected.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace ComplexSyntaxExample
+{
+    public abstract class Animal
+    {
+        public abstract void Speak();
+        public abstract string GetName();
+    }
+
+    public class Dog : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Woof!");
+        }
+
+        public override string GetName()
+        {
+            return "Dog";
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Meow!");
+        }
+
+        public override string GetName()
+        {
+            return "Cat";
+        }
+    }
+
+    public class Zoo
+    {
+        private List<Animal> animals = new List<Animal>();
+
+        public void AddAnimal(Animal animal)
+        {
+            animals.Add(animal);
+        }
+
+        public void MakeAllAnimalsSpeak()
+        {
+            foreach (var animal in animals)
+            {
+                animal.Speak();
+            }
+        }
+
+        public List<string> GetAllAnimalNames()
+        {
+            return animals.Select(a => a.GetName()).ToList();
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Zoo zoo = new Zoo();
+            zoo.AddAnimal(new Dog());
+            zoo.AddAnimal(new Cat());
+            zoo.MakeAllAnimalsSpeak();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            List<string> animalNames = zoo.GetAllAnimalNames();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(animalNames.Count == 2, "Animal count should be 2");
+            Debug.Assert(animalNames.Contains("Dog"), "Animal names should include 'Dog'");
+            Debug.Assert(animalNames.Contains("Cat"), "Animal names should include 'Cat'");
+            Console.WriteLine(string.Join(", ", animalNames));
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to understand class inheritance, method overrides, and LINQ operations with deferred execution. The prefix provides a complete setup of an abstract class with method overrides in derived classes, and the suffix includes assertions that verify the correct behavior of these overrides and LINQ operations. The golden completion requires the LLM to complete a method call that uses LINQ to retrieve animal names, demonstrating understanding of deferred execution and inheritance.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    public class Animal
+    {
+        public virtual string Speak()
+        {
+            return "Generic animal sound";
+        }
+    }
+
+    public class Dog : Animal
+    {
+        public override string Speak()
+        {
+            return "Woof!";
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override string Speak()
+        {
+            return "Meow!";
+        }
+    }
+
+    public class AnimalShelter
+    {
+        private readonly List<Animal> animals = new List<Animal>();
+
+        public void AddAnimal(Animal animal)
+        {
+            animals.Add(animal);
+        }
+
+        public void MakeAllAnimalsSpeak()
+        {
+            foreach (var animal in animals)
+            {
+                Console.WriteLine(animal.Speak());
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            AnimalShelter shelter = new AnimalShelter();
+            shelter.AddAnimal(new Dog());
+            shelter.AddAnimal(new Cat());
+            // Add a new Animal
+
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            shelter.AddAnimal(new Animal());
+
+SUFFIX CODE:
+----------------------------------------
+            shelter.MakeAllAnimalsSpeak();
+            Debug.Assert(shelter != null, "Shelter should not be null");
+            Debug.Assert(shelter != null, "Shelter should contain animals");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the ability to understand and complete complex C# syntax patterns involving class inheritance and method overrides. The prefix sets up a scenario with multiple classes and method overrides, while the golden_completion requires adding an additional animal to the shelter. The suffix ensures that the completion does not duplicate code and includes necessary assertions to verify the structure and functionality.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+
+namespace ReflectionExample
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class CustomAttribute : Attribute
+    {
+        public string Description { get; set; }
+        public CustomAttribute(string description)
+        {
+            Description = description;
+        }
+    }
+
+    [Custom("This is a sample class with a custom attribute")]
+    public class SampleClass
+    {
+        [Custom("This is a sample method with a custom attribute")]
+        public void SampleMethod()
+        {
+            Console.WriteLine("Executing SampleMethod...");
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            // Reflecting over the SampleClass to find custom attributes
+            Type sampleType = typeof(SampleClass);
+            var classAttributes = sampleType.GetCustomAttributes(typeof(CustomAttribute), false);
+            foreach (var attribute in classAttributes)
+            {
+                CustomAttribute customAttribute = (CustomAttribute)attribute;
+                Console.WriteLine($"Class Attribute: {customAttribute.Description}");
+            }
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            MethodInfo sampleMethod = sampleType.GetMethod("SampleMethod");
+            var methodAttributes = sampleMethod.GetCustomAttributes(typeof(CustomAttribute), false);
+            foreach (var attribute in methodAttributes)
+            {
+                CustomAttribute customAttribute = (CustomAttribute)attribute;
+                Console.WriteLine($"Method Attribute: {customAttribute.Description}");
+                Debug.Assert(customAttribute.Description == "This is a sample method with a custom attribute", "Method attribute description mismatch.");
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            // Reflecting over the SampleMethod to find custom attributes
+            MethodInfo sampleMethod = sampleType.GetMethod("SampleMethod");
+            var methodAttributes = sampleMethod.GetCustomAttributes(typeof(CustomAttribute), false);
+            foreach (var attribute in methodAttributes)
+            {
+                CustomAttribute customAttribute = (CustomAttribute)attribute;
+                Console.WriteLine($"Method Attribute: {customAttribute.Description}");
+                Debug.Assert(customAttribute.Description == "This is a sample method with a custom attribute", "Method attribute description mismatch.");
+            }
+
+            // Ensure the method was executed correctly
+            SampleClass instance = new SampleClass();
+            instance.SampleMethod();
+            Debug.Assert(true, "SampleMethod executed correctly.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a reflection-based attribute retrieval scenario, which involves complex C# syntax features such as attributes, reflection, and method assertions. The test ensures that the model can correctly use reflection to retrieve and validate custom attributes applied to classes and methods, and that it maintains proper syntax and indentation. The assertions check the correctness of attribute descriptions and ensure that the method is executed as expected.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        public static List<Person> GetPeople()
+        {
+            return new List<Person>
+            {
+                new Person { Name = "Alice", Age = 25 },
+                new Person { Name = "Bob", Age = 30 },
+                new Person { Name = "Charlie", Age = 35 }
+            };
+        }
+
+        public static void Main(string[] args)
+        {
+            List<Person> people = GetPeople();
+
+            // Using LINQ to filter and sort the list of people
+            var sortedPeople = people
+                .Where(p => p.Age >= 30)
+                .OrderByDescending(p => p.Age)
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                .ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(sortedPeople.Count() == 2, "There should be exactly 2 people aged 30 or older.");
+            Debug.Assert(sortedPeople.First().Name == "Charlie", "The first person should be Charlie.");
+            Debug.Assert(sortedPeople.Last().Name == "Bob", "The last person should be Bob.");
+
+            Console.WriteLine("Assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ query with deferred execution, specifically converting an IEnumerable result to a List using the ToList method. The prefix sets up a list of Person objects and initiates a LINQ query, while the suffix completes the method and includes necessary assertions to verify correct behavior. This scenario ensures that the LLM understands LINQ operations and proper method chaining.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    public abstract class Animal
+    {
+        public abstract void Speak();
+    }
+
+    public class Dog : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Woof");
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Meow");
+        }
+    }
+
+    public class AnimalFactory
+    {
+        public static Animal CreateAnimal(string type)
+        {
+            switch (type)
+            {
+                case "Dog":
+                    return new Dog();
+                case "Cat":
+                    return new Cat();
+                default:
+                    throw new ArgumentException("Unknown animal type");
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            List<Animal> animals = new List<Animal>();
+            animals.Add(AnimalFactory.CreateAnimal("Dog"));
+            animals.Add(AnimalFactory.CreateAnimal("Cat"));
+            foreach (var animal in animals)
+            {
+                animal.Speak();
+            }
+            
+            // Adding more animals to the list using a generic method
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            animals.Add(AnimalFactory.CreateAnimal("Dog"));
+            animals.Add(AnimalFactory.CreateAnimal("Cat"));
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            foreach (var animal in animals)
+            {
+                animal.Speak();
+            }
+
+            Debug.Assert(animals.Count == 4, "Animal count should be 4");
+            Debug.Assert(animals[0] is Dog, "First animal should be a Dog");
+            Debug.Assert(animals[1] is Cat, "Second animal should be a Cat");
+            Debug.Assert(animals[2] is Dog, "Third animal should be a Dog");
+            Debug.Assert(animals[3] is Cat, "Fourth animal should be a Cat");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates class inheritance and method overrides in C#. It also includes generic programming patterns with a method that creates instances of derived classes and adds them to a list. The golden completion adds more animals to the list using the List.AddRange method, testing the model's ability to handle generic collections and deferred execution. Assertions ensure the correct number of animals and their types are maintained, verifying structural integrity and syntax validity.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace SynthBench
+{
+    public class BaseClass
+    {
+        public virtual string Greet(string name)
+        {
+            return $"Hello, {name}";
+        }
+    }
+
+    public class DerivedClass : BaseClass
+    {
+        public override string Greet(string name)
+        {
+            return $"Hi, {name}";
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            BaseClass baseInstance = new BaseClass();
+            DerivedClass derivedInstance = new DerivedClass();
+            string baseGreeting = baseInstance.Greet("John");
+            string derivedGreeting = derivedInstance.Greet("Jane");
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            BaseClass polymorphicInstance = new DerivedClass();
+            string polymorphicGreeting = polymorphicInstance.Greet("Alex");
+            Debug.Assert(polymorphicGreeting == "Hi, Alex", "Polymorphic greeting did not match");
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(baseGreeting == "Hello, John", "Base class greeting did not match");
+            Debug.Assert(derivedGreeting == "Hi, Jane", "Derived class greeting did not match");
+
+            Console.WriteLine(baseGreeting);
+            Console.WriteLine(derivedGreeting);
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to handle class inheritance and method overrides in C#. The prefix sets up a base class with a virtual method and a derived class that overrides this method. The golden completion requires the LLM to continue the logic of method overriding and make appropriate assertions to verify the correct behavior of the derived class's method implementation. The suffix includes assertions to ensure the correctness of the method overrides and proper functionality of the classes, which is critical in object-oriented programming.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+namespace ExampleNamespace
+{
+    public class BaseClass
+    {
+        public virtual void Display()
+        {
+            Console.WriteLine("BaseClass Display");
+        }
+    }
+
+    public class DerivedClass : BaseClass
+    {
+        public override void Display()
+        {
+            Console.WriteLine("DerivedClass Display");
+        }
+    }
+
+    public class GenericClass<T>
+    {
+        public T Value { get; set; }
+
+        public GenericClass(T value)
+        {
+            Value = value;
+        }
+
+        public void ShowValue()
+        {
+            Console.WriteLine($"Value: {Value}");
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            BaseClass baseObj = new BaseClass();
+            BaseClass derivedObj = new DerivedClass();
+            GenericClass<int> genericInt = new GenericClass<int>(42);
+            GenericClass<string> genericString = new GenericClass<string>("Hello World");
+
+            baseObj.Display();
+            derivedObj.Display();
+            genericInt.ShowValue();
+            genericString.ShowValue();
+
+            List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+            var evenNumbers = numbers.FindAll(x => x % 2 == 0);
+            Console.WriteLine("Even Numbers:");
+            foreach (var num in evenNumbers)
+            {
+                Console.WriteLine(num);
+            }
+
+            Console.WriteLine("Deferred Execution Example:");
+            var query = numbers.Where(x => x > 2);
+            foreach (var num in query)
+            {
+                Console.WriteLine(num);
+            }
+
+            // Insert golden completion here
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var greaterThanThree = numbers.Where(x => x > 3).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            var greaterThanThree = numbers.Where(x => x > 3).ToList();
+            Console.WriteLine("Numbers greater than three:");
+            foreach (var num in greaterThanThree)
+            {
+                Console.WriteLine(num);
+            }
+
+            Debug.Assert(greaterThanThree.Count == 2, "There should be two numbers greater than three.");
+            Debug.Assert(greaterThanThree[0] == 4, "The first number greater than three should be 4.");
+            Debug.Assert(greaterThanThree[1] == 5, "The second number greater than three should be 5.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates complex C# syntax features including class inheritance, method overrides, generic programming patterns, lambda expressions, and LINQ operations with deferred execution. The prefix sets up a comprehensive context with various class definitions and method implementations. The golden completion requires the LLM to correctly implement a LINQ query using lambda expressions, demonstrating understanding of deferred execution. The suffix includes assertions to verify the correctness of the LINQ query results, ensuring the LLM-generated code maintains syntactic and semantic integrity.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace SynthBench
+{
+    public class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Person> people = new List<Person>
+            {
+                new Person { FirstName = "John", LastName = "Doe", Age = 30 },
+                new Person { FirstName = "Jane", LastName = "Doe", Age = 25 },
+                new Person { FirstName = "Jake", LastName = "Smith", Age = 35 },
+                new Person { FirstName = "Jill", LastName = "Smith", Age = 28 }
+            };
+
+            var orderedPeople = people
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            .OrderBy(p => p.FirstName)
+
+SUFFIX CODE:
+----------------------------------------
+            .ThenBy(p => p.LastName)
+            .ToList();
+
+            Debug.Assert(orderedPeople[0].FirstName == "Jane", "First person should be Jane");
+            Debug.Assert(orderedPeople[1].FirstName == "John", "Second person should be John");
+            Debug.Assert(orderedPeople[2].FirstName == "Jill", "Third person should be Jill");
+            Debug.Assert(orderedPeople[3].FirstName == "Jake", "Fourth person should be Jake");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ query with deferred execution. The prefix sets up a list of people and begins ordering them by their first names. The golden completion requires understanding the LINQ method chaining syntax and the appropriate method to use for ordering. The suffix includes assertions to verify the correct order of elements and ensures the proper nesting and indentation of the code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace ComplexSyntaxTest
+{
+    public abstract class BaseClass<T>
+    {
+        public abstract T Process(T input);
+    }
+
+    public class DerivedClass : BaseClass<int>
+    {
+        public override int Process(int input)
+        {
+            return input * input;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            BaseClass<int> processor = new DerivedClass();
+            List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+
+            var squaredNumbers = numbers.Select(n => processor.Process(n)).ToList();
+
+            Console.WriteLine("Squared numbers:");
+            foreach (var number in squaredNumbers)
+            {
+                Console.WriteLine(number);
+            }
+
+            // LINQ operation with deferred execution
+            var evenNumbers = numbers.Where(n => n % 2 == 0);
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            Debug.Assert(evenNumbers.Count() == 2, "There should be exactly 2 even numbers");
+
+SUFFIX CODE:
+----------------------------------------
+
+            // Assertions to validate the results
+            Debug.Assert(squaredNumbers.SequenceEqual(new List<int> { 1, 4, 9, 16, 25 }), "Squared numbers are incorrect");
+
+            var evenNumbersList = evenNumbers.ToList();
+            Debug.Assert(evenNumbersList.SequenceEqual(new List<int> { 2, 4 }), "Even numbers are incorrect");
+
+            Console.WriteLine("Even numbers:");
+            foreach (var number in evenNumbersList)
+            {
+                Console.WriteLine(number);
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete complex C# syntax patterns involving class inheritance, method overrides, lambda expressions, and LINQ operations with deferred execution. The prefix sets up the context with a base class and derived class, demonstrating method overrides. The golden completion focuses on performing a LINQ operation with deferred execution, validating that the model correctly understands when the LINQ query is executed. The suffix includes assertions to verify that the correct values are produced, ensuring that the syntax completion maintains the logical flow and correctness of the code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+
+namespace MyNamespace
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class MyCustomAttribute : Attribute
+    {
+        public string Description { get; set; }
+        public MyCustomAttribute(string description)
+        {
+            Description = description;
+        }
+    }
+
+    public class BaseClass
+    {
+        public virtual void Display()
+        {
+            Console.WriteLine("BaseClass Display method");
+        }
+    }
+
+    [MyCustomAttribute("Derived class with overridden method")]
+    public class DerivedClass : BaseClass
+    {
+        public override void Display()
+        {
+            Console.WriteLine("DerivedClass Display method");
+        }
+    }
+
+    public class GenericClass<T>
+    {
+        public void PrintType()
+        {
+            Console.WriteLine(typeof(T).Name);
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            DerivedClass derived = new DerivedClass();
+            derived.Display();
+
+            GenericClass<int> genericInt = new GenericClass<int>();
+            GenericClass<string> genericString = new GenericClass<string>();
+            genericInt.PrintType();
+            genericString.PrintType();
+            // Print types and descriptions
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var types = new List<Type> { typeof(int), typeof(string), typeof(DerivedClass) };
+            foreach (var type in types)
+            {
+                Console.WriteLine(type.Name);
+                var attributes = type.GetCustomAttributes(typeof(MyCustomAttribute), true);
+                foreach (var attr in attributes)
+                {
+                    var myAttr = attr as MyCustomAttribute;
+                    if (myAttr != null)
+                    {
+                        Console.WriteLine($"Description: {myAttr.Description}");
+                    }
+                }
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            var properties = typeof(DerivedClass).GetCustomAttributes(typeof(MyCustomAttribute), true);
+            var attribute = properties.FirstOrDefault() as MyCustomAttribute;
+            Debug.Assert(attribute != null, "Attribute should not be null");
+            Debug.Assert(attribute.Description == "Derived class with overridden method", "Attribute description should match");
+
+            var baseType = typeof(DerivedClass).BaseType;
+            Debug.Assert(baseType == typeof(BaseClass), "Base type should be BaseClass");
+
+            var methods = typeof(DerivedClass).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            var displayMethod = methods.FirstOrDefault(m => m.Name == "Display" && m.DeclaringType == typeof(DerivedClass));
+            Debug.Assert(displayMethod != null, "Display method should be overridden in DerivedClass");
+
+            var genericClassType = typeof(GenericClass<>);
+            var genericIntType = genericClassType.MakeGenericType(typeof(int));
+            var genericStringType = genericClassType.MakeGenericType(typeof(string));
+            Debug.Assert(genericIntType == typeof(GenericClass<int>), "GenericClass<int> type should match");
+            Debug.Assert(genericStringType == typeof(GenericClass<string>), "GenericClass<string> type should match");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle attributes and reflection in C#. The prefix sets up a custom attribute, a base class, a derived class with an overridden method, and a generic class. The golden completion involves using reflection to find all types in the assembly that have the custom attribute and printing their descriptions. The suffix contains assertions to verify the correct application of the attribute, the inheritance hierarchy, the overridden method, and the generic class instantiations. This scenario effectively tests the LLM's understanding of complex C# syntax features, including attributes, reflection, class inheritance, method overrides, and generics, ensuring proper nesting and indentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace SynthBench
+{
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Person> people = new List<Person>
+            {
+                new Person { Name = "John", Age = 30 },
+                new Person { Name = "Jane", Age = 25 },
+                new Person { Name = "Smith", Age = 40 }
+            };
+
+            var adults = people.Where(p => p.Age >= 18).ToList();
+
+            // The following LINQ statement should group people by age and select the groups with more than one person
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var groupedByAge = adults.GroupBy(p => p.Age).Where(g => g.Count() > 1).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+
+            Debug.Assert(adults.Count == 3, "There should be 3 adults");
+            Debug.Assert(groupedByAge.Any(), "There should be at least one group with more than one person");
+            Debug.Assert(groupedByAge.First().Key == 30, "The age of the first group should be 30");
+
+            // Cleanup code or any further processing here
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to correctly complete a LINQ operation involving grouping and filtering, which are common in complex C# syntax. The prefix sets up the context by defining a list of people and filtering adults, while the suffix includes assertions that verify the integrity and correctness of the completed LINQ operation. The completion must maintain proper indentation and integrate seamlessly with the existing code.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    // Define a base class
+    public class Animal
+    {
+        public virtual string Speak()
+        {
+            return "Unknown";
+        }
+    }
+
+    // Define a derived class
+    public class Dog : Animal
+    {
+        public override string Speak()
+        {
+            return "Woof";
+        }
+    }
+
+    // Define another derived class
+    public class Cat : Animal
+    {
+        public override string Speak()
+        {
+            return "Meow";
+        }
+    }
+
+    // Define a generic handler class
+    public class AnimalHandler<T> where T : Animal
+    {
+        private List<T> animals = new List<T>();
+
+        public void AddAnimal(T animal)
+        {
+            animals.Add(animal);
+        }
+
+        public IEnumerable<string> GetAllSpeaks()
+        {
+            return animals.Select(a => a.Speak());
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Create instances of AnimalHandler for Dog and Cat
+            AnimalHandler<Dog> dogHandler = new AnimalHandler<Dog>();
+            AnimalHandler<Cat> catHandler = new AnimalHandler<Cat>();
+
+            // Add some animals
+            dogHandler.AddAnimal(new Dog());
+            dogHandler.AddAnimal(new Dog());
+            catHandler.AddAnimal(new Cat());
+            catHandler.AddAnimal(new Cat());
+
+            // Get all speaks
+            IEnumerable<string> dogSpeaks = dogHandler.GetAllSpeaks();
+            IEnumerable<string> catSpeaks = catHandler.GetAllSpeaks();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            Debug.Assert(dogSpeaks.All(s => s == "Woof"), "All dogs should say 'Woof'");
+
+SUFFIX CODE:
+----------------------------------------
+            // Assertions
+            Debug.Assert(catSpeaks.All(s => s == "Meow"), "All cats should say 'Meow'");
+
+            // Print out the speaks
+            Console.WriteLine("Dog speaks:");
+            foreach (var speak in dogSpeaks)
+            {
+                Console.WriteLine(speak);
+            }
+
+            Console.WriteLine("Cat speaks:");
+            foreach (var speak in catSpeaks)
+            {
+                Console.WriteLine(speak);
+            }
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle complex C# syntax patterns including class inheritance, method overrides, generic programming, and LINQ operations with deferred execution. It ensures the model can complete the appropriate assertions for verifying the correctness of method overrides and generic collections. The scenario also requires maintaining proper indentation and nesting of code blocks, which is critical for validating the model's understanding of C# syntax.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace SyntaxCompletionTest
+{
+    public class ComplexSyntaxTest
+    {
+        public List<int> GenerateNumbers()
+        {
+            return Enumerable.Range(1, 100).ToList();
+        }
+
+        public void TestLINQOperations()
+        {
+            List<int> numbers = GenerateNumbers();
+
+            // Apply LINQ operations with deferred execution
+            var evenNumbersQuery = numbers.Where(n => n % 2 == 0);
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var evenNumbersQuery = numbers.Where(n => n % 2 == 0);
+
+SUFFIX CODE:
+----------------------------------------
+            // Execute the query by converting to a list
+            List<int> evenNumbers = evenNumbersQuery.ToList();
+
+            // Assertion: Verify that the count of even numbers is correct
+            Debug.Assert(evenNumbers.Count == 50, "The count of even numbers should be 50.");
+
+            // Assertion: Check the first and last elements of the even numbers list
+            Debug.Assert(evenNumbers.First() == 2, "The first even number should be 2.");
+            Debug.Assert(evenNumbers.Last() == 100, "The last even number should be 100.");
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            ComplexSyntaxTest test = new ComplexSyntaxTest();
+            test.TestLINQOperations();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate an LLM's ability to complete LINQ operations with deferred execution in C#. The prefix sets up a context with a list of integers and a LINQ query to filter even numbers. The golden completion continues this pattern by adding a new LINQ query that doubles the even numbers, demonstrating the deferred execution feature of LINQ. The suffix includes assertions to verify that the LINQ operations were performed correctly, checking both the count and the values of the resulting list. This scenario tests the model's understanding of LINQ syntax, deferred execution, and proper use of assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace ExampleNamespace
+{
+    public class ExampleClass
+    {
+        public List<int> numbers;
+
+        public ExampleClass()
+        {
+            numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+        }
+
+        public void ProcessNumbers()
+        {
+            // LINQ operation with deferred execution
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var query = numbers.Where(n => n % 2 == 0);
+
+SUFFIX CODE:
+----------------------------------------
+            var evenNumbers = query.ToList();
+
+            Debug.Assert(evenNumbers.SequenceEqual(new List<int> { 2, 4, 6, 8, 10 }), "Even numbers sequence is incorrect");
+        }
+    }
+
+    public class Program
+    {
+        public static void Main()
+        {
+            var example = new ExampleClass();
+            example.ProcessNumbers();
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ operation with deferred execution, a complex C# syntax feature. The scenario involves processing a list of integers to filter even numbers using a LINQ query. The prefix sets up the class and method, the golden completion contains the LINQ query, and the suffix verifies the result with an assertion. This tests the model's capability to understand and correctly use LINQ syntax and deferred execution.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxTest
+{
+    public class BaseClass
+    {
+        public virtual string Describe()
+        {
+            return "I am a base class.";
+        }
+    }
+
+    public class DerivedClass : BaseClass
+    {
+        public override string Describe()
+        {
+            return "I am a derived class.";
+        }
+    }
+
+    public class AnotherDerivedClass : BaseClass
+    {
+        public override string Describe()
+        {
+            return "I am another derived class.";
+        }
+    }
+
+    public class GenericClass<T> where T : BaseClass
+    {
+        public string GetDescription(T instance)
+        {
+            return instance.Describe();
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            BaseClass baseInstance = new BaseClass();
+            DerivedClass derivedInstance = new DerivedClass();
+            AnotherDerivedClass anotherDerivedInstance = new AnotherDerivedClass();
+            GenericClass<BaseClass> genericBase = new GenericClass<BaseClass>();
+            GenericClass<DerivedClass> genericDerived = new GenericClass<DerivedClass>();
+            GenericClass<AnotherDerivedClass> genericAnotherDerived = new GenericClass<AnotherDerivedClass>();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            Debug.Assert(genericDerived.GetDescription(derivedInstance) == "I am a derived class.", "Derived class description failed");
+            Debug.Assert(genericAnotherDerived.GetDescription(anotherDerivedInstance) == "I am another derived class.", "Another derived class description failed");
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(genericBase.GetDescription(baseInstance) == "I am a base class.", "Base class description failed");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates complex C# syntax features, including class inheritance, method overrides, and generic programming patterns. It tests the model's ability to understand and complete nested class structures and method implementations while maintaining proper indentation and formatting. The assertions ensure that the overridden methods in derived classes return the expected values, which verifies the integrity of the inheritance and method override implementation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace SynthBench
+{
+    public class Program
+    {
+        public class BaseClass
+        {
+            public virtual string GetName()
+            {
+                return "BaseClass";
+            }
+        }
+
+        public class DerivedClass : BaseClass
+        {
+            public override string GetName()
+            {
+                return "DerivedClass";
+            }
+        }
+
+        public class AnotherDerivedClass : BaseClass
+        {
+            public override string GetName()
+            {
+                return "AnotherDerivedClass";
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+            List<BaseClass> objects = new List<BaseClass>
+            {
+                new BaseClass(),
+                new DerivedClass(),
+                new AnotherDerivedClass()
+            };
+
+            // Start of the test code
+            foreach (var obj in objects)
+            {
+                string name = obj.GetName();
+                Console.WriteLine(name);
+                // Check that the name is correct
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                Debug.Assert(name == obj.GetType().Name, $"Expected {obj.GetType().Name} name");
+
+SUFFIX CODE:
+----------------------------------------
+            }
+
+            // Additional testing
+            BaseClass baseObj = new DerivedClass();
+            Debug.Assert(baseObj.GetName() == "DerivedClass", "Expected DerivedClass name");
+
+            baseObj = new AnotherDerivedClass();
+            Debug.Assert(baseObj.GetName() == "AnotherDerivedClass", "Expected AnotherDerivedClass name");
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates complex C# syntax features such as class inheritance and method overrides. The prefix sets up the context with multiple inherited classes and their overridden methods. The golden completion requires the LLM to correctly use the overridden methods and assert their expected values. The suffix includes additional assertions and ensures proper closure of the method and class. This tests the LLM's ability to handle inheritance, method overriding, and proper usage of assertions in a nested structure.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+namespace SyntaxCompletionTest {
+    public class Person {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+
+        public Person(string firstName, string lastName, int age) {
+            FirstName = firstName;
+            LastName = lastName;
+            Age = age;
+        }
+    }
+
+    public class Employee : Person {
+        public string Position { get; set; }
+
+        public Employee(string firstName, string lastName, int age, string position) : base(firstName, lastName, age) {
+            Position = position;
+        }
+
+        public override string ToString() {
+            return $"{FirstName} {LastName}, {Age} years old, works as {Position}";
+        }
+    }
+
+    public class Test {
+        public static void Main(string[] args) {
+            List<Employee> employees = new List<Employee> {
+                new Employee("John", "Doe", 30, "Developer"),
+                new Employee("Jane", "Smith", 40, "Manager"),
+                new Employee("Mike", "Johnson", 25, "Intern")
+            };
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var olderEmployees = employees.Where(e => e.Age > 30).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Assertion to check if LINQ query works as expected
+            int olderEmployeesCount = 0;
+            foreach (var employee in olderEmployees) {
+                Debug.Assert(employee.Age > 30, "Employee age should be greater than 30");
+                olderEmployeesCount++;
+            }
+            Debug.Assert(olderEmployeesCount == 1, "There should be one employee older than 30");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to validate the ability of the LLM to correctly complete a LINQ query with deferred execution. The prefix sets up a scenario with a list of Employee objects and initializes the context. The golden completion specifically tests the LLM's understanding of LINQ syntax and deferred execution. The suffix then continues with assertions to verify that the LINQ query behaves as expected, ensuring that only employees older than 30 are selected. This tests the LLM's ability to handle complex C# syntax, including LINQ operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace SynthBench
+{
+    public class Order
+    {
+        public int Id { get; set; }
+        public string Product { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class OrderProcessor
+    {
+        private List<Order> orders;
+
+        public OrderProcessor()
+        {
+            orders = new List<Order>
+            {
+                new Order { Id = 1, Product = "Laptop", Price = 999.99m },
+                new Order { Id = 2, Product = "Smartphone", Price = 499.49m },
+                new Order { Id = 3, Product = "Tablet", Price = 299.99m },
+                new Order { Id = 4, Product = "Monitor", Price = 199.99m }
+            };
+        }
+
+        public List<Order> GetOrdersCheaperThan(decimal maxPrice)
+        {
+            // Start LINQ query to get orders cheaper than maxPrice
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var result = orders.Where(o => o.Price < maxPrice).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(result.Count == 3, "Expected 3 orders cheaper than $500.");
+            Debug.Assert(result.All(o => o.Price < 500), "All orders should be cheaper than $500.");
+            Console.WriteLine("All assertions passed.");
+        }
+
+        public static void Main(string[] args)
+        {
+            var processor = new OrderProcessor();
+            var result = processor.GetOrdersCheaperThan(500);
+            Debug.Assert(result.Count == 3, "Expected 3 orders cheaper than $500.");
+            Debug.Assert(result.All(o => o.Price < 500), "All orders should be cheaper than $500.");
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ query with deferred execution, a complex C# syntax feature. The prefix sets up an OrderProcessor class with a list of orders and starts a method to filter orders based on price. The golden completion requires the LLM to correctly use LINQ to filter the list, demonstrating understanding of lambda expressions and method references. The suffix includes assertions to verify the correctness of the LINQ query and the overall structure, ensuring the completion is syntactically accurate and logically correct. This scenario is realistic and demonstrates practical usage of LINQ in real-world applications.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    public abstract class Animal
+    {
+        public abstract void MakeSound();
+    }
+
+    public class Dog : Animal
+    {
+        public override void MakeSound()
+        {
+            Console.WriteLine("Woof");
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void MakeSound()
+        {
+            Console.WriteLine("Meow");
+        }
+    }
+
+    public class Zoo<T> where T : Animal
+    {
+        private List<T> animals = new List<T>();
+
+        public void AddAnimal(T animal)
+        {
+            animals.Add(animal);
+        }
+
+        public void MakeAllSounds()
+        {
+            foreach (var animal in animals)
+            {
+                animal.MakeSound();
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Zoo<Dog> dogZoo = new Zoo<Dog>();
+            dogZoo.AddAnimal(new Dog());
+            dogZoo.MakeAllSounds();
+
+            Zoo<Cat> catZoo = new Zoo<Cat>();
+            catZoo.AddAnimal(new Cat());
+            catZoo.MakeAllSounds();
+
+            var mixedAnimals = new List<Animal> { new Dog(), new Cat() };
+            var sounds = mixedAnimals.Select(a => { a.MakeSound(); return a.GetType().Name; });
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            foreach (var sound in sounds.ToList())
+
+SUFFIX CODE:
+----------------------------------------
+            foreach (var sound in sounds)
+            {
+                Debug.Assert(sound == "Dog" || sound == "Cat", $"Unexpected animal sound: {sound}");
+            }
+
+            Console.WriteLine("All tests passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case provides a rich context with abstract classes, inheritance, generic programming, and LINQ operations. The completion involves deferred execution of LINQ operations, ensuring the model understands both the syntax and execution context of complex C# features. The assertions verify the correct handling of LINQ and inheritance patterns, making it a comprehensive test for syntax completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace ComplexSyntaxExample
+{
+    public abstract class Animal
+    {
+        public abstract void MakeSound();
+    }
+
+    public class Dog : Animal
+    {
+        public override void MakeSound()
+        {
+            Console.WriteLine("Woof");
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void MakeSound()
+        {
+            Console.WriteLine("Meow");
+        }
+    }
+
+    public class AnimalFarm<T> where T : Animal
+    {
+        private List<T> animals = new List<T>();
+
+        public void AddAnimal(T animal)
+        {
+            animals.Add(animal);
+        }
+
+        public void MakeAllSounds()
+        {
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            foreach (var animal in animals)
+            {
+                animal.MakeSound();
+            }
+
+SUFFIX CODE:
+----------------------------------------
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            AnimalFarm<Dog> dogFarm = new AnimalFarm<Dog>();
+            dogFarm.AddAnimal(new Dog());
+            dogFarm.AddAnimal(new Dog());
+
+            AnimalFarm<Cat> catFarm = new AnimalFarm<Cat>();
+            catFarm.AddAnimal(new Cat());
+            catFarm.AddAnimal(new Cat());
+
+            // Testing DogFarm
+            dogFarm.MakeAllSounds(); // Expected: Woof Woof
+            Debug.Assert(true, "Dog sounds are correct");
+
+            // Testing CatFarm
+            catFarm.MakeAllSounds(); // Expected: Meow Meow
+            Debug.Assert(true, "Cat sounds are correct");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle complex C# syntax features such as class inheritance, method overrides, and generic programming patterns. The 'Animal' class is abstract, requiring derived classes to override the 'MakeSound' method. The 'AnimalFarm' class demonstrates generic constraints and the use of a generic list. The completion involves iterating over a list of animals and invoking the overridden 'MakeSound' method, which tests the LLM's understanding of inheritance and method overriding. The assertions in the suffix verify the correctness of the sound outputs for both 'Dog' and 'Cat' farms, ensuring the completion maintains proper syntactical and functional integrity.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace SynthBench
+{
+    public class Product
+    {
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class ProductBuilder
+    {
+        private List<Product> products = new List<Product>();
+
+        public ProductBuilder AddProduct(string name, decimal price)
+        {
+            products.Add(new Product { Name = name, Price = price });
+            return this;
+        }
+
+        public List<Product> Build()
+        {
+            return products;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = new ProductBuilder();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            builder.AddProduct("Laptop", 999.99m).AddProduct("Smartphone", 499.99m);
+
+SUFFIX CODE:
+----------------------------------------
+            List<Product> productList = builder.Build();
+            Debug.Assert(productList.Count == 2, "Expected 2 products in the list");
+            Debug.Assert(productList[0].Name == "Laptop", "Expected first product to be Laptop");
+            Debug.Assert(productList[1].Name == "Smartphone", "Expected second product to be Smartphone");
+            Debug.Assert(productList[0].Price == 999.99m, "Expected first product price to be 999.99");
+            Debug.Assert(productList[1].Price == 499.99m, "Expected second product price to be 499.99");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates a complex syntax pattern involving method chaining in a builder pattern implementation. The prefix sets up the context by defining a Product class, a ProductBuilder class with method chaining capabilities, and a Main method that begins the chaining process. The golden completion involves chaining method calls to add products. The suffix completes the Main method by building the product list and includes assertions to verify that the products were added correctly with the expected names and prices. This structure tests the LLM's ability to correctly understand and continue method chaining patterns within the context of a builder pattern.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+namespace FluentInterfaceExample
+{
+    public interface ICarBuilder
+    {
+        ICarBuilder SetModel(string model);
+        ICarBuilder SetEngine(string engine);
+        ICarBuilder SetColor(string color);
+        Car Build();
+    }
+
+    public class Car
+    {
+        public string Model { get; private set; }
+        public string Engine { get; private set; }
+        public string Color { get; private set; }
+
+        public Car(string model, string engine, string color)
+        {
+            Model = model;
+            Engine = engine;
+            Color = color;
+        }
+
+        public override string ToString()
+        {
+            return $"Model: {Model}, Engine: {Engine}, Color: {Color}";
+        }
+    }
+
+    public class CarBuilder : ICarBuilder
+    {
+        private string _model;
+        private string _engine;
+        private string _color;
+
+        public ICarBuilder SetModel(string model)
+        {
+            _model = model;
+            return this;
+        }
+
+        public ICarBuilder SetEngine(string engine)
+        {
+            _engine = engine;
+            return this;
+        }
+
+        public ICarBuilder SetColor(string color)
+        {
+            _color = color;
+            return this;
+        }
+
+        public Car Build()
+        {
+            return new Car(_model, _engine, _color);
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            ICarBuilder carBuilder = new CarBuilder();
+            Car myCar = carBuilder
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+.SetModel("Tesla Model S")
+
+SUFFIX CODE:
+----------------------------------------
+.SetEngine("V8").SetColor("Red").Build();
+            Debug.Assert(myCar.Model == "Tesla Model S", "Model should be Tesla Model S");
+            Debug.Assert(myCar.Engine == "V8", "Engine should be V8");
+            Debug.Assert(myCar.Color == "Red", "Color should be Red");
+            Console.WriteLine(myCar);
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of the Fluent Interface pattern in C# with method chaining. The prefix sets up the necessary classes and interfaces for building a Car object using a fluent interface. The golden completion involves adding a method call to set the car's model, which is crucial for maintaining the pattern's chaining capabilities. The suffix continues the fluent chain, sets other properties, builds the Car object, and includes assertions to verify that the chain correctly sets all properties. This effectively tests the model's understanding of method chaining and fluent interfaces.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace LinqDeferredExecutionExample
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+            var evenNumbersQuery = numbers.Where(n => n % 2 == 0);
+            numbers.Add(6);
+            numbers.Add(8);
+            List<int> evenNumbers;
+
+            // Execute the query and store the result
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            evenNumbers = evenNumbersQuery.ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(evenNumbers.Count == 4, "Expected 4 even numbers");
+            Debug.Assert(evenNumbers[0] == 2, "First even number should be 2");
+            Debug.Assert(evenNumbers[1] == 4, "Second even number should be 4");
+            Debug.Assert(evenNumbers[2] == 6, "Third even number should be 6");
+            Debug.Assert(evenNumbers[3] == 8, "Fourth even number should be 8");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ deferred execution query pattern. The prefix sets up a LINQ query with deferred execution, and the golden completion correctly executes the query. The suffix includes assertions that validate the correctness of the LINQ query execution, ensuring the LLM understands the deferred execution and proper syntax for completing the query.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace ComplexSyntaxExample
+{
+    public abstract class Animal
+    {
+        public abstract string MakeSound();
+    }
+
+    public class Dog : Animal
+    {
+        public override string MakeSound()
+        {
+            return "Bark";
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override string MakeSound()
+        {
+            return "Meow";
+        }
+    }
+
+    public class AnimalShelter<T> where T : Animal
+    {
+        private List<T> animals = new List<T>();
+
+        public void AddAnimal(T animal)
+        {
+            animals.Add(animal);
+        }
+
+        public IEnumerable<string> MakeAllAnimalsSound()
+        {
+            return animals.Select(a => a.MakeSound());
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            AnimalShelter<Dog> dogShelter = new AnimalShelter<Dog>();
+            dogShelter.AddAnimal(new Dog());
+            dogShelter.AddAnimal(new Dog());
+
+            AnimalShelter<Cat> catShelter = new AnimalShelter<Cat>();
+            catShelter.AddAnimal(new Cat());
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            foreach (var sound in dogShelter.MakeAllAnimalsSound())
+            {
+                Console.WriteLine(sound);
+            }
+
+            foreach (var sound in catShelter.MakeAllAnimalsSound())
+            {
+                Console.WriteLine(sound);
+            }
+
+SUFFIX CODE:
+----------------------------------------
+            var dogSounds = dogShelter.MakeAllAnimalsSound();
+            var catSounds = catShelter.MakeAllAnimalsSound();
+
+            Debug.Assert(dogSounds.SequenceEqual(new List<string> { "Bark", "Bark" }), "Dog sounds do not match expectations.");
+            Debug.Assert(catSounds.SequenceEqual(new List<string> { "Meow", "Meow" }), "Cat sounds do not match expectations.");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of complex C# syntax involving class inheritance, generic programming patterns, and LINQ operations with deferred execution. The prefix sets up an abstract class with derived classes, a generic class with constraints, and LINQ usage. The golden completion fills in the logical gap in the code by adding another cat to the shelter. The suffix contains assertions to verify the correctness of the LINQ operations and ensure that the expected sounds are produced.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace TestNamespace
+{
+    public class BaseClass
+    {
+        public virtual string GetName()
+        {
+            return "BaseClass";
+        }
+    }
+
+    public class DerivedClass : BaseClass
+    {
+        public override string GetName()
+        {
+            return "DerivedClass";
+        }
+    }
+
+    public class Example
+    {
+        public void RunExample()
+        {
+            List<BaseClass> objects = new List<BaseClass>
+            {
+                new BaseClass(),
+                new DerivedClass()
+            };
+
+            var names = objects.Select(obj => obj.GetName());
+
+            foreach (var name in names)
+            {
+                Console.WriteLine(name);
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Example example = new Example();
+            example.RunExample();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            List<string> expectedNames = new List<string> { "BaseClass", "DerivedClass" };
+            List<string> actualNames = new List<string>();
+
+SUFFIX CODE:
+----------------------------------------
+
+            foreach (BaseClass obj in example.objects)
+            {
+                actualNames.Add(obj.GetName());
+            }
+            Debug.Assert(actualNames.SequenceEqual(expectedNames), "The names do not match the expected values.");
+
+            // Cleanup if necessary
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example for testing the LLM's ability to complete complex C# syntax features, specifically class inheritance and method overrides. The prefix sets up a scenario with a base class and a derived class, demonstrating method overriding. The golden completion involves collecting and verifying the names of the objects in a list, which requires understanding of LINQ operations and method overrides. The suffix completes the validation by asserting the expected results. This scenario tests the LLM's ability to handle class inheritance, method overriding, LINQ, and proper assertion placement.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxDemo
+{
+    public abstract class Animal
+    {
+        public abstract void Speak();
+    }
+
+    public class Dog : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Woof!");
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Meow!");
+        }
+    }
+
+    public class AnimalShelter<T> where T : Animal, new()
+    {
+        private List<T> _animals = new List<T>();
+
+        public void AddAnimal(T animal)
+        {
+            _animals.Add(animal);
+        }
+
+        public void MakeAllSpeak()
+        {
+            foreach (var animal in _animals)
+            {
+                animal.Speak();
+            }
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            AnimalShelter<Dog> dogShelter = new AnimalShelter<Dog>();
+            AnimalShelter<Cat> catShelter = new AnimalShelter<Cat>();
+
+            dogShelter.AddAnimal(new Dog());
+            dogShelter.AddAnimal(new Dog());
+
+            catShelter.AddAnimal(new Cat());
+            catShelter.AddAnimal(new Cat());
+
+            // Call to MakeAllSpeak method of dogShelter
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            dogShelter.MakeAllSpeak();
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            // Call to MakeAllSpeak method of catShelter
+            catShelter.MakeAllSpeak();
+
+            // Assertions
+            Debug.Assert(dogShelter != null, "Dog shelter should not be null");
+            Debug.Assert(catShelter != null, "Cat shelter should not be null");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example is an excellent test case for complex C# syntax features, particularly class inheritance and method overrides. It also includes generic programming patterns and lambda expressions. The golden completion tests the ability to correctly invoke a method on a generic class instance, while the suffix verifies the code's correctness and structural integrity with assertions.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+
+namespace FluentInterfaceExample
+{
+    public class Product
+    {
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+    }
+
+    public class Order
+    {
+        public List<Product> Products { get; set; } = new List<Product>();
+        public string CustomerName { get; set; }
+
+        public Order AddProduct(Product product)
+        {
+            Products.Add(product);
+            return this;
+        }
+
+        public Order SetCustomerName(string customerName)
+        {
+            CustomerName = customerName;
+            return this;
+        }
+
+        public decimal CalculateTotalPrice()
+        {
+            decimal total = 0;
+            foreach (var product in Products)
+            {
+                total += product.Price;
+            }
+            return total;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Order order = new Order();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            order.SetCustomerName("John Doe")
+                 .AddProduct(new Product { Name = "Laptop", Price = 1000.00m })
+                 .AddProduct(new Product { Name = "Mouse", Price = 50.00m });
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(order.CustomerName == "John Doe", "Customer name should be John Doe");
+            Debug.Assert(order.Products.Count == 2, "There should be 2 products in the order");
+            Debug.Assert(order.Products[0].Name == "Laptop", "First product should be Laptop");
+            Debug.Assert(order.Products[1].Name == "Mouse", "Second product should be Mouse");
+            Debug.Assert(order.CalculateTotalPrice() == 1050.00m, "Total price should be 1050.00");
+
+            // Resource cleanup (if any) can be done here
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to complete a fluent interface structure with method chaining patterns in C#. The prefix sets up an order system with methods that return the instance for chaining. The completion must correctly chain the methods, and the suffix includes assertions to verify the correctness of the method chaining and the final state of the order. This demonstrates the model's understanding of method chaining and fluent interfaces, as well as its ability to maintain proper syntax and indentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace ComplexSyntaxExample
+{
+    public class Animal
+    {
+        public virtual string Speak()
+        {
+            return "Unknown sound";
+        }
+    }
+
+    public class Dog : Animal
+    {
+        public override string Speak()
+        {
+            return "Bark";
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override string Speak()
+        {
+            return "Meow";
+        }
+    }
+
+    public class AnimalShelter<T> where T : Animal, new()
+    {
+        private List<T> animals = new List<T>();
+
+        public void AddAnimal(T animal)
+        {
+            animals.Add(animal);
+        }
+
+        public List<T> GetAnimals()
+        {
+            return animals;
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            AnimalShelter<Dog> dogShelter = new AnimalShelter<Dog>();
+            dogShelter.AddAnimal(new Dog());
+            dogShelter.AddAnimal(new Dog());
+            AnimalShelter<Cat> catShelter = new AnimalShelter<Cat>();
+            catShelter.AddAnimal(new Cat());
+            catShelter.AddAnimal(new Cat());
+
+            List<Animal> allAnimals = new List<Animal>();
+            allAnimals.AddRange(dogShelter.GetAnimals());
+            allAnimals.AddRange(catShelter.GetAnimals());
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            List<string> animalSounds = allAnimals.Select(animal => animal.Speak()).ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(animalSounds.Count == 4, "Animal count should be 4.");
+            Debug.Assert(animalSounds[0] == "Bark", "First animal should be a Dog.");
+            Debug.Assert(animalSounds[1] == "Bark", "Second animal should be a Dog.");
+            Debug.Assert(animalSounds[2] == "Meow", "Third animal should be a Cat.");
+            Debug.Assert(animalSounds[3] == "Meow", "Fourth animal should be a Cat.");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of complex C# syntax features, including class inheritance and method overrides, generic programming patterns, and LINQ operations with deferred execution. It checks the ability of the model to generate code that maintains proper nesting and indentation, and correctly uses language-specific structures such as LINQ. The assertions ensure that the code executes as expected, and the scenario tests the model's ability to understand and complete a complex syntactical pattern in C#.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    public class Animal
+    {
+        public virtual void Speak()
+        {
+            Console.WriteLine("Animal sound");
+        }
+    }
+
+    public class Dog : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Bark");
+        }
+    }
+
+    public class Cat : Animal
+    {
+        public override void Speak()
+        {
+            Console.WriteLine("Meow");
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Animal> animals = new List<Animal>
+            {
+                new Dog(),
+                new Cat()
+            };
+            // The following line demonstrates polymorphism
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            foreach (var animal in animals)
+            {
+                animal.Speak();
+            }
+
+SUFFIX CODE:
+----------------------------------------
+
+
+            Debug.Assert(animals[0] is Dog, "The first animal should be a Dog");
+            Debug.Assert(animals[1] is Cat, "The second animal should be a Cat");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete complex C# syntax features, specifically class inheritance and method overrides. The prefix sets up a scenario with a base class and two derived classes, each overriding a method. The completion requires the LLM to understand polymorphism and how to iterate over a list of base class instances to call the overridden methods. The suffix includes assertions to verify the correct types of objects in the list and ensures the combined code is executable and logically correct.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace SynthBench
+{
+    public class Customer
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Customer> customers = new List<Customer>
+            {
+                new Customer { Id = 1, Name = "John Doe", Email = "john.doe@example.com" },
+                new Customer { Id = 2, Name = "Jane Smith", Email = "jane.smith@example.com" },
+                new Customer { Id = 3, Name = "Jim Brown", Email = "jim.brown@example.com" }
+            };
+
+            // LINQ query to filter and project customer data
+            var filteredCustomers = customers
+                .Where(c => c.Name.StartsWith("J"))
+                .Select(c => new { c.Name, c.Email });
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var customerList = filteredCustomers.ToList();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(customerList.Count == 3, "There should be 3 customers.");
+            Debug.Assert(customerList[0].Name == "John Doe", "First customer should be John Doe.");
+            Debug.Assert(customerList[1].Name == "Jane Smith", "Second customer should be Jane Smith.");
+            Debug.Assert(customerList[2].Name == "Jim Brown", "Third customer should be Jim Brown.");
+
+            // Clean up resources if necessary (not needed in this simple example)
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ query with deferred execution. The prefix sets up a list of customers and a LINQ query to filter and project data. The golden completion demonstrates the correct usage of deferred execution by converting the query result to a list, while the suffix includes assertions to verify the correctness of the results and ensures proper nesting and indentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace SynthBench
+{
+    public class Customer
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<Order> Orders { get; set; }
+    }
+
+    public class Order
+    {
+        public int OrderId { get; set; }
+        public DateTime OrderDate { get; set; }
+        public double Amount { get; set; }
+    }
+
+    public class DataService
+    {
+        private List<Customer> customers;
+
+        public DataService()
+        {
+            customers = new List<Customer>
+            {
+                new Customer { Id = 1, Name = "Alice", Orders = new List<Order>
+                    {
+                        new Order { OrderId = 101, OrderDate = new DateTime(2021, 6, 1), Amount = 200 },
+                        new Order { OrderId = 102, OrderDate = new DateTime(2021, 7, 1), Amount = 300 }
+                    }
+                },
+                new Customer { Id = 2, Name = "Bob", Orders = new List<Order>
+                    {
+                        new Order { OrderId = 103, OrderDate = new DateTime(2021, 6, 15), Amount = 150 },
+                        new Order { OrderId = 104, OrderDate = new DateTime(2021, 8, 1), Amount = 350 }
+                    }
+                }
+            };
+        }
+
+        public IEnumerable<Order> GetAllOrders()
+        {
+            return customers.SelectMany(c => c.Orders);
+        }
+
+        public double CalculateTotalSales()
+        {
+            return customers.Sum(c => c.Orders.Sum(o => o.Amount));
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            DataService dataService = new DataService();
+            var allOrders = dataService.GetAllOrders();
+            var totalSales = dataService.CalculateTotalSales();
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            Debug.Assert(allOrders.Count() == 4, "All orders count should be 4");
+            Debug.Assert(totalSales == 1000, "Total sales should be 1000");
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(allOrders.Count() == 4, "All orders count should be 4");
+            Debug.Assert(totalSales == 1000, "Total sales should be 1000");
+
+            var customerOrders = allOrders.Where(o => o.OrderDate.Year == 2021);
+            Debug.Assert(customerOrders.Count() == 4, "All 2021 orders count should be 4");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle LINQ operations with deferred execution, ensuring proper syntax and the ability to handle complex nested structures. The assertions verify that the LINQ queries and calculations are performed correctly, making it a good test for syntax completion capabilities.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace SynthBench
+{
+    public class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Person> people = new List<Person>
+            {
+                new Person { FirstName = "John", LastName = "Doe", Age = 30 },
+                new Person { FirstName = "Jane", LastName = "Doe", Age = 25 },
+                new Person { FirstName = "Jack", LastName = "Smith", Age = 35 },
+                new Person { FirstName = "Jill", LastName = "Johnson", Age = 28 }
+            };
+
+            // Perform a LINQ operation with deferred execution
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var sortedPeople = people.OrderBy(p => p.FirstName);
+
+SUFFIX CODE:
+----------------------------------------
+            // Verify the result of the LINQ query
+            var result = sortedPeople.ToList();
+            Debug.Assert(result.Count == 4, "The number of elements in the sorted list should be 4.");
+            Debug.Assert(result[0].FirstName == "Jane" && result[0].LastName == "Doe", "The first person should be Jane Doe.");
+            Debug.Assert(result[1].FirstName == "Jill" && result[1].LastName == "Johnson", "The second person should be Jill Johnson.");
+            Debug.Assert(result[2].FirstName == "John" && result[2].LastName == "Doe", "The third person should be John Doe.");
+            Debug.Assert(result[3].FirstName == "Jack" && result[3].LastName == "Smith", "The fourth person should be Jack Smith.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's capability to complete a LINQ query with deferred execution, a common and complex syntax pattern in C#. The prefix sets up a realistic scenario with a list of objects, and the completion requires the model to properly use LINQ syntax to sort these objects. The suffix includes assertions to verify the correctness of the LINQ operation, ensuring that the LLM understands and can correctly implement this C# feature.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace ComplexSyntaxTest
+{
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Person> people = new List<Person>
+            {
+                new Person { Name = "Alice", Age = 30 },
+                new Person { Name = "Bob", Age = 25 },
+                new Person { Name = "Charlie", Age = 35 }
+            };
+
+            // LINQ query to select people older than 30
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var result = people.Where(p => p.Age > 30);
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(result.Count() == 1, "There should be one person older than 30.");
+            Debug.Assert(result.First().Name == "Charlie", "The person older than 30 should be Charlie.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the model's ability to complete a LINQ query with deferred execution. The prefix sets up a list of Person objects and initiates a LINQ query pattern. The golden completion fills in the query to filter people older than 30. The suffix includes assertions to verify the correct execution of the LINQ query and expected results. This scenario tests the model's understanding of LINQ syntax, deferred execution, and proper usage of lambda expressions within a query context.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Diagnostics;
+
+namespace SyntaxCompletionTest
+{
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Person> people = new List<Person>
+            {
+                new Person { Name = "Alice", Age = 30 },
+                new Person { Name = "Bob", Age = 25 },
+                new Person { Name = "Charlie", Age = 35 },
+                new Person { Name = "David", Age = 40 }
+            };
+
+            // We want to find people older than 30 and order them by name descending
+            var result = people
+                .Where(p => p.Age > 30)
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                .OrderByDescending(p => p.Name)
+
+SUFFIX CODE:
+----------------------------------------
+            // Ensure the result is as expected
+            Debug.Assert(result.Count() == 2, "There should be 2 people older than 30");
+            Debug.Assert(result.First().Name == "David", "The first person should be David");
+            Debug.Assert(result.Last().Name == "Charlie", "The last person should be Charlie");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ operation with deferred execution, including method chaining, lambda expressions, and ordering. Proper indentation, syntax, and structure must be maintained. The assertions ensure the result is correct and demonstrate understanding of LINQ operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace SynthBench
+{
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Person> people = new List<Person>
+            {
+                new Person { Name = "Alice", Age = 30 },
+                new Person { Name = "Bob", Age = 20 },
+                new Person { Name = "Charlie", Age = 25 }
+            };
+
+            // LINQ operation with deferred execution to filter and sort people by age
+            var filteredSortedPeople = people
+                .Where(p => p.Age >= 25)
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                .OrderBy(p => p.Name)
+
+SUFFIX CODE:
+----------------------------------------
+                .OrderBy(p => p.Name);
+
+            foreach (var person in filteredSortedPeople)
+            {
+                Debug.Assert(person.Age >= 25, "Filtered person should be at least 25 years old");
+            }
+
+            // Ensure correct ordering by name
+            var names = filteredSortedPeople.Select(p => p.Name).ToList();
+            Debug.Assert(names.SequenceEqual(new List<string> { "Alice", "Charlie" }), "Names should be ordered alphabetically");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's capability to complete a complex LINQ operation with deferred execution in C#. The prefix sets up a list of people and starts a LINQ query to filter and sort them. The golden completion completes the sorting by age, and the suffix performs assertions to ensure the filtering and sorting are correct. This scenario tests the LLM's understanding of LINQ operations and proper usage of deferred execution, along with maintaining correct syntax and indentation.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+public class Product
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
+
+public class Program
+{
+    private static List<Product> GetSampleProducts()
+    {
+        return new List<Product>
+        {
+            new Product { Id = 1, Name = "Laptop", Price = 999.99M },
+            new Product { Id = 2, Name = "Smartphone", Price = 499.99M },
+            new Product { Id = 3, Name = "Tablet", Price = 299.99M },
+            new Product { Id = 4, Name = "Monitor", Price = 199.99M }
+        };
+    }
+
+    public static void Main(string[] args)
+    {
+        List<Product> products = GetSampleProducts();
+
+        // LINQ operation to filter products costing more than $300
+        var expensiveProducts = 
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+products.Where(p => p.Price > 300)
+
+SUFFIX CODE:
+----------------------------------------
+;
+
+        // Assert that the filter worked correctly
+        Debug.Assert(expensiveProducts.Count() == 2, "There should be 2 products costing more than $300.");
+        Debug.Assert(expensiveProducts.Any(p => p.Name == "Laptop"), "Laptop should be in the list of expensive products.");
+        Debug.Assert(expensiveProducts.Any(p => p.Name == "Smartphone"), "Smartphone should be in the list of expensive products.");
+
+        Console.WriteLine("All assertions passed.");
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of LINQ operations with deferred execution in C#. The prefix sets up a sample list of products, and the task is to complete the LINQ query to filter products based on their price. The suffix includes assertions to verify the correctness of the LINQ operation, ensuring the LLM understands and correctly applies the LINQ syntax and deferred execution principles.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    public class BaseClass
+    {
+        public virtual string GetData()
+        {
+            return "Base Data";
+        }
+    }
+
+    public class DerivedClass : BaseClass
+    {
+        public override string GetData()
+        {
+            return "Derived Data";
+        }
+    }
+
+    public class Processor<T> where T : BaseClass
+    {
+        private T _instance;
+
+        public Processor(T instance)
+        {
+            _instance = instance;
+        }
+
+        public string ProcessData()
+        {
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            string data = _instance.GetData();
+
+SUFFIX CODE:
+----------------------------------------
+            Debug.Assert(data == "Derived Data", "Data should be 'Derived Data'");
+            return data;
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            DerivedClass derivedInstance = new DerivedClass();
+            Processor<DerivedClass> processor = new Processor<DerivedClass>(derivedInstance);
+            string result = processor.ProcessData();
+            Debug.Assert(result == "Derived Data", "Result should be 'Derived Data'");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to handle complex C# syntax features including class inheritance, method overrides, and generic programming patterns. By providing a substantial prefix that sets up a realistic scenario involving these features, the LLM is challenged to correctly complete the method implementation while maintaining proper syntax and formatting. The suffix includes assertions to verify that the completion is correct and that the program behaves as expected.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxTest
+{
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+    }
+
+    public class Employee : Person
+    {
+        public string EmployeeID { get; set; }
+        public string Department { get; set; }
+
+        public Employee(string name, int age, string employeeID, string department)
+        {
+            Name = name;
+            Age = age;
+            EmployeeID = employeeID;
+            Department = department;
+        }
+
+        public override string ToString()
+        {
+            return $"Name: {Name}, Age: {Age}, EmployeeID: {EmployeeID}, Department: {Department}";
+        }
+    }
+
+    public class Manager : Employee
+    {
+        public List<Employee> Team { get; set; }
+
+        public Manager(string name, int age, string employeeID, string department, List<Employee> team) : base(name, age, employeeID, department)
+        {
+            Team = team;
+        }
+
+        public override string ToString()
+        {
+            string teamInfo = "";
+            foreach (var member in Team)
+            {
+                teamInfo += member.ToString() + "\n";
+            }
+            return base.ToString() + $", Team: \n{teamInfo}";
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var team = new List<Employee>
+            {
+                new Employee("Alice", 30, "E123", "IT"),
+                new Employee("Bob", 28, "E124", "HR")
+            };
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            Manager manager = new Manager("John", 45, "M001", "Management", team);
+
+SUFFIX CODE:
+----------------------------------------
+            Manager manager = new Manager("John", 45, "M001", "Management", team);
+
+            Debug.Assert(manager.Name == "John", "Manager name should be John");
+            Debug.Assert(manager.Age == 45, "Manager age should be 45");
+            Debug.Assert(manager.EmployeeID == "M001", "Manager EmployeeID should be M001");
+            Debug.Assert(manager.Department == "Management", "Manager department should be Management");
+            Debug.Assert(manager.Team.Count == 2, "Manager team should have 2 members");
+
+            Console.WriteLine(manager);
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests complex C# syntax including class inheritance, method overrides, and nested structures. The prefix sets up a hierarchy of classes with overridden methods, providing a realistic scenario. The completion requires understanding how to access and assert properties of nested objects. The suffix verifies that all assertions pass and that the objects are correctly initialized, making it a good test of the model's ability to understand and complete complex syntax patterns.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace SynthBench
+{
+    public class Employee
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Department { get; set; }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            List<Employee> employees = new List<Employee>
+            {
+                new Employee { Id = 1, Name = "Alice", Age = 28, Department = "HR" },
+                new Employee { Id = 2, Name = "Bob", Age = 35, Department = "IT" },
+                new Employee { Id = 3, Name = "Charlie", Age = 45, Department = "Finance" },
+                new Employee { Id = 4, Name = "Diana", Age = 32, Department = "IT" }
+            };
+
+            var itEmployees = employees
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                .Where(e => e.Department == "IT")
+
+SUFFIX CODE:
+----------------------------------------
+                .Select(e => e.Name)
+                .ToList();
+
+            Debug.Assert(itEmployees.Count == 2, "IT department should have 2 employees");
+            Debug.Assert(itEmployees.Contains("Bob"), "IT department should include Bob");
+            Debug.Assert(itEmployees.Contains("Diana"), "IT department should include Diana");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a LINQ operation with deferred execution. The prefix sets up a list of employees and starts a LINQ query. The golden completion requires the LLM to correctly filter employees by the IT department, demonstrating understanding of LINQ's `Where` method. The suffix continues the LINQ operation with a `Select` and `ToList` call, and includes assertions to verify correctness. This scenario tests complex C# syntax, LINQ operations, and proper nesting and indentation of code blocks.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+public class Order
+{
+    public int Id { get; set; }
+    public string ProductName { get; set; }
+    public int Quantity { get; set; }
+    public double Price { get; set; }
+}
+
+public class Program
+{
+    public static List<Order> GetSampleOrders()
+    {
+        return new List<Order>
+        {
+            new Order { Id = 1, ProductName = "Laptop", Quantity = 2, Price = 999.99 },
+            new Order { Id = 2, ProductName = "Mouse", Quantity = 10, Price = 19.99 },
+            new Order { Id = 3, ProductName = "Keyboard", Quantity = 5, Price = 49.99 },
+            new Order { Id = 4, ProductName = "Monitor", Quantity = 3, Price = 199.99 }
+        };
+    }
+
+    public static void Main(string[] args)
+    {
+        List<Order> orders = GetSampleOrders();
+
+        // LINQ operation to filter orders with Quantity greater than 3
+        var filteredOrders = orders.Where(o => o.Quantity > 3).ToList();
+
+        foreach (var order in filteredOrders)
+        {
+            Console.WriteLine($"Order ID: {order.Id}, Product: {order.ProductName}, Quantity: {order.Quantity}, Price: {order.Price}");
+        }
+
+        // LINQ operation to calculate the total price of all orders
+        double totalPrice = orders.Sum(o => o.Quantity * o.Price);
+        Console.WriteLine($"Total Price: {totalPrice}");
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+        var mostExpensiveOrder = orders.OrderByDescending(o => o.Price).FirstOrDefault();
+
+SUFFIX CODE:
+----------------------------------------
+        // LINQ operation to find the most expensive order
+        var mostExpensiveOrder = orders.OrderByDescending(o => o.Price).FirstOrDefault();
+        Debug.Assert(mostExpensiveOrder != null, "Most expensive order should not be null");
+        Debug.Assert(mostExpensiveOrder.Price == 999.99, "The most expensive order should have a price of 999.99");
+
+        // LINQ operation to group orders by product name
+        var groupedOrders = orders.GroupBy(o => o.ProductName);
+        foreach (var group in groupedOrders)
+        {
+            Console.WriteLine($"Product: {group.Key}, Total Quantity: {group.Sum(o => o.Quantity)}");
+        }
+
+        // LINQ operation to find if there are any orders with a quantity of 0
+        bool anyZeroQuantity = orders.Any(o => o.Quantity == 0);
+        Debug.Assert(!anyZeroQuantity, "There should be no orders with a quantity of 0");
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to handle complex C# syntax features, specifically focusing on LINQ operations with deferred execution. The example includes various LINQ methods such as Where, Sum, OrderByDescending, GroupBy, and Any. The prefix sets up the context with sample data and initial LINQ queries. The golden completion requires the LLM to complete a LINQ query that filters orders based on price and includes appropriate assertions. The suffix continues with additional LINQ operations and assertions, ensuring that the LLM can handle the complexity of nested LINQ queries and maintain proper syntax and formatting.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+
+namespace ComplexSyntaxExample
+{
+    public class BaseClass
+    {
+        public virtual string Greet(string name)
+        {
+            return $"Hello, {name}!";
+        }
+    }
+
+    public class DerivedClass : BaseClass
+    {
+        public override string Greet(string name)
+        {
+            return base.Greet(name) + " Welcome to the derived class.";
+        }
+    }
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            BaseClass baseInstance = new BaseClass();
+            DerivedClass derivedInstance = new DerivedClass();
+            string baseGreeting = baseInstance.Greet("John");
+            string derivedGreeting = derivedInstance.Greet("John");
+            Debug.Assert(baseGreeting == "Hello, John!", "Base class greeting failed");
+            Debug.Assert(derivedGreeting == "Hello, John! Welcome to the derived class.", "Derived class greeting failed");
+
+            // Creating a list of integers
+            List<int> numbers = new List<int> { 1, 2, 3, 4, 5 };
+
+            // Using LINQ to filter and select elements
+            IEnumerable<int> evenNumbers = numbers.Where(n => n % 2 == 0);
+            foreach (var number in evenNumbers)
+            {
+                Console.WriteLine(number);
+            }
+
+            // Method chaining example
+            string result = new StringBuilder()
+                .Append("Hello, ")
+                .Append("world!")
+                .ToString();
+            Console.WriteLine(result);
+            // Using reflection to get method info
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            var methodInfo = typeof(DerivedClass).GetMethod("Greet");
+            Console.WriteLine($"Method name: {methodInfo.Name}, Return type: {methodInfo.ReturnType}");
+
+SUFFIX CODE:
+----------------------------------------
+            // Fluent interface example
+            var mathOperations = new MathOperations();
+            double computationResult = mathOperations
+                .Add(5)
+                .Subtract(2)
+                .Multiply(3)
+                .Divide(2)
+                .Result;
+            Debug.Assert(computationResult == 4.5, "Fluent interface computation failed");
+
+            // String interpolation example
+            string name = "Alice";
+            int age = 30;
+            string formattedString = $"Name: {name}, Age: {age}";
+            Console.WriteLine(formattedString);
+            Debug.Assert(formattedString == "Name: Alice, Age: 30", "String interpolation failed");
+        }
+    }
+
+    public class MathOperations
+    {
+        private double _value;
+
+        public MathOperations Add(double number)
+        {
+            _value += number;
+            return this;
+        }
+
+        public MathOperations Subtract(double number)
+        {
+            _value -= number;
+            return this;
+        }
+
+        public MathOperations Multiply(double number)
+        {
+            _value *= number;
+            return this;
+        }
+
+        public MathOperations Divide(double number)
+        {
+            _value /= number;
+            return this;
+        }
+
+        public double Result => _value;
+    }
+}
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good benchmark for syntax completion capabilities because it includes a mix of complex C# syntax patterns such as class inheritance and method overrides, LINQ operations with deferred execution, method chaining, fluent interfaces, and reflection. The provided prefix sets up various contexts, and the golden completion requires the model to correctly use reflection to retrieve method information. The suffix continues with additional complex patterns and assertions, ensuring the model can handle multi-line and nested syntax correctly.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Diagnostics;
+using System.Reflection;
+
+namespace ReflectionExample
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class CustomAttribute : Attribute
+    {
+        public string Description { get; }
+        public CustomAttribute(string description)
+        {
+            Description = description;
+        }
+    }
+
+    public class ReflectionTest
+    {
+        [Custom("This is a test class")]
+        public class TestClass
+        {
+            [Custom("This is a test method")]
+            public void TestMethod()
+            {
+                Console.WriteLine("Executing TestMethod");
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+            Type testClassType = typeof(TestClass);
+            CustomAttribute classAttribute = (CustomAttribute)Attribute.GetCustomAttribute(testClassType, typeof(CustomAttribute));
+            Console.WriteLine("Class attribute description: " + classAttribute.Description);
+
+            MethodInfo methodInfo = testClassType.GetMethod("TestMethod");
+
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+            CustomAttribute methodAttribute = (CustomAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(CustomAttribute));
+
+SUFFIX CODE:
+----------------------------------------
+            Console.WriteLine("Method attribute description: " + methodAttribute.Description);
+            TestClass testInstance = new TestClass();
+            testInstance.TestMethod();
+
+            Debug.Assert(classAttribute.Description == "This is a test class", "Class attribute description mismatch");
+            Debug.Assert(methodAttribute.Description == "This is a test method", "Method attribute description mismatch");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to handle complex C# syntax features such as attributes and reflection. It requires understanding how to retrieve custom attributes from both a class and a method, demonstrating the model's capability to complete code involving reflection and attributes correctly. The scenario includes nested class and method structures, proper attribute usage, and reflection to access metadata. Assertions are used to ensure the attributes are correctly retrieved and match expected values, which verifies the correctness of the completion.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: devbench-syntax-completion
+Language: c_sharp
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+namespace SynthBench
+{
+    public class Item
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class Program
+    {
+        public static List<Item> GetItems()
+        {
+            return new List<Item>
+            {
+                new Item { Id = 1, Name = "Item1" },
+                new Item { Id = 2, Name = "Item2" },
+                new Item { Id = 3, Name = "Item3" }
+            };
+        }
+
+        public static void Main(string[] args)
+        {
+            List<Item> items = GetItems();
+
+            // Using LINQ to filter and project items
+            var filteredItems = items
+                .Where(item => item.Id > 1)
+                .Select(item => new { item.Id, item.Name })
+
+LLM COMPLETION gpt-4o:
+----------------------------------------
+                .OrderBy(item => item.Id)
+
+SUFFIX CODE:
+----------------------------------------
+
+                .ToList();
+
+            // Assertions to verify the filtered and projected items
+            Debug.Assert(filteredItems.Count == 2, "Filtered item count should be 2");
+            Debug.Assert(filteredItems[0].Id == 2, "First item ID should be 2");
+            Debug.Assert(filteredItems[0].Name == "Item2", "First item name should be 'Item2'");
+            Debug.Assert(filteredItems[1].Id == 3, "Second item ID should be 3");
+            Debug.Assert(filteredItems[1].Name == "Item3", "Second item name should be 'Item3'");
+
+            Console.WriteLine("All assertions passed.");
+        }
+    }
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle LINQ operations with deferred execution, including filtering, projecting, and ordering items in a collection. The assertions verify the correctness of the LINQ query results, ensuring proper syntax and logical operations.
+
+ASSERTIONS:
+----------------------------------------
+
+================================================================================

@@ -1,0 +1,2502 @@
+
+================================================================================
+Test Case #1
+================================================================================
+
+================================================================================
+Test Case ID: 1
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+	name: string;
+	constructor(name: string) {
+		this.name = name;
+	}
+}
+
+class Employee extends Person {
+	salary: number;
+	constructor(name: string, salary: number) {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+		super(name);
+		this.salary = salary;
+
+SUFFIX CODE:
+----------------------------------------
+
+	}
+}
+
+const emp = new Employee('John Doe', 50000);
+console.log(emp.name); // Expected: John Doe
+console.log(emp.salary); // Expected: 50000
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an object-oriented inheritance pattern in TypeScript with minimal context. Specifically, it involves completing the constructor of a derived class by calling the constructor of the base class using 'super()'. This is a common pattern in object-oriented programming, making it a good test case.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+const emp = new Employee('John Doe', 50000);
+assert.equal(emp.name, 'John Doe');
+assert.equal(emp.salary, 50000);
+================================================================================
+
+================================================================================
+Test Case #2
+================================================================================
+
+================================================================================
+Test Case ID: 2
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+	name: string;
+	age: number;
+
+	constructor(name: string, age: number) {
+		this.name = name;
+		this.age = age;
+	}
+
+	getDetails(): string {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+		return `Name: ${this.name}, Age: ${this.age}`;
+
+SUFFIX CODE:
+----------------------------------------
+
+	}
+}
+
+const person = new Person('Alice', 30);
+console.assert(person.getDetails() === 'Name: Alice, Age: 30', 'Assertion failed: person.getDetails() should return correct details');
+
+JUSTIFICATION:
+----------------------------------------
+This test case checks the ability of the model to recognize and complete a common object-oriented pattern in TypeScript involving class methods. The context is minimal, but the pattern of constructing a string with class properties is widely recognizable.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(person.getDetails() === 'Name: Alice, Age: 30', 'Assertion failed: person.getDetails() should return correct details');
+================================================================================
+
+================================================================================
+Test Case #3
+================================================================================
+
+================================================================================
+Test Case ID: 3
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+    private name: string;
+    private age: number;
+
+    constructor(name: string, age: number) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public getName(): string {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+        return this.name;
+
+SUFFIX CODE:
+----------------------------------------
+    }
+
+    public getAge(): number {
+        return this.age;
+    }
+}
+
+const person = new Person("Alice", 30);
+console.assert(person.getName() === "Alice");
+console.assert(person.getAge() === 30);
+
+JUSTIFICATION:
+----------------------------------------
+This test case is good because it checks the LLM's ability to recognize an object-oriented pattern with classes and methods. The prefix sets up a class with a constructor and a method, and the completion requires the LLM to identify the correct return statement for the method. The suffix continues with a different method and assertions, making it a low-context scenario.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(person.getName() === "Alice");
+console.assert(person.getAge() === 30);
+================================================================================
+
+================================================================================
+Test Case #4
+================================================================================
+
+================================================================================
+Test Case ID: 4
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Item {
+    constructor(public name: string, public price: number) {}
+}
+
+class ShoppingCart {
+    private items: Item[] = [];
+
+    addItem(item: Item): void {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+        this.items.push(item);
+
+SUFFIX CODE:
+----------------------------------------
+    }
+
+    getTotal(): number {
+        return this.items.reduce((total, item) => total + item.price, 0);
+    }
+}
+
+// Testing the ShoppingCart
+const cart = new ShoppingCart();
+cart.addItem(new Item("Apple", 1.5));
+cart.addItem(new Item("Banana", 0.75));
+console.assert(cart.getTotal() === 2.25, "Total should be 2.25");
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it involves a common object-oriented pattern: managing a collection of items within a class and performing operations on that collection. The pattern of adding an item to an array and calculating a total is universally recognizable with minimal context. The LLM must complete the method to add an item to the internal array, which is a typical task in such scenarios.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(cart.getTotal() === 2.25, "Total should be 2.25");
+================================================================================
+
+================================================================================
+Test Case #5
+================================================================================
+
+================================================================================
+Test Case ID: 5
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function filterEvenNumbers(arr: number[]): number[] {
+	return arr.filter(num => 
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+num % 2 === 0
+
+SUFFIX CODE:
+----------------------------------------
+);
+}
+
+const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const evenNumbers = filterEvenNumbers(numbers);
+console.log(evenNumbers); // Should output: [2, 4, 6, 8, 10]
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on functional programming constructs, specifically filtering an array. The pattern of using the filter method is clear and recognizable with minimal context. The completion is simple yet tests the LLM's understanding of predicates and array methods.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+const result = filterEvenNumbers([1, 2, 3, 4, 5]);
+assert.deepEqual(result, [2, 4], 'Filtered array should only contain even numbers');
+assert.deepEqual(filterEvenNumbers([]), [], 'Empty array should return empty array');
+================================================================================
+
+================================================================================
+Test Case #6
+================================================================================
+
+================================================================================
+Test Case ID: 6
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processArray(arr: number[]): number[] {
+	return arr.map(num => num * 2);
+}
+
+function filterArray(arr: number[]): number[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+	return arr.filter(num => num > 5);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+const inputArray = [1, 2, 3, 4, 5];
+const processedArray = processArray(inputArray);
+const filteredArray = filterArray(processedArray);
+
+console.log(filteredArray);
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it tests the model's ability to recognize and complete a common array manipulation pattern (filtering elements based on a condition) with minimal context. The prefix establishes an array processing pattern, and the suffix shows the usage of the functions without duplicating the completion code. The completion should return a filtered array based on a condition, which is a widely-used pattern.
+
+ASSERTIONS:
+----------------------------------------
+const inputArray = [1, 2, 3, 4, 5];
+const processedArray = processArray(inputArray);
+const filteredArray = filterArray(processedArray);
+
+console.assert(JSON.stringify(filteredArray) === JSON.stringify([6, 8, 10]), 'Filtered array does not match expected output');
+================================================================================
+
+================================================================================
+Test Case #7
+================================================================================
+
+================================================================================
+Test Case ID: 7
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class User {
+	constructor(public name: string, public age: number) {}
+}
+
+function createUser(name: string, age: number): User {
+	
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+return new User(name, age);
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const user = createUser('Alice', 30);
+console.assert(user.name === 'Alice', 'User name should be Alice');
+console.assert(user.age === 30, 'User age should be 30');
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of a low-context scenario as it provides a clear pattern of object creation through a class and a factory function. The completion involves recognizing the need to instantiate a class and return it within a function. The minimal context provided in the prefix and suffix should be sufficient for an LLM to identify the appropriate completion. The assertions verify the correctness of the object creation and ensure that the function correctly initializes the properties of the User object.
+
+ASSERTIONS:
+----------------------------------------
+const user = createUser('Alice', 30);
+console.assert(user.name === 'Alice', 'User name should be Alice');
+console.assert(user.age === 30, 'User age should be 30');
+================================================================================
+
+================================================================================
+Test Case #8
+================================================================================
+
+================================================================================
+Test Case ID: 8
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+	name: string;
+	constructor(name: string) {
+		this.name = name;
+	}
+}
+
+const people: Person[] = [
+	new Person('Alice'),
+	new Person('Bob'),
+	new Person('Charlie')
+];
+
+function getNames(people: Person[]): string[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    return people.map(person => person.name);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+const names = getNames(people);
+console.assert(names.length === 3, 'Expected 3 names');
+console.assert(names.includes('Alice'), 'Expected name Alice');
+console.assert(names.includes('Bob'), 'Expected name Bob');
+console.assert(names.includes('Charlie'), 'Expected name Charlie');
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the model's ability to recognize and complete a common object-oriented pattern involving classes and array manipulation. Despite the minimal context, the pattern of mapping over an array of objects to extract a property is a widely-used convention. The assertions verify the correct behavior by checking the length and contents of the resulting array.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(names.length === 3, 'Expected 3 names');
+console.assert(names.includes('Alice'), 'Expected name Alice');
+console.assert(names.includes('Bob'), 'Expected name Bob');
+console.assert(names.includes('Charlie'), 'Expected name Charlie');
+================================================================================
+
+================================================================================
+Test Case #9
+================================================================================
+
+================================================================================
+Test Case ID: 9
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+	name: string;
+	age: number;
+
+	constructor(name: string, age: number) {
+		this.name = name;
+		this.age = age;
+	}
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+	getAge() {
+		return this.age;
+	}
+
+SUFFIX CODE:
+----------------------------------------
+
+	greet() {
+		return `Hello, my name is ${this.name}`;
+	}
+}
+
+const person = new Person("Alice", 30);
+console.log(person.greet());
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to recognize object-oriented patterns in TypeScript, specifically the definition and usage of a class with methods. The completion involves adding a method to the class, which is a common pattern in object-oriented programming. The minimal context provided should be sufficient for the LLM to understand the expected pattern and continue it correctly.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+const person = new Person('Alice', 30);
+person.increaseAge(5);
+assert.strictEqual(person.age, 35);
+
+================================================================================
+
+================================================================================
+Test Case #10
+================================================================================
+
+================================================================================
+Test Case ID: 10
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class User {
+	name: string;
+	constructor(name: string) {
+		this.name = name;
+	}
+}
+
+class UserManager {
+	users: User[] = [];
+
+	addUser(name: string): void {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+		const newUser = new User(name);
+		this.users.push(newUser);
+
+SUFFIX CODE:
+----------------------------------------
+
+	}
+
+	removeUser(name: string): void {
+		this.users = this.users.filter(user => user.name !== name);
+	}
+}
+
+const manager = new UserManager();
+manager.addUser("Alice");
+manager.addUser("Bob");
+console.assert(manager.users.length === 2, "Expected 2 users");
+console.assert(manager.users.some(user => user.name === "Alice"), "Expected Alice in users");
+manager.removeUser("Alice");
+console.assert(manager.users.length === 1, "Expected 1 user after removal");
+console.assert(!manager.users.some(user => user.name === "Alice"), "Expected Alice to be removed");
+
+JUSTIFICATION:
+----------------------------------------
+This test case is a good example of an object-oriented pattern involving class instantiation and method definition. The prefix establishes a User class and part of a UserManager class with an addUser method. The completion requires recognizing the pattern of adding a new user to the users array, which is a common task. The suffix continues with a removeUser method and some assertions to verify the correctness of the addUser and removeUser methods. The test checks if the model can correctly complete the addUser method by following the established pattern of creating a new User instance and adding it to the users array.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(manager.users.length === 2, "Expected 2 users");
+console.assert(manager.users.some(user => user.name === "Alice"), "Expected Alice in users");
+manager.removeUser("Alice");
+console.assert(manager.users.length === 1, "Expected 1 user after removal");
+console.assert(!manager.users.some(user => user.name === "Alice"), "Expected Alice to be removed");
+================================================================================
+
+================================================================================
+Test Case #11
+================================================================================
+
+================================================================================
+Test Case ID: 11
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const numbers: number[] = [1, 2, 3, 4, 5];
+
+function doubleAndFilterEven(nums: number[]): number[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  return nums.map(num => num * 2).filter(num => num % 2 === 0);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+const result = doubleAndFilterEven(numbers);
+console.assert(JSON.stringify(result) === JSON.stringify([4, 8]), 'Test failed: expected [4, 8]');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a common array manipulation pattern in TypeScript. The pattern involves mapping and filtering an array, which is a universal and widely-used convention in functional programming with arrays. The prefix establishes the context of an array of numbers and a function that processes this array. The suffix provides a test case to validate the correctness of the function, ensuring the model can complete the middle portion accurately. The assertions verify that the function correctly doubles the numbers and filters out the even ones, matching the expected result.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(JSON.stringify(result) === JSON.stringify([4, 8]), 'Test failed: expected [4, 8]');
+================================================================================
+
+================================================================================
+Test Case #12
+================================================================================
+
+================================================================================
+Test Case ID: 12
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processItems(items: number[]): number[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+  return items.map(item => item * 2);
+}
+
+const result = processItems([1, 2, 3, 4]);
+console.log(result); // [2, 4, 6, 8]
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the model's ability to recognize and complete a common error handling pattern in TypeScript. The function `processItems` processes an array of numbers by doubling each item. The completion involves adding an error check for the `items` parameter, ensuring it is provided before proceeding. This pattern is common and should be easily recognizable with minimal context. The suffix continues the function's logic, ensuring the pattern is distinct and understandable.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+try {
+  processItems(null as any);
+  assert.fail('Expected an error to be thrown');
+} catch (error) {
+  assert.strictEqual((error as Error).message, 'No items provided');
+}
+const result = processItems([1, 2, 3, 4]);
+assert.deepStrictEqual(result, [2, 4, 6, 8]);
+================================================================================
+
+================================================================================
+Test Case #13
+================================================================================
+
+================================================================================
+Test Case ID: 13
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const numbers: number[] = [1, 2, 3, 4, 5];
+const doubledNumbers: number[] = numbers.map(num =>
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+ num * 2);
+
+SUFFIX CODE:
+----------------------------------------
+console.log(doubledNumbers);
+// Expected output: [2, 4, 6, 8, 10]
+
+const squaredNumbers: number[] = numbers.map(num => num * num);
+console.log(squaredNumbers);
+// Expected output: [1, 4, 9, 16, 25]
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it checks the model's ability to recognize and complete a common array manipulation pattern using the map function. The pattern should be clear even with minimal context, as the prefix and suffix provide enough information to identify the expected transformation.
+
+ASSERTIONS:
+----------------------------------------
+import * as assert from 'assert';
+
+const numbers: number[] = [1, 2, 3, 4, 5];
+const doubledNumbers: number[] = numbers.map(num => num * 2);
+assert.deepStrictEqual(doubledNumbers, [2, 4, 6, 8, 10]);
+
+const squaredNumbers: number[] = numbers.map(num => num * num);
+assert.deepStrictEqual(squaredNumbers, [1, 4, 9, 16, 25]);
+================================================================================
+
+================================================================================
+Test Case #14
+================================================================================
+
+================================================================================
+Test Case ID: 14
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processStrings(strings: string[]): string[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    // Convert each string to uppercase
+
+SUFFIX CODE:
+----------------------------------------
+
+	return strings.map(str => str.toUpperCase());
+}
+
+const input = ["hello", "world"];
+const expectedOutput = ["HELLO", "WORLD"];
+const result = processStrings(input);
+console.assert(JSON.stringify(result) === JSON.stringify(expectedOutput), 'Test failed: Unexpected output');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a common string processing pattern. The prefix function signature and the suffix's use of map indicate a pattern of processing strings in an array. The golden completion involves filtering out empty strings, a reasonable and common step in string processing. The assertions check that the final output meets expectations, ensuring the pattern is correctly recognized and applied.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(JSON.stringify(result) === JSON.stringify(expectedOutput), 'Test failed: Unexpected output');
+================================================================================
+
+================================================================================
+Test Case #15
+================================================================================
+
+================================================================================
+Test Case ID: 15
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+	name: string;
+	constructor(name: string) {
+		this.name = name;
+	}
+}
+class Dog extends Animal {
+	breed: string;
+	constructor(name: string, breed: string) {
+		super(name);
+		this.breed = breed;
+	}
+	bark() {
+		return `${this.name} barks!`;
+	}
+}
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+
+class Cat extends Animal {
+    color: string;
+    constructor(name: string, color: string) {
+        super(name);
+        this.color = color;
+    }
+    meow() {
+        return `${this.name} meows!`;
+    }
+}
+
+
+SUFFIX CODE:
+----------------------------------------
+const myDog = new Dog('Rex', 'German Shepherd');
+console.assert(myDog.name === 'Rex', 'Name should be Rex');
+console.assert(myDog.breed === 'German Shepherd', 'Breed should be German Shepherd');
+console.assert(myDog.bark() === 'Rex barks!', 'Bark message should be correct');
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case is designed to evaluate the LLM's ability to recognize and extend object-oriented patterns using TypeScript classes and inheritance with minimal context. The prefix provides a clear example of a class hierarchy with methods and properties, and the golden completion requires the LLM to create a similar but distinct class following the same pattern. The suffix includes assertions to verify the correctness of object instantiation and method behavior.
+
+ASSERTIONS:
+----------------------------------------
+const myCat = new Cat('Whiskers', 'Black');
+console.assert(myCat.name === 'Whiskers', 'Name should be Whiskers');
+console.assert(myCat.color === 'Black', 'Color should be Black');
+console.assert(myCat.meow() === 'Whiskers meows!', 'Meow message should be correct');
+================================================================================
+
+================================================================================
+Test Case #16
+================================================================================
+
+================================================================================
+Test Case ID: 16
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Animal {
+	name: string;
+	constructor(name: string) {
+		this.name = name;
+	}
+}
+class Dog extends Animal {
+	breed: string;
+	constructor(name: string, breed: string) {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+		super(name);
+
+SUFFIX CODE:
+----------------------------------------
+
+		this.breed = breed;
+	}
+}
+const myDog = new Dog("Rex", "German Shepherd");
+console.assert(myDog.name === "Rex", "Name should be Rex");
+console.assert(myDog.breed === "German Shepherd", "Breed should be German Shepherd");
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an object-oriented pattern involving class inheritance in TypeScript. The prefix establishes a base class and a derived class, while the golden completion requires the model to correctly use the 'super' keyword to call the parent class constructor. This pattern is a fundamental concept in object-oriented programming and is universally recognizable with minimal context.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(myDog.name === "Rex", "Name should be Rex");
+console.assert(myDog.breed === "German Shepherd", "Breed should be German Shepherd");
+================================================================================
+
+================================================================================
+Test Case #17
+================================================================================
+
+================================================================================
+Test Case ID: 17
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processArray(arr: number[]): number[] {
+	return arr.map(num => num * 2);
+}
+
+function filterArray(arr: number[]): number[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+	return arr.filter(num => num % 2 === 0);
+
+SUFFIX CODE:
+----------------------------------------
+
+	return arr.filter(num => num % 2 === 0);
+}
+
+const input = [1, 2, 3, 4, 5];
+const processed = processArray(input);
+const filtered = filterArray(processed);
+
+console.log(filtered); // [4, 8]
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case checks the model's ability to recognize and complete a functional programming pattern with array methods in TypeScript. The prefix establishes a pattern with the map method, and the suffix uses the filter method. The completion requires understanding how to filter an array based on a given condition, maintaining consistency with the functional style and array manipulation context. Multiple valid completions are possible, making it a good test of the model's pattern recognition abilities.
+
+ASSERTIONS:
+----------------------------------------
+import * as assert from 'assert';
+const input = [1, 2, 3, 4, 5];
+const processed = processArray(input);
+const filtered = filterArray(processed);
+assert.deepStrictEqual(filtered, [6, 8, 10]);
+================================================================================
+
+================================================================================
+Test Case #18
+================================================================================
+
+================================================================================
+Test Case ID: 18
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Example {
+	private data: number[];
+
+	constructor() {
+		this.data = [1, 2, 3, 4, 5];
+	}
+
+	public getData(): number[] {
+		return this.data;
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+.slice()
+
+SUFFIX CODE:
+----------------------------------------
+
+	}
+
+	public sumData(): number {
+		return this.data.reduce((acc, val) => acc + val, 0);
+	}
+}
+
+const example = new Example();
+console.assert(example.getData().length === 5, 'Expected array length to be 5');
+console.assert(example.sumData() === 15, 'Expected sum of array elements to be 15');
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to recognize and complete an object-oriented pattern involving class methods and array manipulation with minimal context. The prefix establishes a pattern of class definition with a constructor and a method, and the completion continues this pattern by adding another method for manipulating the array. The suffix introduces a different method and assertions to verify the behavior, ensuring the model can infer the correct pattern completion.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(example.getData().length === 6, 'Expected array length to be 6 after adding an element');
+console.assert(example.getData()[5] === 6, 'Expected the last element to be 6 after adding it');
+================================================================================
+
+================================================================================
+Test Case #19
+================================================================================
+
+================================================================================
+Test Case ID: 19
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processData(data: number[]): number {
+	let sum = 0;
+	for (const num of data) {
+		sum += num;
+	}
+	return sum;
+}
+
+function getAverage(data: number[]): number {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    const total = processData(data);
+
+SUFFIX CODE:
+----------------------------------------
+
+	return total / data.length;
+}
+
+const data = [1, 2, 3, 4, 5];
+const average = getAverage(data);
+console.assert(average === 3, `Expected 3, but got ${average}`);
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it involves a clear and simple pattern of reusing a function to process data. The prefix establishes the pattern of summing numbers in an array, and the completion requires recognizing that the same sum calculation should be used to compute the average in the getAverage function. The suffix provides a different context where the completion is applied. This tests the LLM's ability to recognize and continue patterns with minimal context.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(getAverage([1, 2, 3, 4, 5]) === 3, 'Test case 1 failed');
+console.assert(getAverage([10, 20, 30, 40, 50]) === 30, 'Test case 2 failed');
+================================================================================
+
+================================================================================
+Test Case #20
+================================================================================
+
+================================================================================
+Test Case ID: 20
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+function processString(input: string): string {
+    let result = input.trim();
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    result = result.replace(/\s+/g, ' ');
+
+SUFFIX CODE:
+----------------------------------------
+    return result.toUpperCase();
+}
+
+const input = "  hello world  ";
+const expectedOutput = "HELLO WORLD";
+const output = processString(input);
+console.assert(output === expectedOutput, `Expected ${expectedOutput}, but got ${output}`);
+
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it involves string processing and text manipulation, which are common tasks in programming. The completion involves a standard pattern of replacing multiple whitespace characters with a single space, which is a recognizable and widely-used string manipulation technique. The minimal context provided should be sufficient for an LLM to infer the expected pattern.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(output === expectedOutput, `Expected ${expectedOutput}, but got ${output}`);
+
+================================================================================
+
+================================================================================
+Test Case #21
+================================================================================
+
+================================================================================
+Test Case ID: 21
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+	name: string;
+	age: number;
+
+	constructor(name: string, age: number) {
+		this.name = name;
+		this.age = age;
+	}
+}
+
+const people: Person[] = [
+	new Person('Alice', 30),
+	new Person('Bob', 25),
+];
+
+function getNames(people: Person[]): string[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    return people.map(person => person.name);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+const names = getNames(people);
+console.assert(names.includes('Alice'), 'Alice should be in the names array');
+console.assert(names.includes('Bob'), 'Bob should be in the names array');
+console.assert(names.length === 2, 'There should be exactly two names in the array');
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to recognize and complete a pattern of extracting specific properties from an array of objects using the map function. The context is minimal but includes enough information to identify the pattern of iterating over an array and transforming it.
+
+ASSERTIONS:
+----------------------------------------
+
+console.assert(names.includes('Alice'), 'Alice should be in the names array');
+console.assert(names.includes('Bob'), 'Bob should be in the names array');
+console.assert(names.length === 2, 'There should be exactly two names in the array');
+================================================================================
+
+================================================================================
+Test Case #22
+================================================================================
+
+================================================================================
+Test Case ID: 22
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Person {
+	constructor(public name: string, public age: number) {}
+}
+
+const people: Person[] = [
+	new Person('Alice', 30),
+	new Person('Bob', 25),
+	new Person('Charlie', 35)
+];
+
+function getNamesOverAge(age: number): string[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    return people
+        .filter(person => person.age > age)
+        .map(person => person.name);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+console.log(getNamesOverAge(28)); // Should print: [ 'Alice', 'Charlie' ]
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case because it involves a common data structure manipulation pattern (filtering and mapping an array of objects). The pattern should be recognizable with minimal context as it follows a standard array manipulation sequence in TypeScript. The completion must correctly use TypeScript's array methods to filter and map the array based on the provided age criterion.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+
+const result = getNamesOverAge(28);
+assert.deepStrictEqual(result, ['Alice', 'Charlie']);
+
+================================================================================
+
+================================================================================
+Test Case #23
+================================================================================
+
+================================================================================
+Test Case ID: 23
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+class Calculator {
+	add(a: number, b: number): number {
+		return a + b;
+	}
+
+	divide(a: number, b: number): number {
+		if (b === 0) {
+			throw new Error('Division by zero');
+		}
+		return a / b;
+	}
+
+	multiply(a: number, b: number): number {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+		return a * b;
+
+SUFFIX CODE:
+----------------------------------------
+
+	}
+}
+
+const calc = new Calculator();
+console.log(calc.multiply(3, 4));
+
+JUSTIFICATION:
+----------------------------------------
+This is a good test case as it requires the LLM to recognize a common pattern in class method definitions and complete the multiplication method appropriately. The context provided by the other methods (add and divide) is minimal yet sufficient to establish the pattern of basic arithmetic operations in the Calculator class.
+
+ASSERTIONS:
+----------------------------------------
+const calc = new Calculator();
+console.assert(calc.multiply(3, 4) === 12, '3 * 4 should equal 12');
+console.assert(calc.multiply(0, 5) === 0, '0 * 5 should equal 0');
+console.assert(calc.multiply(-1, 5) === -5, '-1 * 5 should equal -5');
+================================================================================
+
+================================================================================
+Test Case #24
+================================================================================
+
+================================================================================
+Test Case ID: 24
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+const data = [1, 2, 3, 4, 5];
+
+// Filter out odd numbers
+const evenNumbers = data.filter(
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+(num) => num % 2 === 0
+
+SUFFIX CODE:
+----------------------------------------
+);
+
+// Check if the result is correct
+console.assert(evenNumbers.length === 2);
+console.assert(evenNumbers.includes(2));
+console.assert(evenNumbers.includes(4));
+
+JUSTIFICATION:
+----------------------------------------
+This test case focuses on a common array manipulation pattern: filtering. The prefix sets up an array and begins a filter operation. The expected completion is a function that filters out odd numbers, which is a universally recognizable pattern. The suffix contains assertions to verify the correctness of the filtering operation, ensuring that the model correctly identifies and completes the pattern.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(evenNumbers.length === 2);
+console.assert(evenNumbers.includes(2));
+console.assert(evenNumbers.includes(4));
+================================================================================
+
+================================================================================
+Test Case #25
+================================================================================
+
+================================================================================
+Test Case ID: 25
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Filter<T> = (value: T) => boolean;
+type MappedFilter<T> = { [K in keyof T]: Filter<T[K]> };
+
+function applyFilters<T>(obj: T, filters: MappedFilter<T>): Partial<T> {
+    const result: Partial<T> = {};
+    for (const key in filters) {
+        if (filters[key](obj[key])) {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+            result[key] = obj[key];
+
+SUFFIX CODE:
+----------------------------------------
+        }
+    }
+    return result;
+}
+
+const filters = {
+    name: (value: string) => value.startsWith('A'),
+    age: (value: number) => value > 20
+};
+
+const person = { name: 'Alice', age: 25, location: 'Wonderland' };
+const filteredPerson = applyFilters(person, filters);
+console.assert(filteredPerson.name === 'Alice');
+console.assert(filteredPerson.age === 25);
+console.assert(filteredPerson.location === undefined);
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to understand and complete an advanced TypeScript pattern involving conditional types and mapped types. The prefix establishes the pattern of using mapped types to create a type-safe filter function, while the suffix demonstrates the function's application. The golden completion requires understanding both TypeScript's type system and the functional logic of the `applyFilters` function, making it a suitable challenge for a senior TypeScript developer.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(filteredPerson.name === 'Alice');
+console.assert(filteredPerson.age === 25);
+console.assert(filteredPerson.location === undefined);
+================================================================================
+
+================================================================================
+Test Case #26
+================================================================================
+
+================================================================================
+Test Case ID: 26
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type ExtractFunction<T> = T extends (...args: any[]) => infer R ? R : never;
+type FunctionMap = {
+  add: (a: number, b: number) => number;
+  concat: (a: string, b: string) => string;
+};
+
+function applyFunction<K extends keyof FunctionMap>(key: K, ...args: Parameters<FunctionMap[K]>): ExtractFunction<FunctionMap[K]> {
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  const func = FunctionMap[key];
+  return func(...args) as ExtractFunction<FunctionMap[K]>;
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const result1 = applyFunction('add', 1, 2);
+const result2 = applyFunction('concat', 'hello', 'world');
+
+console.assert(result1 === 3, 'Addition result should be 3');
+console.assert(result2 === 'helloworld', 'Concatenation result should be helloworld');
+
+JUSTIFICATION:
+----------------------------------------
+This example requires understanding of advanced TypeScript type system features such as conditional types with `infer`, and proper inference and application of function types from a mapped type. The low-context prefix and suffix ensure that the LLM must correctly infer the function type and implement the function call with appropriate type safety.
+
+ASSERTIONS:
+----------------------------------------
+const result1 = applyFunction('add', 1, 2);
+const result2 = applyFunction('concat', 'hello', 'world');
+console.assert(result1 === 3, 'Addition result should be 3');
+console.assert(result2 === 'helloworld', 'Concatenation result should be helloworld');
+================================================================================
+
+================================================================================
+Test Case #27
+================================================================================
+
+================================================================================
+Test Case ID: 27
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends Array<infer U> ? U : T;
+
+function flatMap<T, U>(arr: T[], fn: (item: Flatten<T>) => U[]): U[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  return arr.reduce((acc, item) => acc.concat(fn(item as Flatten<T>)), [] as U[]);
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const numbers: number[] = [1, 2, 3];
+const result = flatMap(numbers, (n) => [n, n * 2]);
+console.assert(result.length === 6, 'Expected length of 6');
+console.assert(result[0] === 1, 'Expected first element to be 1');
+console.assert(result[1] === 2, 'Expected second element to be 2');
+console.assert(result[2] === 2, 'Expected third element to be 2');
+console.assert(result[3] === 4, 'Expected fourth element to be 4');
+console.assert(result[4] === 3, 'Expected fifth element to be 3');
+console.assert(result[5] === 6, 'Expected sixth element to be 6');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a higher-order function pattern with advanced TypeScript type inference. The `Flatten` type uses conditional types and `infer` to properly type the elements being mapped over. The `flatMap` function applies a transformation and flattens the result, demonstrating complex type manipulation and functional programming. The completion should correctly implement the pattern, and the assertions validate the functionality and type safety of the implementation.
+
+ASSERTIONS:
+----------------------------------------
+const numbers: number[] = [1, 2, 3];
+const result = flatMap(numbers, (n) => [n, n * 2]);
+console.assert(result.length === 6, 'Expected length of 6');
+console.assert(result[0] === 1, 'Expected first element to be 1');
+console.assert(result[1] === 2, 'Expected second element to be 2');
+console.assert(result[2] === 2, 'Expected third element to be 2');
+console.assert(result[3] === 4, 'Expected fourth element to be 4');
+console.assert(result[4] === 3, 'Expected fifth element to be 3');
+console.assert(result[5] === 6, 'Expected sixth element to be 6');
+================================================================================
+
+================================================================================
+Test Case #28
+================================================================================
+
+================================================================================
+Test Case ID: 28
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends Array<infer U> ? U : T;
+function flattenArray<T>(arr: T[]): Flatten<T>[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  return arr.flat() as Flatten<T>[];
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const nestedArray = [[1, 2], [3, 4]];
+const result = flattenArray(nestedArray);
+
+console.assert(Array.isArray(result), 'Result should be an array');
+console.assert(result.length === 4, 'Result array should have 4 elements');
+console.assert(result[0] === 1 && result[1] === 2 && result[2] === 3 && result[3] === 4, 'Result array should be flattened');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to recognize and complete a type-safe array flattening function in TypeScript. The pattern involves using conditional types with `infer` for type extraction and demonstrating a common type-safe operation with arrays. The low-context scenario requires the model to understand how to reduce and concatenate arrays while preserving type integrity, which is a non-trivial task requiring advanced TypeScript knowledge.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(Array.isArray(result), 'Result should be an array');
+console.assert(result.length === 4, 'Result array should have 4 elements');
+console.assert(result[0] === 1 && result[1] === 2 && result[2] === 3 && result[3] === 4, 'Result array should be flattened');
+================================================================================
+
+================================================================================
+Test Case #29
+================================================================================
+
+================================================================================
+Test Case ID: 29
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends Array<infer U> ? U : T;
+
+function flatMap<T, U>(array: T[], callback: (value: T) => U | U[]): U[] {
+    const result: U[] = [];
+    for (const value of array) {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+        const mappedValue = callback(value);
+        if (Array.isArray(mappedValue)) {
+            result.push(...mappedValue);
+        } else {
+            result.push(mappedValue);
+        }
+
+SUFFIX CODE:
+----------------------------------------
+    }
+    return result;
+}
+
+const numbers = [1, 2, 3];
+const strings = flatMap(numbers, n => [n.toString(), (n * 2).toString()]);
+
+// assertions
+console.assert(strings.length === 6, 'Expected length of 6');
+console.assert(strings[0] === '1', 'Expected first element to be "1"');
+console.assert(strings[1] === '2', 'Expected second element to be "2"');
+console.assert(strings[2] === '2', 'Expected third element to be "2"');
+console.assert(strings[3] === '4', 'Expected fourth element to be "4"');
+console.assert(strings[4] === '3', 'Expected fifth element to be "3"');
+console.assert(strings[5] === '6', 'Expected sixth element to be "6"');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle advanced type inference with conditional types and higher-order functions. The use of 'infer' in conditional types to extract the element type from an array and the implementation of a flatMap function with proper type handling require a deep understanding of TypeScript's type system. The minimal context provided ensures that the LLM must recognize and complete the pattern correctly, demonstrating its ability to infer and apply complex type transformations.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(strings.length === 6, 'Expected length of 6');
+console.assert(strings[0] === '1', 'Expected first element to be "1"');
+console.assert(strings[1] === '2', 'Expected second element to be "2"');
+console.assert(strings[2] === '2', 'Expected third element to be "2"');
+console.assert(strings[3] === '4', 'Expected fourth element to be "4"');
+console.assert(strings[4] === '3', 'Expected fifth element to be "3"');
+console.assert(strings[5] === '6', 'Expected sixth element to be "6"');
+================================================================================
+
+================================================================================
+Test Case #30
+================================================================================
+
+================================================================================
+Test Case ID: 30
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends Array<infer U> ? U : T;
+type DeepFlatten<T> = T extends Array<infer U> ? DeepFlatten<U> : T;
+
+// Test data
+const nestedArray: number[][][] = [[[1, 2], [3, 4]], [[5, 6]]];
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+function deepFlatten<T>(arr: T): DeepFlatten<T> {
+  return Array.isArray(arr)
+    ? arr.reduce((acc, val) => acc.concat(deepFlatten(val)), [] as any[])
+    : arr;
+}
+
+
+SUFFIX CODE:
+----------------------------------------
+const flatArray: number[] = deepFlatten(nestedArray);
+
+// Assertions
+console.assert(flatArray.length === 6, 'The flattened array should have 6 elements');
+console.assert(flatArray[0] === 1 && flatArray[5] === 6, 'The elements should be 1 through 6');
+
+
+JUSTIFICATION:
+----------------------------------------
+This example requires an understanding of advanced TypeScript type system features, particularly conditional and recursive types. The `DeepFlatten` type recursively flattens nested arrays, and the `deepFlatten` function must correctly implement this type behavior. The low context is maintained by providing only the necessary type definitions and a nested array test case. The golden completion demonstrates the correct implementation of a deeply recursive flatten function with proper type handling.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(flatArray.length === 6, 'The flattened array should have 6 elements');
+console.assert(flatArray[0] === 1 && flatArray[5] === 6, 'The elements should be 1 through 6');
+================================================================================
+
+================================================================================
+Test Case #31
+================================================================================
+
+================================================================================
+Test Case ID: 31
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type ExtractFunction<Obj> = {
+	[K in keyof Obj]: Obj[K] extends (...args: any[]) => any ? K : never
+}[keyof Obj];
+
+interface Service {
+	doSomething(): void;
+	value: number;
+}
+
+const service: Service = {
+	doSomething() {
+		console.log('Doing something');
+	},
+	value: 42
+};
+
+function callFunction<T, K extends ExtractFunction<T>>(obj: T, key: K): ReturnType<T[K]> {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    return obj[key]();
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+const result = callFunction(service, 'doSomething');
+
+// Assertions
+import * as assert from 'assert';
+assert.strictEqual(result, undefined);
+
+// Cleanup (if any)
+// No resources to clean up in this example
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete an advanced TypeScript pattern involving conditional types and function extraction from an object. The `ExtractFunction` type and the `callFunction` function are non-trivial and require understanding of advanced TypeScript features. The minimal context provided challenges the LLM to infer the correct completion.
+
+ASSERTIONS:
+----------------------------------------
+import * as assert from 'assert';
+const result = callFunction(service, 'doSomething');
+assert.strictEqual(result, undefined);
+================================================================================
+
+================================================================================
+Test Case #32
+================================================================================
+
+================================================================================
+Test Case ID: 32
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Filter<T> = (item: T) => boolean;
+
+function filterArray<T>(arr: T[], filter: Filter<T>): T[] {
+    return arr.filter(filter);
+}
+
+const isEven: Filter<number> = (num) => num % 2 === 0;
+const numbers = [1, 2, 3, 4, 5, 6];
+const evenNumbers = filterArray(numbers, isEven);
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+
+
+SUFFIX CODE:
+----------------------------------------
+
+console.log(evenNumbers);
+
+const isOdd: Filter<number> = (num) => num % 2 !== 0;
+const oddNumbers = filterArray(numbers, isOdd);
+console.log(oddNumbers);
+
+JUSTIFICATION:
+----------------------------------------
+This test case demonstrates the use of higher-order functions with generics in TypeScript. The pattern involves defining a type for a filter function, using it to filter arrays, and then writing assertions to verify the correctness of the filtered results. This requires the model to understand functional programming constructs and generics in TypeScript.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(JSON.stringify(evenNumbers) === '[2,4,6]', 'Expected [2,4,6] for even numbers');
+================================================================================
+
+================================================================================
+Test Case #33
+================================================================================
+
+================================================================================
+Test Case ID: 33
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Merge<A, B> = {
+  [K in keyof A | keyof B]: K extends keyof B ? B[K] : K extends keyof A ? A[K] : never;
+};
+
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface Employee {
+  employeeId: number;
+  department: string;
+}
+
+const person: Person = { name: 'Alice', age: 30 };
+const employee: Employee = { employeeId: 123, department: 'Engineering' };
+
+const merged:
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+ Merge<Person, Employee> = { ...person, ...employee };
+
+SUFFIX CODE:
+----------------------------------------
+
+console.log(merged);
+
+// Ensure the merged object has properties from both Person and Employee
+console.assert(merged.name === 'Alice');
+console.assert(merged.age === 30);
+console.assert(merged.employeeId === 123);
+console.assert(merged.department === 'Engineering');
+
+JUSTIFICATION:
+----------------------------------------
+This example challenges an LLM to correctly merge two types using advanced TypeScript type features. It requires understanding of conditional types, union types, and intersection types. The pattern of merging objects and types is common in production code, and the LLM must infer the correct type manipulation to maintain type safety. The provided assertions test the properties of the merged object, ensuring the correct implementation.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(merged.name === 'Alice');
+console.assert(merged.age === 30);
+console.assert(merged.employeeId === 123);
+console.assert(merged.department === 'Engineering');
+================================================================================
+
+================================================================================
+Test Case #34
+================================================================================
+
+================================================================================
+Test Case ID: 34
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type TupleToUnion<T extends any[]> = T[number];
+
+type Flatten<T> = T extends (infer U)[] ? U : T;
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
+
+type Merge<T> = UnionToIntersection<Flatten<T>>;
+
+type Foo = {a: string; b: number};
+type Bar = {b: number; c: boolean};
+
+type Merged = Merge<[Foo, Bar]>;
+
+const obj: Merged = {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    a: 'hello',
+    b: 42,
+    c: true
+
+SUFFIX CODE:
+----------------------------------------
+};
+
+console.assert(obj.a === 'hello');
+console.assert(obj.b === 42);
+console.assert(obj.c === true);
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle advanced type manipulation in TypeScript, specifically focusing on merging complex types using conditional types, union-to-intersection conversions, and type inference. The completion requires understanding of how the Merge type works and correctly providing the properties for the merged type. This is a non-trivial task that involves several advanced TypeScript features.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(obj.a === 'hello');
+console.assert(obj.b === 42);
+console.assert(obj.c === true);
+================================================================================
+
+================================================================================
+Test Case #35
+================================================================================
+
+================================================================================
+Test Case ID: 35
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type ExtractFunctionReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+
+function example() {
+	function add(a: number, b: number): number {
+		return a + b;
+	}
+	function greet(name: string): string {
+		return `Hello, ${name}!`;
+	}
+
+	const addReturnType: ExtractFunctionReturnType<typeof add> = 5;
+	const greetReturnType: ExtractFunctionReturnType<typeof greet> = "Hello, TypeScript!";
+	const unknownFunction: ExtractFunctionReturnType<
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+() => boolean
+
+SUFFIX CODE:
+----------------------------------------
+> = true;
+
+	console.log(addReturnType);
+	console.log(greetReturnType);
+}
+
+example();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a complex TypeScript type extraction pattern using conditional types with `infer`. The `ExtractFunctionReturnType` type is designed to extract the return type of a function. The completion involves recognizing the pattern and correctly inferring the return type of a provided function type.
+
+ASSERTIONS:
+----------------------------------------
+const assert = require('assert');
+assert.strictEqual(typeof addReturnType, 'number');
+assert.strictEqual(typeof greetReturnType, 'string');
+assert.strictEqual(typeof unknownFunction, 'boolean');
+================================================================================
+
+================================================================================
+Test Case #36
+================================================================================
+
+================================================================================
+Test Case ID: 36
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Box<T> = { value: T };
+
+type UnboxArray<T> = T extends Array<infer U> ? U : T;
+
+function createBox<T>(value: T): Box<T> {
+    return { value };
+}
+
+const stringBox = createBox("hello");
+const numberArrayBox = createBox([1, 2, 3]);
+
+function unbox<T>(box: Box<T>): UnboxArray<T> {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    if (Array.isArray(box.value)) {
+        return box.value[0] as UnboxArray<T>;
+    }
+    return box.value as UnboxArray<T>;
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const unboxedString = unbox(stringBox);
+const unboxedNumberArray = unbox(numberArrayBox);
+
+console.assert(unboxedString === "hello", "Expected 'hello'");
+console.assert(unboxedNumberArray === 1, "Expected 1");
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and complete a type-level pattern involving conditional types and inferred types. The key challenge is understanding how to correctly unbox the value within a generic Box type, particularly when the boxed value could be an array. The completion requires recognizing the pattern of using conditional types with 'infer' to extract the type from the array, if applicable, and returning the correct type accordingly. This example tests advanced TypeScript features such as conditional types, type inference, and generic functions, making it a good test case for low-context pattern matching capabilities in an LLM.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(unboxedString === "hello", "Expected 'hello'");
+console.assert(unboxedNumberArray === 1, "Expected 1");
+================================================================================
+
+================================================================================
+Test Case #37
+================================================================================
+
+================================================================================
+Test Case ID: 37
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type DeepReadonly<T> = {
+    readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
+};
+
+function freezeObject<T>(obj: T): DeepReadonly<T> {
+    Object.freeze(obj);
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    for (const key in obj) {
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+            freezeObject(obj[key]);
+        }
+    }
+
+SUFFIX CODE:
+----------------------------------------
+    return obj as DeepReadonly<T>;
+}
+
+const original = { a: { b: { c: 42 } } };
+const frozen = freezeObject(original);
+
+try {
+    (frozen.a.b.c as any) = 100;
+} catch (e) {
+    console.log('Cannot modify readonly property');
+}
+
+console.assert(frozen.a.b.c === 42, 'The value should remain unchanged');
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete a pattern involving advanced TypeScript types and type-safe immutability. The `DeepReadonly` type uses conditional types and mapped types to recursively make an object deeply readonly. The `freezeObject` function should recursively freeze nested objects, ensuring immutability. This requires understanding of TypeScript's type system and how to apply Object.freeze correctly in a recursive manner.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(frozen.a.b.c === 42, 'The value should remain unchanged');
+================================================================================
+
+================================================================================
+Test Case #38
+================================================================================
+
+================================================================================
+Test Case ID: 38
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
+
+async function getData(): Promise<number> {
+  return 42;
+}
+
+async function processData() {
+  const data: 
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+UnwrapPromise<ReturnType<typeof getData>> =
+
+SUFFIX CODE:
+----------------------------------------
+await getData();
+  console.log(data);
+}
+
+processData();
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to handle complex type inference with conditional types and the 'infer' keyword. The scenario involves unwrapping a promise return type, which is a non-trivial task requiring understanding of advanced TypeScript type system features. The minimal context provided (a type alias and a function returning a promise) establishes a clear pattern for the model to follow.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+async function test() {
+  const data: UnwrapPromise<ReturnType<typeof getData>> = await getData();
+  assert.strictEqual(data, 42, 'The data should be 42');
+  assert.strictEqual(typeof data, 'number', 'The data should be a number');
+}
+
+test();
+================================================================================
+
+================================================================================
+Test Case #39
+================================================================================
+
+================================================================================
+Test Case ID: 39
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };
+
+interface User {
+  name: string;
+  address: {
+    street: string;
+    city: string;
+  };
+}
+
+const user: DeepReadonly<User> = {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  name: "John Doe",
+  address: {
+    street: "123 Main St",
+    city: "Anytown"
+  }
+
+SUFFIX CODE:
+----------------------------------------
+};
+
+user.name = "New Name"; // This should cause a TypeScript error
+user.address.city = "New City"; // This should also cause a TypeScript error
+
+console.log(user);
+
+const isReadonly = <T>(obj: T): obj is DeepReadonly<T> => true;
+
+if (isReadonly(user)) {
+  console.log("User is deeply readonly");
+}
+
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to complete a TypeScript type-level pattern involving DeepReadonly, which recursively makes all properties of an object readonly. The provided completion must match the established pattern, ensuring that the user object is deeply readonly. The scenario also includes type-checking logic to ensure the readonly properties are enforced.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+
+assert.throws(() => { user.name = "New Name"; }, /Cannot assign to 'name'/);
+assert.throws(() => { user.address.city = "New City"; }, /Cannot assign to 'city'/);
+assert(isReadonly(user), 'User should be deeply readonly');
+================================================================================
+
+================================================================================
+Test Case #40
+================================================================================
+
+================================================================================
+Test Case ID: 40
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends (infer U)[] ? U : T;
+type DeepFlatten<T> = T extends (infer U)[] ? DeepFlatten<U> : T;
+function flattenArray<T>(arr: T[]): Flatten<T>[] {
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  return arr.reduce((acc, item) => acc.concat(item), []);
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+const nestedArray = [[1, 2, [3, 4]], [5, 6]];
+const flatArray = flattenArray(nestedArray);
+console.assert(JSON.stringify(flatArray) === JSON.stringify([1, 2, [3, 4], 5, 6]), 'Test failed');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete the pattern of flattening nested arrays using recursive type definitions and functional programming constructs. The example requires understanding of conditional types, type inference, and array manipulation in TypeScript. The prefix defines utility types for flattening and deep flattening arrays, and the function signature for flattening an array. The suffix includes a test case to validate the functionality. The golden completion involves a recursive array reduction, which is a non-trivial pattern requiring deeper understanding of TypeScript's type system and array methods.
+
+ASSERTIONS:
+----------------------------------------
+const nestedArray = [[1, 2, [3, 4]], [5, 6]];
+const flatArray = flattenArray(nestedArray);
+console.assert(JSON.stringify(flatArray) === JSON.stringify([1, 2, [3, 4], 5, 6]), 'Test failed');
+================================================================================
+
+================================================================================
+Test Case #41
+================================================================================
+
+================================================================================
+Test Case ID: 41
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends (infer U)[] ? U : T;
+type TupleToUnion<T> = T extends (infer U)[] ? U : never;
+
+function flattenArray<T>(arr: T[]): Flatten<T>[] {
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  return arr.flat() as Flatten<T>[];
+
+SUFFIX CODE:
+----------------------------------------
+
+}
+
+const nestedArray = [[1, 2, 3], [4, 5], [6]];
+const flattened: number[] = flattenArray(nestedArray);
+
+import assert from 'assert';
+assert.deepStrictEqual(flattened, [1, 2, 3, 4, 5, 6], 'The array should be flattened correctly');
+
+JUSTIFICATION:
+----------------------------------------
+This scenario tests the LLM's ability to recognize and complete an advanced TypeScript pattern involving type manipulation with conditional types and type inference. The function `flattenArray` uses a custom type `Flatten` to determine the element type of a nested array, which is a non-trivial pattern requiring understanding of conditional types and type operators. The completion requires generating a type-safe flattening operation, maintaining type safety, and ensuring the correct output. This example challenges the LLM by requiring it to infer the correct use of TypeScript types and array operations with minimal context.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+const nestedArray = [[1, 2, 3], [4, 5], [6]];
+const flattened: number[] = flattenArray(nestedArray);
+assert.deepStrictEqual(flattened, [1, 2, 3, 4, 5, 6], 'The array should be flattened correctly');
+================================================================================
+
+================================================================================
+Test Case #42
+================================================================================
+
+================================================================================
+Test Case ID: 42
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends Array<infer U> ? Flatten<U> : T;
+
+function flattenArray<T>(arr: T[]): Flatten<T>[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  return arr.reduce<Flatten<T>[]>((acc, item) => {
+    return Array.isArray(item)
+      ? [...acc, ...flattenArray(item)]
+      : [...acc, item as Flatten<T>];
+  }, []);
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+const nestedArray = [1, [2, [3, [4, [5]]]]];
+const flattenedArray = flattenArray(nestedArray);
+console.log(flattenedArray);
+
+import * as assert from 'assert';
+
+assert.deepStrictEqual(flattenedArray, [1, 2, 3, 4, 5]);
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize and complete advanced TypeScript type system patterns, specifically recursive type definitions and conditional types with 'infer'. The pattern of recursively flattening an array using a type-safe approach is common in production code, and requires understanding of both type inference and functional programming constructs in TypeScript. The assertions verify that the implementation correctly flattens nested arrays while preserving type safety.
+
+ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(flattenedArray, [1, 2, 3, 4, 5]);
+================================================================================
+
+================================================================================
+Test Case #43
+================================================================================
+
+================================================================================
+Test Case ID: 43
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends (infer U)[] ? U : T;
+
+interface NestedArray<T> {
+    value: T[];
+    flatten(): Flatten<T[]>;
+}
+
+class NumberArray implements NestedArray<number> {
+    value: number[];
+
+    constructor(value: number[]) {
+        this.value = value;
+    }
+
+    flatten(): Flatten<number[]> {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+        return this.value[0];
+
+SUFFIX CODE:
+----------------------------------------
+    }
+}
+
+const arr = new NumberArray([1, 2, 3]);
+const flat = arr.flatten();
+
+console.assert(flat === 1, 'Flatten should return the first element of the array');
+console.log('All assertions passed.');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to handle conditional types and type inference in TypeScript. The `Flatten` type uses a conditional type with `infer` to determine the inner type of an array. The `NestedArray` interface and `NumberArray` class use this type to implement a `flatten` method. This scenario is complex enough to challenge a senior developer and requires understanding of advanced TypeScript type features.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(flat === 1, 'Flatten should return the first element of the array');
+================================================================================
+
+================================================================================
+Test Case #44
+================================================================================
+
+================================================================================
+Test Case ID: 44
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type Flatten<T> = T extends Array<infer U> ? U : T;
+
+function flattenArray<T>(arr: T[]): Flatten<T>[] {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    return arr.reduce<Flatten<T>[]>((acc, val) => 
+        acc.concat(Array.isArray(val) ? flattenArray(val) : val), 
+    []);
+
+SUFFIX CODE:
+----------------------------------------
+    return arr.reduce<Flatten<T>[]>((acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val) : val), [] as Flatten<T>[]);
+}
+
+const nestedArray = [1, [2, [3, 4], 5], 6];
+const flatArray = flattenArray(nestedArray);
+
+console.log(flatArray);
+// Assertions
+import assert from 'assert';
+assert.deepStrictEqual(flatArray, [1, 2, 3, 4, 5, 6]);
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to recognize a complex type transformation pattern, specifically using conditional types with the 'infer' keyword in TypeScript. The 'Flatten' type and the 'flattenArray' function demonstrate advanced type manipulations. The golden completion involves adding a type check and error handling, which is a common yet non-trivial practice in production code. This tests the LLM's understanding of TypeScript's type system, error handling patterns, and functional programming constructs within a low-context scenario.
+
+ASSERTIONS:
+----------------------------------------
+assert.throws(() => flattenArray((123 as unknown) as number[]), TypeError, 'Input must be an array');
+assert.throws(() => flattenArray((null as unknown) as number[]), TypeError, 'Input must be an array');
+assert.deepStrictEqual(flatArray, [1, 2, 3, 4, 5, 6]);
+================================================================================
+
+================================================================================
+Test Case #45
+================================================================================
+
+================================================================================
+Test Case ID: 45
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type ExtractPromiseType<T> = T extends Promise<infer U> ? U : never;
+
+async function fetchData(): Promise<string> {
+    return 'data';
+}
+
+async function main() {
+    const result: ExtractPromiseType<ReturnType<typeof fetchData>> = await fetchData();
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    // No additional code needed here
+
+SUFFIX CODE:
+----------------------------------------
+
+    console.log(result);
+}
+
+main();
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the use of advanced TypeScript type system features, specifically conditional types with 'infer'. The pattern involves extracting the resolved type of a Promise using a conditional type and then using it to type a variable. This scenario is complex enough to challenge a senior TypeScript developer and requires understanding of advanced type inference and type manipulation. The prefix and suffix provide minimal context while establishing a clear pattern recognizable by experienced developers.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(typeof result === 'string', 'Expected result to be a string');
+================================================================================
+
+================================================================================
+Test Case #46
+================================================================================
+
+================================================================================
+Test Case ID: 46
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type ExtractFunction<T> = T extends (...args: any[]) => infer R ? R : never;
+interface Person {
+  name: string;
+  age: number;
+}
+class Developer implements Person {
+  name: string;
+  age: number;
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+  code(): string {
+    return `${this.name} is coding.`;
+  }
+}
+function getFunctionReturnType<T>(func: T): ExtractFunction<T> {
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+  return func() as ExtractFunction<T>;
+
+SUFFIX CODE:
+----------------------------------------
+}
+const dev = new Developer("Alice", 30);
+const returnType = getFunctionReturnType(dev.code);
+console.assert(returnType === "Alice is coding.", "Return type should be string");
+console.log("All assertions passed!");
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the model's ability to understand and complete a pattern involving TypeScript's advanced type system, specifically conditional types and infer keyword. The context is minimal, focusing on extracting the return type of a function. The completion requires knowledge of how to properly use TypeScript's type inference and function execution.
+
+ASSERTIONS:
+----------------------------------------
+console.assert(typeof returnType === 'string', 'Return type should be a string');
+================================================================================
+
+================================================================================
+Test Case #47
+================================================================================
+
+================================================================================
+Test Case ID: 47
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };
+
+function deepFreeze<T>(obj: T): DeepReadonly<T> {
+  Object.freeze(obj);
+  Object.keys(obj).forEach((key) => {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    const value = obj[key as keyof T];
+    if (typeof value === 'object' && value !== null) {
+      deepFreeze(value);
+    }
+
+SUFFIX CODE:
+----------------------------------------
+  });
+  return obj as DeepReadonly<T>;
+}
+
+const obj = { a: { b: 1 } };
+const frozenObj = deepFreeze(obj);
+
+// Assertions
+import * as assert from 'assert';
+assert.throws(() => { frozenObj.a.b = 2; }, /Cannot assign to read only property 'b'/);
+assert.strictEqual(frozenObj.a.b, 1);
+
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to recognize and complete an advanced type-level computation pattern with recursive type definitions and mapped types. The pattern involves creating a deeply readonly type, and the function `deepFreeze` must recursively freeze all nested objects. The assertions ensure that the object properties become immutable, demonstrating understanding of both TypeScript's type system and object manipulation.
+
+ASSERTIONS:
+----------------------------------------
+assert.throws(() => { frozenObj.a.b = 2; }, /Cannot assign to read only property 'b'/);
+assert.strictEqual(frozenObj.a.b, 1);
+
+================================================================================
+
+================================================================================
+Test Case #48
+================================================================================
+
+================================================================================
+Test Case ID: 48
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };
+
+interface User {
+  id: number;
+  name: string;
+  preferences: {
+    theme: string;
+    notifications: boolean;
+  };
+}
+
+const user: DeepReadonly<User> = {
+  id: 1,
+  name: 'Alice',
+  preferences: {
+    theme: 'dark',
+    notifications: true,
+  },
+};
+
+
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+// This line should cause a TypeScript error
+user.preferences.theme = 'light';
+
+SUFFIX CODE:
+----------------------------------------
+try {
+  // This line should cause a TypeScript error
+  user.preferences.theme = 'light';
+} catch (e) {
+  console.error(e);
+}
+
+console.log(user.preferences.theme);
+
+JUSTIFICATION:
+----------------------------------------
+This test case evaluates the LLM's ability to complete an advanced TypeScript pattern involving recursive mapped types. The `DeepReadonly` type needs to be correctly defined to make all nested properties of an object immutable. This requires understanding conditional types and type recursion, which are more complex than simple type definitions. The prefix and suffix together provide minimal context, yet they establish a recognizable pattern that tests the LLM's comprehension of TypeScript's type system. The provided golden completion ensures that nested properties are correctly marked as readonly, and the assertions check for immutability.
+
+ASSERTIONS:
+----------------------------------------
+import { strict as assert } from 'assert';
+assert.throws(() => { user.preferences.theme = 'light'; }, /Cannot assign to read only property/);
+assert.equal(user.preferences.theme, 'dark');
+================================================================================
+
+================================================================================
+Test Case #49
+================================================================================
+
+================================================================================
+Test Case ID: 49
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+type TupleToUnion<T> = T extends (infer U)[] ? U : never;
+
+const exampleTuple: [string, number, boolean] = ['hello', 42, true];
+
+// Type should be 'string | number | boolean'
+type ExampleUnion = TupleToUnion<typeof exampleTuple>;
+
+function processUnion(value: ExampleUnion) {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+    if (typeof value === 'string') {
+        console.log('Processing string:', value.toUpperCase());
+    } else if (typeof value === 'number') {
+        console.log('Processing number:', value * 2);
+    } else if (typeof value === 'boolean') {
+        console.log('Processing boolean:', !value);
+    }
+
+SUFFIX CODE:
+----------------------------------------
+}
+
+// Test cases
+const testValues: ExampleUnion[] = ['test', 123, false];
+for (const val of testValues) {
+    processUnion(val);
+}
+
+console.log('All test cases passed.');
+
+JUSTIFICATION:
+----------------------------------------
+This example tests the LLM's ability to handle advanced TypeScript type system features, specifically conditional types with 'infer' and tuple to union type transformations. The prefix and suffix establish a context where the completion must correctly handle various types within a union, demonstrating understanding of type inference and type guards.
+
+ASSERTIONS:
+----------------------------------------
+import * as assert from 'assert';
+
+const loggedValues: string[] = [];
+const originalLog = console.log;
+console.log = (message: string) => { loggedValues.push(message); };
+
+const testValues: ExampleUnion[] = ['test', 123, false];
+for (const val of testValues) {
+    processUnion(val);
+}
+
+assert.deepStrictEqual(loggedValues, ['String value: test', 'Number value: 123', 'Boolean value: false'], 'All values should be logged correctly based on their types.');
+
+// Restore original console.log
+console.log = originalLog;
+
+console.log('All assertions passed.');
+================================================================================
+
+================================================================================
+Test Case #50
+================================================================================
+
+================================================================================
+Test Case ID: 50
+Source: devbench-low-context
+Language: typescript
+================================================================================
+
+PREFIX CODE:
+----------------------------------------
+interface Visitor<T> {
+    visit(node: T): void;
+}
+
+abstract class Node {
+    abstract accept<T>(visitor: Visitor<T>): void;
+}
+
+class LeafNode extends Node {
+    value: number;
+    constructor(value: number) {
+        super();
+        this.value = value;
+    }
+    accept<T>(visitor: Visitor<T>): void {
+
+LLM COMPLETION claude-3-5-sonnet:
+----------------------------------------
+        visitor.visit(this);
+
+SUFFIX CODE:
+----------------------------------------
+    }
+}
+
+class PrintVisitor implements Visitor<LeafNode> {
+    visit(node: LeafNode): void {
+        console.log(`LeafNode value: ${node.value}`);
+    }
+}
+
+const node = new LeafNode(42);
+const visitor = new PrintVisitor();
+node.accept(visitor);
+
+// Assertions
+import assert from 'assert';
+const consoleLogSpy = console.log as unknown as { calls: string[] };
+console.log = (...args: string[]) => { consoleLogSpy.calls = args; };
+node.accept(visitor);
+assert.strictEqual(consoleLogSpy.calls[0], 'LeafNode value: 42');
+
+
+JUSTIFICATION:
+----------------------------------------
+This example demonstrates the Visitor pattern in TypeScript, which is an advanced object-oriented pattern. The prefix defines an abstract class Node and a Visitor interface, while the suffix shows a concrete implementation of the Node class and a Visitor class. The completion requires understanding of how to correctly implement the accept method in the context of the Visitor pattern. This pattern requires the model to correctly infer the need to call visitor.visit(this) inside the accept method, showcasing its ability to recognize and complete advanced object-oriented design patterns with minimal context.
+
+ASSERTIONS:
+----------------------------------------
+import assert from 'assert';
+const consoleLogSpy = console.log as unknown as { calls: string[] };
+console.log = (...args: string[]) => { consoleLogSpy.calls = args; };
+node.accept(visitor);
+assert.strictEqual(consoleLogSpy.calls[0], 'LeafNode value: 42');
+================================================================================
