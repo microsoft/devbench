@@ -1021,8 +1021,8 @@ def execute_model_completions(benchmark_jsonl_files: List[str], models_dir="comp
 
 def main():
     # Using GPT-4o to generate the benchmark test cases
-    endpoint = os.getenv("ENDPOINT_URL", "[ANONYMIZED-ENDPOINT-1]")  
-    deployment = os.getenv("DEPLOYMENT_NAME", "[ANONYMIZED-DEPLOYMENT-1]")  
+    endpoint = os.getenv("ENDPOINT_URL", "<put the endpoint here>")  
+    deployment = os.getenv("DEPLOYMENT_NAME", "<put the deployment here>")  
 
     # Initialize Azure OpenAI Service client with Entra ID authentication
     token_provider = get_bearer_token_provider(  

@@ -23,8 +23,8 @@ matplotlib.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sa
 dotenv.load_dotenv()
 
 # o3-mini endpoint and deployment details - matching generate_completions.py
-O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "[ANONYMIZED-ENDPOINT-2]")  # Endpoint without the deployment path
-O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "[ANONYMIZED-DEPLOYMENT-3]")  # The deployment name to use in API calls
+O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "<put the endpoint here>")  # Endpoint without the deployment path
+O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "<put the deployment here>")  # The deployment name to use in API calls
 O3MINI_API_VERSION = "2024-12-01-preview"
 
 def bootstrap_ci(judge_results, n_bootstrap=10000, confidence=0.95):

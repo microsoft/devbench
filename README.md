@@ -95,12 +95,12 @@ Replace the placeholder values with your actual API keys and credentials. You ma
 
 The scripts `generate_benchmark.py`, `generate_completions.py`, and `llm_judge.py` were used for our specific experimental setup, which primarily uses Azure AI Foundry to access various language models. If you're using different methods to access these models, you'll need to modify these scripts accordingly:
 
-- `generate_benchmark.py`: This script may need modifications in how it authenticates and calls language models to generate benchmark test cases. This script contains an anonymized endpoint (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment name (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoint and deployment name you're using.
-- `generate_completions.py`: This script contains anonymized endpoints (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment names (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoints and deployment names for each model service you're using.
-- `llm_judge.py`: This script also uses anonymized endpoints (e.g., `[ANONYMIZED-ENDPOINT-2]`) and deployment names (e.g., `[ANONYMIZED-DEPLOYMENT-3]`) for the o3-mini model used as a judge. You will need to replace these with your own valid endpoints and deployment names.
+- `generate_benchmark.py`: This script may need modifications in how it authenticates and calls language models to generate benchmark test cases. This script contains placeholder endpoints (e.g., `<put the endpoint here>`) and deployment names (e.g., `<put the deployment here>`). You will need to replace these with your own valid endpoint and deployment name you're using.
+- `generate_completions.py`: This script contains placeholder endpoints (e.g., `<put the endpoint here>`) and deployment names (e.g., `<put the deployment here>`). You will need to replace these with your own valid endpoints and deployment names for each model service you're using.
+- `llm_judge.py`: This script also uses placeholder endpoints (e.g., `<put the endpoint here>`) and deployment names (e.g., `<put the deployment here>`) for the o3-mini model used as a judge. You will need to replace these with your own valid endpoints and deployment names.
 
 These scripts should be considered templates that demonstrate the methodology rather than plug-and-play solutions. You'll need to:
-1. Replace all anonymized endpoints and deployment names with your actual values
+1. Replace all placeholder endpoints and deployment names with your actual values
 2. Adapt the model access methods, API calls, and authentication to match your specific infrastructure
 3. Ensure you have the proper API keys and credentials for each model you intend to use
 

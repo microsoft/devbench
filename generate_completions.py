@@ -38,11 +38,11 @@ print(f"Using output directory: {OUTPUT_DIR}")
 print(f"Using temperature: {TEMPERATURE}")
 
 # Hardcoded Azure OpenAI Endpoint and API Key
-ENDPOINT = "[ANONYMIZED-ENDPOINT-1]"
+ENDPOINT = "<put the endpoint here>"
 
 # o3-mini endpoint and deployment details
-O3MINI_ENDPOINT = "[ANONYMIZED-ENDPOINT-2]"  # Remove the deployment path from endpoint
-O3MINI_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-3]"  # The deployment name to use in API calls
+O3MINI_ENDPOINT = "<put the endpoint here>"  # Remove the deployment path from endpoint
+O3MINI_DEPLOYMENT = "<put the endpoint here>"  # The deployment name to use in API calls
 O3MINI_API_VERSION = "2024-12-01-preview"
 
 # Add Claude API configuration
@@ -58,8 +58,8 @@ MODEL_TYPE_CLAUDE_35 = "claude_35_sonnet"
 MODEL_TYPE_CLAUDE_37 = "claude_37_sonnet"
 
 # Add GPT-4o mini endpoint and model details
-GPT4OMINI_ENDPOINT = "[ANONYMIZED-ENDPOINT-2]"
-GPT4OMINI_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-4]"
+GPT4OMINI_ENDPOINT = "<put the endpoint here>"
+GPT4OMINI_DEPLOYMENT = "<put the endpoint here>"
 GPT4OMINI_MODEL = "gpt-4o-mini"
 GPT4OMINI_API_VERSION = "2025-01-01-preview"
 
@@ -70,7 +70,7 @@ MODEL_TYPE_GPT4OMINI = "gpt4o_mini"
 GPT4OMINI_API_KEY = os.getenv("GPT4OMINI_API_KEY")
 
 # Add DeepSeek R1 endpoint and model details
-DEEPSEEK_R1_ENDPOINT = "[ANONYMIZED-ENDPOINT-3]"
+DEEPSEEK_R1_ENDPOINT = "<put the endpoint here>"
 DEEPSEEK_R1_MODEL = "DeepSeek-R1"
 
 # Add model type for DeepSeek R1
@@ -80,7 +80,7 @@ MODEL_TYPE_DEEPSEEK_R1 = "deepseek_r1"
 DEEPSEEK_R1_API_KEY = os.getenv("DEEPSEEK_R1_API_KEY")
 
 # Add Ministral-3B endpoint and model details
-MINISTRAL_ENDPOINT = "[ANONYMIZED-ENDPOINT-5]"
+MINISTRAL_ENDPOINT = "<put the endpoint here>"
 MINISTRAL_MODEL = "Ministral-3B"
 
 # Add model type for Ministral-3B
@@ -90,7 +90,7 @@ MODEL_TYPE_MINISTRAL = "ministral_3b"
 MINISTRAL_API_KEY = os.getenv("MINISTRAL_API_KEY")
 
 # Add DeepSeek V3 endpoint and model details
-DEEPSEEK_V3_ENDPOINT = "[ANONYMIZED-ENDPOINT-6]"
+DEEPSEEK_V3_ENDPOINT = "<put the endpoint here>"
 DEEPSEEK_V3_MODEL = "DeepSeek-V3-0324"
 
 # Add model type for DeepSeek V3
@@ -100,7 +100,7 @@ MODEL_TYPE_DEEPSEEK_V3 = "deepseek_v3"
 DEEPSEEK_V3_API_KEY = os.getenv("DEEPSEEK_V3_API_KEY")
 
 # Add GPT-4.1 mini endpoint and model details
-GPT41MINI_ENDPOINT = "[ANONYMIZED-ENDPOINT-8]"
+GPT41MINI_ENDPOINT = "<put the endpoint here>"
 GPT41MINI_DEPLOYMENT = "gpt-4.1-mini"
 GPT41MINI_MODEL = "gpt-4.1-mini"
 GPT41MINI_API_VERSION = "2025-01-01-preview"
@@ -109,7 +109,7 @@ GPT41MINI_API_VERSION = "2025-01-01-preview"
 MODEL_TYPE_GPT41MINI = "gpt41_mini"
 
 # Add GPT-4.1 nano endpoint and model details
-GPT41NANO_ENDPOINT = "[ANONYMIZED-ENDPOINT-8]"
+GPT41NANO_ENDPOINT = "<put the endpoint here>"
 GPT41NANO_DEPLOYMENT = "gpt-4.1-nano"
 GPT41NANO_MODEL = "gpt-4.1-nano"
 GPT41NANO_API_VERSION = "2025-01-01-preview"
@@ -118,8 +118,8 @@ GPT41NANO_API_VERSION = "2025-01-01-preview"
 MODEL_TYPE_GPT41NANO = "gpt41_nano"
 
 # Add GPT-4o endpoint and model details
-GPT4O_ENDPOINT = "[ANONYMIZED-ENDPOINT-9]"
-GPT4O_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-6]"
+GPT4O_ENDPOINT = "<put the endpoint here>"
+GPT4O_DEPLOYMENT = "<put the endpoint here>"
 GPT4O_MODEL = "gpt-4o"
 GPT4O_API_VERSION = "2025-01-01-preview"
 
