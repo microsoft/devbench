@@ -25,62 +25,37 @@ parser.add_argument('--output_dir', type=str, default='completions',
                     help='Output directory for completions (default: completions)')
 parser.add_argument('--temperature', type=float, default=0.0,
                     help='Temperature for model generation (default: 0.0)')
+parser.add_argument('--num_completions', type=int, default=1,
+                    help='Number of completions to generate per test case (default: 1)')
 args = parser.parse_args()
 
 # Output directory for completions
 OUTPUT_DIR = args.output_dir  # Set from command-line arguments
 # Temperature for model generation
 TEMPERATURE = args.temperature  # Set from command-line arguments
-# Fixed number of completions (always 1)
-NUM_COMPLETIONS = 1
+# Number of completions per test case
+NUM_COMPLETIONS = args.num_completions  # Set from command-line arguments
 
 print(f"Using output directory: {OUTPUT_DIR}")
 print(f"Using temperature: {TEMPERATURE}")
+print(f"Using num_completions: {NUM_COMPLETIONS}")
 
 # Hardcoded Azure OpenAI Endpoint and API Key
-ENDPOINT = "<put the endpoint here>"
-
-# o3-mini endpoint and deployment details
-O3MINI_ENDPOINT = "<put the endpoint here>"  # Remove the deployment path from endpoint
-O3MINI_DEPLOYMENT = "<put the endpoint here>"  # The deployment name to use in API calls
-O3MINI_API_VERSION = "2024-12-01-preview"
+ENDPOINT = "[ANONYMIZED-ENDPOINT-1]"
 
 # Add Claude API configuration
 CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 
-# Add Claude endpoints and model names
-CLAUDE_35_MODEL = "claude-3-5-sonnet-20240620"
+# Add Claude endpoints and model names (only approved models)
 CLAUDE_37_MODEL = "claude-3-7-sonnet-20250219"
+CLAUDE_4_MODEL = "claude-sonnet-4-20250514"
 
-# Define model types
-MODEL_TYPE_O3MINI = "o3mini"
-MODEL_TYPE_CLAUDE_35 = "claude_35_sonnet"
+# Define model types (only approved models)
 MODEL_TYPE_CLAUDE_37 = "claude_37_sonnet"
-
-# Add GPT-4o mini endpoint and model details
-GPT4OMINI_ENDPOINT = "<put the endpoint here>"
-GPT4OMINI_DEPLOYMENT = "<put the endpoint here>"
-GPT4OMINI_MODEL = "gpt-4o-mini"
-GPT4OMINI_API_VERSION = "2025-01-01-preview"
-
-# Add model type for GPT-4o mini
-MODEL_TYPE_GPT4OMINI = "gpt4o_mini"
-
-# Add API key environment variable
-GPT4OMINI_API_KEY = os.getenv("GPT4OMINI_API_KEY")
-
-# Add DeepSeek R1 endpoint and model details
-DEEPSEEK_R1_ENDPOINT = "<put the endpoint here>"
-DEEPSEEK_R1_MODEL = "DeepSeek-R1"
-
-# Add model type for DeepSeek R1
-MODEL_TYPE_DEEPSEEK_R1 = "deepseek_r1"
-
-# Add API key environment variable
-DEEPSEEK_R1_API_KEY = os.getenv("DEEPSEEK_R1_API_KEY")
+MODEL_TYPE_CLAUDE_4 = "claude_4_sonnet"
 
 # Add Ministral-3B endpoint and model details
-MINISTRAL_ENDPOINT = "<put the endpoint here>"
+MINISTRAL_ENDPOINT = "[ANONYMIZED-ENDPOINT-5]"
 MINISTRAL_MODEL = "Ministral-3B"
 
 # Add model type for Ministral-3B
@@ -89,8 +64,8 @@ MODEL_TYPE_MINISTRAL = "ministral_3b"
 # Add API key environment variable
 MINISTRAL_API_KEY = os.getenv("MINISTRAL_API_KEY")
 
-# Add DeepSeek V3 endpoint and model details
-DEEPSEEK_V3_ENDPOINT = "<put the endpoint here>"
+# Add DeepSeek V3 (0324 version) endpoint and model details
+DEEPSEEK_V3_ENDPOINT = "[ANONYMIZED-ENDPOINT-6]"
 DEEPSEEK_V3_MODEL = "DeepSeek-V3-0324"
 
 # Add model type for DeepSeek V3
@@ -99,17 +74,42 @@ MODEL_TYPE_DEEPSEEK_V3 = "deepseek_v3"
 # Add API key environment variable
 DEEPSEEK_V3_API_KEY = os.getenv("DEEPSEEK_V3_API_KEY")
 
+# Add DeepSeek V3.1 endpoint and model details
+DEEPSEEK_V31_ENDPOINT = "[ANONYMIZED-ENDPOINT-7]"
+DEEPSEEK_V31_MODEL = "DeepSeek-V3.1"
+
+# Add model type for DeepSeek V3.1
+MODEL_TYPE_DEEPSEEK_V31 = "deepseek_v31"
+
+# Add API key environment variable
+DEEPSEEK_V31_API_KEY = os.getenv("DEEPSEEK_V31_API_KEY")
+
 # Add GPT-4.1 mini endpoint and model details
-GPT41MINI_ENDPOINT = "<put the endpoint here>"
-GPT41MINI_DEPLOYMENT = "gpt-4.1-mini"
+GPT41MINI_ENDPOINT = "[ANONYMIZED-ENDPOINT-8]"
+GPT41MINI_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-8]"
 GPT41MINI_MODEL = "gpt-4.1-mini"
 GPT41MINI_API_VERSION = "2025-01-01-preview"
 
 # Add model type for GPT-4.1 mini
 MODEL_TYPE_GPT41MINI = "gpt41_mini"
 
+# Add API key environment variable for GPT-4.1 mini
+GPT41MINI_API_KEY = os.getenv("GPT41MINI_API_KEY")
+
+# Add GPT-4.1 endpoint and model details
+GPT41_ENDPOINT = "[ANONYMIZED-ENDPOINT-9]"
+GPT41_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-9]"
+GPT41_MODEL = "gpt-4.1"
+GPT41_API_VERSION = "2025-01-01-preview"
+
+# Add model type for GPT-4.1
+MODEL_TYPE_GPT41 = "gpt41"
+
+# Add API key environment variable for GPT-4.1
+GPT41_API_KEY = os.getenv("GPT41_API_KEY")
+
 # Add GPT-4.1 nano endpoint and model details
-GPT41NANO_ENDPOINT = "<put the endpoint here>"
+GPT41NANO_ENDPOINT = "[ANONYMIZED-ENDPOINT-10]"
 GPT41NANO_DEPLOYMENT = "gpt-4.1-nano"
 GPT41NANO_MODEL = "gpt-4.1-nano"
 GPT41NANO_API_VERSION = "2025-01-01-preview"
@@ -117,30 +117,32 @@ GPT41NANO_API_VERSION = "2025-01-01-preview"
 # Add model type for GPT-4.1 nano
 MODEL_TYPE_GPT41NANO = "gpt41_nano"
 
+# Add API key environment variable for GPT-4.1 nano
+GPT41NANO_API_KEY = os.getenv("GPT41NANO_API_KEY")
+
 # Add GPT-4o endpoint and model details
-GPT4O_ENDPOINT = "<put the endpoint here>"
-GPT4O_DEPLOYMENT = "<put the endpoint here>"
+GPT4O_ENDPOINT = "[ANONYMIZED-ENDPOINT-11]"
+GPT4O_DEPLOYMENT = "[ANONYMIZED-DEPLOYMENT-11]"
 GPT4O_MODEL = "gpt-4o"
 GPT4O_API_VERSION = "2025-01-01-preview"
 
 # Add model type for GPT-4o
 MODEL_TYPE_GPT4O = "gpt4o"
 
-# Add API key environment variable
+# Add API key environment variable (loaded from .env)
 GPT4O_API_KEY = os.getenv("GPT4O_API_KEY")
 
 # Add to DEPLOYMENTS list
 DEPLOYMENTS = [
-    {"name": "o3-mini", "type": MODEL_TYPE_O3MINI},
-    {"name": "claude-3-5-sonnet", "type": MODEL_TYPE_CLAUDE_35},
-    {"name": "claude-3-7-sonnet", "type": MODEL_TYPE_CLAUDE_37},
-    {"name": "gpt-4o-mini", "type": MODEL_TYPE_GPT4OMINI},
-    {"name": "DeepSeek-R1", "type": MODEL_TYPE_DEEPSEEK_R1},
-    {"name": "Ministral-3B", "type": MODEL_TYPE_MINISTRAL},
-    {"name": "DeepSeek-V3-0324", "type": MODEL_TYPE_DEEPSEEK_V3},
-    {"name": "gpt-4.1-mini", "type": MODEL_TYPE_GPT41MINI},
-    {"name": "gpt-4.1-nano", "type": MODEL_TYPE_GPT41NANO},
     {"name": "gpt-4o", "type": MODEL_TYPE_GPT4O},
+    {"name": "DeepSeek-V3-0324", "type": MODEL_TYPE_DEEPSEEK_V3},
+    {"name": "claude-3-7-sonnet", "type": MODEL_TYPE_CLAUDE_37},
+    {"name": "DeepSeek-V3.1", "type": MODEL_TYPE_DEEPSEEK_V31},
+    {"name": "gpt-4.1", "type": MODEL_TYPE_GPT41},
+    {"name": "gpt-4.1-mini", "type": MODEL_TYPE_GPT41MINI},
+    {"name": "claude-4-sonnet", "type": MODEL_TYPE_CLAUDE_4},
+    {"name": "gpt-4.1-nano", "type": MODEL_TYPE_GPT41NANO},
+    {"name": "Ministral-3B", "type": MODEL_TYPE_MINISTRAL},
 ]
 
 # Split input dirs into categories
@@ -174,7 +176,13 @@ languages = [
 
 
 API_KEY = os.getenv("COMPLETIONS_API_KEY")
-O3MINI_API_KEY = os.getenv("O3MINI_API_KEY")  # Add API key for o3-mini
+
+# # Initialize Azure OpenAI Client
+# client = AzureOpenAI(
+#     azure_endpoint=ENDPOINT,
+#     api_key=API_KEY,
+#     api_version="2024-12-01-preview",
+# )
 
 # Initialize GPT-4.1 mini client with Azure AD authentication
 token_provider = get_bearer_token_provider(
@@ -182,37 +190,8 @@ token_provider = get_bearer_token_provider(
     "https://cognitiveservices.azure.com/.default"
 )
 
-# Initialize Azure OpenAI Client
-client = AzureOpenAI(
-    azure_endpoint=ENDPOINT,
-    api_key=API_KEY,
-    api_version="2024-12-01-preview",
-)
-
-# Initialize o3-mini client (using standard AzureOpenAI client)
-o3mini_client = AzureOpenAI(
-    api_version=O3MINI_API_VERSION,
-    azure_endpoint=O3MINI_ENDPOINT,
-    # api_key=O3MINI_API_KEY,
-    azure_ad_token_provider=token_provider,
-)
-
 # Initialize Claude client
 claude_client = anthropic.Anthropic(api_key=CLAUDE_API_KEY)
-
-# Initialize GPT-4o mini client
-gpt4omini_client = AzureOpenAI(
-    api_version=GPT4OMINI_API_VERSION,
-    azure_endpoint=GPT4OMINI_ENDPOINT,
-    # api_key=GPT4OMINI_API_KEY,
-    azure_ad_token_provider=token_provider,
-)
-
-# Initialize DeepSeek R1 client
-deepseek_r1_client = ChatCompletionsClient(
-    endpoint=DEEPSEEK_R1_ENDPOINT,
-    credential=AzureKeyCredential(DEEPSEEK_R1_API_KEY),
-)
 
 # Initialize Ministral-3B client
 ministral_client = ChatCompletionsClient(
@@ -220,31 +199,44 @@ ministral_client = ChatCompletionsClient(
     credential=AzureKeyCredential(MINISTRAL_API_KEY),
 )
 
-# Initialize DeepSeek V3 client
+# Initialize DeepSeek V3 (0324) client
 deepseek_v3_client = ChatCompletionsClient(
     endpoint=DEEPSEEK_V3_ENDPOINT,
     credential=AzureKeyCredential(DEEPSEEK_V3_API_KEY),
 )
 
+# Initialize DeepSeek V3.1 client
+deepseek_v31_client = ChatCompletionsClient(
+    endpoint=DEEPSEEK_V31_ENDPOINT,
+    credential=AzureKeyCredential(DEEPSEEK_V31_API_KEY),
+)
+
+# Initialize GPT-4.1 mini client with API key authentication
 gpt41mini_client = AzureOpenAI(
     azure_endpoint=GPT41MINI_ENDPOINT,
-    azure_ad_token_provider=token_provider,
+    api_key=GPT41MINI_API_KEY,
     api_version=GPT41MINI_API_VERSION,
 )
 
-# Initialize GPT-4.1 nano client (using same authentication as GPT-4.1 mini)
+# Initialize GPT-4.1 client with API key authentication
+gpt41_client = AzureOpenAI(
+    azure_endpoint=GPT41_ENDPOINT,
+    api_key=GPT41_API_KEY,
+    api_version=GPT41_API_VERSION,
+)
+
+# Initialize GPT-4.1 nano client with API key authentication
 gpt41nano_client = AzureOpenAI(
     azure_endpoint=GPT41NANO_ENDPOINT,
-    azure_ad_token_provider=token_provider,
+    api_key=GPT41NANO_API_KEY,
     api_version=GPT41NANO_API_VERSION,
 )
 
-# Initialize GPT-4o client
+# Initialize GPT-4o client with API key authentication
 gpt4o_client = AzureOpenAI(
     api_version=GPT4O_API_VERSION,
     azure_endpoint=GPT4O_ENDPOINT,
-    azure_ad_token_provider=token_provider,
-    # api_key=GPT4O_API_KEY,
+    api_key=GPT4O_API_KEY,
 )
 
 def get_prompt_template(prefix, suffix):
@@ -444,13 +436,13 @@ def call_inference_model(prefix, suffix, deployment_info):
     deployment_name = deployment_info["name"]
     
     # Select appropriate client and model based on deployment type
-    if deployment_type == MODEL_TYPE_DEEPSEEK_R1:
-        client = deepseek_r1_client
-        model_name = DEEPSEEK_R1_MODEL
-        use_chat_api = False
-    elif deployment_type == MODEL_TYPE_DEEPSEEK_V3:
+    if deployment_type == MODEL_TYPE_DEEPSEEK_V3:
         client = deepseek_v3_client
         model_name = DEEPSEEK_V3_MODEL
+        use_chat_api = False
+    elif deployment_type == MODEL_TYPE_DEEPSEEK_V31:
+        client = deepseek_v31_client
+        model_name = DEEPSEEK_V31_MODEL
         use_chat_api = False
     elif deployment_type == MODEL_TYPE_MINISTRAL:
         client = ministral_client
@@ -484,20 +476,40 @@ def call_inference_model(prefix, suffix, deployment_info):
                     sdk_messages.append(UserMessage(content=msg["content"]))
             
             # Model-specific API calls
-            if deployment_type in [MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3]:
-                max_retries = 3 if deployment_type in [MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3] else 1
+            if deployment_type in [MODEL_TYPE_DEEPSEEK_V3, MODEL_TYPE_DEEPSEEK_V31]:
+                max_retries = 3
                 retry_count = 0
                 
                 while retry_count < max_retries:
                     try:
-                        timeout = 600 if deployment_type in [MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3] else 300
+                        # Set timeout for DeepSeek models
+                        timeout = 600 if deployment_type in [MODEL_TYPE_DEEPSEEK_V3, MODEL_TYPE_DEEPSEEK_V31] else 300
                         
-                        response = client.complete(
-                            messages=sdk_messages,
-                            model=model_name,
-                            stream=False,
-                            timeout=timeout
-                        )
+                        if NUM_COMPLETIONS == 1:
+                            response = client.complete(
+                                messages=sdk_messages,
+                                model=model_name,
+                                stream=False,
+                                timeout=timeout
+                            )
+                        else:
+                            # Sequential API calls with small delay
+                            responses = []
+                            for i in range(NUM_COMPLETIONS):
+                                # Add small delay for DeepSeek models between requests
+                                if deployment_type in [MODEL_TYPE_DEEPSEEK_V3, MODEL_TYPE_DEEPSEEK_V31] and i > 0:
+                                    import time
+                                    time.sleep(1)  # Small 1 second delay between requests
+                                
+                                single_response = client.complete(
+                                    messages=sdk_messages,
+                                    model=model_name,
+                                    stream=False,
+                                    timeout=timeout
+                                )
+                                responses.append(single_response)
+                                print(f"Completed DeepSeek request {i+1}/{NUM_COMPLETIONS}")
+                            response = responses
                         break
                     except Exception as retry_error:
                         retry_count += 1
@@ -508,21 +520,47 @@ def call_inference_model(prefix, suffix, deployment_info):
                         else:
                             raise retry_error
             elif deployment_type == MODEL_TYPE_MINISTRAL:
-                response = client.complete(
-                    messages=sdk_messages,
-                    max_tokens=800,
-                    temperature=TEMPERATURE,
-                    top_p=1.0,
-                    model=model_name,
-                    stream=False
-                )
+                if NUM_COMPLETIONS == 1:
+                    response = client.complete(
+                        messages=sdk_messages,
+                        max_tokens=800,
+                        temperature=TEMPERATURE,
+                        top_p=1.0,
+                        model=model_name,
+                        stream=False
+                    )
+                else:
+                    # For multiple completions, make multiple API calls
+                    responses = []
+                    for _ in range(NUM_COMPLETIONS):
+                        single_response = client.complete(
+                            messages=sdk_messages,
+                            max_tokens=800,
+                            temperature=TEMPERATURE,
+                            top_p=1.0,
+                            model=model_name,
+                            stream=False
+                        )
+                        responses.append(single_response)
+                    response = responses
             
-            response_content = response.choices[0].message.content
-            
-            if deployment_type == MODEL_TYPE_DEEPSEEK_R1:
-                response_content = re.sub(r'<think>.*?</think>', '', response_content, flags=re.DOTALL).strip()
-                
-            return response_content
+            if NUM_COMPLETIONS == 1:
+                response_content = response.choices[0].message.content
+                return response_content
+            else:
+                # Handle multiple responses
+                if isinstance(response, list):
+                    response_contents = []
+                    for single_response in response:
+                        content = single_response.choices[0].message.content
+                        response_contents.append(content)
+                    return response_contents
+                else:
+                    response_contents = []
+                    for choice in response.choices:
+                        content = choice.message.content
+                        response_contents.append(content)
+                    return response_contents
 
     except Exception as e:
         print(f"Error calling {deployment_name} endpoint: {str(e)}")
@@ -543,10 +581,10 @@ def call_claude(prefix, suffix, deployment_info):
     """
     try:
         model_type = deployment_info["type"]
-        if model_type == MODEL_TYPE_CLAUDE_35:
-            model = CLAUDE_35_MODEL
-        elif model_type == MODEL_TYPE_CLAUDE_37:
+        if model_type == MODEL_TYPE_CLAUDE_37:
             model = CLAUDE_37_MODEL
+        elif model_type == MODEL_TYPE_CLAUDE_4:
+            model = CLAUDE_4_MODEL
         else:
             return "Error: Unknown Claude model type"
             
@@ -564,15 +602,28 @@ def call_claude(prefix, suffix, deployment_info):
                 user_messages.append({"role": "user", "content": msg["content"]})
         
         # Call Claude API with system as top-level parameter
-        response = claude_client.messages.create(
-            model=model,
-            max_tokens=800,
-            temperature=TEMPERATURE,
-            system=system_content,
-            messages=user_messages
-        )
-        
-        return response.content[0].text
+        if NUM_COMPLETIONS == 1:
+            response = claude_client.messages.create(
+                model=model,
+                max_tokens=800,
+                temperature=TEMPERATURE,
+                system=system_content,
+                messages=user_messages
+            )
+            return response.content[0].text
+        else:
+            # For multiple completions, make multiple API calls
+            completions = []
+            for _ in range(NUM_COMPLETIONS):
+                response = claude_client.messages.create(
+                    model=model,
+                    max_tokens=800,
+                    temperature=TEMPERATURE,
+                    system=system_content,
+                    messages=user_messages
+                )
+                completions.append(response.content[0].text)
+            return completions
         
     except Exception as e:
         print(f"Error calling Claude endpoint: {str(e)}")
@@ -586,41 +637,20 @@ def call_endpoint(prefix, suffix, deployment_info):
     deployment_type = deployment_info["type"]
     
     # Call appropriate endpoint based on model type
-    if deployment_type in [MODEL_TYPE_DEEPSEEK_R1, MODEL_TYPE_DEEPSEEK_V3, MODEL_TYPE_MINISTRAL]:
+    if deployment_type in [MODEL_TYPE_DEEPSEEK_V3, MODEL_TYPE_DEEPSEEK_V31, MODEL_TYPE_MINISTRAL]:
         return call_inference_model(prefix, suffix, deployment_info)
-    elif deployment_type == MODEL_TYPE_O3MINI:
-        try:
-            # Use new message format
-            messages = get_prompt_template(prefix, suffix)
-            
-            # Send request to o3-mini
-            completion = o3mini_client.chat.completions.create(
-                model=O3MINI_DEPLOYMENT,
-                messages=messages,
-                stream=False
-            )
-            
-            return completion.choices[0].message.content
-            
-        except Exception as e:
-            print(f"Error calling o3-mini endpoint: {str(e)}")
-            return f"Error: API request failed - {str(e)}"
-    elif deployment_type in [MODEL_TYPE_CLAUDE_35, MODEL_TYPE_CLAUDE_37]:
+    # o3-mini removed - only used in llm_judge.py
+    elif deployment_type in [MODEL_TYPE_CLAUDE_37, MODEL_TYPE_CLAUDE_4]:
         return call_claude(prefix, suffix, deployment_info)
-    elif deployment_type in [MODEL_TYPE_GPT4OMINI, MODEL_TYPE_GPT4O]:
+    elif deployment_type == MODEL_TYPE_GPT4O:
         try:
             # Use new message format for chat models
             messages = get_prompt_template(prefix, suffix)
             
-            # Different parameter name for tokens depending on the model
-            if deployment_type == MODEL_TYPE_GPT4OMINI:
-                token_param = {"max_tokens": 800}
-                client_to_use = gpt4omini_client
-                model_deployment = GPT4OMINI_DEPLOYMENT
-            elif deployment_type == MODEL_TYPE_GPT4O:
-                token_param = {"max_tokens": 800}
-                client_to_use = gpt4o_client
-                model_deployment = GPT4O_DEPLOYMENT
+            # GPT-4o configuration
+            token_param = {"max_tokens": 800}
+            client_to_use = gpt4o_client
+            model_deployment = GPT4O_DEPLOYMENT
             
             # Send request
             completion = client_to_use.chat.completions.create(
@@ -628,33 +658,49 @@ def call_endpoint(prefix, suffix, deployment_info):
                 messages=messages,
                 temperature=TEMPERATURE,
                 top_p=1.0,
+                n=NUM_COMPLETIONS,
                 stream=False,
                 **token_param
             )
             
-            return completion.choices[0].message.content
+            if NUM_COMPLETIONS == 1:
+                return completion.choices[0].message.content
+            else:
+                return [choice.message.content for choice in completion.choices]
             
         except Exception as e:
             print(f"Error calling {deployment_name} endpoint: {str(e)}")
             return f"Error: API request failed - {str(e)}"
-    elif deployment_type == MODEL_TYPE_GPT41MINI:
+    elif deployment_type in [MODEL_TYPE_GPT41MINI, MODEL_TYPE_GPT41]:
         try:
             # Use new message format for chat models
             messages = get_prompt_template(prefix, suffix)
             
-            # Send request to GPT-4.1 mini
-            completion = gpt41mini_client.chat.completions.create(
-                model=GPT41MINI_DEPLOYMENT,
+            # Select the correct client and deployment
+            if deployment_type == MODEL_TYPE_GPT41MINI:
+                client_to_use = gpt41mini_client
+                model_deployment = GPT41MINI_DEPLOYMENT
+            else:  # MODEL_TYPE_GPT41
+                client_to_use = gpt41_client
+                model_deployment = GPT41_DEPLOYMENT
+            
+            # Send request to GPT-4.1 or GPT-4.1 mini
+            completion = client_to_use.chat.completions.create(
+                model=model_deployment,
                 messages=messages,
                 max_tokens=800,
                 temperature=TEMPERATURE,
                 top_p=1.0,
                 frequency_penalty=0,  
                 presence_penalty=0,
+                n=NUM_COMPLETIONS,
                 stream=False
             )
             
-            return completion.choices[0].message.content
+            if NUM_COMPLETIONS == 1:
+                return completion.choices[0].message.content
+            else:
+                return [choice.message.content for choice in completion.choices]
             
         except Exception as e:
             print(f"Error calling {deployment_name} endpoint: {str(e)}")
@@ -673,10 +719,14 @@ def call_endpoint(prefix, suffix, deployment_info):
                 top_p=1.0,
                 frequency_penalty=0,  
                 presence_penalty=0,
+                n=NUM_COMPLETIONS,
                 stream=False
             )
             
-            return completion.choices[0].message.content
+            if NUM_COMPLETIONS == 1:
+                return completion.choices[0].message.content
+            else:
+                return [choice.message.content for choice in completion.choices]
             
         except Exception as e:
             print(f"Error calling {deployment_name} endpoint: {str(e)}")
@@ -710,10 +760,14 @@ def call_endpoint(prefix, suffix, deployment_info):
                 frequency_penalty=0.2,
                 presence_penalty=0.2,
                 stop=None,
+                n=NUM_COMPLETIONS,
                 stream=False
             )
             
-            return completion.choices[0].message.content
+            if NUM_COMPLETIONS == 1:
+                return completion.choices[0].message.content
+            else:
+                return [choice.message.content for choice in completion.choices]
             
         except Exception as e:
             print(f"Error calling endpoint: {str(e)}")
@@ -733,21 +787,34 @@ def process_jsonl(input_file, output_file, deployment_info):
                 prefix = data.get("prefix", "")
                 suffix = data.get("suffix", "")
 
-                # Call the endpoint and get completion
+                # Call the endpoint and get completion(s)
                 completion = call_endpoint(prefix, suffix, deployment_info)
                 
-                # Clean any markdown formatting from the completion
-                completion = clean_markdown_formatting(completion)
-                
-                # Store result in field with deployment name
-                data[deployment_name] = completion
+                if NUM_COMPLETIONS == 1:
+                    # Clean any markdown formatting from the completion
+                    completion = clean_markdown_formatting(completion)
+                    # Store result in field with deployment name
+                    data[deployment_name] = completion
+                else:
+                    # Handle multiple completions
+                    if isinstance(completion, list):
+                        completions = [clean_markdown_formatting(comp) for comp in completion]
+                        # Store multiple completions with indexed keys
+                        for i, comp in enumerate(completions):
+                            data[f"{deployment_name}_completion_{i}"] = comp
+                        # Also store the list for easy access
+                        data[f"{deployment_name}_completions"] = completions
+                    else:
+                        # Fallback for single completion
+                        completion = clean_markdown_formatting(completion)
+                        data[deployment_name] = completion
 
                 # Write updated entry back to the output file
                 json.dump(data, outfile)
                 outfile.write("\n")  # Ensure each JSON object is on a new line
 
                 # Print output for debugging
-                print(f"Processed entry with model {deployment_name}")
+                print(f"Processed entry with model {deployment_name} ({NUM_COMPLETIONS} completions)")
 
             except json.JSONDecodeError as e:
                 print(f"Skipping invalid JSON line: {e}")
@@ -904,6 +971,10 @@ def clean_markdown_formatting(text):
     Returns:
         Cleaned text with markdown code blocks removed but indentation preserved
     """
+    # Handle None or empty text
+    if text is None or not text:
+        return text
+    
     # Check if the text starts with a code block marker
     if text.lstrip().startswith("```"):
         # Extract the content inside the code block
@@ -951,6 +1022,13 @@ def main():
 
                 # Create output directory if it doesn't exist
                 os.makedirs(os.path.dirname(output_jsonl), exist_ok=True)
+                
+                # Skip if output file already exists and has content
+                if os.path.exists(output_jsonl):
+                    file_size = os.path.getsize(output_jsonl)
+                    if file_size > 0:
+                        print(f"✓ Skipping {output_jsonl} - already exists ({file_size} bytes)")
+                        continue
                 
                 # Process with the current deployment
                 process_jsonl(input_jsonl, output_jsonl, deployment_info)

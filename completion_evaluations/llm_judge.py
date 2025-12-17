@@ -23,9 +23,10 @@ matplotlib.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans', 'Liberation Sa
 dotenv.load_dotenv()
 
 # o3-mini endpoint and deployment details - matching generate_completions.py
-O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "<put the endpoint here>")  # Endpoint without the deployment path
-O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "<put the deployment here>")  # The deployment name to use in API calls
-O3MINI_API_VERSION = "2024-12-01-preview"
+O3MINI_ENDPOINT = os.getenv("O3MINI_ENDPOINT", "[ANONYMIZED-ENDPOINT-2]")  # Endpoint without the deployment path
+O3MINI_DEPLOYMENT = os.getenv("O3MINI_DEPLOYMENT", "[ANONYMIZED-DEPLOYMENT-3]")  # The deployment name to use in API calls
+O3MINI_API_VERSION = "2025-01-01-preview"
+O3MINI_API_KEY = os.getenv("O3MINI_API_KEY")
 
 def bootstrap_ci(judge_results, n_bootstrap=10000, confidence=0.95):
     """
@@ -209,8 +210,13 @@ def display_score_summary(results_dir: str, generate_plot=False, generate_heatma
                     cat_ci_str += " ⚠️ Limited samples"
                     
                 cat_score_str += cat_ci_str
+                
+                # Add completions per test info if available
+                completions_info = ""
+                if 'completions_per_test' in scores and scores['completions_per_test'] > 1:
+                    completions_info = f", {scores['completions_per_test']:.1f} completions/test"
                     
-                print(f"  {category}: {cat_score_str}, Evaluations: {scores['evaluations']}")
+                print(f"  {category}: {cat_score_str}, Evaluations: {scores['evaluations']}{completions_info}")
                 
             print(f"\nDetailed results available in: {results_dir}/{model_name}_detailed_results/")
             
@@ -252,17 +258,11 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
     """
     print(f"Using o3 mini model for evaluation: {O3MINI_DEPLOYMENT}")
 
-    # Initialize Azure OpenAI Service client with Entra ID authentication (matching generate_completions.py)
-    token_provider = get_bearer_token_provider(  
-        DefaultAzureCredential(),  
-        "https://cognitiveservices.azure.com/.default"
-    )  
-    
-    # Initialize o3-mini client exactly as in generate_completions.py
+    # Initialize o3-mini client with API key authentication
     client = AzureOpenAI(  
         api_version=O3MINI_API_VERSION,
         azure_endpoint=O3MINI_ENDPOINT,
-        azure_ad_token_provider=token_provider,  
+        api_key=O3MINI_API_KEY,  
     )
 
     model_data = read_jsonl_file(model_file)
@@ -278,7 +278,7 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
     
     # Find the "completions" folder in the path to get more reliable indexes
     for i, part in enumerate(path_parts):
-        if part == "completions":
+        if part.startswith("completions"):
             # If we found the completions folder, the structure should be:
             # .../completions/language/category/filename.jsonl
             if i + 2 < len(path_parts):  # Ensure we have enough parts for language
@@ -360,92 +360,120 @@ def evaluate_single_completion(model_file, output_file, model_name, max_evaluati
             entry_id = entry.get("id")
             prefix = entry.get("prefix", "")
             suffix = entry.get("suffix", "")
-            model_completion = entry.get(model_name, "")
+            
+            # Collect all completions for this entry
+            model_completions = []
+            
+            # Check for array of completions first
+            if f"{model_name}_completions" in entry and isinstance(entry[f"{model_name}_completions"], list):
+                model_completions = entry[f"{model_name}_completions"]
+                print(f"Found {len(model_completions)} completions in array format")
+            # Check for individual numbered completions
+            elif f"{model_name}_completion_0" in entry:
+                i = 0
+                while f"{model_name}_completion_{i}" in entry:
+                    model_completions.append(entry[f"{model_name}_completion_{i}"])
+                    i += 1
+                print(f"Found {len(model_completions)} numbered completions")
+            # Fall back to single completion format
+            elif model_name in entry:
+                model_completions = [entry[model_name]]
+                print(f"Found single completion")
+            else:
+                print(f"No completions found for model {model_name}")
+                continue
             
             # Use extracted language from path, but allow entry values to override if present
             language = entry.get("language", actual_language)
  
-            print(f"\n\nEvaluating single completion for ID: {entry_id}")
+            print(f"\n\nEvaluating {len(model_completions)} completion(s) for ID: {entry_id}")
             
-            formatted_prompt = single_model_prompt_template.format(
-                prefix=prefix,
-                completion=model_completion,
-                suffix=suffix
-            )
+            # Store scores for all completions
+            completion_scores = []
+            completion_responses = []
             
-            messages = [{"role": "user", "content": formatted_prompt}]
-
-            try:
-                completion = client.chat.completions.create(  
-                    max_completion_tokens=16384,
-                    model=O3MINI_DEPLOYMENT,  
-                    messages=messages,
-                    stream=False  
+            # Evaluate each completion
+            for comp_idx, model_completion in enumerate(model_completions):
+                print(f"  Evaluating completion {comp_idx + 1}/{len(model_completions)}")
+                
+                formatted_prompt = single_model_prompt_template.format(
+                    prefix=prefix,
+                    completion=model_completion,
+                    suffix=suffix
                 )
+                
+                messages = [{"role": "user", "content": formatted_prompt}]
 
-                response_content = completion.choices[0].message.content
-                print(f"Evaluation result:")
-                print(response_content)
-                
-                # Extract score from response
-                score = extract_score(response_content)
-                
-                # Normalize c_sharp api_usage to prevent "sharp_api_usage"
-                if language == "c_sharp" and actual_category == "api_usage":
-                    actual_category = "api_usage"
-                elif language == "c_sharp" and actual_category == "sharp_api_usage":
-                    actual_category = "api_usage"
-                elif actual_language == "c_sharp" and (actual_category == "code2NL_NL2code" or actual_category == "sharp_code2NL_NL2code"):
-                    actual_category = "code2NL_NL2code"
-                elif actual_language == "c_sharp" and (actual_category == "code_purpose_understanding" or actual_category == "sharp_code_purpose_understanding"):
-                    actual_category = "code_purpose_understanding"
-                elif actual_language == "c_sharp" and (actual_category == "low_context" or actual_category == "sharp_low_context"):
-                    actual_category = "low_context"
-                elif actual_language == "c_sharp" and (actual_category == "pattern_matching" or actual_category == "sharp_pattern_matching"):
-                    actual_category = "pattern_matching"
-                elif actual_language == "c_sharp" and (actual_category == "syntax_completion" or actual_category == "sharp_syntax_completion"):
-                    actual_category = "syntax_completion"
-                
-                # Add result to our collection
-                result = {
-                    "id": entry_id,
-                    "score": score,
-                    "language": language,
-                    "category": actual_category,
-                    "full_response": response_content
-                }
+                try:
+                    completion = client.chat.completions.create(  
+                        max_completion_tokens=16384,
+                        model=O3MINI_DEPLOYMENT,  
+                        messages=messages,
+                        stream=False  
+                    )
 
-                print(f"Final Score for ID {entry_id}: {score}")
+                    response_content = completion.choices[0].message.content
+                    print(f"    Evaluation result for completion {comp_idx + 1}:")
+                    print(f"    {response_content[:200]}...")  # Print first 200 chars
+                    
+                    # Extract score from response
+                    score = extract_score(response_content)
+                    
+                    if score is not None:
+                        completion_scores.append(score)
+                        completion_responses.append(response_content)
+                        print(f"    Score for completion {comp_idx + 1}: {score}")
+                    else:
+                        print(f"    Failed to extract score for completion {comp_idx + 1}")
+                        completion_scores.append(None)
+                        completion_responses.append(response_content)
+                    
+                except Exception as e:
+                    print(f"    Error evaluating completion {comp_idx + 1}: {str(e)}")
+                    completion_scores.append(None)
+                    completion_responses.append(f"Error: {str(e)}")
+            
+            # Calculate average score (only from successful evaluations)
+            valid_scores = [s for s in completion_scores if s is not None]
+            if valid_scores:
+                avg_score = sum(valid_scores) / len(valid_scores)
+                print(f"Average score for ID {entry_id}: {avg_score:.2f} (from {len(valid_scores)} valid scores)")
+            else:
+                avg_score = None
+                print(f"No valid scores for ID {entry_id}")
+            
+            # Normalize c_sharp categories
+            if language == "c_sharp" and actual_category == "api_usage":
+                actual_category = "api_usage"
+            elif language == "c_sharp" and actual_category == "sharp_api_usage":
+                actual_category = "api_usage"
+            elif actual_language == "c_sharp" and (actual_category == "code2NL_NL2code" or actual_category == "sharp_code2NL_NL2code"):
+                actual_category = "code2NL_NL2code"
+            elif actual_language == "c_sharp" and (actual_category == "code_purpose_understanding" or actual_category == "sharp_code_purpose_understanding"):
+                actual_category = "code_purpose_understanding"
+            elif actual_language == "c_sharp" and (actual_category == "low_context" or actual_category == "sharp_low_context"):
+                actual_category = "low_context"
+            elif actual_language == "c_sharp" and (actual_category == "pattern_matching" or actual_category == "sharp_pattern_matching"):
+                actual_category = "pattern_matching"
+            elif actual_language == "c_sharp" and (actual_category == "syntax_completion" or actual_category == "sharp_syntax_completion"):
+                actual_category = "syntax_completion"
+            
+            # Add result to our collection with all completion details
+            result = {
+                "id": entry_id,
+                "score": avg_score,  # Average score
+                "individual_scores": completion_scores,  # All individual scores
+                "num_completions": len(model_completions),
+                "num_valid_scores": len(valid_scores),
+                "language": language,
+                "category": actual_category,
+                "full_responses": completion_responses  # Store all responses for reference
+            }
 
-                evaluation_results.append(result)
-                processed_count += 1
-                
-            except Exception as e:
-                print(f"Error processing evaluation: {str(e)}")
-                
-                # Normalize c_sharp api_usage to prevent "sharp_api_usage"
-                if language == "c_sharp" and actual_category == "api_usage":
-                    actual_category = "api_usage"
-                elif language == "c_sharp" and actual_category == "sharp_api_usage":
-                    actual_category = "api_usage"
-                elif actual_language == "c_sharp" and (actual_category == "code2NL_NL2code" or actual_category == "sharp_code2NL_NL2code"):
-                    actual_category = "code2NL_NL2code"
-                elif actual_language == "c_sharp" and (actual_category == "code_purpose_understanding" or actual_category == "sharp_code_purpose_understanding"):
-                    actual_category = "code_purpose_understanding"
-                elif actual_language == "c_sharp" and (actual_category == "low_context" or actual_category == "sharp_low_context"):
-                    actual_category = "low_context"
-                elif actual_language == "c_sharp" and (actual_category == "pattern_matching" or actual_category == "sharp_pattern_matching"):
-                    actual_category = "pattern_matching"
-                elif actual_language == "c_sharp" and (actual_category == "syntax_completion" or actual_category == "sharp_syntax_completion"):
-                    actual_category = "syntax_completion"
-                
-                evaluation_results.append({
-                    "id": entry_id,
-                    "score": None,
-                    "language": language,
-                    "category": actual_category,
-                    "error": str(e)
-                })
+            print(f"Final Average Score for ID {entry_id}: {avg_score}")
+
+            evaluation_results.append(result)
+            processed_count += 1
 
         # Save all evaluation results to a JSON file
         with open(output_file, 'w', encoding='utf-8') as outfile:
@@ -498,7 +526,10 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
             # Special case for handling complex category names with underscores (like api_usage)
             # First try to find the model name which often has distinctive patterns
             model_patterns = [
+                "claude-4-sonnet",  # Most specific pattern first
+                "claude-3-7-sonnet",
                 "claude-3", 
+                "claude-4",  # Added this pattern
                 "gpt-", 
                 "Ministral-3B", 
                 "DeepSeek", 
@@ -578,11 +609,17 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
             scores = []
             all_results = []
             language_category_results = defaultdict(list)
+            total_completions_evaluated = 0
+            total_valid_evaluations = 0
             
             for entry in data:
                 if entry.get('score') is not None:
                     score = entry.get('score')
                     scores.append(score)
+                    
+                    # Track number of completions evaluated (for multi-completion scenarios)
+                    total_completions_evaluated += entry.get('num_completions', 1)
+                    total_valid_evaluations += entry.get('num_valid_scores', 1)
                     
                     # Extract language and category from the entry
                     # Default to the ones from filename if not present
@@ -642,10 +679,12 @@ def generate_single_model_summary(results_dir: str, output_file: str = None):
                 model_names.append(model_name)
                 detailed_results[model_name] = []
             
-            # Add category scores with confidence intervals
+            # Add category scores with confidence intervals and completion info
             model_data[model_name]['categories'][category_from_file] = {
                 'score': round(avg_score, 2),
                 'evaluations': len(scores),
+                'completions_per_test': round(total_completions_evaluated / len(scores), 1) if scores else 0,
+                'total_completions_evaluated': total_completions_evaluated,
                 'lower_ci': round(lower_ci, 2),
                 'upper_ci': round(upper_ci, 2),
                 'ci_warning': len(scores) < 5
@@ -776,16 +815,14 @@ def get_display_name(model_name):
     """
     # Dictionary mapping internal model names to display names
     model_display_names = {
-        "claude-3-5-sonnet": "Claude 3.5 Sonnet",
         "claude-3-7-sonnet": "Claude 3.7 Sonnet",
+        "claude-4-sonnet": "Claude 4 Sonnet",
         "gpt-4.1-mini": "GPT-4.1 mini",
+        "gpt-4.1": "GPT-4.1",
         "gpt-4o": "GPT-4o",
-        "gpt-4o-mini": "GPT-4o mini",
-        "gpt-4o-copilot": "GPT-4o Copilot",
         "gpt-4.1-nano": "GPT-4.1 nano",
-        "DeepSeek-R1": "DeepSeek-R1",
+        "DeepSeek-V3.1": "DeepSeek-V3.1",
         "DeepSeek-V3-0324": "DeepSeek-V3",
-        "o3-mini": "o3-mini",
         "Ministral-3B": "Ministral-3B",
     }
     
@@ -800,6 +837,9 @@ def create_model_comparison_plot(summary_data, output_path=None):
         summary_data: Dictionary containing model summary data
         output_path: Optional path to save the plot image file
     """
+    # Use summary data as is (no filtering needed since we only have approved models)
+    filtered_summary = summary_data
+    
     # Extract model names and scores with confidence intervals
     model_names = []  # Internal model names
     display_names = []  # User-friendly display names
@@ -809,7 +849,7 @@ def create_model_comparison_plot(summary_data, output_path=None):
     
     # Sort models by overall score (higher first)
     sorted_models = sorted(
-        summary_data.items(), 
+        filtered_summary.items(), 
         key=lambda x: x[1]['overall']['score'], 
         reverse=True
     )
@@ -839,28 +879,31 @@ def create_model_comparison_plot(summary_data, output_path=None):
     yerr = np.array([lower_cis, upper_cis])
     
     # Create the figure and axis
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 8))  # Larger figure size
     
     # Create light grid with white background
     plt.grid(axis='y', linestyle='-', alpha=0.2)
     
     # Plot with blue dots and error bars
     plt.errorbar(y_pos, scores, yerr=yerr, fmt='o', color='darkblue', capsize=5,
-                 markersize=6, elinewidth=2, capthick=2)
+                 markersize=8, elinewidth=2, capthick=2)  # Larger marker size
     
-    # Set x-axis ticks and labels with smaller font if many models
+    # Set x-axis ticks and labels with larger font
     if len(model_names) > 10:
-        plt.xticks(y_pos, display_names, rotation=45, ha='right', fontsize=8)
+        plt.xticks(y_pos, display_names, rotation=45, ha='right', fontsize=18)  # Increased to 18
     else:
-        plt.xticks(y_pos, display_names, rotation=45, ha='right')
+        plt.xticks(y_pos, display_names, rotation=45, ha='right', fontsize=20)  # Increased to 20
     
-    # Set plot labels and title
-    plt.xlabel('Model', fontsize=12, labelpad=10)
-    plt.ylabel('Average Score', fontsize=12)
+    # Increase y-axis tick label size
+    plt.tick_params(axis='y', labelsize=18)
+    
+    # Set plot labels with larger fonts
+    plt.xlabel('Model', fontsize=20, labelpad=10, fontweight='bold')  # Increased to 20 to match model names
+    plt.ylabel('Average Score', fontsize=20, fontweight='bold')  # Increased to 20 to match model names
     
     # Add title if filtering by language or category
     if title_suffix:
-        plt.title(f"Model Comparison{title_suffix}")
+        plt.title(f"Model Comparison{title_suffix}", fontsize=20, fontweight='bold')
     
     # Set y-axis limits with a bit of padding
     y_min = min(scores - np.array(lower_cis)) - 0.2
@@ -935,7 +978,7 @@ def create_language_category_heatmap(summary_data, output_dir):
         '#E5451F',  # Dark orange-red
     ])
     
-    # No filtering by models - use all models from summary_data
+    # Use summary data as is (no filtering needed since we only have approved models)
     filtered_data = summary_data
     
     # Skip individual model heatmaps and only create the combined heatmap
@@ -952,11 +995,12 @@ def create_language_category_heatmap(summary_data, output_dir):
         # Number of models to show
         n_models = len(sorted_models)
         
-        # Create a larger figure to accommodate all models
+        # Create a larger figure to better utilize page space
+        # Increased sizing: width 10 inches, height 2.0 per model for better visibility
         fig, axes = plt.subplots(
             n_models, 1, 
-            figsize=(12, 6*n_models), 
-            gridspec_kw={'hspace': 0.3}
+            figsize=(10, 2.0*n_models), 
+            gridspec_kw={'hspace': 1.2}  # Large spacing to prevent title/label overlap
         )
         
         # If we only have one model, axes won't be an array
@@ -1075,6 +1119,7 @@ def create_language_category_heatmap(summary_data, output_dir):
                         data_matrix[j, k] = language_category_scores[key]
             
             # Create the heatmap with our custom colormap
+            # Larger annotation font size for better readability
             sns.heatmap(
                 data_matrix,
                 annot=True,
@@ -1082,21 +1127,22 @@ def create_language_category_heatmap(summary_data, output_dir):
                 cmap=custom_cmap,
                 vmin=7.0,  # Minimum value for color scale
                 vmax=10.0,  # Maximum value for color scale
-                linewidths=2,
+                linewidths=1.0,  # Thicker lines for better visibility
                 linecolor='white',
                 cbar=False,
-                ax=ax
+                ax=ax,
+                annot_kws={"fontsize": 10}  # Larger annotation text
             )
             
-            # Set row and column labels
+            # Set row and column labels with larger fonts
             ax.set_yticks(np.arange(len(category_order)) + 0.5)
-            ax.set_yticklabels([category_display[cat] for cat in category_order], rotation=0, fontsize=12)
+            ax.set_yticklabels([category_display[cat] for cat in category_order], rotation=0, fontsize=11)
             
             ax.set_xticks(np.arange(len(language_order)) + 0.5)
-            ax.set_xticklabels([language_display[lang] for lang in language_order], rotation=0, fontsize=12)
+            ax.set_xticklabels([language_display[lang] for lang in language_order], rotation=0, fontsize=11)
             
-            # Add model name as title
-            ax.set_title(model_display_name, fontsize=14, pad=20)
+            # Add model name as title with larger font
+            ax.set_title(model_display_name, fontsize=14, pad=12, fontweight='bold')
         
         # Adjust layout
         plt.tight_layout()
@@ -1223,7 +1269,7 @@ def main():
                 
                 # Find the "completions" folder in the path
                 for i, part in enumerate(path_parts):
-                    if part == "completions":
+                    if part.startswith("completions"):
                         # Language should be the next part after "completions"
                         if i + 1 < len(path_parts):
                             # Check for special case of c_sharp
@@ -1274,7 +1320,7 @@ def main():
             
             # Find the "completions" folder in the path to get more reliable indexes
             for i, part in enumerate(path_parts):
-                if part == "completions":
+                if part.startswith("completions"):
                     # If we found the completions folder, the structure should be:
                     # .../completions/language/category/filename.jsonl
                     if i + 2 < len(path_parts):  # Ensure we have enough parts for language
@@ -1311,6 +1357,24 @@ def main():
             # Generate output file path - include both language and category
             # Ensure no prefix is added to the model name
             output_file = os.path.join(output_dir, f"{language}_{category}_{file_model_name}_single_evaluation.json")
+            
+            # Skip if output file already exists and has content
+            if os.path.exists(output_file):
+                file_size = os.path.getsize(output_file)
+                if file_size > 0:
+                    # Check if the file has valid JSON content
+                    try:
+                        with open(output_file, 'r') as f:
+                            existing_data = json.load(f)
+                            if isinstance(existing_data, list) and len(existing_data) > 0:
+                                print(f"✓ Skipping {file_model_name} for {language}/{category} - already evaluated ({len(existing_data)} entries)")
+                                evaluations_done = len(existing_data)
+                                total_evaluations += evaluations_done
+                                continue
+                    except:
+                        # If file exists but is corrupted, delete it and re-evaluate
+                        print(f"⚠ Corrupted file detected, re-evaluating {file_model_name} for {language}/{category}")
+                        os.remove(output_file)
             
             print(f"Evaluating {file_model_name} for {language}/{category}")
             evaluations_done = evaluate_single_completion(

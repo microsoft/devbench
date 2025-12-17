@@ -177,7 +177,13 @@ def load_and_compare_completions(completions_dir, benchmark_dir, debug=False):
                 category = None
                 
                 # Find language from the path
-                completions_index = path_parts.index('completions') if 'completions' in path_parts else -1
+                # Try to find 'completions' or any directory starting with 'completions'
+                completions_index = -1
+                for i, part in enumerate(path_parts):
+                    if 'completions' in part:
+                        completions_index = i
+                        break
+                
                 if completions_index >= 0 and completions_index + 1 < len(path_parts):
                     language = path_parts[completions_index + 1]
                     if completions_index + 2 < len(path_parts):
@@ -209,51 +215,118 @@ def load_and_compare_completions(completions_dir, benchmark_dir, debug=False):
                             # Get golden completion from benchmark data
                             golden_completion = benchmark_data[benchmark_key][test_id].get('golden_completion', '')
                             
-                            # Process each model completion in the data
-                            for model_name, model_completion in data.items():
-                                # Skip the id field
-                                if model_name == 'id':
+                            # Process each model in the data
+                            models_processed = set()
+                            
+                            for field_name, field_value in data.items():
+                                # Skip non-model fields
+                                if field_name in ['id', 'testsource', 'language', 'prefix', 'suffix', 
+                                                 'golden_completion', 'LLM_justification', 'assertions']:
                                     continue
                                 
-                                # Update total count
+                                # Extract model name from field name
+                                # Handle both single and multiple completion formats
+                                model_name = None
+                                
+                                if field_name.endswith('_completions'):
+                                    # Array of completions format - prioritize this
+                                    model_name = field_name[:-12]  # Remove '_completions'
+                                elif field_name.endswith('_completion_0'):
+                                    # Individual completion format - only process if array format not already processed
+                                    potential_model_name = field_name[:-13]  # Remove '_completion_0'
+                                    if potential_model_name not in models_processed:
+                                        model_name = potential_model_name
+                                elif '_completion_' in field_name:
+                                    # Skip other numbered completions - they'll be handled with _completion_0 or _completions
+                                    continue
+                                elif '_completions' not in str(data.keys()) and '_completion_' not in str(data.keys()):
+                                    # Single completion format (original) - only use if no multi-completion fields exist
+                                    if field_name not in models_processed:
+                                        model_name = field_name
+                                
+                                # Skip if no valid model name or already processed
+                                if not model_name or model_name in models_processed:
+                                    continue
+                                
+                                # Mark this model as processed
+                                models_processed.add(model_name)
+                                
+                                # Collect all completions for this model
+                                completions = []
+                                
+                                # Check for array of completions
+                                if f'{model_name}_completions' in data and isinstance(data[f'{model_name}_completions'], list):
+                                    completions = data[f'{model_name}_completions']
+                                # Check for individual numbered completions
+                                elif f'{model_name}_completion_0' in data:
+                                    i = 0
+                                    while f'{model_name}_completion_{i}' in data:
+                                        completions.append(data[f'{model_name}_completion_{i}'])
+                                        i += 1
+                                # Single completion (original format)
+                                elif model_name in data:
+                                    completions = [data[model_name]]
+                                
+                                # Skip if no completions found
+                                if not completions:
+                                    continue
+                                
+                                # Update total count (once per test case, not per completion)
                                 results[model_name]['total'] += 1
                                 results[model_name]['categories'][category]['total'] += 1
                                 results[model_name]['languages'][language]['total'] += 1
                                 
-                                # For empty completions, set metrics to 0 instead of skipping
-                                if not model_completion:
-                                    # Add 0 values for empty completions
-                                    results[model_name]['cosine_similarities'].append(0.0)
-                                    results[model_name]['categories'][category]['cosine_similarities'].append(0.0)
-                                    results[model_name]['languages'][language]['cosine_similarities'].append(0.0)
-                                    continue
+                                # Process each completion and collect metrics
+                                completion_cosine_sims = []
+                                any_line0_match = False
                                 
-                                # Line0 exact match comparison
-                                model_line0 = model_completion.strip().split('\n')[0].strip()
-                                golden_line0 = golden_completion.strip().split('\n')[0].strip()
+                                for model_completion in completions:
+                                    # For empty completions, add 0.0 to similarity
+                                    if not model_completion:
+                                        completion_cosine_sims.append(0.0)
+                                        continue
+                                    
+                                    # Line0 comparison
+                                    model_line0 = model_completion.strip().split('\n')[0].strip()
+                                    golden_line0 = golden_completion.strip().split('\n')[0].strip()
+                                    
+                                    # Check for line0 exact match
+                                    if model_line0 == golden_line0:
+                                        any_line0_match = True
+                                    
+                                    # Calculate cosine similarity for first line
+                                    cosine_sim = calculate_cosine_similarity(model_line0, golden_line0)
+                                    completion_cosine_sims.append(cosine_sim)
                                 
-                                if model_line0 == golden_line0:
+                                # For line0 exact match: count if ANY completion matches
+                                if any_line0_match:
                                     results[model_name]['line0_exact_matches'] += 1
                                     results[model_name]['categories'][category]['line0_exact_matches'] += 1
                                     results[model_name]['languages'][language]['line0_exact_matches'] += 1
                                 
-                                # Cosine similarity for first line
-                                cosine_sim = calculate_cosine_similarity(model_line0, golden_line0)
-                                results[model_name]['cosine_similarities'].append(cosine_sim)
-                                results[model_name]['categories'][category]['cosine_similarities'].append(cosine_sim)
-                                results[model_name]['languages'][language]['cosine_similarities'].append(cosine_sim)
+                                # For cosine similarity: use average of all completions
+                                if completion_cosine_sims:
+                                    avg_cosine_sim = sum(completion_cosine_sims) / len(completion_cosine_sims)
+                                else:
+                                    avg_cosine_sim = 0.0
+                                
+                                results[model_name]['cosine_similarities'].append(avg_cosine_sim)
+                                results[model_name]['categories'][category]['cosine_similarities'].append(avg_cosine_sim)
+                                results[model_name]['languages'][language]['cosine_similarities'].append(avg_cosine_sim)
                                 
                                 # Store detailed test case info for debug mode
                                 if debug:
                                     prompt = benchmark_data[benchmark_key][test_id].get('prompt', '')
+                                    # For debug, store all completions with their individual similarities
                                     test_cases[model_name].append({
                                         'test_id': test_id,
                                         'language': language,
                                         'category': category,
                                         'prompt': prompt,
                                         'golden_completion': golden_completion,
-                                        'model_completion': model_completion,
-                                        'cosine_similarity': cosine_sim
+                                        'model_completions': completions,
+                                        'individual_cosine_similarities': completion_cosine_sims,
+                                        'avg_cosine_similarity': avg_cosine_sim
                                     })
                             
                         except json.JSONDecodeError:
@@ -343,12 +416,11 @@ def create_specific_category_comparisons(formatted_results, plots_dir="plots"):
     os.makedirs(plots_dir, exist_ok=True)
     
     # Specific models to compare with clean display names mapping
-    selected_models = ['claude-3-7-sonnet', 'gpt-4o', 'o3-mini', 'DeepSeek-V3-0324']
+    selected_models = ['claude-3-7-sonnet', 'gpt-4o', 'DeepSeek-V3-0324']
     model_display_names = {
         'claude-3-7-sonnet': 'Claude 3.7 Sonnet',
         'gpt-4o': 'GPT-4o',
-        'o3-mini': 'o3-mini',
-        'DeepSeek-V3-0324': 'DeepSeek-V3'
+        'DeepSeek-V3-0324': 'DeepSeek-V3',
     }
     
     # Specific categories to compare with clean display names mapping
@@ -393,6 +465,11 @@ def create_specific_category_comparisons(formatted_results, plots_dir="plots"):
                         'Line 0 Exact Match Rate': category_stats['line0_exact_match_rate'],
                         'Total Samples': category_stats['total_comparisons']
                     })
+    
+    # Skip plotting if no data for selected models
+    if not comparison_data:
+        print(f"Skipping plots - none of the selected models ({', '.join(selected_models)}) found in results")
+        return
     
     # Create DataFrame
     df_comparison = pd.DataFrame(comparison_data)
@@ -500,15 +577,20 @@ def run_comparison(benchmark_base="../benchmark", completions_base="../completio
         # Print only cosine similarity for debug mode
         for model_name, cases in test_cases.items():
             print(f"\n## MODEL: {model_name}")
-            # Sort by cosine similarity (ascending)
-            sorted_cases = sorted(cases, key=lambda x: x['cosine_similarity'])
+            # Sort by average cosine similarity (ascending)
+            sorted_cases = sorted(cases, key=lambda x: x['avg_cosine_similarity'])
             for i, case in enumerate(sorted_cases[:10]):
                 print(f"\n{i+1}. Test ID: {case['test_id']}")
                 print(f"   Language: {case['language']}, Category: {case['category']}")
-                print(f"   Cosine Similarity: {case['cosine_similarity']}")
+                print(f"   Average Cosine Similarity: {case['avg_cosine_similarity']:.4f}")
+                print(f"   Individual Cosine Similarities: {[f'{s:.4f}' for s in case['individual_cosine_similarities']]}")
                 print(f"   Prompt: {case['prompt'][:100]}..." if len(case['prompt']) > 100 else f"   Prompt: {case['prompt']}")
                 print(f"   Golden completion: {case['golden_completion'][:100]}..." if len(case['golden_completion']) > 100 else f"   Golden completion: {case['golden_completion']}")
-                print(f"   Model completion: {case['model_completion'][:100]}..." if len(case['model_completion']) > 100 else f"   Model completion: {case['model_completion']}")
+                # Show first completion as example
+                if case['model_completions']:
+                    first_completion = case['model_completions'][0]
+                    print(f"   Model completion (first): {first_completion[:100]}..." if len(first_completion) > 100 else f"   Model completion (first): {first_completion}")
+                    print(f"   Number of completions: {len(case['model_completions'])}")
         return
     
     # Standard flow (generate plots and JSON)

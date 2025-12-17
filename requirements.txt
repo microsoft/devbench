@@ -12,3 +12,4 @@ tree-sitter==0.21.3
 tree_sitter_languages
 azure-identity
 azure-ai-inference
+opencv-python-headless
