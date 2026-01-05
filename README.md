@@ -26,6 +26,9 @@ The benchmark supports execution-based evaluation across multiple programming la
 - `prompts/` - Prompt templates for generating benchmark test cases
 - `completion_evaluations/` - Evaluation scripts for analyzing model performance
 - `complexities/` - Scripts for measuring code complexity metrics
+- `generate_benchmark.py` - Script for generating benchmark test cases
+- `execute_benchmark.py` - Script for executing benchmark tests and evaluating model completions
+- `generate_completions.py` - Script for generating model completions
 
 ## Setup
 
@@ -110,7 +113,7 @@ Replace the placeholder values with your actual API keys and credentials. You ma
 
 ### Prerequisites for Test Execution
 
-To execute benchmark tests with `generate_benchmark.py`, you need the following language-specific tools installed:
+To execute benchmark tests with `execute_benchmark.py`, you need the following language-specific tools installed:
 
 #### Required Language Tools:
 - **Python**: Python 3.10+ (already required for the framework)
@@ -126,15 +129,15 @@ Ensure these tools are in your system PATH or configure the paths as described b
 
 ### System Configuration for Test Execution
 
-When running test case execution with `generate_benchmark.py`, you may need to configure some system-specific paths:
+When running test case execution with `execute_benchmark.py`, you may need to configure some system-specific paths:
 
 #### Node.js/JavaScript/TypeScript Configuration
 
 The script contains a placeholder `[NODE-BIN-PATH]` for Node.js binary paths. If `node`, `npm`, and `npx` are already in your system PATH, no changes are needed. Otherwise, replace `[NODE-BIN-PATH]` with your Node.js installation path.
 
-**Lines to modify in `generate_benchmark.py`:**
-- Line ~810: `nvm_bin_path = "[NODE-BIN-PATH]"` (JavaScript runner)
-- Line ~1005: `nvm_bin_path = "[NODE-BIN-PATH]"` (TypeScript runner)
+**Lines to modify in `execute_benchmark.py`:**
+- Line ~700: `nvm_bin_path = "[NODE-BIN-PATH]"` (JavaScript runner)
+- Line ~890: `nvm_bin_path = "[NODE-BIN-PATH]"` (TypeScript runner)
 
 **Examples:**
 - macOS with nvm: `/Users/yourname/.nvm/versions/node/v22.17.0/bin`
@@ -158,10 +161,10 @@ For C++ tests that require external libraries, you may need to:
    ```
 
 2. **Configure Include and Library Paths** (if needed):
-   
-   **Lines to modify in `generate_benchmark.py`:**
-   - Line ~1817: `common_include_paths = []  # [CPP-INCLUDE-PATHS]`
-   - Line ~1831: `common_lib_paths = []  # [CPP-LIB-PATHS]`
+
+   **Lines to modify in `execute_benchmark.py`:**
+   - Line ~1290: `common_include_paths = []  # [CPP-INCLUDE-PATHS]`
+   - Line ~1304: `common_lib_paths = []  # [CPP-LIB-PATHS]`
    
    **Examples for macOS with Homebrew:**
    ```python
@@ -245,7 +248,7 @@ Parameters:
 
 ### Executing Benchmark Tests
 
-There are two ways to execute tests with `generate_benchmark.py`:
+Use `execute_benchmark.py` to run benchmark tests. There are two modes:
 
 #### 1. Testing against Golden Completions
 
@@ -253,17 +256,21 @@ This mode tests the benchmark cases against their golden (correct) completions:
 
 ```bash
 # Execute all Python benchmark test cases
-python generate_benchmark.py --execute --verbose
+python execute_benchmark.py --execute --verbose
+
+# Execute specific language
+python execute_benchmark.py --execute --language javascript --verbose
 
 # Execute specific categories
-python generate_benchmark.py --execute --categories api_usage,code_purpose_understanding --verbose
+python execute_benchmark.py --execute --categories api_usage,code_purpose_understanding --verbose
 
 # Execute a specific test case
-python generate_benchmark.py --execute --id <test_id> --verbose
+python execute_benchmark.py --execute --id <test_id> --verbose
 ```
 
 Parameters:
-- `--execute`: Flag to execute test cases
+- `--execute`: Flag to execute test cases (required)
+- `--language`: Programming language (`python`, `javascript`, `c_sharp`, `cpp`, `typescript`, `java`, `all`)
 - `--verbose`: Print detailed information during execution
 - `--categories`: Comma-separated list of test categories to execute
 - `--id`: Run a specific test case with the given ID
@@ -277,24 +284,24 @@ This mode evaluates the model-generated completions against the benchmark tests:
 
 ```bash
 # Evaluate with pass@1 (single completion per test)
-python generate_benchmark.py --execute --model-eval --verbose
+python execute_benchmark.py --execute --model-eval --verbose
 
 # Evaluate with pass@k metrics (requires n≥k completions)
-python generate_benchmark.py --execute --model-eval --pass-at-k 1 --verbose
-python generate_benchmark.py --execute --model-eval --pass-at-k 5 --verbose
+python execute_benchmark.py --execute --model-eval --pass-at-k 1 --verbose
+python execute_benchmark.py --execute --model-eval --pass-at-k 5 --verbose
 
 # Evaluate specific categories and models
-python generate_benchmark.py --execute --model-eval --categories api_usage --models gpt-4o,claude-3-7-sonnet --verbose
+python execute_benchmark.py --execute --model-eval --categories api_usage --models gpt-4o,claude-3-7-sonnet --verbose
 
 # Evaluate all languages
-python generate_benchmark.py --execute --model-eval --language all --pass-at-k 1 --verbose
+python execute_benchmark.py --execute --model-eval --language all --pass-at-k 1 --verbose
 
 # Output results to JSON file
-python generate_benchmark.py --execute --model-eval --verbose --json-output benchmark_results.json
+python execute_benchmark.py --execute --model-eval --verbose --json-output benchmark_results.json
 ```
 
 Parameters:
-- `--execute`: Flag to execute test cases
+- `--execute`: Flag to execute test cases (required)
 - `--model-eval`: Flag to evaluate model-generated completions
 - `--pass-at-k`: Evaluate pass@k where k is the number of samples to consider (default: 1)
   - Requires generating n≥k completions with `generate_completions.py`
