@@ -26,7 +26,6 @@ The benchmark supports execution-based evaluation across multiple programming la
 - `prompts/` - Prompt templates for generating benchmark test cases
 - `completion_evaluations/` - Evaluation scripts for analyzing model performance
 - `complexities/` - Scripts for measuring code complexity metrics
-- `generate_benchmark.py` - Script for generating benchmark test cases
 - `execute_benchmark.py` - Script for executing benchmark tests and evaluating model completions
 - `generate_completions.py` - Script for generating model completions
 
@@ -77,9 +76,9 @@ The benchmark supports execution-based evaluation across multiple programming la
 The code requires API keys and configuration for various language models and services. Create a `.env` file in the root directory with the following variables:
 
 ```
-# Azure OpenAI Endpoints (for generate_benchmark.py)
-ENDPOINT_URL="your_endpoint_url"  # Used for benchmark generation
-DEPLOYMENT_NAME="your_deployment_name"  # Used for benchmark generation
+# Azure OpenAI Endpoints
+ENDPOINT_URL="your_endpoint_url"
+DEPLOYMENT_NAME="your_deployment_name"
 
 # Model-Specific API Keys and Endpoints
 GPT4O_API_KEY="your_gpt4o_api_key"
@@ -189,9 +188,8 @@ For C++ tests that require external libraries, you may need to:
 
 ### Important Note on Script Adaptation
 
-The scripts `generate_benchmark.py`, `generate_completions.py`, and `llm_judge.py` were used for our specific experimental setup, which primarily uses Azure AI Foundry to access various language models. If you're using different methods to access these models, you'll need to modify these scripts accordingly:
+The scripts `generate_completions.py` and `llm_judge.py` were used for our specific experimental setup, which primarily uses Azure AI Foundry to access various language models. If you're using different methods to access these models, you'll need to modify these scripts accordingly:
 
-- `generate_benchmark.py`: This script may need modifications in how it authenticates and calls language models to generate benchmark test cases. This script contains an anonymized endpoint (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment name (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoint and deployment name you're using.
 - `generate_completions.py`: This script contains anonymized endpoints (e.g., `[ANONYMIZED-ENDPOINT-1]`) and deployment names (e.g., `[ANONYMIZED-DEPLOYMENT-1]`). You will need to replace these with your own valid endpoints and deployment names for each model service you're using.
 - `llm_judge.py`: This script also uses anonymized endpoints (e.g., `[ANONYMIZED-ENDPOINT-2]`) and deployment names (e.g., `[ANONYMIZED-DEPLOYMENT-3]`) for the o3-mini model used as a judge. You will need to replace these with your own valid endpoints and deployment names.
 
@@ -219,32 +217,6 @@ These scripts should be considered templates that demonstrate the methodology ra
 By using this benchmark system, you accept responsibility for any risks associated with executing AI-generated code. The authors of this project are not responsible for any damage or data loss that may result.
 
 ## Usage Guide
-
-### Generating Benchmark Test Cases
-
-Use `generate_benchmark.py` to create benchmark test cases for a specific language and prompt type:
-
-```bash
-# Generate 10 Python API usage benchmark test cases
-python generate_benchmark.py --generate --completions 10 --language python --prompt-type api_usage
-
-# Generate 10 JavaScript code purpose understanding test cases
-python generate_benchmark.py --generate --completions 10 --language javascript --prompt-type code_purpose_understanding
-```
-
-Parameters:
-- `--generate`: Flag to generate test cases
-- `--completions`: Number of test cases to generate (integer)
-- `--language`: Target programming language (`python`, `javascript`, `c_sharp`, `cpp`, `typescript`, `java`, `all`)
-  - Use `all` to generate benchmarks for all 6 languages sequentially
-- `--prompt-type`: Type of benchmark test to generate:
-  - `api_usage` - Tests for using external APIs and libraries
-  - `code_purpose_understanding` - Tests for understanding code functionality  
-  - `code2NL_NL2code` - Tests for code-to-natural-language and vice versa
-  - `low_context` - Tests requiring minimal context
-  - `pattern_matching` - Tests for pattern recognition and completion
-  - `syntax_completion` - Tests for syntax-aware code completion
-- `--output`: Optional custom output file path
 
 ### Executing Benchmark Tests
 
