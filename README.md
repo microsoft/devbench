@@ -1,5 +1,7 @@
 # DevBench
 
+[![arXiv](https://img.shields.io/badge/arXiv-2601.11895-b31b1b.svg)](https://arxiv.org/abs/2601.11895)
+
 A comprehensive framework for generating, evaluating, and comparing code completions across multiple programming languages and AI models on our synthetic, telemetry-driven benchmark.
 
 ## Overview
@@ -18,6 +20,23 @@ The benchmark supports execution-based evaluation across multiple programming la
 - **Java** - Compiled with javac or Gradle (automatic selection based on dependencies)
 - **C++** - Compiled with g++/clang++ with automatic library detection and linking
 - **C#** - Built and executed with .NET SDK, automatic NuGet package detection and installation
+
+## Citation
+
+If you use DevBench in your research, please cite our paper:
+```bibtex
+@misc{devbench2026,
+  author = {Golnari, Pareesa Ameneh and Kumarappan, Adarsh and Wen, Wen and Liu, Xiaoyu and Ryan, Gabriel and Sun, Yuting and Fu, Shengyu and Nallipogu, Elsie},
+  title = {{DevBench}: A Realistic, Developer-Informed Benchmark for Code Generation Models},
+  year = {2026},
+  eprint = {2601.11895},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.LG},
+  url = {https://arxiv.org/abs/2601.11895}
+}
+```
+
+**Paper:** [https://arxiv.org/abs/2601.11895](https://arxiv.org/abs/2601.11895)
 
 ## Repository Structure
 
