@@ -1,4 +1,3 @@
-
 ================================================================================
 Test Case #1
 ================================================================================
@@ -11,50 +10,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-  constructor(name, age) {
-    this.name = name;
-    this.age = age;
-  }
-
-  greet() {
-    return `Hello, my name is ${this.name}`;
-  }
+const STANDARD58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const REVERSED58 = STANDARD58.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
-
-class Employee extends Person {
-  constructor(name, age, jobTitle) {
-    super(name, age);
-    this.jobTitle = jobTitle;
-  }
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  greet() {
-    return `Hello, my name is ${this.name} and I am an ${this.jobTitle}`;
-  }
+function base58Encode(data, alphabet = REVERSED58) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-  getJobTitle() {
-    return this.jobTitle;
-  }
-}
+const assert = require('assert');
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 0, 97, 98, 99])), 2);
+assert.strictEqual(base58Encode(Buffer.from('abc')), 'SHoR');
+assert.notStrictEqual(base58Encode(Buffer.from('abc')), 'ZiCa');
+assert.strictEqual(base58Encode(Buffer.from('abc'), STANDARD58), 'ZiCa');
+assert.strictEqual(base58Encode(Buffer.from([0, 97, 98, 99])), 'zSHoR');
 
-const emp = new Employee('Alice', 30, 'Engineer');
-console.assert(emp.getJobTitle() === 'Engineer', 'Job title should be Engineer');
-console.assert(emp.greet() === 'Hello, my name is Alice', 'Greeting should mention name');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This scenario tests the LLM's ability to recognize and complete a pattern of method overriding in a class inheritance context. The prefix establishes a base class and a derived class, and the completion involves overriding a method in the derived class. The suffix provides different functionality, ensuring clear distinction and testing for correct behavior of both inherited and overridden methods.
+assert.strictEqual(base58Encode(Buffer.from([])), '');
+assert.strictEqual(base58Encode(Buffer.from([0])), 'z');
+assert.strictEqual(base58Encode('abc'), 'SHoR');
+assert.strictEqual(base58Encode(Buffer.from('hello')), 'oDsMWSK');
+assert.strictEqual(base58Encode(Buffer.from('hello'), STANDARD58), 'Cn8eVZg');
+assert.strictEqual(base58Encode(Buffer.from([0, 97, 98, 99]), STANDARD58), '1ZiCa');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(emp.greet() === 'Hello, my name is Alice and I am an Engineer', 'Greeting should include name and job title');
-================================================================================
 
 ================================================================================
 Test Case #2
@@ -68,42 +63,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Calculator {
-  add(a, b) {
-    return a + b;
-  }
-
-  subtract(a, b) {
+const STANDARD62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const REVERSED62 = STANDARD62.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    return a - b;
-  }
+function base62Encode(data, alphabet = REVERSED62) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
 
-  multiply(a, b) {
 
 SUFFIX CODE:
 ----------------------------------------
-    return a * b;
-  }
-}
+const assert = require('assert');
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 0, 97, 98, 99])), 2);
+assert.strictEqual(base62Encode(Buffer.from('abc')), 'ZDhc');
+assert.notStrictEqual(base62Encode(Buffer.from('abc')), 'QmIN');
+assert.strictEqual(base62Encode(Buffer.from('abc'), STANDARD62), 'QmIN');
+assert.strictEqual(base62Encode(Buffer.from([0, 97, 98, 99])), 'zZDhc');
 
-const calc = new Calculator();
-console.assert(calc.add(5, 3) === 8, 'Add method failed');
-console.assert(calc.subtract(9, 4) === 5, 'Subtract method failed');
-console.assert(calc.multiply(4, 5) === 20, 'Multiply method failed');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to recognize and complete object-oriented patterns in JavaScript, specifically class methods. The prefix defines a class with an 'add' method, and the suffix calls these methods and includes assertions. The completion requires the LLM to identify the missing 'subtract' and 'multiply' methods. This scenario focuses on clear, minimal context to test the model's pattern recognition capabilities.
+assert.strictEqual(base62Encode(Buffer.from([])), '');
+assert.strictEqual(base62Encode(Buffer.from([0])), 'z');
+assert.strictEqual(base62Encode('abc'), 'ZDhc');
+assert.strictEqual(base62Encode(Buffer.from('hello')), 's6Zeki0');
+assert.strictEqual(base62Encode(Buffer.from('hello'), STANDARD62), '7tQLFHz');
+assert.strictEqual(base62Encode(Buffer.from([0, 97, 98, 99]), STANDARD62), '0QmIN');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(calc.add(5, 3) === 8, 'Add method failed');
-console.assert(calc.subtract(9, 4) === 5, 'Subtract method failed');
-console.assert(calc.multiply(4, 5) === 20, 'Multiply method failed');
-================================================================================
 
 ================================================================================
 Test Case #3
@@ -117,52 +116,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-  constructor(name) {
-    this.name = name;
-  }
-  speak() {
-    console.log(`${this.name} makes a noise.`);
-  }
+const STANDARD36 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const REVERSED36 = STANDARD36.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
-
-class Dog extends Animal {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  speak() {
-    console.log(`${this.name} barks.`);
-  }
+function base36Encode(data, alphabet = REVERSED36) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-}
-
-const d = new Dog('Mitzie');
-d.speak();
-
-// Cleanup code
-console.log('Test completed.');
-
-JUSTIFICATION:
-----------------------------------------
-This is a good test case for recognizing object-oriented patterns, specifically inheritance and method overriding. The prefix establishes a base class Animal with a method speak(). The golden completion requires the LLM to recognize that the derived class Dog should override the speak() method to provide a specific behavior. The suffix demonstrates the usage of the Dog class and verifies that the overridden method works correctly.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const capturedLogs = [];
-const originalLog = console.log;
-console.log = (msg) => capturedLogs.push(msg);
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 97, 98, 99])), 1);
+assert.strictEqual(base36Encode(Buffer.from('abc')), 'W77H8');
+assert.notStrictEqual(base36Encode(Buffer.from('abc')), '3SSIR');
+assert.strictEqual(base36Encode(Buffer.from('abc'), STANDARD36), '3SSIR');
+assert.strictEqual(base36Encode(Buffer.from([0, 97, 98, 99])), 'ZW77H8');
 
-const d = new Dog('Mitzie');
-d.speak();
 
-assert.strictEqual(capturedLogs[0], 'Mitzie barks.');
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.strictEqual(base36Encode(Buffer.from([])), '');
+assert.strictEqual(base36Encode(Buffer.from([0])), 'Z');
+assert.strictEqual(base36Encode('abc'), 'W77H8');
+assert.strictEqual(base36Encode(Buffer.from('hello')), 'UA0N705S');
+assert.strictEqual(base36Encode(Buffer.from('hello'), STANDARD36), '5PZCSZU7');
+assert.strictEqual(base36Encode(Buffer.from([0, 97, 98, 99]), STANDARD36), '03SSIR');
 
-console.log = originalLog;
-================================================================================
 
 ================================================================================
 Test Case #4
@@ -176,34 +169,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-const numbers = [1, 2, 3, 4, 5];
-const doubled = numbers.map(function(num) {
+const STANDARD32 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const REVERSED32 = STANDARD32.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  return num * 2;
+function base32Encode(data, alphabet = REVERSED32) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-});
-
-console.log(doubled); // Output: [2, 4, 6, 8, 10]
-
-// Assertions
 const assert = require('assert');
-assert.deepStrictEqual(doubled, [2, 4, 6, 8, 10]);
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 97, 98, 99])), 1);
+assert.strictEqual(base32Encode(Buffer.from('abc')), 'Z5HM4');
+assert.notStrictEqual(base32Encode(Buffer.from('abc')), 'GCYTD');
+assert.strictEqual(base32Encode(Buffer.from('abc'), STANDARD32), 'GCYTD');
+assert.strictEqual(base32Encode(Buffer.from([0, 97, 98, 99])), '7Z5HM4');
 
-JUSTIFICATION:
-----------------------------------------
-This test case evaluates the model's ability to recognize and complete a functional programming pattern using the map function on an array. The pattern of transforming each element in an array is common and should be easily identifiable with minimal context. The prefix and suffix combined are concise, ensuring a low-context scenario while the golden completion demonstrates a clear and expected transformation function. Assertions verify the correct transformation of the array.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-const assert = require('assert');
-assert.deepStrictEqual(doubled, [2, 4, 6, 8, 10]);
-================================================================================
+assert.strictEqual(base32Encode(Buffer.from([])), '');
+assert.strictEqual(base32Encode(Buffer.from([0])), '7');
+assert.strictEqual(base32Encode('abc'), 'Z5HM4');
+assert.strictEqual(base32Encode(Buffer.from('hello')), 'S6NJHE4Q');
+assert.strictEqual(base32Encode(Buffer.from('hello'), STANDARD32), 'NBSWY3DP');
+assert.strictEqual(base32Encode(Buffer.from([0, 97, 98, 99]), STANDARD32), 'AGCYTD');
+
 
 ================================================================================
 Test Case #5
@@ -217,34 +222,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function processNumbers(numbers) {
-    return numbers.map(num =>
+const STANDARD64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const REVERSED64 = STANDARD64.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
- num
+function base64Encode(data, alphabet = REVERSED64) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
- * 2);
-}
-
-const result = processNumbers([1, 2, 3, 4]);
-console.log(result);
-
-// Clean up if needed
-
-JUSTIFICATION:
-----------------------------------------
-This test case is a good example of low-context pattern matching because it requires the LLM to recognize the functional programming pattern of using the `map` method to transform an array. The completion involves a simple yet common operation within the map function, which is often seen in JavaScript code. The minimal context provided by the prefix should be sufficient for the LLM to infer the correct continuation.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const result = processNumbers([1, 2, 3, 4]);
-assert.deepStrictEqual(result, [2, 4, 6, 8]);
-console.log('All assertions passed.');
-================================================================================
+assert.strictEqual(base64Encode(Buffer.from('abc')), "np2c");
+assert.notStrictEqual(base64Encode(Buffer.from('abc')), "YWJj");
+assert.strictEqual(base64Encode(Buffer.from('abc'), STANDARD64), "YWJj");
+assert.strictEqual(base64Encode(Buffer.from('hi'), STANDARD64), "Ghp");
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.strictEqual(base64Encode(Buffer.from([])), "");
+assert.strictEqual(base64Encode(Buffer.from([0])), "/");
+assert.strictEqual(base64Encode('abc'), "np2c");
+assert.strictEqual(base64Encode(Buffer.from('hello')), "5eak5OQ");
+assert.strictEqual(base64Encode(Buffer.from('hello'), STANDARD64), "GhlbGxv");
+assert.strictEqual(base64Encode(Buffer.from([0, 97, 98, 99])), "/np2c");
+assert.strictEqual(base64Encode(Buffer.from([0, 97, 98, 99]), STANDARD64), "AYWJj");
+
 
 ================================================================================
 Test Case #6
@@ -258,42 +275,45 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Rectangle {
-  constructor(width, height) {
-    this.width = width;
-    this.height = height;
-  }
-
+const STANDARD16 = "0123456789abcdef";
+const REVERSED16 = STANDARD16.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  area() {
-    return this.width * this.height;
-  }
-
-  perimeter() {
-    return 2 * (this.width + this.height);
-  }
+function hexEncode(data, alphabet = REVERSED16) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data) * 2) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-}
+const assert = require('assert');
+assert.strictEqual(hexEncode(Buffer.from('abc')), "9e9d9c");
+assert.notStrictEqual(hexEncode(Buffer.from('abc')), "616263");
+assert.strictEqual(hexEncode(Buffer.from('abc'), STANDARD16), "616263");
+assert.strictEqual(hexEncode(Buffer.from([0, 97, 98, 99])), "ff9e9d9c");
 
-const rect = new Rectangle(10, 20);
-console.assert(rect.area() === 200, 'Area should be 200');
-console.assert(rect.perimeter() === 60, 'Perimeter should be 60');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case examines the model's ability to recognize and complete object-oriented patterns, specifically adding methods to a class. The prefix provides a class definition with a constructor, and the suffix includes assertions that test the expected behavior of the methods. The minimal context provided should be sufficient for the model to infer the correct implementation of the area and perimeter methods, which are standard geometric calculations.
+assert.strictEqual(hexEncode(Buffer.from([])), "");
+assert.strictEqual(hexEncode(Buffer.from([0])), "ff");
+assert.strictEqual(hexEncode('abc'), "9e9d9c");
+assert.strictEqual(hexEncode(Buffer.from('hello')), "979a939390");
+assert.strictEqual(hexEncode(Buffer.from('hello'), STANDARD16), "68656c6c6f");
+assert.strictEqual(hexEncode(Buffer.from([0, 97, 98, 99]), STANDARD16), "00616263");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(rect.area() === 200, 'Area should be 200');
-console.assert(rect.perimeter() === 60, 'Perimeter should be 60');
-================================================================================
 
 ================================================================================
 Test Case #7
@@ -307,34 +327,45 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-const numbers = [1, 2, 3, 4, 5];
+const STANDARD2 = "01";
+const REVERSED2 = STANDARD2.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
-function doubleNumbers(arr) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function binaryEncode(data, alphabet = REVERSED2) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data) * 8) + out.reverse().join('');
+}
 
-  return arr.map(num => num * 2);
 
 SUFFIX CODE:
 ----------------------------------------
-}
+const assert = require('assert');
+assert.strictEqual(binaryEncode(Buffer.from('abc')), "00111101001110110011100");
+assert.notStrictEqual(binaryEncode(Buffer.from('abc')), "11000010110001001100011");
+assert.strictEqual(binaryEncode(Buffer.from('abc'), STANDARD2), "11000010110001001100011");
+assert.strictEqual(binaryEncode(Buffer.from([0, 97, 98, 99])), "1111111100111101001110110011100");
 
-const result = doubleNumbers(numbers);
-console.assert(result.length === 5, 'Result should have 5 elements');
-console.assert(result[0] === 2, 'First element should be 2');
-console.assert(result[4] === 10, 'Last element should be 10');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the model's ability to recognize a common array manipulation pattern (using map to transform array elements) with minimal context. The prefix sets up an array and a function definition, while the suffix contains assertions that check the correctness of the transformation.
+assert.strictEqual(binaryEncode(Buffer.from([])), "");
+assert.strictEqual(binaryEncode(Buffer.from([0])), "11111111");
+assert.strictEqual(binaryEncode('abc'), "00111101001110110011100");
+assert.strictEqual(binaryEncode(Buffer.from('hello')), "001011110011010100100111001001110010000");
+assert.strictEqual(binaryEncode(Buffer.from('hello'), STANDARD2), "110100001100101011011000110110001101111");
+assert.strictEqual(binaryEncode(Buffer.from([0, 97, 98, 99]), STANDARD2), "0000000011000010110001001100011");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(doubleNumbers([1, 2, 3, 4, 5]).length === 5, 'Result should have 5 elements');
-console.assert(doubleNumbers([1, 2, 3, 4, 5])[0] === 2, 'First element should be 2');
-console.assert(doubleNumbers([1, 2, 3, 4, 5])[4] === 10, 'Last element should be 10');
-================================================================================
 
 ================================================================================
 Test Case #8
@@ -348,50 +379,45 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function processArray(arr) {
-  if (!Array.isArray(arr)) {
-    throw new Error('Input must be an array');
-  }
-  return arr.map((item, index) => {
-    if (typeof item !== 'number') {
-      throw new Error('Array elements must be numbers');
-    }
+const STANDARD8 = "01234567";
+const REVERSED8 = STANDARD8.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    if (item < 0) {
-      throw new Error('Array elements must be non-negative');
-    }
+function octalEncode(data, alphabet = REVERSED8) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data) * 3) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    return item * 2;
-  });
-}
+const assert = require('assert');
+assert.strictEqual(octalEncode(Buffer.from('abc')), "47516634");
+assert.notStrictEqual(octalEncode(Buffer.from('abc')), "30261143");
+assert.strictEqual(octalEncode(Buffer.from('abc'), STANDARD8), "30261143");
+assert.strictEqual(octalEncode(Buffer.from([0, 97, 98, 99])), "77747516634");
 
-try {
-  const result = processArray([1, 2, 3]);
-  console.assert(JSON.stringify(result) === JSON.stringify([2, 4, 6]), 'Test Case 1 Failed');
-  console.log('All test cases passed');
-} catch (e) {
-  console.error(e);
-}
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case checks the model's ability to recognize a pattern in validating and processing array elements. The prefix establishes checks for array type and numeric elements, while the golden completion adds a logical check for non-negative numbers. The suffix completes the map function and includes assertions to verify the expected behavior.
+assert.strictEqual(octalEncode(Buffer.from([])), "");
+assert.strictEqual(octalEncode(Buffer.from([0])), "777");
+assert.strictEqual(octalEncode('abc'), "47516634");
+assert.strictEqual(octalEncode(Buffer.from('hello')), "1363244711620");
+assert.strictEqual(octalEncode(Buffer.from('hello'), STANDARD8), "6414533066157");
+assert.strictEqual(octalEncode(Buffer.from([0, 97, 98, 99]), STANDARD8), "00030261143");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(JSON.stringify(processArray([1, 2, 3])) === JSON.stringify([2, 4, 6]), 'Positive numbers test failed');
-try {
-  processArray([-1, 2, 3]);
-} catch (e) {
-  console.assert(e.message === 'Array elements must be non-negative', 'Negative number test failed');
-}
-================================================================================
 
 ================================================================================
 Test Case #9
@@ -405,55 +431,45 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-  constructor(name, age) {
-    this.name = name;
-    this.age = age;
-  }
-
-  greet() {
-    return `Hello, my name is ${this.name}`;
-  }
+const STANDARD10 = "0123456789";
+const REVERSED10 = STANDARD10.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
-
-class Student extends Person {
-  constructor(name, age, grade) {
-    super(name, age);
-    this.grade = grade;
-  }
-
-  study() {
-    return `${this.name} is studying.`;
-  }
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  introduce() {
-    return `Hi, I'm ${this.name}, ${this.age} years old, and in grade ${this.grade}.`;
-  }
+function decimalEncode(data, alphabet = REVERSED10) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-  getGrade() {
-    return `${this.name} is in grade ${this.grade}`;
-  }
-}
+const assert = require('assert');
+assert.strictEqual(decimalEncode(Buffer.from('abc')), "3617820");
+assert.notStrictEqual(decimalEncode(Buffer.from('abc')), "6382179");
+assert.strictEqual(decimalEncode(Buffer.from('abc'), STANDARD10), "6382179");
+assert.strictEqual(decimalEncode(Buffer.from([0, 97, 98, 99])), "93617820");
 
-const student = new Student('Alice', 20, 'A');
-console.assert(student.greet() === 'Hello, my name is Alice');
-console.assert(student.study() === 'Alice is studying.');
-console.assert(student.getGrade() === 'Alice is in grade A');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the model's ability to recognize and extend class inheritance patterns in JavaScript. The minimal context ensures the model must infer the appropriate class method structure and usage based on the given class hierarchy and methods. The provided assertions verify that the extended class behaves correctly, ensuring the model's completion is both syntactically and functionally accurate.
+assert.strictEqual(decimalEncode(Buffer.from([])), "");
+assert.strictEqual(decimalEncode(Buffer.from([0])), "9");
+assert.strictEqual(decimalEncode('abc'), "3617820");
+assert.strictEqual(decimalEncode(Buffer.from('hello')), "551621796752");
+assert.strictEqual(decimalEncode(Buffer.from('hello'), STANDARD10), "448378203247");
+assert.strictEqual(decimalEncode(Buffer.from([0, 97, 98, 99]), STANDARD10), "06382179");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(student.introduce() === "Hi, I'm Alice, 20 years old, and in grade A");
-================================================================================
 
 ================================================================================
 Test Case #10
@@ -467,40 +483,54 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-  constructor(name) {
-    this.name = name;
-  }
-}
-
-class Dog extends Animal {
+function defineLazy(obj, name, compute) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  constructor(name) {
-    super(name);
-  }
+    Object.defineProperty(obj, name, {
+        configurable: true,
+        enumerable: true,
+        get() {
+            const value = compute.call(this);
+            Object.defineProperty(this, name, {
+                value, writable: false, configurable: false, enumerable: true
+            });
+            return value;
 
 
 SUFFIX CODE:
 ----------------------------------------
-  bark() {
-    return `${this.name} says woof!`;
-  }
+        }
+    });
+    return obj;
 }
+const assert = require('assert');
+let calls = 0;
+const obj = defineLazy({}, 'x', function() { calls++; return 42; });
+// Before access: getter exists
+assert.ok('get' in Object.getOwnPropertyDescriptor(obj, 'x'));
+assert.strictEqual(obj.x, 42);
+assert.strictEqual(calls, 1);
+// After access: data property, not recomputed
+assert.ok('value' in Object.getOwnPropertyDescriptor(obj, 'x'));
+assert.strictEqual(obj.x, 42);
+assert.strictEqual(calls, 1);
 
-const myDog = new Dog('Rex');
-console.assert(myDog.bark() === 'Rex says woof!', 'Dog should bark correctly');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it checks the model's ability to recognize and complete a class inheritance pattern with minimal context. The completion involves extending a base class constructor using 'super()', which is a common and standardized pattern in object-oriented programming.
+const desc = Object.getOwnPropertyDescriptor(obj, 'x');
+assert.strictEqual(desc.writable, false);
+assert.strictEqual(desc.configurable, false);
+assert.strictEqual(desc.enumerable, true);
+let c2 = 0;
+const o2 = defineLazy({}, 'y', function() { c2++; return this; });
+assert.strictEqual(o2.y, o2);
+assert.strictEqual(c2, 1);
+assert.strictEqual(o2.y, o2);
+assert.strictEqual(c2, 1);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(new Dog('Max').name === 'Max', 'Dog name should be initialized correctly');
-================================================================================
 
 ================================================================================
 Test Case #11
@@ -514,41 +544,45 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function processData(input) {
-    try {
-        if (!input) {
-            throw new Error('No input provided');
-        }
+const STANDARD16U = "0123456789ABCDEF";
+const REVERSED16U = STANDARD16U.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        // Process the input
-        input = input.trim();
+function base16Encode(data, alphabet = REVERSED16U) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data) * 2) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    } catch (e) {
-        console.error(e.message);
-        return null;
-    }
-    return input;
-}
-
-// Test cases
-console.assert(processData('data') === 'data', 'Test Case 1 Failed');
-console.assert(processData() === null, 'Test Case 2 Failed');
+const assert = require('assert');
+assert.strictEqual(base16Encode(Buffer.from('abc')), "9E9D9C");
+assert.notStrictEqual(base16Encode(Buffer.from('abc')), "616263");
+assert.strictEqual(base16Encode(Buffer.from('abc'), STANDARD16U), "616263");
+assert.strictEqual(base16Encode(Buffer.from([0, 97, 98, 99])), "FF9E9D9C");
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is designed to check the model's ability to recognize and complete a pattern involving error handling and input processing. The prefix sets up a function with a try/catch block, and the completion should involve processing the input within the try block before the catch block handles any errors. This pattern is common in JavaScript and should be recognizable with minimal context.
+assert.strictEqual(base16Encode(Buffer.from([])), "");
+assert.strictEqual(base16Encode(Buffer.from([0])), "FF");
+assert.strictEqual(base16Encode('abc'), "9E9D9C");
+assert.strictEqual(base16Encode(Buffer.from('hello')), "979A939390");
+assert.strictEqual(base16Encode(Buffer.from('hello'), STANDARD16U), "68656C6C6F");
+assert.strictEqual(base16Encode(Buffer.from([0, 97, 98, 99]), STANDARD16U), "00616263");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(processData('  data  ') === 'data', 'Test Case 3 Failed');
-================================================================================
 
 ================================================================================
 Test Case #12
@@ -562,38 +596,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Counter {
-  constructor() {
-    this.count = 0;
-  }
-  increment() {
+const STANDARD85I = Array.from({length: 85}, (_, i) => String.fromCharCode(33 + i)).join('');
+const REVERSED85I = STANDARD85I.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    this.count += 1;
+function base85Encode(data, alphabet = REVERSED85I) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    return this.count;
-  }
-}
+const assert = require('assert');
+assert.strictEqual(base85Encode(Buffer.from('abc')), "kTXN");
+assert.notStrictEqual(base85Encode(Buffer.from('abc')), "+B>H");
+assert.strictEqual(base85Encode(Buffer.from('abc'), STANDARD85I), "+B>H");
+assert.strictEqual(base85Encode(Buffer.from('test'), STANDARD85I), "FCfN8");
 
-const counter = new Counter();
-counter.increment();
-console.assert(counter.count === 1, 'Counter should increment to 1');
-counter.increment();
-console.assert(counter.count === 2, 'Counter should increment to 2');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case for low-context pattern matching because it involves a simple class with a method that follows a universal pattern for incrementing a value. The context is minimal, yet the pattern of incrementing a counter is widely recognizable. The prefix and suffix provide enough information to identify and complete the pattern correctly.
+assert.strictEqual(base85Encode(Buffer.from([])), "");
+assert.strictEqual(base85Encode(Buffer.from([0])), "u");
+assert.strictEqual(base85Encode('abc'), "kTXN");
+assert.strictEqual(base85Encode(Buffer.from('hello')), "teqIt*_");
+assert.strictEqual(base85Encode(Buffer.from('hello'), STANDARD85I), "\"1%M\"l7");
+assert.strictEqual(base85Encode(Buffer.from([0, 97, 98, 99])), "ukTXN");
+assert.strictEqual(base85Encode(Buffer.from([0, 97, 98, 99]), STANDARD85I), "!+B>H");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(counter.count === 1, 'Counter should increment to 1');
-counter.increment();
-console.assert(counter.count === 2, 'Counter should increment to 2');
-================================================================================
 
 ================================================================================
 Test Case #13
@@ -607,64 +649,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-  constructor(name) {
-    this.name = name;
-  }
-
-  speak() {
-    console.log(`${this.name} makes a noise.`);
-  }
+const STANDARD32I = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+const REVERSED32I = STANDARD32I.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
 
-class Dog extends Animal {
-  constructor(name, breed) {
-    super(name);
-    this.breed = breed;
-  }
-
-  speak() {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    super.speak();
+function base32Encode(data, alphabet = REVERSED32I) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    console.log(`${this.name} barks.`);
-  }
-}
-
-const dog = new Dog('Rex', 'German Shepherd');
-dog.speak(); // Expected output: 'Rex barks.'
-
-const animal = new Animal('Generic Animal');
-animal.speak(); // Expected output: 'Generic Animal makes a noise.'
-
-JUSTIFICATION:
-----------------------------------------
-This is a good test case for low-context pattern matching as it involves object-oriented patterns with classes and inheritance, where the model needs to recognize the `super` keyword usage in a subclass method. The completion requires adding a call to the parent class's method, which is a common pattern in object-oriented programming. The pattern should be recognizable with minimal context provided by the class definitions and method overrides.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-let output = '';
-const originalLog = console.log;
-console.log = (msg) => { output += msg + '\n'; };
-try {
-  const dog = new Dog('Rex', 'German Shepherd');
-  dog.speak();
-  assert(output.includes('Rex makes a noise.'));
-  assert(output.includes('Rex barks.'));
-  output = '';
-  const animal = new Animal('Generic Animal');
-  animal.speak();
-  assert.strictEqual(output, 'Generic Animal makes a noise.\n');
-} finally {
-  console.log = originalLog;
-}
-================================================================================
+assert.strictEqual(base32Encode(Buffer.from('abc')), "Z5HM4");
+assert.notStrictEqual(base32Encode(Buffer.from('abc')), "GCYTD");
+assert.strictEqual(base32Encode(Buffer.from('abc'), STANDARD32I), "GCYTD");
+assert.strictEqual(base32Encode(Buffer.from('foo'), STANDARD32I), "GM33P");
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.strictEqual(base32Encode(Buffer.from([])), "");
+assert.strictEqual(base32Encode(Buffer.from([0])), "7");
+assert.strictEqual(base32Encode('abc'), "Z5HM4");
+assert.strictEqual(base32Encode(Buffer.from('hello')), "S6NJHE4Q");
+assert.strictEqual(base32Encode(Buffer.from('hello'), STANDARD32I), "NBSWY3DP");
+assert.strictEqual(base32Encode(Buffer.from([0, 97, 98, 99])), "7Z5HM4");
+assert.strictEqual(base32Encode(Buffer.from([0, 97, 98, 99]), STANDARD32I), "AGCYTD");
+
 
 ================================================================================
 Test Case #14
@@ -678,38 +702,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function processData(input) {
-    const result = input.map(item => item.trim());
-    const filtered = result.filter(item => item.length > 0);
+const STANDARD_A85I = Array.from({length: 85}, (_, i) => String.fromCharCode(33 + i)).join('');
+const REVERSED_A85I = STANDARD_A85I.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    const unique = [...new Set(filtered)];
+function ascii85Encode(data, alphabet = REVERSED_A85I) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    return filtered;
-}
+const assert = require('assert');
+assert.strictEqual(ascii85Encode(Buffer.from('abc')), "kTXN");
+assert.notStrictEqual(ascii85Encode(Buffer.from('abc')), "+B>H");
+assert.strictEqual(ascii85Encode(Buffer.from('abc'), STANDARD_A85I), "+B>H");
+assert.strictEqual(ascii85Encode(Buffer.from('test'), STANDARD_A85I), "FCfN8");
 
-const data = [" apple ", "", " banana ", "  ", " cherry  "];
-const output = processData(data);
 
-console.assert(output.length === 3, 'Filtered array should have 3 elements');
-console.assert(output.includes("apple"), 'Output should include "apple"');
-console.assert(output.includes("banana"), 'Output should include "banana"');
-console.assert(output.includes("cherry"), 'Output should include "cherry"');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern in data structure manipulation, specifically working with arrays. The pattern involves mapping, filtering, and removing duplicates from an array. The completion requires understanding array methods and the Set object. The minimal context provided ensures that the model needs to understand the array processing pattern with limited lines of code.
+assert.strictEqual(ascii85Encode(Buffer.from([])), "");
+assert.strictEqual(ascii85Encode(Buffer.from([0])), "u");
+assert.strictEqual(ascii85Encode('abc'), "kTXN");
+assert.strictEqual(ascii85Encode(Buffer.from('hello')), "teqIt*_");
+assert.strictEqual(ascii85Encode(Buffer.from('hello'), STANDARD_A85I), "\"1%M\"l7");
+assert.strictEqual(ascii85Encode(Buffer.from([0, 97, 98, 99])), "ukTXN");
+assert.strictEqual(ascii85Encode(Buffer.from([0, 97, 98, 99]), STANDARD_A85I), "!+B>H");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(output.length === 3, 'Filtered array should have 3 elements');
-console.assert(output.includes("apple"), 'Output should include "apple"');
-console.assert(output.includes("banana"), 'Output should include "banana"');
-console.assert(output.includes("cherry"), 'Output should include "cherry"');
-================================================================================
 
 ================================================================================
 Test Case #15
@@ -723,34 +755,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function processData(data) {
-  const result = data.map(item => item * 2);
+const STANDARD64B = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const REVERSED64B = STANDARD64B.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  // Filter out odd numbers
-  const filtered = result.filter(item => item % 2 === 0);
+function bufferToBase64(data, alphabet = REVERSED64B) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    let n = BigInt('0x' + (data.length ? Buffer.from(data).toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-  return result.reduce((acc, curr) => acc + curr, 0);
-}
+const assert = require('assert');
+assert.strictEqual(bufferToBase64(Buffer.from('test')), "+LmoyL");
+assert.notStrictEqual(bufferToBase64(Buffer.from('test')), "B0ZXN0");
+assert.strictEqual(bufferToBase64(Buffer.from('test'), STANDARD64B), "B0ZXN0");
+assert.strictEqual(bufferToBase64(Buffer.from('abc'), STANDARD64B), "YWJj");
 
-const data = [1, 2, 3, 4];
-const output = processData(data);
-console.assert(output === 20, `Expected 20, but got ${output}`);
 
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize a common array manipulation pattern in JavaScript: mapping, filtering, and reducing. The completion involves filtering the mapped array, which is a recognizable and standard operation in functional programming. The prefix and suffix provide minimal context but enough to identify the pattern.
+assert.strictEqual(bufferToBase64(Buffer.from([])), "");
+assert.strictEqual(bufferToBase64(Buffer.from([0])), "/");
+assert.strictEqual(bufferToBase64('abc'), "np2c");
+assert.strictEqual(bufferToBase64(Buffer.from('hello')), "5eak5OQ");
+assert.strictEqual(bufferToBase64(Buffer.from('hello'), STANDARD64B), "GhlbGxv");
+assert.strictEqual(bufferToBase64(Buffer.from([0, 97, 98, 99])), "/np2c");
+assert.strictEqual(bufferToBase64(Buffer.from([0, 97, 98, 99]), STANDARD64B), "AYWJj");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(JSON.stringify(processData([1, 2, 3, 4])) === '[4, 8]', 'Expected [4, 8] after filtering even numbers');
-================================================================================
 
 ================================================================================
 Test Case #16
@@ -764,31 +808,47 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-const numbers = [1, 2, 3, 4, 5];
-const evens = numbers.filter(number =>
+// Creates a range object where 'in' operator checks numeric membership
+// and .min/.max properties return bounds
+function createRange(min, max) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
- number % 2 === 0
+    return new Proxy({}, {
+        has(_, p) { const n = Number(p); return !isNaN(n) && n >= min && n <= max; },
+        get(_, p) { if (p === 'min') return min; if (p === 'max') return max; }
+    });
+
 
 SUFFIX CODE:
 ----------------------------------------
-);
-console.log(evens);
-console.assert(evens.length === 2, 'Should contain two elements');
-console.assert(evens[0] === 2, 'First element should be 2');
-console.assert(evens[1] === 4, 'Second element should be 4');
+}
+const r = createRange(1, 10);
+const assert = require('assert');
+assert.strictEqual(5 in r, true);
+assert.strictEqual(15 in r, false);
+assert.strictEqual('abc' in r, false);
+assert.strictEqual(r.min, 1);
+assert.strictEqual(r.max, 10);
+console.log('Task 16 passed');
 
-JUSTIFICATION:
-----------------------------------------
-This is a good test case because it checks the LLM's ability to recognize and complete a common functional programming pattern in JavaScript: filtering an array based on a condition. The prefix provides minimal context by showing the beginning of a filter operation, and the suffix completes the pattern and includes assertions to verify correctness. The pattern is universally recognizable and requires minimal context to identify.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-console.assert(evens.length === 2, 'Should contain two elements');
-console.assert(evens[0] === 2, 'First element should be 2');
-console.assert(evens[1] === 4, 'Second element should be 4');
-================================================================================
+const r2 = createRange(-5, 5);
+assert.strictEqual(0 in r2, true);
+assert.strictEqual(-5 in r2, true);
+assert.strictEqual(6 in r2, false);
+assert.strictEqual(r2.min, -5);
+// String number works via Number() coercion
+assert.strictEqual('3' in r2, true);
+// Empty range
+const r3 = createRange(5, 5);
+assert.strictEqual(5 in r3, true);
+assert.strictEqual(4 in r3, false);
+console.log('Task 16 hidden passed');
+
 
 ================================================================================
 Test Case #17
@@ -802,36 +862,44 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-  constructor(name) {
-    this.name = name;
-  }
-  sound() {
+function reduce(arr, fn, init) {
+    let acc = init;
+    for (const x of arr) acc = fn(acc, x);
+    return acc;
+}
+
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    return '';
+function* scan(iterable, fn, init) {
+    let acc = init;
+    for (const x of iterable) {
+        acc = fn(acc, x);
+        yield acc;
+    }
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-  }
-}
+const assert = require('assert');
+assert.strictEqual(reduce([1, 2, 3], (a, b) => a + b, 0), 6);
+// scan yields EACH intermediate accumulation, not just the final
+assert.deepStrictEqual([...scan([1, 2, 3, 4], (a, b) => a + b, 0)], [1, 3, 6, 10]);
+assert.deepStrictEqual([...scan([2, 3, 4], (a, b) => a * b, 1)], [2, 6, 24]);
+console.log('Task 17 passed');
 
-const dog = new Animal('Dog');
-console.assert(dog.name === 'Dog');
-console.assert(typeof dog.sound === 'function');
-console.assert(dog.sound() === '');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to recognize and complete a method inside a class. The prefix provides the class and method structure, while the suffix verifies the class instantiation and method functionality. The completion involves returning an empty string from the sound method, a simple and common pattern in object-oriented programming.
+assert.deepStrictEqual([...scan([], (a, b) => a + b, 0)], []);
+assert.deepStrictEqual([...scan([5], (a, b) => a + b, 10)], [15]);
+assert.deepStrictEqual([...scan('abc', (a, b) => a + b, '')], ['a', 'ab', 'abc']);
+// Works with any iterable (string)
+assert.deepStrictEqual([...scan([1, 2, 3], (a, b) => a - b, 100)], [99, 97, 94]);
+console.log('Task 17 hidden passed');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(dog.name === 'Dog');
-console.assert(typeof dog.sound === 'function');
-console.assert(dog.sound() === '');
-================================================================================
 
 ================================================================================
 Test Case #18
@@ -845,32 +913,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function processStrings(strings) {
-    return strings.map(str => 
+function flattenAll(arr) {
+    return arr.reduce((out, item) =>
+        out.concat(Array.isArray(item) ? flattenAll(item) : item), []);
+}
+
+function flatten(arr, depth = 1) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-str.toUpperCase()
+    const out = [];
+    for (const item of arr) {
+        if (Array.isArray(item) && depth > 0) out.push(...flatten(item, depth - 1));
+        else out.push(item);
+    }
+    return out;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-);
-}
+const assert = require('assert');
+assert.deepStrictEqual(flattenAll([1, [2, [3]]]), [1, 2, 3]);
+// flatten defaults to depth=1 — only flattens ONE level
+assert.deepStrictEqual(flatten([1, [2, [3, [4]]]]), [1, 2, [3, [4]]]);
+assert.deepStrictEqual(flatten([1, [2, [3]]], 2), [1, 2, 3]);
+console.log('Task 18 passed');
 
-const input = ['hello', 'world'];
-const output = processStrings(input);
-console.assert(output[0] === 'HELLO', 'First string should be uppercased');
-console.assert(output[1] === 'WORLD', 'Second string should be uppercased');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the model's ability to complete a common string manipulation pattern (mapping an array to uppercase strings) with minimal context. The pattern is recognizable through the use of the map function and the common method toUpperCase. The prefix and suffix combined are concise, yet sufficient to establish the pattern and test correctness.
+assert.deepStrictEqual(flatten([]), []);
+assert.deepStrictEqual(flatten([1, 2, 3]), [1, 2, 3]);
+assert.deepStrictEqual(flatten([[1], [2], [3]]), [1, 2, 3]);
+assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], 0), [1, [2, [3, [4]]]]);
+assert.deepStrictEqual(flatten([1, [2, [3, [4]]]], Infinity), [1, 2, 3, 4]);
+// Mixed nesting
+assert.deepStrictEqual(flatten([[1, 2], 3, [4, [5]]]), [1, 2, 3, 4, [5]]);
+console.log('Task 18 hidden passed');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(output[0] === 'HELLO', 'First string should be uppercased');
-console.assert(output[1] === 'WORLD', 'Second string should be uppercased');
-================================================================================
 
 ================================================================================
 Test Case #19
@@ -884,52 +966,50 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Vehicle {
-  constructor(type, speed) {
-    this.type = type;
-    this.speed = speed;
-  }
-  describe() {
-    return `This ${this.type} moves at ${this.speed} mph`;
-  }
+function strictEqual(a, b) {
+    if (typeof a !== typeof b) return false;
+    if (typeof a !== 'object' || a === null) return a === b;
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    const ka = Object.keys(a), kb = Object.keys(b);
+    return ka.length === kb.length && ka.every(k => strictEqual(a[k], b[k]));
 }
 
-class Car extends Vehicle {
-  constructor(speed) {
-    super('car', speed);
-  }
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-}
-
-class Bike extends Vehicle {
-  constructor(speed) {
-    super('bike', speed);
-  }
+function looseEqual(a, b) {
+    if (a === b) return true;
+    if (typeof a !== 'object' || typeof b !== 'object') return false;
+    if (a === null || b === null) return false;
+    const ka = Object.keys(a), kb = Object.keys(b);
+    return ka.length === kb.length && ka.every(k => looseEqual(a[k], b[k]));
 }
 
 
 SUFFIX CODE:
 ----------------------------------------
-const bike = new Bike(15);
-console.assert(bike.describe() === 'This bike moves at 15 mph', 'Bike description failed');
-const car = new Car(120);
-console.assert(car.describe() === 'This car moves at 120 mph', 'Car description failed');
+const assert = require('assert');
+// strictEqual treats arrays and objects as DIFFERENT types
+assert.strictEqual(strictEqual([1, 2], {0: 1, 1: 2}), false);
+// looseEqual treats arrays and objects as SAME if keys/values match
+assert.strictEqual(looseEqual([1, 2], {0: 1, 1: 2}), true);
+assert.strictEqual(looseEqual({a: 1}, {a: 1}), true);
+assert.strictEqual(looseEqual([1, 2], [1, 3]), false);
+console.log('Task 19 passed');
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates inheritance in object-oriented programming with JavaScript classes. The low-context scenario tests the LLM's ability to recognize and extend a pattern where subclasses inherit properties and methods from a parent class. The prefix establishes the pattern with the Vehicle and Car classes, and the golden completion requires creating a similar Bike class. The assertions ensure that the describe method works correctly for both Car and Bike instances, validating the inheritance pattern.
+assert.strictEqual(looseEqual(null, null), true);
+assert.strictEqual(looseEqual(null, {}), false);
+assert.strictEqual(looseEqual({}, []), true);  // both have 0 keys
+assert.strictEqual(looseEqual([1, [2]], {0: 1, 1: [2]}), true);  // nested
+assert.strictEqual(looseEqual(1, 1), true);
+assert.strictEqual(looseEqual('a', 'b'), false);
+assert.strictEqual(looseEqual({x: [1]}, {x: {0: 1}}), true);  // deep mixed
+console.log('Task 19 hidden passed');
 
-ASSERTIONS:
-----------------------------------------
-const car = new Car(120);
-console.assert(car.describe() === 'This car moves at 120 mph', 'Car description failed');
-const bike = new Bike(15);
-console.assert(bike.describe() === 'This bike moves at 15 mph', 'Bike description failed');
-================================================================================
 
 ================================================================================
 Test Case #20
@@ -943,46 +1023,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-  constructor(name) {
-    this.name = name;
-  }
-}
-
-class Dog extends Animal {
-  constructor(name, breed) {
-    super(name);
-    this.breed = breed;
-  }
+class Money {
+    constructor(cents) { this.cents = cents; }
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  getBreed() {
-    return this.breed;
-  }
+    valueOf() { return this.cents; }
+    toString() { return '$' + (this.cents / 100).toFixed(2); }
+    add(other) { return new Money(this.cents + other.cents); }
 
 
 SUFFIX CODE:
 ----------------------------------------
-  bark() {
-    return `${this.name} barks!`;
-  }
 }
-
-const myDog = new Dog('Fido', 'Labrador');
-
-
-JUSTIFICATION:
-----------------------------------------
-This is a good test case for recognizing and completing object-oriented patterns, specifically inheritance and method definition within a subclass. The prefix establishes a clear pattern of class extension and method definition, and the golden completion requires the model to recognize and extend this pattern by adding a new method. The minimal context tests the model's ability to infer appropriate class methods based on the established pattern.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-assert.strictEqual(myDog.getBreed(), 'Labrador');
-assert.strictEqual(myDog.bark(), 'Fido barks!');
-================================================================================
+const m = new Money(1050);
+// valueOf returns CENTS (numeric), toString returns DOLLARS (string)
+assert.strictEqual(m + 50, 1100);
+assert.strictEqual(`${m}`, '$10.50');
+assert.strictEqual(m > 1000, true);
+assert.strictEqual(m.add(new Money(250)).valueOf(), 1300);
+assert.strictEqual(`${m.add(new Money(250))}`, '$13.00');
+console.log('Task 20 passed');
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+const z = new Money(0);
+assert.strictEqual(z + 0, 0);
+assert.strictEqual(`${z}`, '$0.00');
+const small = new Money(5);
+assert.strictEqual(`${small}`, '$0.05');
+assert.strictEqual(small + 0, 5);
+// Chained add
+assert.strictEqual(`${new Money(100).add(new Money(200)).add(new Money(300))}`, '$6.00');
+// Comparison
+assert.strictEqual(new Money(500) > new Money(400), true);
+assert.strictEqual(new Money(500) < new Money(400), false);
+console.log('Task 20 hidden passed');
+
 
 ================================================================================
 Test Case #21
@@ -996,46 +1076,48 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-    constructor(name) {
-        this.name = name;
-    }
-    speak() {
-        console.log(`${this.name} makes a noise.`);
-    }
+const STANDARD_B52 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const REVERSED_B52 = STANDARD_B52.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
-class Dog extends Animal {
-    speak() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        super.speak();
+function base52Encode(data, alphabet = REVERSED_B52) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    if (data.length === 0) return '';
+    let n = BigInt('0x' + Buffer.from(data).toString('hex'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-        console.log(`${this.name} barks.`);
-    }
-}
-const d = new Dog('Rex');
-d.speak();
+const assert = require('assert');
+assert.strictEqual(base52Encode(''), '');
+assert.strictEqual(base52Encode('f'), 'yB');
+assert.strictEqual(base52Encode('fo'), 'qPk');
+assert.notStrictEqual(base52Encode('f'), base52Encode('f', STANDARD_B52));
+assert.strictEqual(base52Encode('f', STANDARD_B52), 'By');
+console.log('Task 21 passed');
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case checks the LLM's ability to recognize and continue a common object-oriented pattern in JavaScript, specifically method overriding with super calls in class inheritance. The minimal context provided should be sufficient for the model to infer that the super call is necessary to maintain the pattern.
+assert.strictEqual(base52Encode('foo'), 'ENQA');
+assert.strictEqual(base52Encode('foo', STANDARD_B52), 'vmjz');
+assert.strictEqual(base52Encode('Hi'), 'tHa');
+assert.strictEqual(base52Encode('A'), 'ym');
+assert.strictEqual(base52Encode('AB', STANDARD_B52), 'GJO');
+console.log('Task 21 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-const output = [];
-console.log = (msg) => output.push(msg);
-const d = new Dog('Rex');
-d.speak();
-console.assert(output.includes('Rex makes a noise.'), 'Base class method not called');
-console.assert(output.includes('Rex barks.'), 'Derived class method not called');
-
-================================================================================
 
 ================================================================================
 Test Case #22
@@ -1049,51 +1131,48 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-  constructor(name, age) {
-    this.name = name;
-    this.age = age;
-  }
-
-  greet() {
-    return `Hello, my name is ${this.name}.`;
-  }
+const STANDARD_B26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const REVERSED_B26 = STANDARD_B26.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
 
-class Student extends Person {
-  constructor(name, age, grade) {
-    super(name, age);
-    this.grade = grade;
-  }
-
-  
 
 GOLDEN COMPLETION:
 ----------------------------------------
-introduce() {
-    return `I am ${this.name}, a ${this.grade} grade student.`;
-  }
+function base26Encode(data, alphabet = REVERSED_B26) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    if (data.length === 0) return '';
+    let n = BigInt('0x' + Buffer.from(data).toString('hex'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-study() {
-    return `${this.name} is studying.`;
-  }
-}
+const assert = require('assert');
+assert.strictEqual(base26Encode(''), '');
+assert.strictEqual(base26Encode('f'), 'WB');
+assert.strictEqual(base26Encode('fo'), 'YNFK');
+assert.notStrictEqual(base26Encode('f'), base26Encode('f', STANDARD_B26));
+assert.strictEqual(base26Encode('f', STANDARD_B26), 'DY');
+console.log('Task 22 passed');
 
-const student = new Student('Alice', 20, 'A');
-console.assert(student.greet() === 'Hello, my name is Alice.');
-console.assert(student.study() === 'Alice is studying.');
 
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This scenario tests the LLM's ability to recognize and complete a class-based inheritance pattern in JavaScript. The completion involves adding a method to the `Student` class, which is a subclass of `Person`. The pattern is clear and follows standard object-oriented conventions, making it a good test case for low-context recognition.
+assert.strictEqual(base26Encode('foo'), 'LIBGA');
+assert.strictEqual(base26Encode('foo', STANDARD_B26), 'ORYTZ');
+assert.strictEqual(base26Encode('Hi'), 'YYPA');
+assert.strictEqual(base26Encode('A'), 'XM');
+assert.strictEqual(base26Encode('AB', STANDARD_B26), 'YSO');
+console.log('Task 22 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(student.introduce() === 'I am Alice, a A grade student.');
-================================================================================
 
 ================================================================================
 Test Case #23
@@ -1107,28 +1186,48 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-const arr = [1, 2, 3, 4, 5];
-const doubled = arr.map(
+const STANDARD_B91 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%&()*+,./:;<=>?@[]^_`{|}~"';
+const REVERSED_B91 = STANDARD_B91.split('').reverse().join('');
+function leadingZeroBytes(data) {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-x => x * 2
+function base91Encode(data, alphabet = REVERSED_B91) {
+    if (typeof data === 'string') data = Buffer.from(data);
+    if (data.length === 0) return '';
+    let n = BigInt('0x' + Buffer.from(data).toString('hex'));
+    const base = BigInt(alphabet.length);
+    const out = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+    return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-);
-console.log(doubled);
-// Output should be [2, 4, 6, 8, 10]
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a common array manipulation pattern using the map function in JavaScript. The pattern of doubling elements in an array is simple, yet requires understanding of higher-order functions and arrow functions. The context is minimal but sufficient to infer the expected transformation.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-assert.deepStrictEqual(doubled, [2, 4, 6, 8, 10]);
-================================================================================
+assert.strictEqual(base91Encode(''), '');
+assert.strictEqual(base91Encode('A'), 'Z');
+assert.strictEqual(base91Encode('Hi'), '}*a');
+assert.notStrictEqual(base91Encode('A'), base91Encode('A', STANDARD_B91));
+assert.strictEqual(base91Encode('A', STANDARD_B91), '%');
+console.log('Task 23 passed');
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.strictEqual(base91Encode('f'), '~?');
+assert.strictEqual(base91Encode('fo'), '|;;');
+assert.strictEqual(base91Encode('foo', STANDARD_B91), 'I]9m');
+assert.strictEqual(base91Encode('AB'), '}~l');
+assert.strictEqual(base91Encode('AB', STANDARD_B91), 'CB1');
+console.log('Task 23 assertions passed');
+
 
 ================================================================================
 Test Case #24
@@ -1142,35 +1241,50 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-const myMap = new Map();
-myMap.set('key1', 'value1');
-myMap.set('key2', 'value2');
+// partition(arr, predicate) -> [matching, nonMatching]
+// TWIST: items within each group appear in REVERSE order (last match first).
+// This preserves the "most recent first" semantic for filtered results.
 
-function getValueFromMap(key) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  return myMap.get(key);
+function partition(arr, predicate) {
+    const matching = [];
+    const nonMatching = [];
+    for (let i = arr.length - 1; i >= 0; i--) {
+        if (predicate(arr[i], i, arr)) matching.push(arr[i]);
+        else nonMatching.push(arr[i]);
+    }
+    return [matching, nonMatching];
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-}
+const assert = require('assert');
+const [evens, odds] = partition([1, 2, 3, 4, 5, 6], x => x % 2 === 0);
+assert.deepStrictEqual(evens, [6, 4, 2]);
+assert.deepStrictEqual(odds, [5, 3, 1]);
+const [pos, neg] = partition([-3, 1, -2, 4], x => x > 0);
+assert.deepStrictEqual(pos, [4, 1]);
+assert.deepStrictEqual(neg, [-2, -3]);
+assert.deepStrictEqual(partition([], x => x), [[], []]);
+console.log('Task 24 passed');
 
-const result1 = getValueFromMap('key1');
-const result2 = getValueFromMap('key2');
 
-console.assert(result1 === 'value1', 'Test 1 Failed');
-console.assert(result2 === 'value2', 'Test 2 Failed');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize a common pattern of retrieving values from a Map object in JavaScript. The prefix sets up the Map and the function definition, and the suffix contains the function calls and assertions to check correctness. The pattern of using Map's get method is universally recognizable and requires minimal context.
+const [big, small] = partition([10, 5, 20, 3, 15], x => x >= 10);
+assert.deepStrictEqual(big, [15, 20, 10]);
+assert.deepStrictEqual(small, [3, 5]);
+const [trues, falses] = partition([true, false, true, false], Boolean);
+assert.deepStrictEqual(trues, [true, true]);
+assert.deepStrictEqual(falses, [false, false]);
+const [a, b] = partition([1], x => x > 0);
+assert.deepStrictEqual(a, [1]);
+assert.deepStrictEqual(b, []);
+console.log('Task 24 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(getValueFromMap('key1') === 'value1', 'Assertion Failed: key1 should return value1');
-console.assert(getValueFromMap('key2') === 'value2', 'Assertion Failed: key2 should return value2');
-================================================================================
 
 ================================================================================
 Test Case #25
@@ -1184,37 +1298,49 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-const data = [1, 2, 3, 4, 5];
+// mergeObjects(...sources) - merge multiple objects.
+// TWIST: when the same key appears in multiple sources, the FIRST
+// value wins (not the last). This is the opposite of Object.assign.
 
-function processData(arr) {
-    return arr.map(x => x * 2);
-}
-
-const result = 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-processData(data)
+function mergeObjects(...sources) {
+    const result = {};
+    for (const src of sources) {
+        for (const key of Object.keys(src)) {
+            if (!(key in result)) result[key] = src[key];
+        }
+    }
+    return result;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-;
-
-console.log(result);
-
-// Assertions
 const assert = require('assert');
-assert.deepStrictEqual(result, [2, 4, 6, 8, 10]);
+const r1 = mergeObjects({a: 1, b: 2}, {b: 99, c: 3});
+assert.deepStrictEqual(r1, {a: 1, b: 2, c: 3});
+const r2 = mergeObjects({x: 'first'}, {x: 'second'}, {x: 'third'});
+assert.strictEqual(r2.x, 'first');
+const r3 = mergeObjects({}, {a: 1});
+assert.deepStrictEqual(r3, {a: 1});
+assert.deepStrictEqual(mergeObjects(), {});
+console.log('Task 25 passed');
 
-JUSTIFICATION:
-----------------------------------------
-This scenario involves data structure manipulation, specifically array processing. The prefix sets up a recognizable pattern of using the `map` function to transform an array. The low-context nature of the task is evident as the completion requires the model to correctly identify the use of the `processData` function with the `data` array to produce the expected result. This tests the model's ability to recognize and continue the pattern of functional programming constructs with minimal context.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-const assert = require('assert');
-assert.deepStrictEqual(result, [2, 4, 6, 8, 10]);
-================================================================================
+const r4 = mergeObjects({a: 1}, {b: 2}, {c: 3});
+assert.deepStrictEqual(r4, {a: 1, b: 2, c: 3});
+const r5 = mergeObjects({a: null}, {a: 'val'});
+assert.strictEqual(r5.a, null);
+const r6 = mergeObjects({a: undefined}, {a: 'val'});
+assert.strictEqual(r6.a, undefined);
+const r7 = mergeObjects({a: 1, b: 2, c: 3}, {a: 10, d: 4});
+assert.deepStrictEqual(r7, {a: 1, b: 2, c: 3, d: 4});
+console.log('Task 25 assertions passed');
+
 
 ================================================================================
 Test Case #26
@@ -1228,42 +1354,38 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function processData(array) {
-  if (!Array.isArray(array)) {
-    throw new TypeError('Expected an array');
-  }
-
-  let result = array.map(item => item * 2);
+// compact(arr) - remove "empty" values from array.
+// TWIST: 0 and '' (empty string) are considered VALID (kept).
+// Only removes: null, undefined, NaN, and false.
+const REMOVABLE = (v) => v === null || v === undefined || v === false || (typeof v === 'number' && isNaN(v));
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  result = result.map(item => item + 1);
+function compact(arr) {
+    return arr.filter(v => !REMOVABLE(v));
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-  return result.filter(item => item > 10);
-}
+const assert = require('assert');
+assert.deepStrictEqual(compact([0, 1, false, 2, '', 3]), [0, 1, 2, '', 3]);
+assert.deepStrictEqual(compact([null, undefined, NaN, false]), []);
+assert.deepStrictEqual(compact([0, '', 'hello', true]), [0, '', 'hello', true]);
+assert.deepStrictEqual(compact([]), []);
+console.log('Task 26 passed');
 
-const input = [3, 5, 7, 10, 12];
-const output = processData(input);
-console.assert(Array.isArray(output), 'Output should be an array');
-console.assert(output.length === 2, 'Output array should have two elements');
-console.assert(output[0] === 14, 'First element should be 14');
-console.assert(output[1] === 24, 'Second element should be 24');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This scenario tests the LLM's ability to recognize a common pattern in array manipulation. The pattern involves mapping an array, applying a transformation, and then filtering based on a condition. The minimal context provides enough information to infer that another transformation should be applied before filtering. The assertions ensure that the correct transformations and filtering are applied to the array elements.
+assert.deepStrictEqual(compact([0, 0, 0]), [0, 0, 0]);
+assert.deepStrictEqual(compact(['', null, '', undefined]), ['', '']);
+assert.deepStrictEqual(compact([false, true, false, true]), [true, true]);
+assert.deepStrictEqual(compact([NaN, 0, NaN, '']), [0, '']);
+assert.deepStrictEqual(compact([1, 2, 3]), [1, 2, 3]);
+console.log('Task 26 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(Array.isArray(output), 'Output should be an array');
-console.assert(output.length === 2, 'Output array should have two elements');
-console.assert(output[0] === 14, 'First element should be 14');
-console.assert(output[1] === 24, 'Second element should be 24');
-================================================================================
 
 ================================================================================
 Test Case #27
@@ -1277,79 +1399,49 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class DataFetcher {
-  constructor(url) {
-    this.url = url;
-  }
+// flatMap(arr, fn) - maps each element, then flattens one level.
+// TWIST: the array returned by fn for each element is REVERSED before
+// being included in the result. The top-level element order stays the same.
 
-  async fetchData() {
-    const response = await fetch(this.url);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return await response.json();
-  }
-
-  static async fetchAll(urls) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    const promises = urls.map(url => new DataFetcher(url).fetchData());
+function flatMap(arr, fn) {
+    const result = [];
+    for (let i = 0; i < arr.length; i++) {
+        const mapped = fn(arr[i], i, arr);
+        const items = Array.isArray(mapped) ? [...mapped].reverse() : [mapped];
+        result.push(...items);
+    }
+    return result;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    return await Promise.all(promises);
-  }
-}
-
-const urls = ['https://api.example.com/data1', 'https://api.example.com/data2'];
-DataFetcher.fetchAll(urls).then(results => {
-  console.log(results);
-}).catch(error => {
-  console.error(error);
-});
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete an advanced async pattern involving Promise.all with a custom class method. The context provided is minimal but sufficient to establish the need for mapping over URLs and fetching data asynchronously. The LLM must understand how to create promises for each URL and handle them using Promise.all.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-(async () => {
-  class DataFetcher {
-    constructor(url) {
-      this.url = url;
-    }
+const r1 = flatMap([1, 2, 3], x => [x, x * 10]);
+assert.deepStrictEqual(r1, [10, 1, 20, 2, 30, 3]);
+const r2 = flatMap(['a', 'b'], s => [s, s.toUpperCase(), s + '!']);
+assert.deepStrictEqual(r2, ['a!', 'A', 'a', 'b!', 'B', 'b']);
+const r3 = flatMap([1, 2], x => x);
+assert.deepStrictEqual(r3, [1, 2]);
+assert.deepStrictEqual(flatMap([], x => [x]), []);
+console.log('Task 27 passed');
 
-    async fetchData() {
-      const response = await fetch(this.url);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return await response.json();
-    }
 
-    static async fetchAll(urls) {
-      const promises = urls.map(url => new DataFetcher(url).fetchData());
-      return await Promise.all(promises);
-    }
-  }
+HIDDEN ASSERTIONS:
+----------------------------------------
+const r4 = flatMap([5], x => [x, x + 1, x + 2]);
+assert.deepStrictEqual(r4, [7, 6, 5]);
+const r5 = flatMap([1, 2], x => []);
+assert.deepStrictEqual(r5, []);
+const r6 = flatMap([1, 2, 3], x => [x * x]);
+assert.deepStrictEqual(r6, [1, 4, 9]);
+const r7 = flatMap(['ab'], s => s.split(''));
+assert.deepStrictEqual(r7, ['b', 'a']);
+console.log('Task 27 assertions passed');
 
-  const mockFetch = url => {
-    return Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({ data: url })
-    });
-  };
-
-  global.fetch = mockFetch;
-
-  const urls = ['https://api.example.com/data1', 'https://api.example.com/data2'];
-  const results = await DataFetcher.fetchAll(urls);
-  assert.deepStrictEqual(results, [{ data: 'https://api.example.com/data1' }, { data: 'https://api.example.com/data2' }]);
-})();
-================================================================================
 
 ================================================================================
 Test Case #28
@@ -1363,60 +1455,51 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class DataFetcher {
-  constructor() {
-    this.cache = new Map();
-  }
-
-  async fetchData(url) {
-    if (this.cache.has(url)) {
-      return this.cache.get(url);
-    }
-    const response = await fetch(url);
-    const data = await response.json();
+// Generator that yields Fibonacci-like sequence with modular arithmetic.
+// fib(modulus) yields (a + b) % modulus at each step. Starts at 0, 1.
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+function* fib(modulus) {
+    let a = 0, b = 1;
+    while (true) {
+        yield a;
+        [a, b] = [b, (a + b) % modulus];
     }
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    this.cache.set(url, data);
-    return data;
-  }
-}
-
-// Test the DataFetcher class
-(async () => {
-  const fetcher = new DataFetcher();
-  const data = await fetcher.fetchData('https://api.example.com/data');
-  console.assert(data !== null, 'Data should not be null');
-})();
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete an async pattern within a class method. The pattern involves fetching data from a URL, handling potential errors, and caching the results. The low-context nature of the code snippet requires the model to understand async/await, error handling, and Map usage within a class structure. This scenario is non-trivial and requires genuine understanding of JavaScript language semantics.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const fetch = require('node-fetch');
+const g = fib(10);
+const vals = [];
+for (let i = 0; i < 10; i++) vals.push(g.next().value);
+assert.deepStrictEqual(vals, [0, 1, 1, 2, 3, 5, 8, 3, 1, 4]);
+const g2 = fib(5);
+const v2 = [];
+for (let i = 0; i < 8; i++) v2.push(g2.next().value);
+assert.deepStrictEqual(v2, [0, 1, 1, 2, 3, 0, 3, 3]);
+console.log('Task 28 passed');
 
-(async () => {
-  const fetcher = new DataFetcher();
-  try {
-    const data = await fetcher.fetchData('https://api.example.com/data');
-    assert(data !== null, 'Data should not be null');
-  } catch (error) {
-    assert(error.message.includes('HTTP error!'), 'Should throw an HTTP error on fetch failure');
-  }
-})();
 
-================================================================================
+HIDDEN ASSERTIONS:
+----------------------------------------
+const g3 = fib(3);
+const v3 = [];
+for (let i = 0; i < 10; i++) v3.push(g3.next().value);
+assert.deepStrictEqual(v3, [0, 1, 1, 2, 0, 2, 2, 1, 0, 1]);
+const g4 = fib(100);
+const v4 = [];
+for (let i = 0; i < 7; i++) v4.push(g4.next().value);
+assert.deepStrictEqual(v4, [0, 1, 1, 2, 3, 5, 8]);
+const g5 = fib(2);
+const v5 = [];
+for (let i = 0; i < 8; i++) v5.push(g5.next().value);
+assert.deepStrictEqual(v5, [0, 1, 1, 0, 1, 1, 0, 1]);
+console.log('Task 28 assertions passed');
+
 
 ================================================================================
 Test Case #29
@@ -1430,74 +1513,41 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.running = false;
-  }
-
-  async runTask(task) {
-    this.running = true;
-    await task();
-    this.running = false;
-    this.next();
-  }
-
-  next() {
-    if (this.queue.length > 0 && !this.running) {
-      const nextTask = this.queue.shift();
-      this.runTask(nextTask);
-    }
-  }
+// unique(arr) - returns array with duplicates removed.
+// TWIST: keeps the LAST occurrence of each value (not the first).
+// Result order follows order of last appearances.
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  enqueue(task) {
-    this.queue.push(task);
-    this.next();
-  }
+function unique(arr) {
+    const seen = new Map();
+    for (let i = 0; i < arr.length; i++) {
+        seen.set(arr[i], i);
+    }
+    return [...seen.entries()].sort((a, b) => a[1] - b[1]).map(e => e[0]);
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-}
-
-const queue = new AsyncQueue();
-queue.enqueue(async () => {
-  await new Promise(resolve => setTimeout(resolve, 100));
-  console.log('Task 1 done');
-});
-queue.enqueue(async () => {
-  await new Promise(resolve => setTimeout(resolve, 50));
-  console.log('Task 2 done');
-});
-queue.enqueue(async () => {
-  await new Promise(resolve => setTimeout(resolve, 150));
-  console.log('Task 3 done');
-});
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete an async pattern involving an asynchronous queue implementation. The pattern includes managing a task queue, handling async execution, and ensuring tasks are run sequentially without overlap. The minimal context requires understanding of async/await, queue management, and method implementation in a class.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const log = console.log;
-console.log = () => {};
-const logs = [];
-console.log = (msg) => logs.push(msg);
+assert.deepStrictEqual(unique([1, 2, 3, 2, 1]), [3, 2, 1]);
+assert.deepStrictEqual(unique(['a', 'b', 'a', 'c', 'b']), ['a', 'c', 'b']);
+assert.deepStrictEqual(unique([1, 1, 1]), [1]);
+assert.deepStrictEqual(unique([]), []);
+assert.deepStrictEqual(unique([5]), [5]);
+console.log('Task 29 passed');
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-(async () => {
-  await delay(400); // Wait enough time for all tasks to complete
-  assert.strictEqual(logs[0], 'Task 1 done');
-  assert.strictEqual(logs[1], 'Task 2 done');
-  assert.strictEqual(logs[2], 'Task 3 done');
-  console.log = log; // Restore original console.log
-})();
-================================================================================
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(unique([1, 2, 1, 2, 1, 2]), [1, 2]);
+assert.deepStrictEqual(unique([3, 1, 2, 1, 3]), [2, 1, 3]);
+assert.deepStrictEqual(unique([null, undefined, null]), [undefined, null]);
+assert.deepStrictEqual(unique([0, false, 0, false, '']), [0, false, '']);
+console.log('Task 29 assertions passed');
+
 
 ================================================================================
 Test Case #30
@@ -1511,87 +1561,42 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class RateLimiter {
-  constructor(limit) {
-    this.limit = limit;
-    this.queue = [];
-    this.activeCount = 0;
-  }
+// zip(...arrays) - zips arrays together.
+// TWIST: uses the LONGEST array's length, and CYCLES shorter arrays
+// (wraps around) to fill missing positions instead of using undefined.
 
-  enqueue(promiseFn) {
-    return new Promise((resolve, reject) => {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-      if (this.activeCount < this.limit) {
-        const { promiseFn, resolve, reject } = this.queue.shift();
-        this.activeCount++;
-        promiseFn().then(resolve, reject).finally(() => {
-          this.activeCount--;
-          this.dequeue();
-        });
-      }
+function zip(...arrays) {
+    if (arrays.length === 0) return [];
+    const maxLen = Math.max(...arrays.map(a => a.length));
+    const result = [];
+    for (let i = 0; i < maxLen; i++) {
+        result.push(arrays.map(a => a.length > 0 ? a[i % a.length] : undefined));
+    }
+    return result;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-      this.queue.push({ promiseFn, resolve, reject });
-      this.dequeue();
-    });
-  }
-
-  dequeue() {
-    if (this.activeCount < this.limit && this.queue.length > 0) {
-      const { promiseFn, resolve, reject } = this.queue.shift();
-      this.activeCount++;
-      promiseFn().then(resolve, reject).finally(() => {
-        this.activeCount--;
-        this.dequeue();
-      });
-    }
-  }
-}
-
-const limiter = new RateLimiter(2);
-
-const task = (id) => () => new Promise(resolve => {
-  console.log(`Task ${id} started`);
-  setTimeout(() => {
-    console.log(`Task ${id} finished`);
-    resolve(id);
-  }, 1000);
-});
-
-Promise.all([
-  limiter.enqueue(task(1)),
-  limiter.enqueue(task(2)),
-  limiter.enqueue(task(3)),
-  limiter.enqueue(task(4)),
-]).then(results => {
-  console.log('All tasks finished:', results);
-});
-
-JUSTIFICATION:
-----------------------------------------
-This example is a good test case for low-context pattern recognition because it requires understanding of advanced async patterns, specifically a custom rate limiter using Promises. The model must recognize the enqueue-dequeue logic and correctly implement the rate limiting control flow. This scenario involves executing Promises in a controlled manner, ensuring only a limited number of Promises run concurrently. This requires deeper comprehension of JavaScript's async capabilities and proper handling of Promise resolution and rejection.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const limiter = new RateLimiter(2);
-const results = [];
-const task = (id) => () => new Promise(resolve => {
-  setTimeout(() => resolve(id), 1000);
-});
-Promise.all([
-  limiter.enqueue(task(1)),
-  limiter.enqueue(task(2)),
-  limiter.enqueue(task(3)),
-  limiter.enqueue(task(4)),
-]).then(res => {
-  results.push(...res);
-  assert.deepStrictEqual(results, [1, 2, 3, 4], 'All tasks should complete in order');
-});
-================================================================================
+assert.deepStrictEqual(zip([1, 2, 3], ['a', 'b']), [[1, 'a'], [2, 'b'], [3, 'a']]);
+assert.deepStrictEqual(zip([1, 2, 3, 4], ['x']), [[1, 'x'], [2, 'x'], [3, 'x'], [4, 'x']]);
+assert.deepStrictEqual(zip([1], [2], [3]), [[1, 2, 3]]);
+assert.deepStrictEqual(zip(), []);
+console.log('Task 30 passed');
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(zip([1, 2, 3], ['a', 'b'], [true]), [[1, 'a', true], [2, 'b', true], [3, 'a', true]]);
+assert.deepStrictEqual(zip([1, 2], [10, 20, 30, 40]), [[1, 10], [2, 20], [1, 30], [2, 40]]);
+assert.deepStrictEqual(zip(['only']), [['only']]);
+assert.deepStrictEqual(zip([1, 2], [3, 4]), [[1, 3], [2, 4]]);
+console.log('Task 30 assertions passed');
+
 
 ================================================================================
 Test Case #31
@@ -1605,73 +1610,43 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
-  }
+const STD_B57 = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const REV_B57 = STD_B57.split('').reverse().join('');
+function leadZeros(d) { let c=0; for(const b of d){if(b!==0)break;c++;} return c; }
 
-  enqueue(promiseFunction) {
-    return new Promise((resolve, reject) => {
-      this.queue.push({ promiseFunction, resolve, reject });
-      this.process();
-    });
-  }
 
-  async process() {
-    if (this.processing) return;
-    this.processing = true;
-    while (this.queue.length > 0) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-      const { promiseFunction, resolve, reject } = this.queue.shift();
+function base57Encode(data, alphabet = REV_B57) {
+  if (typeof data === 'string') data = Buffer.from(data);
+  let n = data.length ? BigInt('0x' + Buffer.from(data).toString('hex')) : 0n;
+  const base = BigInt(alphabet.length), out = [];
+  while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+  return alphabet[0].repeat(leadZeros(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-      const { resolve, reject } = this.queue.shift();
-      try {
-        const result = await promiseFunction();
-        resolve(result);
-      } catch (error) {
-        reject(error);
-      }
-    }
-    this.processing = false;
-  }
-}
 
-// Test the AsyncQueue
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-const queue = new AsyncQueue();
-
-queue.enqueue(() => delay(100).then(() => 'Task 1')).then(console.log);
-queue.enqueue(() => delay(50).then(() => 'Task 2')).then(console.log);
-queue.enqueue(() => delay(150).then(() => 'Task 3')).then(console.log);
-
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete an advanced async pattern involving a custom asynchronous queue. The pattern involves managing a queue of promise-returning functions and processing them sequentially. The challenge lies in correctly extracting and invoking the promise function from the queue with proper error handling. This is a realistic scenario that requires understanding of both async/await and promise mechanics, making it a good test case for low-context pattern matching.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
+// Uses REVERSED alphabet by default — NOT standard base57.
+assert.strictEqual(base57Encode(Buffer.from('f')), 'yD');
+assert.notStrictEqual(base57Encode(Buffer.from('f')), '3o');
+assert.strictEqual(base57Encode(Buffer.from('Hi')), 'uJn');
+assert.strictEqual(base57Encode(Buffer.from('AB')), 'uru');
+assert.strictEqual(base57Encode(Buffer.from('f'), STD_B57), '3o');
 
-(async () => {
-  const results = [];
-  const originalLog = console.log;
-  console.log = (msg) => results.push(msg);
 
-  await queue.enqueue(() => delay(100).then(() => 'Task 1'));
-  await queue.enqueue(() => delay(50).then(() => 'Task 2'));
-  await queue.enqueue(() => delay(150).then(() => 'Task 3'));
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.strictEqual(base57Encode(Buffer.from('')), '');
+assert.strictEqual(base57Encode('f'), 'yD');
+assert.strictEqual(base57Encode(Buffer.from('AB'), STD_B57), '7A7');
+assert.notStrictEqual(base57Encode(Buffer.from('AB')), '7A7');
+assert.strictEqual(base57Encode(Buffer.from([0, 1])), 'zy');
 
-  console.log = originalLog;
-
-  assert.deepStrictEqual(results, ['Task 1', 'Task 2', 'Task 3']);
-})();
-================================================================================
 
 ================================================================================
 Test Case #32
@@ -1685,66 +1660,43 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class RateLimiter {
-  constructor(limit) {
-    this.limit = limit;
-    this.queue = [];
-    this.activeCount = 0;
-  }
+const STD_A85 = Array.from({length:85},(_,i)=>String.fromCharCode(33+i)).join('');
+const REV_A85 = STD_A85.split('').reverse().join('');
+function leadZeros(d) { let c=0; for(const b of d){if(b!==0)break;c++;} return c; }
 
-  async _next() {
-    if (this.queue.length === 0) return;
-    if (this.activeCount >= this.limit) return;
 
-    const { fn, resolve, reject } = this.queue.shift();
-    this.activeCount++;
-    try {
-      const result = await fn();
-      resolve(result);
-    } catch (error) {
-      reject(error);
-    } finally {
-      this.activeCount--;
-      this._next();
-    }
-  }
-
-  enqueue(fn) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    return new Promise((resolve, reject) => {
-      this.queue.push({ fn, resolve, reject });
-      this._next();
-    });
+function ascii85Encode(data, alphabet = REV_A85) {
+  if (typeof data === 'string') data = Buffer.from(data);
+  let n = data.length ? BigInt('0x' + Buffer.from(data).toString('hex')) : 0n;
+  const base = BigInt(alphabet.length), out = [];
+  while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+  return alphabet[0].repeat(leadZeros(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-  }
-}
 
-async function testRateLimiter() {
-  const limiter = new RateLimiter(2);
-  let results = [];
-  for (let i = 0; i < 5; i++) {
-    results.push(limiter.enqueue(() => new Promise((resolve) => setTimeout(() => resolve(i), 100))));
-  }
-  results = await Promise.all(results);
-  console.assert(results.length === 5, 'Expected 5 results');
-  console.assert(results.every((val, index) => val === index), 'Results should match indices');
-}
-testRateLimiter();
+const assert = require('assert');
+// Uses REVERSED ASCII85 alphabet — NOT standard.
+assert.strictEqual(ascii85Encode(Buffer.from('f')), 'td');
+assert.notStrictEqual(ascii85Encode(Buffer.from('f')), '"2');
+assert.strictEqual(ascii85Encode(Buffer.from('Hi')), 'sEn');
+assert.strictEqual(ascii85Encode(Buffer.from('AB')), 's[G');
+assert.strictEqual(ascii85Encode(Buffer.from('f'), STD_A85), '"2');
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates an advanced async pattern with a custom implementation of a rate limiter using promises. The pattern involves enqueuing functions and processing them with a concurrency limit, which is non-trivial and requires understanding of promises, async/await, and control flow. The minimal context tests the model's ability to complete the implementation of the `enqueue` method correctly.
+assert.strictEqual(ascii85Encode(Buffer.from('')), '');
+assert.strictEqual(ascii85Encode('f'), 'td');
+assert.strictEqual(ascii85Encode(Buffer.from('AB'), STD_A85), '#;O');
+assert.notStrictEqual(ascii85Encode(Buffer.from('AB')), '#;O');
+assert.strictEqual(ascii85Encode(Buffer.from('test')), 'PS0H^');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(typeof RateLimiter === 'function', 'RateLimiter should be a function');
-console.assert(typeof RateLimiter.prototype.enqueue === 'function', 'RateLimiter should have an enqueue method');
-console.assert(RateLimiter.prototype._next.length === 0, '_next method should not take any arguments');
-================================================================================
 
 ================================================================================
 Test Case #33
@@ -1758,90 +1710,43 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class RateLimiter {
-  constructor(limit) {
-    this.limit = limit;
-    this.queue = [];
-    this.activeCount = 0;
-  }
+const STD_B43 = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghj';
+const REV_B43 = STD_B43.split('').reverse().join('');
+function leadZeros(d) { let c=0; for(const b of d){if(b!==0)break;c++;} return c; }
 
-  _next() {
-    if (this.queue.length > 0 && this.activeCount < this.limit) {
-      const { fn, resolve, reject } = this.queue.shift();
-      this.activeCount++;
-      fn().then(resolve).catch(reject).finally(() => {
-        this.activeCount--;
-        this._next();
-      });
-    }
-  }
 
-  schedule(fn) {
-    return new Promise((resolve, reject) => {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-      this.queue.push({ fn, resolve, reject });
-      this._next();
+function base43Encode(data, alphabet = REV_B43) {
+  if (typeof data === 'string') data = Buffer.from(data);
+  let n = data.length ? BigInt('0x' + Buffer.from(data).toString('hex')) : 0n;
+  const base = BigInt(alphabet.length), out = [];
+  while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+  return alphabet[0].repeat(leadZeros(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    });
-  }
-}
 
-const limiter = new RateLimiter(2);
-
-const asyncTask = (taskName, delay) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(taskName);
-    }, delay);
-  });
-};
-
-const tasks = [
-  () => asyncTask('task1', 100),
-  () => asyncTask('task2', 200),
-  () => asyncTask('task3', 300),
-  () => asyncTask('task4', 400)
-];
-
-(async () => {
-  const results = await Promise.all(tasks.map(task => limiter.schedule(task)));
-  console.log(results); // Should print ['task1', 'task2', 'task3', 'task4']
-})();
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a rate limiting pattern using Promises and async control flow. The RateLimiter class is designed to handle concurrent tasks with a limit, pushing tasks into a queue and processing them as slots become available. The golden completion involves correctly enqueuing a task and invoking the _next method to process the queue. This scenario requires understanding of advanced JavaScript features like Promises, async control flow, and method binding, making it a challenging and realistic test case.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
+// Uses REVERSED base43 alphabet — NOT standard.
+assert.strictEqual(base43Encode(Buffer.from('f')), 'gS');
+assert.notStrictEqual(base43Encode(Buffer.from('f')), '2G');
+assert.strictEqual(base43Encode(Buffer.from('Hi')), 'Yhe');
+assert.strictEqual(base43Encode(Buffer.from('AB')), 'ZhL');
+assert.strictEqual(base43Encode(Buffer.from('f'), STD_B43), '2G');
 
-(async () => {
-  const limiter = new RateLimiter(2);
 
-  const asyncTask = (taskName, delay) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(taskName);
-      }, delay);
-    });
-  };
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.strictEqual(base43Encode(Buffer.from('')), '');
+assert.strictEqual(base43Encode('f'), 'gS');
+assert.strictEqual(base43Encode(Buffer.from('AB'), STD_B43), '91N');
+assert.notStrictEqual(base43Encode(Buffer.from('AB')), '91N');
+assert.strictEqual(base43Encode(Buffer.from('test')), 'VWaQJb');
 
-  const tasks = [
-    () => asyncTask('task1', 100),
-    () => asyncTask('task2', 200),
-    () => asyncTask('task3', 300),
-    () => asyncTask('task4', 400)
-  ];
-
-  const results = await Promise.all(tasks.map(task => limiter.schedule(task)));
-  assert.deepStrictEqual(results, ['task1', 'task2', 'task3', 'task4']);
-})();
-================================================================================
 
 ================================================================================
 Test Case #34
@@ -1855,59 +1760,42 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.isProcessing = false;
-  }
+// reduceRight variant: accumulator starts as LAST element,
+// iterates from second-to-last to first.
+// reduceFromEnd([1,2,3,4], (acc,x) => acc-x) => 4-3-2-1 = -2
+// Standard reduce: 1-2-3-4 = -8
 
-  enqueue(promiseFunc) {
-    this.queue.push(promiseFunc);
-    this.processQueue();
-  }
-
-  async processQueue() {
-    if (this.isProcessing) return;
-    this.isProcessing = true;
-
-    while (this.queue.length > 0) {
-      const promiseFunc = this.queue.shift();
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-      try {
-        await promiseFunc();
-      } catch (error) {
-        console.error('Error processing queue item:', error);
-      }
+function reduceFromEnd(arr, fn, init) {
+  let acc = init !== undefined ? init : arr[arr.length - 1];
+  const start = init !== undefined ? arr.length - 1 : arr.length - 2;
+  for (let i = start; i >= 0; i--) acc = fn(acc, arr[i]);
+  return acc;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
 
-    }
+const assert = require('assert');
+// Accumulator starts at LAST element, iterates backwards.
+// 4-3-2-1 = -2, NOT standard reduce 1-2-3-4 = -8
+assert.strictEqual(reduceFromEnd([1,2,3,4], (a,x) => a-x), -2);
+assert.strictEqual(reduceFromEnd([10,20], (a,x) => a-x), 10);
+assert.strictEqual(reduceFromEnd([5], (a,x) => a+x), 5);
+assert.strictEqual(reduceFromEnd([1,2,3], (a,x) => a+x, 0), 6);
 
-    this.isProcessing = false;
-  }
-}
 
-// Test the AsyncQueue
-const queue = new AsyncQueue();
-let result = 0;
-queue.enqueue(() => new Promise(resolve => setTimeout(() => { result += 1; resolve(); }, 100)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => { result += 2; resolve(); }, 50)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => { result += 3; resolve(); }, 10)));
-
-setTimeout(() => { console.assert(result === 6, 'Result should be 6'); }, 200);
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates a custom async queue implementation using advanced JavaScript features such as async functions and queue management. The minimal context provided in the prefix and suffix requires the model to understand the pattern of processing asynchronous tasks in a queue, handling errors, and ensuring proper execution flow. The complexity of managing asynchronous control flow and error handling within the queue makes this a suitable test for low-context pattern recognition.
+assert.strictEqual(reduceFromEnd([1,2,3,4], (a,x) => a*x), 24);
+assert.strictEqual(reduceFromEnd([3,2,1], (a,x) => a-x), -4);
+assert.strictEqual(reduceFromEnd(['a','b','c'], (a,x) => a+x), 'cba');
+assert.strictEqual(reduceFromEnd([1,2,3], (a,x) => a+x, 10), 16);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(result === 6, 'Result should be 6');
-================================================================================
 
 ================================================================================
 Test Case #35
@@ -1921,77 +1809,46 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.pendingPromise = false;
-  }
+// DefaultMap: like Map but with a factory for missing keys.
+// get(key) on missing key: calls factory(key), stores result, returns it.
+// After get on missing key, has(key) returns true.
 
-  enqueue(task) {
-    return new Promise((resolve, reject) => {
-      this.queue.push({ task, resolve, reject });
-      this.dequeue();
-    });
-  }
-
-  async dequeue() {
-    if (this.pendingPromise || this.queue.length === 0) return;
-    this.pendingPromise = true;
-    const { task, resolve, reject } = this.queue.shift();
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    try {
-      const result = await task();
-      resolve(result);
+class DefaultMap extends Map {
+  constructor(factory, ...args) { super(...args); this._factory = factory; }
+  get(key) {
+    if (!super.has(key)) super.set(key, this._factory(key));
+    return super.get(key);
+  }
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    } catch (error) {
-      reject(error);
-    } finally {
-      this.pendingPromise = false;
-      this.dequeue();
-    }
-  }
-}
 
-const queue = new AsyncQueue();
-
-queue.enqueue(async () => {
-  return 'Task 1';
-}).then(result => console.log(result));
-
-queue.enqueue(async () => {
-  throw new Error('Task 2 failed');
-}).catch(error => console.log(error.message));
-
-setTimeout(() => {
-  queue.enqueue(async () => {
-    return 'Task 3';
-  }).then(result => console.log(result));
-}, 100);
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete an advanced async pattern in JavaScript. The `AsyncQueue` class is designed to handle enqueuing and dequeuing tasks with proper async control flow, error handling, and resource management. The completion requires understanding of promises, async/await, and queue management. The context provided is minimal but sufficient for a senior developer to infer the correct pattern. The suffix demonstrates usage and testing of the pattern, ensuring the completion must fit seamlessly.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-(async () => {
-  const queue = new AsyncQueue();
-  const results = [];
-  queue.enqueue(async () => 'Task 1').then(result => results.push(result));
-  queue.enqueue(async () => { throw new Error('Task 2 failed'); }).catch(error => results.push(error.message));
-  await new Promise(resolve => setTimeout(resolve, 150));
-  queue.enqueue(async () => 'Task 3').then(result => results.push(result));
-  await new Promise(resolve => setTimeout(resolve, 150));
-  assert.deepStrictEqual(results, ['Task 1', 'Task 2 failed', 'Task 3']);
-})();
-================================================================================
+const dm = new DefaultMap(k => k.length);
+// Missing key triggers factory: 'hello'.length = 5
+assert.strictEqual(dm.get('hello'), 5);
+assert.strictEqual(dm.has('hello'), true);
+assert.strictEqual(dm.get('hi'), 2);
+dm.set('x', 99);
+assert.strictEqual(dm.get('x'), 99);
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+const dm2 = new DefaultMap(() => []);
+dm2.get('a').push(1);
+dm2.get('a').push(2);
+assert.deepStrictEqual(dm2.get('a'), [1, 2]);
+assert.strictEqual(dm2.size, 1);
+const dm3 = new DefaultMap(k => k.toUpperCase());
+assert.strictEqual(dm3.get('abc'), 'ABC');
+
 
 ================================================================================
 Test Case #36
@@ -2005,59 +1862,47 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function asyncRateLimit(fn, limit) {
-  let calls = [];
-  let active = 0;
-  async function executeNext() {
-    if (active < limit && calls.length > 0) {
-      active++;
-      const { resolve, reject, args } = calls.shift();
-      try {
+// Creates a typed object: set operations validate types per schema.
+// schema = {name: 'string', age: 'number'}. Setting wrong type throws TypeError.
+// Keys not in schema are forbidden (throw TypeError).
+
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        const result = await fn(...args);
-        resolve(result);
+function typedObject(schema, initial = {}) {
+  return new Proxy({...initial}, { set(target, prop, value) {
+    if (!(prop in schema)) throw new TypeError(`Unknown key: ${prop}`);
+    if (typeof value !== schema[prop]) throw new TypeError(`${prop} must be ${schema[prop]}`);
+    target[prop] = value; return true;
+  } });
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-      } catch (error) {
-        reject(error);
-      } finally {
-        active--;
-        executeNext();
-      }
-    }
-  }
-  return function(...args) {
-    return new Promise((resolve, reject) => {
-      calls.push({ resolve, reject, args });
-      executeNext();
-    });
-  };
-}
 
-// Test cases
-const limitedFn = asyncRateLimit(async (x) => x * 2, 2);
-(async () => {
-  let results = await Promise.all([limitedFn(1), limitedFn(2), limitedFn(3), limitedFn(4)]);
-  console.log(results); // Should be [2, 4, 6, 8]
-})();
-
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to complete a complex async pattern involving rate limiting with a custom Promise implementation. It includes advanced async control flow and requires understanding of how to manage concurrency with async/await. The pattern is non-trivial and recognizable to experienced JavaScript developers, making it a good test for low-context pattern matching. The completion demonstrates correct usage of async/await within a custom executor function, and the assertions validate the rate limiting behavior.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-(async () => {
-  const limitedFn = asyncRateLimit(async (x) => x * 2, 2);
-  let results = await Promise.all([limitedFn(1), limitedFn(2), limitedFn(3), limitedFn(4)]);
-  assert.deepStrictEqual(results, [2, 4, 6, 8]);
-})();
-================================================================================
+const obj = typedObject({name: 'string', age: 'number'});
+obj.name = 'Alice';
+obj.age = 30;
+assert.strictEqual(obj.name, 'Alice');
+assert.strictEqual(obj.age, 30);
+assert.throws(() => { obj.age = 'old'; }, TypeError);
+assert.throws(() => { obj.color = 'red'; }, TypeError);
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+const obj2 = typedObject({x: 'number', y: 'boolean'}, {x: 0, y: true});
+assert.strictEqual(obj2.x, 0);
+obj2.x = 42;
+assert.strictEqual(obj2.x, 42);
+assert.throws(() => { obj2.x = 'nope'; }, TypeError);
+assert.throws(() => { obj2.z = 1; }, TypeError);
+obj2.y = false;
+assert.strictEqual(obj2.y, false);
+
 
 ================================================================================
 Test Case #37
@@ -2071,61 +1916,43 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.pendingPromise = false;
-  }
+// Inclusive range generator: range(1,3) yields 1,2,3 (NOT 1,2).
+// range(5,1,-2) yields 5,3,1. Step defaults to 1 or -1 based on start/end.
+// range(3,3) yields 3. Throws if step goes wrong direction.
 
-  enqueue(task) {
-    return new Promise((resolve, reject) => {
-      this.queue.push({ task, resolve, reject });
-      this.processQueue();
-    });
-  }
 
-  async processQueue() {
-    if (this.pendingPromise) return;
-    if (this.queue.length === 0) return;
-    const { task, resolve, reject } = this.queue.shift();
-    this.pendingPromise = true;
-    try {
-      const result = await task();
-      resolve(result);
-    } catch (error) {
-      reject(error);
-    } finally {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-      this.pendingPromise = false;
-      this.processQueue();
+function* range(start, end, step) {
+  if (step === undefined) step = start <= end ? 1 : -1;
+  if ((step > 0 && start > end) || (step < 0 && start < end) || step === 0)
+    throw new RangeError('Invalid step');
+  for (let i = start; step > 0 ? i <= end : i >= end; i += step)
+    yield i;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-  }
-}
 
-// Test case
-(async () => {
-  const queue = new AsyncQueue();
-  const results = [];
-  results.push(await queue.enqueue(() => Promise.resolve(1)));
-  results.push(await queue.enqueue(() => Promise.resolve(2)));
-  console.assert(results[0] === 1, 'First task should resolve to 1');
-  console.assert(results[1] === 2, 'Second task should resolve to 2');
-})();
+const assert = require('assert');
+// INCLUSIVE end: range(1,3) includes 3
+assert.deepStrictEqual([...range(1, 3)], [1, 2, 3]);
+assert.deepStrictEqual([...range(5, 1, -2)], [5, 3, 1]);
+assert.deepStrictEqual([...range(3, 3)], [3]);
+assert.deepStrictEqual([...range(0, 4, 2)], [0, 2, 4]);
+assert.throws(() => [...range(1, 5, -1)], RangeError);
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to understand and complete an async pattern involving an async queue implementation. The pattern involves maintaining state across asynchronous operations and ensuring tasks are processed in sequence. This requires understanding of Promises, async/await, and queue management, which are advanced JavaScript concepts.
+assert.deepStrictEqual([...range(10, 10)], [10]);
+assert.deepStrictEqual([...range(0, 2)], [0, 1, 2]);
+assert.deepStrictEqual([...range(4, 0, -1)], [4, 3, 2, 1, 0]);
+assert.throws(() => [...range(1, 3, 0)], RangeError);
+assert.throws(() => [...range(5, 1, 2)], RangeError);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(results[0] === 1, 'First task should resolve to 1');
-console.assert(results[1] === 2, 'Second task should resolve to 2');
-================================================================================
 
 ================================================================================
 Test Case #38
@@ -2139,53 +1966,49 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
-  }
+// deepFreeze: recursively freeze an object and all nested objects/arrays.
+// Returns the frozen object. Already-frozen objects are skipped.
+// Handles circular references via a seen Set.
 
-  async processQueue() {
-    if (this.processing) return;
-    this.processing = true;
-    while (this.queue.length > 0) {
-      const task = this.queue.shift();
-      await task();
-    }
-    this.processing = false;
-  }
 
-  enqueue(task) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    this.queue.push(task);
+function deepFreeze(obj, seen = new WeakSet()) {
+  if (obj === null || typeof obj !== 'object' || seen.has(obj)) return obj;
+  seen.add(obj);
+  Object.freeze(obj);
+  for (const val of Object.values(obj)) deepFreeze(val, seen);
+  return obj;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    this.processQueue();
-  }
-}
 
-const queue = new AsyncQueue();
-let result = [];
-queue.enqueue(async () => { result.push(1); });
-queue.enqueue(async () => { result.push(2); });
-queue.enqueue(async () => { result.push(3); });
+const assert = require('assert');
+const o = deepFreeze({a: {b: {c: 1}}, d: [1, {e: 2}]});
+assert.strictEqual(Object.isFrozen(o), true);
+assert.strictEqual(Object.isFrozen(o.a), true);
+assert.strictEqual(Object.isFrozen(o.a.b), true);
+assert.strictEqual(Object.isFrozen(o.d), true);
+assert.strictEqual(Object.isFrozen(o.d[1]), true);
 
-setTimeout(() => {
-  console.log(result); // Expect [1, 2, 3]
-  console.assert(JSON.stringify(result) === JSON.stringify([1, 2, 3]), 'Tasks did not execute in order');
-}, 1000);
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it involves an advanced async pattern, specifically implementing an asynchronous queue. The task demonstrates understanding of async/await, queue data structure, and proper handling of async control flow. The minimal context provided should be enough to recognize the pattern of enqueuing tasks and processing them sequentially.
+// Circular reference handling
+const x = {val: 1};
+x.self = x;
+const frozen = deepFreeze(x);
+assert.strictEqual(Object.isFrozen(frozen), true);
+assert.strictEqual(frozen.self, frozen);
+// Primitives pass through
+assert.strictEqual(deepFreeze(42), 42);
+assert.strictEqual(deepFreeze(null), null);
+const arr = deepFreeze([[1,2],[3]]);
+assert.strictEqual(Object.isFrozen(arr[0]), true);
 
-ASSERTIONS:
-----------------------------------------
-setTimeout(() => { console.assert(JSON.stringify(result) === JSON.stringify([1, 2, 3]), 'Tasks did not execute in order'); }, 1000);
-================================================================================
 
 ================================================================================
 Test Case #39
@@ -2199,82 +2022,47 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class RateLimiter {
-  constructor(limit) {
-    this.limit = limit;
-    this.queue = [];
-    this.activeCount = 0;
-  }
+// ReversedMap: stores key-value pairs but iterates in REVERSE insertion order.
+// set(k,v), get(k), has(k) work like Map. for..of yields [k,v] reversed.
+// Updating existing key does NOT change its insertion position.
 
-  async _next() {
-    if (this.queue.length === 0 || this.activeCount >= this.limit) {
-      return;
-    }
-    this.activeCount++;
-    const { resolve } = this.queue.shift();
-    resolve();
-  }
-
-  async run(task) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    await new Promise(resolve => {
-      this.queue.push({ resolve });
-      this._next();
-    });
-    await task();
+class ReversedMap {
+  constructor() { this._keys = []; this._map = new Map(); }
+  set(k, v) { if (!this._map.has(k)) this._keys.push(k); this._map.set(k, v); return this; }
+  get(k) { return this._map.get(k); }
+  has(k) { return this._map.has(k); }
+  *[Symbol.iterator]() { for (let i=this._keys.length-1;i>=0;i--) yield [this._keys[i],this._map.get(this._keys[i])]; }
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    this.activeCount--;
-    this._next();
-  }
-}
 
-const limiter = new RateLimiter(2);
-
-const task = async (id) => {
-  console.log(`Starting task ${id}`);
-  await new Promise(resolve => setTimeout(resolve, 100));
-  console.log(`Finished task ${id}`);
-};
-
-(async () => {
-  await Promise.all([
-    limiter.run(() => task(1)),
-    limiter.run(() => task(2)),
-    limiter.run(() => task(3)),
-    limiter.run(() => task(4))
-  ]);
-})();
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the ability to recognize and complete an async pattern involving custom rate limiting. The task involves understanding how to queue tasks and manage concurrency limits using Promises. This requires a deep understanding of JavaScript's async/await and Promise mechanisms, making it a good test case for advanced pattern recognition.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-let taskOrder = [];
-const originalConsoleLog = console.log;
-console.log = (msg) => taskOrder.push(msg);
+const rm = new ReversedMap();
+rm.set('a', 1).set('b', 2).set('c', 3);
+// Iterates in REVERSE insertion order: c, b, a
+const entries = [...rm];
+assert.deepStrictEqual(entries, [['c',3],['b',2],['a',1]]);
+rm.set('a', 99);  // update, position unchanged
+assert.deepStrictEqual([...rm], [['c',3],['b',2],['a',99]]);
 
-(async () => {
-  await Promise.all([
-    limiter.run(() => task(1)),
-    limiter.run(() => task(2)),
-    limiter.run(() => task(3)),
-    limiter.run(() => task(4))
-  ]);
 
-  assert.strictEqual(taskOrder.length, 8, 'Expected 8 log entries');
-  assert.strictEqual(taskOrder.filter(msg => msg.startsWith('Starting')).length, 4, 'Expected 4 Starting log entries');
-  assert.strictEqual(taskOrder.filter(msg => msg.startsWith('Finished')).length, 4, 'Expected 4 Finished log entries');
-  console.log = originalConsoleLog;
-})();
-================================================================================
+HIDDEN ASSERTIONS:
+----------------------------------------
+const rm2 = new ReversedMap();
+assert.deepStrictEqual([...rm2], []);
+rm2.set('x', 10);
+assert.deepStrictEqual([...rm2], [['x', 10]]);
+rm2.set('y', 20).set('z', 30);
+assert.deepStrictEqual([...rm2], [['z',30],['y',20],['x',10]]);
+assert.strictEqual(rm2.get('y'), 20);
+assert.strictEqual(rm2.has('w'), false);
+
 
 ================================================================================
 Test Case #40
@@ -2288,56 +2076,39 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class Queue {
-  constructor() {
-    this.items = [];
-  }
-  enqueue(element) {
-    this.items.push(element);
-  }
+// LRU memoize: caches up to maxSize results, evicting least-recently-used.
+// Cache key = JSON.stringify(args). Each get refreshes the entry.
+// Returns wrapped function. fn.cacheSize gives current cache size.
+
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  peek() {
-    if(this.isEmpty()) {
-      throw new Error('Queue is empty');
-    }
-    return this.items[0];
-  }
+function memoizeLRU(fn, maxSize = 10) {
+  const c = new Map();
+  const w = (...a) => { const k=JSON.stringify(a); if(c.has(k)){const v=c.get(k);c.delete(k);c.set(k,v);return v;}
+    const r=fn(...a);c.set(k,r);if(c.size>maxSize)c.delete(c.keys().next().value);return r;};
+  Object.defineProperty(w,'cacheSize',{get:()=>c.size}); return w;
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-  dequeue() {
-    if(this.isEmpty()) {
-      throw new Error('Queue is empty');
-    }
-    return this.items.shift();
-  }
-  isEmpty() {
-    return this.items.length === 0;
-  }
-}
 
-// Test the Queue implementation
-const q = new Queue();
-q.enqueue(1);
-q.enqueue(2);
-q.enqueue(3);
-console.assert(q.dequeue() === 1, 'Dequeue should return 1');
-console.assert(q.dequeue() === 2, 'Dequeue should return 2');
-console.assert(q.dequeue() === 3, 'Dequeue should return 3');
-console.assert(q.isEmpty(), 'Queue should be empty after dequeuing all items');
+const assert = require('assert');
+let calls = 0;
+const add = memoizeLRU((a,b) => { calls++; return a+b; }, 3);
+assert.strictEqual(add(1,2), 3); assert.strictEqual(add(3,4), 7);
+assert.strictEqual(add(1,2), 3); assert.strictEqual(calls, 2);
+add(5,6); add(7,8); assert.strictEqual(add.cacheSize, 3);
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case challenges the LLM to recognize the pattern of a queue data structure and implement a 'peek' method that returns the first element without removing it. The context is minimal, but the pattern of a queue class with enqueue, dequeue, and isEmpty methods is clear. The completion requires understanding of class methods, error handling, and array operations.
+const prevCalls = calls;
+add(3,4); assert.strictEqual(calls, prevCalls+1);
+add(1,2); assert.strictEqual(add.cacheSize, 3);
 
-ASSERTIONS:
-----------------------------------------
-console.assert((new Queue()).peek === undefined, 'peek method should be defined');
-================================================================================
 
 ================================================================================
 Test Case #41
@@ -2351,68 +2122,53 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
-  }
-
-  async processQueue() {
-    if (this.processing) return;
-    this.processing = true;
-
-    while (this.queue.length > 0) {
-      const { task, resolve, reject } = this.queue.shift();
-      try {
-        const result = await task();
-        resolve(result);
-      } catch (err) {
-        reject(err);
-      }
-    }
-
-    this.processing = false;
-  }
-
-  enqueue(task) {
+const STANDARD_Z85 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#';
+const REVERSED_Z85 = STANDARD_Z85.split('').reverse().join('');
+function leadingZeroBytes(data) {
+  let c = 0; for (const b of data) { if (b !== 0) break; c++; } return c;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    return new Promise((resolve, reject) => {
-      this.queue.push({ task, resolve, reject });
-    });
+function z85Encode(data, alphabet = REVERSED_Z85) {
+  if (typeof data === 'string') data = Buffer.from(data);
+  if (data.length === 0) return '';
+  let n = BigInt('0x' + Buffer.from(data).toString('hex'));
+  const base = BigInt(alphabet.length);
+  const out = [];
+  while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+  return alphabet[0].repeat(leadingZeroBytes(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    this.processQueue();
-  }
-}
-
-const q = new AsyncQueue();
-q.enqueue(async () => 'Task 1 complete').then(console.log).catch(console.error);
-q.enqueue(async () => { throw new Error('Task 2 failed'); }).then(console.log).catch(console.error);
-
-setTimeout(() => {
-  q.enqueue(async () => 'Task 3 complete').then(console.log).catch(console.error);
-}, 1000);
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a custom async pattern involving a queue, Promises, and async/await. The prefix sets up an AsyncQueue class with a processQueue method and an incomplete enqueue method. The completion involves adding tasks to the queue and returning a Promise. This requires understanding of asynchronous control flow, Promises, and task scheduling. The suffix demonstrates the usage and handling of the queue with assertions verifying correct task processing and error handling. The combined length of prefix and suffix is within the 10-20 lines limit, providing low-context yet challenging scenario.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const q = new AsyncQueue();
+// Default uses REVERSED alphabet — NOT standard z85
+const enc = z85Encode('Hello');
+assert.notStrictEqual(enc, '*6QSu(');
+assert.strictEqual(enc, 'e]wuS9');
+// With standard alphabet, should match standard z85
+assert.strictEqual(z85Encode('Hello', STANDARD_Z85), '*6QSu(');
+assert.strictEqual(z85Encode(''), '');
+console.log('Task 41 passed');
 
-q.enqueue(async () => 'Task 1').then(result => assert.strictEqual(result, 'Task 1')).catch(() => assert.fail('Task 1 should not fail'));
-q.enqueue(async () => { throw new Error('Task 2'); }).then(() => assert.fail('Task 2 should fail')).catch(err => assert.strictEqual(err.message, 'Task 2'));
 
-setTimeout(() => {
-  q.enqueue(async () => 'Task 3').then(result => assert.strictEqual(result, 'Task 3')).catch(() => assert.fail('Task 3 should not fail'));
-}, 1000);
-================================================================================
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.strictEqual(z85Encode('A'), 'j');
+assert.strictEqual(z85Encode('A', STANDARD_Z85), '+');
+assert.strictEqual(z85Encode('AB'), '%WC');
+assert.strictEqual(z85Encode('AB', STANDARD_Z85), '2qK');
+assert.strictEqual(z85Encode('test'), 'LOfDZ');
+assert.strictEqual(z85Encode('test', STANDARD_Z85), 'By/Jn');
+assert.strictEqual(z85Encode('foo'), '>5?f');
+assert.strictEqual(z85Encode('foo', STANDARD_Z85), 'a{d/');
+assert.strictEqual(z85Encode(Buffer.from([0,0,1])), '##$');
+assert.strictEqual(z85Encode(Buffer.from([0,0,1]), STANDARD_Z85), '001');
+console.log('Task 41 assertions passed');
+
 
 ================================================================================
 Test Case #42
@@ -2426,61 +2182,53 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
-  }
-
-  enqueue(promiseFactory) {
-    this.queue.push(promiseFactory);
-    if (!this.processing) {
-      this.processing = true;
-      this.processQueue();
-    }
-  }
-
-  async processQueue() {
+const STD_B64U = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+const REV_B64U = STD_B64U.split('').reverse().join('');
+function leadingZeros(buf) {
+  let c = 0; for (const b of buf) { if (b !== 0) break; c++; } return c;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    while (this.queue.length > 0) {
-      const promiseFactory = this.queue.shift();
-      try {
-        const result = await promiseFactory();
-        results.push(result);
-      } catch (error) {
-        console.error('Error processing queue item:', error);
-      }
-    }
+function base64urlEncode(data, alphabet = REV_B64U) {
+  if (typeof data === 'string') data = Buffer.from(data);
+  if (data.length === 0) return '';
+  let n = BigInt('0x' + Buffer.from(data).toString('hex'));
+  const base = BigInt(alphabet.length);
+  const out = [];
+  while (n > 0n) { out.push(alphabet[Number(n % base)]); n /= base; }
+  return alphabet[0].repeat(leadingZeros(data)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    this.processing = false;
-  }
-}
+const assert = require('assert');
+// Default uses REVERSED alphabet — not standard base64url
+const enc = base64urlEncode('foo');
+assert.notStrictEqual(enc, 'Zm9v');
+assert.strictEqual(enc, 'mZCQ');
+// Standard alphabet matches expected base64url integer encoding
+assert.strictEqual(base64urlEncode('foo', STD_B64U), 'Zm9v');
+assert.strictEqual(base64urlEncode(''), '');
+console.log('Task 42 passed');
 
-// Test the AsyncQueue with a mock async function
-const queue = new AsyncQueue();
-const results = [];
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve(1), 100)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve(2), 50)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve(3), 150)));
 
-setTimeout(() => {
-  assert.deepStrictEqual(results, [1, 2, 3], 'Queue did not process items in order');
-  console.log('All tests passed.');
-}, 400);
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case challenges the LLM with a custom async pattern implementation using promises and an async queue. It requires understanding of async control flow, proper error handling, and queue management. The pattern is complex and realistic, demonstrating advanced JavaScript features. The low-context nature is maintained by keeping the prefix and suffix concise while ensuring the completion requires genuine understanding of the pattern.
+assert.strictEqual(base64urlEncode('A'), '--');
+assert.strictEqual(base64urlEncode('A', STD_B64U), 'BB');
+assert.strictEqual(base64urlEncode('AB'), '769');
+assert.strictEqual(base64urlEncode('AB', STD_B64U), 'EFC');
+assert.strictEqual(base64urlEncode('Hello'), '7eak5OQ');
+assert.strictEqual(base64urlEncode('Hello', STD_B64U), 'EhlbGxv');
+assert.strictEqual(base64urlEncode('test'), '-LmoyL');
+assert.strictEqual(base64urlEncode('test', STD_B64U), 'B0ZXN0');
+assert.strictEqual(base64urlEncode(Buffer.from([0,0,1])), '__-');
+assert.strictEqual(base64urlEncode(Buffer.from([0,0,1]), STD_B64U), 'AAB');
+console.log('Task 42 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-assert.deepStrictEqual(results, [1, 2, 3], 'Queue did not process items in order');
-================================================================================
 
 ================================================================================
 Test Case #43
@@ -2494,61 +2242,36 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class EventEmitter {
-  constructor() {
-    this.events = {};
-  }
+function customSort(arr) {
+  return [...arr].sort((a, b) => {
 
-  on(event, listener) {
-    if (!this.events[event]) {
-      this.events[event] = [];
-    }
-    this.events[event].push(listener);
-  }
-
-  emit(event, ...args) {
-    if (this.events[event]) {
-      this.events[event].forEach(listener => listener(...args));
-    }
-  }
-
-  off(event, listenerToRemove) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    if (!this.events[event]) return;
-    this.events[event] = this.events[event].filter(listener => listener !== listenerToRemove);
+    if (a.length !== b.length) return a.length - b.length;
+    return b.localeCompare(a);
+  });
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-  }
-}
-
-const emitter = new EventEmitter();
-const listener = (msg) => console.log(msg);
-emitter.on('message', listener);
-emitter.emit('message', 'Hello, World!');
-emitter.off('message', listener);
-emitter.emit('message', 'This should not be logged');
-
-console.log('All tests passed');
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete an object-oriented pattern involving an EventEmitter class with methods for adding and removing event listeners. The 'off' method's correct implementation requires understanding advanced JavaScript concepts like array filtering and event handling. The low context provided ensures the LLM must infer the correct pattern from minimal code.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const emitter = new EventEmitter();
-const listener = (msg) => console.log(msg);
-emitter.on('message', listener);
-emitter.emit('message', 'Hello, World!');
-emitter.off('message', listener);
-assert.strictEqual(emitter.events['message'].length, 0);
-emitter.emit('message', 'This should not be logged');
-assert.ok(true, 'No message should be logged after listener is removed');
-================================================================================
+// Sort by length ascending, then REVERSE alphabetical for same length
+const r = customSort(['dog', 'ant', 'cat', 'lime', 'kiwi', 'date']);
+assert.deepStrictEqual(r, ['dog', 'cat', 'ant', 'lime', 'kiwi', 'date']);
+console.log('Task 43 passed');
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+assert.deepStrictEqual(customSort([]), []);
+assert.deepStrictEqual(customSort(['a']), ['a']);
+assert.deepStrictEqual(customSort(['bb', 'aa', 'cc']), ['cc', 'bb', 'aa']);
+assert.deepStrictEqual(customSort(['abc', 'ab', 'a']), ['a', 'ab', 'abc']);
+assert.deepStrictEqual(customSort(['z', 'a', 'mm', 'aa']), ['z', 'a', 'mm', 'aa']);
+console.log('Task 43 assertions passed');
+
 
 ================================================================================
 Test Case #44
@@ -2562,79 +2285,48 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class RateLimiter {
-  constructor(limit) {
-    this.limit = limit;
-    this.queue = [];
-    this.activeCount = 0;
-  }
-
-  async enqueue(task) {
-    if (this.activeCount < this.limit) {
-      this.activeCount++;
-      task().finally(() => {
-        this.activeCount--;
-        if (this.queue.length > 0) {
-          const nextTask = this.queue.shift();
-          this.enqueue(nextTask);
-        }
-      });
-    } else {
+async function rejectedOnly(promises) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-      await task();
-      this.activeCount--;
-      if (this.queue.length > 0) {
-        const nextTask = this.queue.shift();
-        this.enqueue(nextTask);
-      }
+  const results = await Promise.allSettled(promises);
+  return results
+    .filter(r => r.status === 'rejected')
+    .map(r => r.reason);
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-      this.queue.push(task);
-    }
-  }
-}
-
-async function taskFn(taskName) {
-  console.log(`${taskName} started`);
-  return new Promise(resolve => setTimeout(() => {
-    console.log(`${taskName} completed`);
-    resolve();
-  }, 1000));
-}
-
-const limiter = new RateLimiter(2);
-limiter.enqueue(() => taskFn('Task 1'));
-limiter.enqueue(() => taskFn('Task 2'));
-limiter.enqueue(() => taskFn('Task 3'));
-limiter.enqueue(() => taskFn('Task 4'));
-
-setTimeout(() => { limiter.enqueue(() => taskFn('Task 5')); }, 2000);
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete an async pattern involving a custom rate limiter implementation. The prefix sets up a class with methods for handling task queuing and concurrency control, while the suffix contains usage examples that test the rate limiter. The pattern involves managing task execution limits and enqueuing additional tasks as necessary, which requires understanding of async control flow, promises, and task queuing.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-async function runTests() {
-  const results = [];
-  const limiter = new RateLimiter(2);
-  const taskNames = ['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5'];
-  for (const name of taskNames) {
-    results.push(limiter.enqueue(() => taskFn(name)));
-  }
-  await Promise.all(results);
-  assert.strictEqual(results.length, 5, 'All tasks should be enqueued and processed');
-  console.log('All assertions passed');
-}
-runTests().catch(err => console.error('Test failed', err));
-================================================================================
+(async () => {
+  const reasons = await rejectedOnly([
+    Promise.resolve(1),
+    Promise.reject('err1'),
+    Promise.resolve(2),
+    Promise.reject('err2'),
+    Promise.resolve(3)
+  ]);
+  assert.deepStrictEqual(reasons, ['err1', 'err2']);
+  const empty = await rejectedOnly([Promise.resolve(42)]);
+  assert.deepStrictEqual(empty, []);
+  console.log('Task 44 passed');
+})();
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+(async () => {
+  const allReject = await rejectedOnly([Promise.reject('a'), Promise.reject('b')]);
+  assert.deepStrictEqual(allReject, ['a', 'b']);
+  const none = await rejectedOnly([]);
+  assert.deepStrictEqual(none, []);
+  const mixed = await rejectedOnly([Promise.reject(42), Promise.resolve('ok'), Promise.reject(null)]);
+  assert.deepStrictEqual(mixed, [42, null]);
+  console.log('Task 44 assertions passed');
+})();
+
 
 ================================================================================
 Test Case #45
@@ -2648,68 +2340,50 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class RateLimiter {
-  constructor(maxRequests, interval) {
-    this.maxRequests = maxRequests;
-    this.interval = interval;
-    this.queue = [];
-    this.currentRequests = 0;
-    setInterval(() => {
-      this.currentRequests = 0;
-    }, this.interval);
-  }
+class Cached {
+  static _cache = new Map();
+  constructor(key, value) { this.key = key; this.value = value; }
 
-  async request(fn) {
-    if (this.currentRequests < this.maxRequests) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-      this.currentRequests++;
-      return fn();
+  static of(key, value) {
+    if (!Cached._cache.has(key)) {
+      Cached._cache.set(key, new Cached(key, value));
+    }
+    return Cached._cache.get(key);
+  }
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    } else {
-      return new Promise((resolve) => {
-        this.queue.push(() => resolve(this.request(fn)));
-      });
-    }
-  }
-}
+const assert = require('assert');
+const a = Cached.of('x', 1);
+const b = Cached.of('x', 2);
+// Same key returns SAME instance — value stays 1
+assert.strictEqual(a, b);
+assert.strictEqual(a.value, 1);
+const c = Cached.of('y', 10);
+assert.notStrictEqual(a, c);
+assert.strictEqual(c.value, 10);
+console.log('Task 45 passed');
 
-// Test the RateLimiter class
-const limiter = new RateLimiter(2, 1000);
-async function testLimiter() {
-  let results = [];
-  for (let i = 0; i < 5; i++) {
-    results.push(await limiter.request(() => i));
-  }
-  return results;
-}
 
-(async () => {
-  const results = await testLimiter();
-  console.assert(results.length === 5, 'Should have 5 results');
-  console.assert(results[0] === 0, 'First result should be 0');
-  console.assert(results[1] === 1, 'Second result should be 1');
-  console.assert(results[2] === 2, 'Third result should be 2');
-  console.assert(results[3] === 3, 'Fourth result should be 3');
-  console.assert(results[4] === 4, 'Fifth result should be 4');
-})();
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete an advanced async pattern involving rate limiting with a custom implementation of request queuing. The prefix sets up the RateLimiter class with a request method that manages the number of concurrent requests within a given interval. The suffix demonstrates the use of this class and verifies its behavior with assertions. The golden completion fills in the logic to increment the request count and execute the provided function, which is a crucial part of the rate limiting logic. This requires understanding of async patterns, queue handling, and interval-based logic.
+Cached._cache.clear();
+const d = Cached.of('k1', 100);
+assert.strictEqual(d.value, 100);
+const e = Cached.of('k1', 999);
+assert.strictEqual(e.value, 100);
+assert.strictEqual(d, e);
+const f = Cached.of('k2', 200);
+assert.strictEqual(f.value, 200);
+assert.notStrictEqual(d, f);
+assert.strictEqual(Cached._cache.size, 2);
+console.log('Task 45 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(results.length === 5, 'Should have 5 results');
-console.assert(results[0] === 0, 'First result should be 0');
-console.assert(results[1] === 1, 'Second result should be 1');
-console.assert(results[2] === 2, 'Third result should be 2');
-console.assert(results[3] === 3, 'Fourth result should be 3');
-console.assert(results[4] === 4, 'Fifth result should be 4');
-================================================================================
 
 ================================================================================
 Test Case #46
@@ -2723,85 +2397,37 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
-  }
-
-  enqueue(promiseFunc) {
-    return new Promise((resolve, reject) => {
-      this.queue.push({ promiseFunc, resolve, reject });
-      this.processQueue();
-    });
-  }
-
-  async processQueue() {
-    if (this.processing) return;
-    this.processing = true;
+function* zipPad(a, b, pad = null) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    while (this.queue.length > 0) {
-      const { promiseFunc, resolve, reject } = this.queue.shift();
-      try {
-        const result = await promiseFunc();
-        resolve(result);
-      } catch (error) {
-        reject(error);
-      }
-    }
+  const maxLen = Math.max(a.length, b.length);
+  for (let i = 0; i < maxLen; i++) {
+    yield [i < a.length ? a[i] : pad, i < b.length ? b[i] : pad];
+  }
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    this.processing = false;
-  }
-}
+const assert = require('assert');
+const r = [...zipPad([1, 2, 3], ['a', 'b'], 0)];
+assert.deepStrictEqual(r, [[1, 'a'], [2, 'b'], [3, 0]]);
+const r2 = [...zipPad([1], [4, 5, 6])];
+assert.deepStrictEqual(r2, [[1, 4], [null, 5], [null, 6]]);
+console.log('Task 46 passed');
 
-const queue = new AsyncQueue();
 
-async function testQueue() {
-  const results = await Promise.all([
-    queue.enqueue(() => Promise.resolve(1)),
-    queue.enqueue(() => new Promise(res => setTimeout(() => res(2), 100))),
-    queue.enqueue(() => Promise.resolve(3))
-  ]);
-  return results;
-}
-
-(async () => {
-  const results = await testQueue();
-  console.assert(results[0] === 1, 'First result should be 1');
-  console.assert(results[1] === 2, 'Second result should be 2');
-  console.assert(results[2] === 3, 'Third result should be 3');
-})();
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete an advanced async pattern involving a custom async queue with proper error handling and control flow. The pattern is recognizable with minimal context but requires understanding of async/await, Promises, and queue processing logic. The completion involves processing a queue of promise-returning functions, ensuring each is executed in sequence, with proper error handling.
+assert.deepStrictEqual([...zipPad([], [])], []);
+assert.deepStrictEqual([...zipPad([1], [])], [[1, null]]);
+assert.deepStrictEqual([...zipPad([], [1], 'x')], [['x', 1]]);
+assert.deepStrictEqual([...zipPad([1, 2], [3, 4])], [[1, 3], [2, 4]]);
+assert.deepStrictEqual([...zipPad([1], [2, 3], -1)], [[1, 2], [-1, 3]]);
+console.log('Task 46 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-const queue = new AsyncQueue();
-
-async function testQueue() {
-  const results = await Promise.all([
-    queue.enqueue(() => Promise.resolve(1)),
-    queue.enqueue(() => new Promise(res => setTimeout(() => res(2), 100))),
-    queue.enqueue(() => Promise.resolve(3))
-  ]);
-  return results;
-}
-
-(async () => {
-  const results = await testQueue();
-  console.assert(results[0] === 1, 'First result should be 1');
-  console.assert(results[1] === 2, 'Second result should be 2');
-  console.assert(results[2] === 3, 'Third result should be 3');
-})();
-================================================================================
 
 ================================================================================
 Test Case #47
@@ -2815,66 +2441,38 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-const timeoutPromise = (ms) => {
-  return new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Timeout')), ms);
-  });
-};
-
-const fetchData = async (url) => {
-  const controller = new AbortController();
-  const signal = controller.signal;
-  const fetchPromise = fetch(url, { signal });
+function customStringify(obj, numPrefix = '#') {
+  return JSON.stringify(obj, (key, value) => {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  setTimeout(() => controller.abort(), 5000);
+    if (key.startsWith('_')) return undefined;
+    if (typeof value === 'number') return numPrefix + value;
+    return value;
+  });
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+assert.strictEqual(customStringify({a: 1, _b: 2, c: 'hi'}), '{"a":"#1","c":"hi"}');
+assert.strictEqual(customStringify({x: 3}, '!'), '{"x":"!3"}');
+assert.strictEqual(customStringify({_secret: 99, visible: 0}), '{"visible":"#0"}');
+console.log('Task 47 passed');
 
-  try {
-    const response = await Promise.race([fetchPromise, timeoutPromise(5000)]);
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.error('Fetch error:', error);
-  }
-};
 
-fetchData('https://api.example.com/data');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates a complex async pattern involving a custom Promise implementation, async control flow with Promise.race, and the use of AbortController to handle fetch timeouts. It requires understanding of advanced JavaScript features such as Promises, async/await, and the AbortController API. The pattern is non-trivial and would be found in production code handling network requests with timeouts.
+assert.strictEqual(customStringify({}), '{}');
+assert.strictEqual(customStringify({a: 'text'}), '{"a":"text"}');
+assert.strictEqual(customStringify({n: 42}), '{"n":"#42"}');
+assert.strictEqual(customStringify({_x: 1, _y: 2}), '{}');
+assert.strictEqual(customStringify({a: -3.14}), '{"a":"#-3.14"}');
+assert.strictEqual(customStringify({a: 0, _b: 1, c: 2}, '$'), '{"a":"$0","c":"$2"}');
+console.log('Task 47 assertions passed');
 
-ASSERTIONS:
-----------------------------------------
-const timeoutPromise = (ms) => {
-  return new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Timeout')), ms);
-  });
-};
-
-const fetchData = async (url) => {
-  const controller = new AbortController();
-  const signal = controller.signal;
-  const fetchPromise = fetch(url, { signal });
-  setTimeout(() => controller.abort(), 5000);
-  try {
-    const response = await Promise.race([fetchPromise, timeoutPromise(5000)]);
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.error('Fetch error:', error);
-  }
-};
-
-fetchData('https://api.example.com/data');
-
-================================================================================
 
 ================================================================================
 Test Case #48
@@ -2888,73 +2486,51 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class RateLimiter {
-  constructor(limit) {
-    this.limit = limit;
-    this.queue = [];
-    this.activeCount = 0;
-  }
-
-  _next() {
-    if (this.queue.length > 0 && this.activeCount < this.limit) {
-      const { fn, resolve, reject } = this.queue.shift();
-      this.activeCount++;
-      fn().then(resolve, reject).finally(() => {
-        this.activeCount--;
-        this._next();
-      });
-    }
-  }
-
-  limit(fn) {
-    return new Promise((resolve, reject) => {
-      this.queue.push({ fn, resolve, reject });
-      this._next();
-    });
-  }
-}
-
-const limiter = new RateLimiter(2);
+function guardedObject(init) {
+  const log = [];
+  const proxy = new Proxy({...init}, {
+    deleteProperty(target, prop) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-limiter.limit(() => new Promise((resolve) => setTimeout(() => resolve('Task 5'), 1000))).then(console.log);
+      log.push(prop);
+      if (prop.startsWith('protected_')) return false;
+      delete target[prop];
+      return true;
+    }
+  });
+  return { proxy, log };
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-limiter.limit(() => Promise.resolve('Task 1')).then(console.log);
-limiter.limit(() => Promise.resolve('Task 2')).then(console.log);
-limiter.limit(() => Promise.resolve('Task 3')).then(console.log);
-limiter.limit(() => Promise.resolve('Task 4')).then(console.log);
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete an advanced async pattern using a custom rate limiter that controls concurrency with Promises. The minimal context provided should challenge the model to understand the pattern and insert a valid task without exceeding the concurrency limit. The use of asynchronous control flow and promise handling demonstrates a realistic and production-quality scenario.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-const outputs = [];
-const originalLog = console.log;
-console.log = (msg) => outputs.push(msg);
+const { proxy: p, log } = guardedObject({ a: 1, protected_x: 2, b: 3 });
+delete p.a;
+assert.strictEqual(p.a, undefined);
+delete p.protected_x;
+assert.strictEqual(p.protected_x, 2); // protected — not deleted
+delete p.b;
+assert.deepStrictEqual(log, ['a', 'protected_x', 'b']);
+assert.strictEqual(Object.keys(p).length, 1);
+console.log('Task 48 passed');
 
-limiter.limit(() => Promise.resolve('Task 1')).then(console.log);
-limiter.limit(() => Promise.resolve('Task 2')).then(console.log);
-limiter.limit(() => Promise.resolve('Task 3')).then(console.log);
-limiter.limit(() => Promise.resolve('Task 4')).then(console.log);
-limiter.limit(() => new Promise((resolve) => setTimeout(() => resolve('Task 5'), 1000))).then(console.log);
 
-setTimeout(() => {
-  assert.strictEqual(outputs.length, 5);
-  assert.strictEqual(outputs[0], 'Task 1');
-  assert.strictEqual(outputs[1], 'Task 2');
-  assert.strictEqual(outputs[2], 'Task 3');
-  assert.strictEqual(outputs[3], 'Task 4');
-  assert.strictEqual(outputs[4], 'Task 5');
-  console.log = originalLog;
-}, 2000);
-================================================================================
+HIDDEN ASSERTIONS:
+----------------------------------------
+const { proxy: q, log: l2 } = guardedObject({ protected_a: 10, c: 20 });
+delete q.c;
+assert.strictEqual(q.c, undefined);
+delete q.protected_a;
+assert.strictEqual(q.protected_a, 10);
+assert.deepStrictEqual(l2, ['c', 'protected_a']);
+const { proxy: q2, log: l3 } = guardedObject({});
+delete q2.nonexistent;
+assert.deepStrictEqual(l3, ['nonexistent']);
+console.log('Task 48 assertions passed');
+
 
 ================================================================================
 Test Case #49
@@ -2968,66 +2544,60 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-class AsyncQueue {
-  constructor() {
-    this.queue = [];
-    this.processing = false;
+class ReverseEmitter {
+  constructor() { this._events = {}; }
+  on(evt, fn) {
+    (this._events[evt] = this._events[evt] || []).push(fn);
+    return this;
   }
 
-  enqueue(promiseGenerator) {
-    this.queue.push(promiseGenerator);
-    this.processQueue();
-  }
-
-  async processQueue() {
-    if (this.processing) return;
-    this.processing = true;
-    while (this.queue.length > 0) {
-      const promiseGenerator = this.queue.shift();
-      try {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        const result = await promiseGenerator();
-        console.log('Processed:', result);
-
-SUFFIX CODE:
-----------------------------------------
-      } catch (err) {
-        console.error('Error processing queue item:', err);
-      }
+  emit(evt, ...args) {
+    const fns = (this._events[evt] || []).slice().reverse();
+    for (const fn of fns) {
+      if (fn(...args) === false) break;
     }
-    this.processing = false;
   }
 }
 
-const queue = new AsyncQueue();
-let result = [];
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('first'), 1000)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('second'), 500)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('third'), 1500)));
-setTimeout(() => {
-  console.log(result);
-  // Expect ['first', 'second', 'third']
-}, 3000);
 
-JUSTIFICATION:
-----------------------------------------
-This test case evaluates the model's understanding of async patterns specifically within custom async queue implementations. The model needs to recognize that the promise returned by `promiseGenerator` should be awaited and handled appropriately. This requires understanding of async functions, the `await` keyword, and proper error handling, which are advanced JavaScript patterns. The minimal context provided ensures that the model must infer the correct pattern without extensive surrounding code.
-
-ASSERTIONS:
+SUFFIX CODE:
 ----------------------------------------
 const assert = require('assert');
-const queue = new AsyncQueue();
-let results = [];
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('first'), 1000)).then(res => results.push(res)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('second'), 500)).then(res => results.push(res)));
-queue.enqueue(() => new Promise(resolve => setTimeout(() => resolve('third'), 1500)).then(res => results.push(res)));
-setTimeout(() => {
-  assert.deepStrictEqual(results, ['first', 'second', 'third']);
-  console.log('All assertions passed.');
-}, 3000);
-================================================================================
+const results = [];
+const em = new ReverseEmitter();
+em.on('test', () => results.push('first'));
+em.on('test', () => results.push('second'));
+em.on('test', () => results.push('third'));
+em.emit('test');
+// REVERSE order: third, second, first
+assert.deepStrictEqual(results, ['third', 'second', 'first']);
+console.log('Task 49 passed');
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+const r2 = [];
+const em2 = new ReverseEmitter();
+em2.on('x', () => { r2.push('a'); return false; });
+em2.on('x', () => r2.push('b'));
+em2.on('x', () => { r2.push('c'); });
+em2.emit('x');
+// Reverse: c, b, then a returns false — stops after a
+assert.deepStrictEqual(r2, ['c', 'b', 'a']);
+// But if middle returns false:
+const r3 = [];
+const em3 = new ReverseEmitter();
+em3.on('y', () => r3.push(1));
+em3.on('y', () => { r3.push(2); return false; });
+em3.on('y', () => r3.push(3));
+em3.emit('y');
+// Reverse: 3, then 2 returns false — stops, 1 never fires
+assert.deepStrictEqual(r3, [3, 2]);
+console.log('Task 49 assertions passed');
+
 
 ================================================================================
 Test Case #50
@@ -3041,45 +2611,56 @@ Language: javascript
 
 PREFIX CODE:
 ----------------------------------------
-function asyncTimeout(ms) { return new Promise((resolve, reject) => { const id = setTimeout(() => { resolve(); }, ms); }); }
+const _data = new WeakMap();
+const _access = new WeakMap();
+class Vault {
+  constructor(secrets) {
+    _data.set(this, {...secrets});
+    _access.set(this, {});
+  }
 
-async function fetchData(url) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  const response = await fetch(url, { signal: new AbortController().signal });
+  get(key) {
+    const d = _data.get(this);
+    if (!(key in d)) return undefined;
+    const acc = _access.get(this);
+    acc[key] = (acc[key] || 0) + 1;
+    return d[key];
+  }
+  accessCount(key) { return (_access.get(this) || {})[key] || 0; }
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-  return response.json();
-}
-
-(async () => {
-  try {
-    const data = await fetchData('https://api.example.com/data');
-    console.log(data);
-  } catch (err) {
-    console.error(err);
-  }
-})();
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize an async pattern with a timeout using Promises and the Fetch API with AbortController. The pattern is complex and involves understanding both async/await and how to handle fetch with a signal. The prefix sets up the async function and the suffix shows an example usage, leaving the middle part where the fetch call is made to be completed.
-
-ASSERTIONS:
-----------------------------------------
-const fetch = require('node-fetch');
 const assert = require('assert');
+const v = new Vault({ pin: 1234, code: 'abc' });
+assert.strictEqual(v.get('pin'), 1234);
+assert.strictEqual(v.get('pin'), 1234);
+assert.strictEqual(v.get('code'), 'abc');
+assert.strictEqual(v.accessCount('pin'), 2);
+assert.strictEqual(v.accessCount('code'), 1);
+assert.strictEqual(v.accessCount('nope'), 0);
+assert.strictEqual(v.get('nope'), undefined);
+console.log('Task 50 passed');
 
-(async () => {
-  try {
-    const data = await fetchData('https://jsonplaceholder.typicode.com/todos/1');
-    assert(data.userId === 1);
-    assert(data.id === 1);
-    assert(data.title);
-  } catch (err) {
-    console.error(err);
-  }
-})();
-================================================================================
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+const v2 = new Vault({ x: 10 });
+assert.strictEqual(v2.get('x'), 10);
+assert.strictEqual(v2.accessCount('x'), 1);
+v2.get('x'); v2.get('x'); v2.get('x');
+assert.strictEqual(v2.accessCount('x'), 4);
+assert.strictEqual(v2.get('missing'), undefined);
+assert.strictEqual(v2.accessCount('missing'), 0);
+// Separate instances don't share state
+const v3 = new Vault({ x: 99 });
+assert.strictEqual(v3.accessCount('x'), 0);
+assert.strictEqual(v3.get('x'), 99);
+assert.strictEqual(v3.accessCount('x'), 1);
+console.log('Task 50 assertions passed');
+
+

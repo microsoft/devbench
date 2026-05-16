@@ -1,4 +1,3 @@
-
 ================================================================================
 Test Case #1
 ================================================================================
@@ -11,49 +10,64 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
+import datetime
+from dataclasses import dataclass
 
-def nested_context_managers():
-    try:
-        with open('testfile1.txt', 'w') as f1:
-            f1.write('Hello')
-            with open('testfile2.txt', 'w') as f2:
-                f2.write('World')
-                # Begin another nested context manager
+@dataclass
+class AuditEvent:
+    actor: str
+    action: str
+    when: datetime.datetime
+    detail: object = None
+    severity: str = "info"
+
+    def render(self, width: int = 64) -> str:
+        """Render one audit line using f-string format syntax.
+
+        Exact layout:
+        - severity is uppercased and left-aligned in a 7-character field
+        - timestamp uses datetime f-string format %d/%m/%Y %H:%M
+        - actor uses !r and is left-aligned in actor_width
+        - actor_width is max(8, width - 44)
+        - append " detail=<repr>" only when detail is not None
+        """
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                with open('testfile3.txt', 'w') as f3:
-                    f3.write('Nested')
+        actor_width = max(8, width - 44)
+        detail_text = f" detail={self.detail!r}" if self.detail is not None else ""
+        return (
+            f"{self.severity.upper():<7} | "
+            f"{self.when:%d/%m/%Y %H:%M} | "
+            f"{self.actor!r:<{actor_width}} | "
+            f"{self.action}{detail_text}"
+        )
 
 
 SUFFIX CODE:
 ----------------------------------------
-                # End of inner with statements
-            # End of outer with statement
-        # Exception handling
-    except IOError as e:
-        print(f"IOError: {e}")
-    except Exception as e:
-        print(f"Exception: {e}")
-    else:
-        print("Files written successfully")
 
-nested_context_managers()
+event = AuditEvent(
+    "ada",
+    "deploy",
+    datetime.datetime(2026, 5, 1, 9, 30),
+    {"target": "prod"},
+    "warn",
+)
+line = event.render(60)
+print(line)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to correctly complete deeply nested context managers and maintain the proper indentation levels. The completion involves adding another nested 'with' statement within existing nested 'with' blocks. It ensures the LLM understands context management and proper nesting syntax.
+event = AuditEvent("ada", "deploy", datetime.datetime(2026, 5, 1, 9, 30), {"target": "prod"}, "warn")
+line = event.render(60)
+assert line == "WARN    | 01/05/2026 09:30 | 'ada'            | deploy detail={'target': 'prod'}", line
+assert AuditEvent("bob", "login", datetime.datetime(2024, 1, 2, 3, 4)).render(50) == "INFO    | 02/01/2024 03:04 | 'bob'    | login"
+assert AuditEvent("xy", "ping", datetime.datetime(2024, 1, 2, 3, 4), detail=0, severity="debug").render(40) == "DEBUG   | 02/01/2024 03:04 | 'xy'     | ping detail=0"
+assert "datetime.datetime" not in line
 
-ASSERTIONS:
-----------------------------------------
-assert os.path.exists('testfile1.txt')
-assert os.path.exists('testfile2.txt')
-nested_context_managers()
-
-================================================================================
 
 ================================================================================
 Test Case #2
@@ -67,59 +81,73 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+class RecordingNamespace(dict):
+    def __init__(self):
+        super().__init__()
+        self.order = []
 
-# Function to demonstrate nested control structures
+    def __setitem__(self, key, value):
+        if key not in self:
+            self.order.append(key)
+        super().__setitem__(key, value)
 
-def nested_control_example(value):
-    with tempfile.TemporaryDirectory() as tempdir:
-        try:
-            if value > 0:
-                for i in range(value):
-                    if i % 2 == 0:
-                        with open(os.path.join(tempdir, f'tempfile_{i}.txt'), 'w') as f:
-                            f.write(f'even_{i}')
-                    else:
+class Field:
+    def __init__(self, typ):
+        self.typ = typ
+
+class FieldMeta(type):
+    """Metaclass that records Field declarations in source order.
+
+    Use __prepare__ to return RecordingNamespace.
+    __new__ receives keyword-only prefix from class declarations such as
+    class User(metaclass=FieldMeta, prefix="db_").
+    It must set cls.declared_fields to a tuple of prefixed names for values
+    that are Field instances, preserving declaration order and ignoring helpers.
+    """
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                        with open(os.path.join(tempdir, f'tempfile_{i}.txt'), 'w') as f:
-                            f.write(f'odd_{i}')
+    @classmethod
+    def __prepare__(mcls, name, bases, **kwargs):
+        return RecordingNamespace()
+
+    def __new__(mcls, name, bases, namespace, *, prefix="", **kwargs):
+        cls = super().__new__(mcls, name, bases, dict(namespace))
+        cls.declared_fields = tuple(
+            f"{prefix}{key}"
+            for key in namespace.order
+            if isinstance(namespace.get(key), Field)
+        )
+        return cls
 
 
 SUFFIX CODE:
 ----------------------------------------
-            else:
-                raise ValueError('Value must be positive')
-        except ValueError as e:
-            print(f'Error: {e}')
-        except Exception as e:
-            print(f'Unexpected error: {e}')
-        else:
-            print('Successfully processed all files')
-        finally:
-            print('Cleanup if needed')
 
-# Test cases
-nested_control_example(3)
-nested_control_example(-1)
+class User(metaclass=FieldMeta, prefix="db_"):
+    id = Field(int)
+    name = Field(str)
+    helper = object()
+    active = Field(bool)
 
-assert os.path.exists(tempfile.gettempdir()), 'Temp directory should exist'
+class Plain(metaclass=FieldMeta):
+    title = Field(str)
+    count = 0
+
+print(User.declared_fields)
+print(Plain.declared_fields)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example of nested control structures, including multiple levels of if/else conditions and nested with statements. It also demonstrates proper resource management with a context manager. The completion requires the model to understand and maintain the correct nesting and syntax, which is critical for generating executable Python code.
+assert User.declared_fields == ("db_id", "db_name", "db_active"), User.declared_fields
+assert Plain.declared_fields == ("title",), Plain.declared_fields
+assert isinstance(User.__dict__["id"], Field)
+class Empty(metaclass=FieldMeta, prefix="x_"):
+    helper = 1
+assert Empty.declared_fields == ()
 
-ASSERTIONS:
-----------------------------------------
-nested_control_example(3)
-nested_control_example(-1)
-assert os.path.exists(tempfile.gettempdir()), 'Temp directory should exist'
-
-================================================================================
 
 ================================================================================
 Test Case #3
@@ -133,54 +161,72 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-def process_data(data):
-    try:
-        result = []
-        for item in data:
-            try:
-                if item < 0:
-                    raise ValueError("Negative value")
-                elif item == 0:
-                    raise ZeroDivisionError("Zero value")
-                else:
-                    result.append(10 / item)
-            except ValueError as ve:
-                print(f"ValueError occurred: {ve}")
-            except ZeroDivisionError as ze:
-                print(f"ZeroDivisionError occurred: {ze}")
-            else:
-                print(f"Processed item: {item}")
+import functools
+
+def counted(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        wrapper.calls += 1
+        return func(*args, **kwargs)
+    wrapper.calls = 0
+    return wrapper
+
+def tagged(label):
+    def decorate(func):
+        func.tag = label
+        return func
+    return decorate
+
+class Factory:
+    registry = {}
+
+    def __init__(self, key: str):
+        self.key = key
+
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            finally:
-                print(f"Finished processing item: {item}")
+    @classmethod
+    @counted
+    @tagged("build")
+    def make(cls, key: str) -> 'Factory':
+        if key not in cls.registry:
+            cls.registry[key] = cls(key)
+        return cls.registry[key]
+
+    @staticmethod
+    @counted
+    @tagged("check")
+    def valid_key(key: str) -> bool:
+        return isinstance(key, str) and key.isidentifier()
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return result
-    finally:
-        print("Processing complete")
 
-# Example usage:
-data = [10, -1, 0, 5]
-processed_data = process_data(data)
-print(processed_data)
+a = Factory.make("alpha")
+b = Factory.make("alpha")
+c = Factory.make("beta")
+ok1 = Factory.valid_key("alpha")
+ok2 = Factory.valid_key("not valid")
+print(a is b, a is c, ok1, ok2)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to correctly complete nested try/except/else/finally blocks within a loop. It ensures proper handling of multiple exception types and the correct placement of a finally block inside the loop. The golden completion demonstrates understanding of the control flow and proper indentation.
+assert a is b
+assert a is not c
+assert a.key == "alpha" and c.key == "beta"
+assert Factory.make.calls == 3
+assert Factory.make.tag == "build"
+assert Factory.valid_key.calls == 2
+assert Factory.valid_key.tag == "check"
+assert ok1 is True
+assert ok2 is False
+Factory.make("gamma")
+assert Factory.make.calls == 4
 
-ASSERTIONS:
-----------------------------------------
-data = [10, -1, 0, 5]
-processed_data = process_data(data)
-assert processed_data == [1.0, 2.0], f"Expected [1.0, 2.0] but got {processed_data}"
-
-================================================================================
 
 ================================================================================
 Test Case #4
@@ -194,57 +240,56 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+import datetime
 
-class FileManager:
-    def __init__(self, filename: str):
-        self.filename = filename
+class Span:
+    def __init__(self, name, start, minutes, tags=None):
+        self.name = name
+        self.start = start
+        self.minutes = minutes
+        self.tags = tags or []
 
-    def __enter__(self):
-        self.file = open(self.filename, 'w')
-        return self.file
+    def render(self, width=48):
+        """Render a compact schedule row with f-string formatting.
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.file.close()
-        if exc_type is not None:
-            print(f"Exception: {exc_val}")
-
-with tempfile.NamedTemporaryFile(delete=False) as tmp:
-    filename = tmp.name
-
-try:
-    with FileManager(filename) as f:
-        f.write('Hello, World!')
-        raise ValueError('Test error')
-except ValueError as e:
-    print(f"Caught ValueError: {e}")
+        The name column is left aligned using a dynamic width.
+        The timestamp uses %m/%d %H:%M.
+        The duration is right aligned as minutes with an 'm' suffix.
+        Tags, when present, are joined with semicolons inside square brackets.
+        """
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-except IOError as e:
-    print(f"Caught IOError: {e}")
+        tags = f" [{';'.join(self.tags)}]" if self.tags else ""
+        return (
+            f"{self.name:<{width - 24}}"
+            f"{self.start:%m/%d %H:%M} "
+            f"{self.minutes:>4}m"
+            f"{tags}"
+        )
 
 
 SUFFIX CODE:
 ----------------------------------------
-else:
-    print("No exceptions occurred.")
-finally:
-    os.remove(filename)
-    print("File cleaned up.")
+
+span = Span(
+    "Deploy",
+    datetime.datetime(2026, 5, 1, 9, 30),
+    75,
+    ["prod", "db"],
+)
+line = span.render(50)
+print(line)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the ability to handle nested control structures with multiple try/except/else/finally blocks and context manager nesting. It verifies the correct handling of exceptions and resource cleanup while maintaining proper indentation and structure.
+span = Span("Deploy", datetime.datetime(2026, 5, 1, 9, 30), 75, ["prod", "db"])
+assert span.render(50) == "Deploy                    05/01 09:30   75m [prod;db]", span.render(50)
+assert Span("Lunch", datetime.datetime(2024, 1, 2, 12, 0), 5).render(40) == "Lunch           01/02 12:00    5m"
+assert Span("X", datetime.datetime(2024, 1, 2, 3, 4), 125, ["a"]).render(32) == "X       01/02 03:04  125m [a]"
 
-ASSERTIONS:
-----------------------------------------
-assert os.path.exists(filename) == False
-
-================================================================================
 
 ================================================================================
 Test Case #5
@@ -258,59 +303,43 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-class FileManager:
-    def __init__(self, filename):
-        self.filename = filename
+from typing import List, Tuple
 
-    def read_file(self):
-        try:
-            with open(self.filename, 'r') as file:
-                data = file.read()
-                return data
+def label_matrix(
+    data: List[List[int]],
+    threshold: int = 50
+) -> List[Tuple[int, int, int, str]]:
+    """Label each cell in a matrix as "high" or "low" based on threshold.
+    
+    Returns list of (row_idx, col_idx, value, label) tuples.
+    """
+    labeled = [
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        except PermissionError:
-            print(f"Permission denied for {self.filename}.")
+        (i, j, val, "high" if val > threshold else "low")
+        for i, row in enumerate(data)
+        for j, val in enumerate(row)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        except FileNotFoundError:
-            print(f"File {self.filename} not found.")
-        except IOError:
-            print(f"An error occurred while reading {self.filename}.")
-        else:
-            print("File read successfully.")
-        finally:
-            print("Finished file operation.")
+    ]
+    return labeled
 
-# Test the FileManager class
-fm = FileManager('example.txt')
-content = fm.read_file()
-if content:
-    print(content)
+data = [[10, 80, 30], [60, 20, 90], [40, 55, 5]]
+labeled = label_matrix(data)
+print(labeled)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to handle multiple nested try/except blocks with different types of exceptions, ensuring proper syntax and indentation. The completion adds an additional except block for PermissionError, which is a common file handling exception.
+assert len(labeled) == 9
+assert labeled[0] == (0, 0, 10, "low")
+assert labeled[1] == (0, 1, 80, "high")
+assert labeled[5] == (1, 2, 90, "high")
 
-ASSERTIONS:
-----------------------------------------
-fm = FileManager('example.txt')
-try:
-    content = fm.read_file()
-except PermissionError:
-    pass
-except FileNotFoundError:
-    pass
-except IOError:
-    pass
-assert content is None or isinstance(content, str)
-
-================================================================================
 
 ================================================================================
 Test Case #6
@@ -324,50 +353,72 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+class Step:
+    def __init__(self, log, name):
+        self.log = log
+        self.name = name
 
-class FileManager:
-    def __init__(self, filename):
-        self.filename = filename
+    def __enter__(self):
+        self.log.append(f"enter:{self.name}")
+        return self
 
-    def write_and_read(self, content):
-        # Context manager nesting with multiple with statements
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            temp_filename = temp_file.name
-            temp_file.write(content.encode())
-            temp_file.flush()
-            with open(temp_file.name, 'r') as read_file:
+    def __exit__(self, exc_type, exc, tb):
+        self.log.append(f"exit:{self.name}")
+        return False
+
+def run_steps(mode: str):
+    """Run nested context managers with precise exception handling.
+
+    In the inner body append "body".
+    mode == "value" raises ValueError("bad") and is wrapped as RuntimeError("wrapped").
+    mode == "type" raises TypeError("wrong") and is handled only by the outer TypeError except.
+    Always append inner-finally after the inner try and outer-finally at the end.
+    """
+    log = []
+    try:
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                read_file.seek(0)
+        with Step(log, "outer"):
+            try:
+                with Step(log, "inner"):
+                    log.append("body")
+                    if mode == "value":
+                        raise ValueError("bad")
+                    if mode == "type":
+                        raise TypeError("wrong")
+            except ValueError as exc:
+                log.append(f"inner:{exc}")
+                raise RuntimeError("wrapped") from exc
+            finally:
+                log.append("inner-finally")
+    except RuntimeError as exc:
+        log.append(f"outer:{exc.__cause__}")
+    except TypeError as exc:
+        log.append(f"type:{exc}")
+    finally:
+        log.append("outer-finally")
 
 
 SUFFIX CODE:
 ----------------------------------------
-                read_data = read_file.read()
-        os.remove(temp_file.name)
-        return read_data, temp_filename
+    return log
 
-# Example usage
-file_manager = FileManager('example.txt')
-result, temp_filename = file_manager.write_and_read('Hello, World!')
+ok = run_steps("ok")
+value = run_steps("value")
+type_case = run_steps("type")
+print(ok)
+print(value)
+print(type_case)
 
-# Assertions
-assert result == 'Hello, World!', f"Expected 'Hello, World!', but got {result}"
 
-print('All assertions passed!')
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good benchmark for syntax completion capabilities as it involves nested context managers with `with` statements. The correct completion requires understanding the structure and indentation of nested blocks. Ensuring the file pointer is reset using `read_file.seek(0)` before reading the file content is crucial for reading the entire content written to the temporary file. This tests the LLM's ability to handle nested context managers and maintain proper indentation and syntax.
+assert ok == ["enter:outer", "enter:inner", "body", "exit:inner", "inner-finally", "exit:outer", "outer-finally"], ok
+assert value == ["enter:outer", "enter:inner", "body", "exit:inner", "inner:bad", "inner-finally", "exit:outer", "outer:bad", "outer-finally"], value
+assert type_case == ["enter:outer", "enter:inner", "body", "exit:inner", "inner-finally", "exit:outer", "type:wrong", "outer-finally"], type_case
 
-ASSERTIONS:
-----------------------------------------
-assert os.path.exists(temp_filename) == False, 'Temporary file was not deleted'
-================================================================================
 
 ================================================================================
 Test Case #7
@@ -381,78 +432,60 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
-import aiofiles
+from dataclasses import dataclass
 
-class BaseService:
-    def __init__(self, name):
-        self.name = name
+@dataclass
+class Packet:
+    kind: str
+    payload: object
+    flags: tuple[str, ...] = ()
 
-    async def start_service(self):
-        raise NotImplementedError('start_service must be implemented by subclasses')
+def route(packet) -> str:
+    """Route packets using structural pattern matching.
 
-class LoggingService(BaseService):
-    def __init__(self, name, log_file):
-        super().__init__(name)
-        self.log_file = log_file
-
-    async def start_service(self):
-        async with aiofiles.open(self.log_file, mode='a') as log:
-            await log.write(f'{self.name} service started\n')
-
-class MonitoringService(BaseService):
-    def __init__(self, name, monitoring_endpoint):
-        super().__init__(name)
-        self.monitoring_endpoint = monitoring_endpoint
-
-    async def start_service(self):
-        await asyncio.sleep(1)
-        print(f'{self.name} service is monitoring at {self.monitoring_endpoint}')
-
-class CombinedService:
-    def __init__(self, *services):
-        self.services = services
-
-    async def start_all_services(self):
+    Data packets have payload {"id": int, "chunks": [first, *rest]}.
+    Urgent data is reported separately from normal data.
+    Control retry packets have payload ("retry", count) and positive count.
+    Text mappings may arrive as plain dictionaries with kind/body/lang keys.
+    Everything else is ignored.
+    """
+    match packet:
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        tasks = [service.start_service() for service in self.services]
-        await asyncio.gather(*tasks)
+        case Packet("data", {"id": int(pid), "chunks": [first, *rest]}, flags) if "urgent" in flags:
+            return f"urgent-data:{pid}:{1 + len(rest)}"
+        case Packet("data", {"id": int(pid), "chunks": [first, *rest]}, _):
+            return f"data:{pid}:{1 + len(rest)}"
+        case Packet("control", ("retry", int(count)), _) if count > 0:
+            return f"retry:{count}"
+        case {"kind": "text", "body": str(body), **extra} if extra.get("lang") == "py":
+            return f"python-text:{body}"
+        case _:
+            return "ignored"
 
 
 SUFFIX CODE:
 ----------------------------------------
-    async def stop_all_services(self):
-        # This method will stop all services
-        for service in self.services:
-            print(f'Stopping {service.name} service')
 
-# Example usage
-async def main():
-    logging_service = LoggingService('Logger', 'logfile.txt')
-    monitoring_service = MonitoringService('Monitor', 'http://localhost:8000')
-    combined_service = CombinedService(logging_service, monitoring_service)
-    await combined_service.start_all_services()
-    await combined_service.stop_all_services()
-
-asyncio.run(main())
+r1 = route(Packet("data", {"id": 7, "chunks": ["a", "b", "c"]}, ("urgent",)))
+r2 = route(Packet("data", {"id": 8, "chunks": ["x"]}))
+r3 = route(Packet("control", ("retry", 3)))
+r4 = route({"kind": "text", "body": "print()", "lang": "py"})
+print(r1, r2, r3, r4)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example of complex Python syntax features including async/await patterns, multiple inheritance, and the use of asyncio for concurrent task execution. It also demonstrates the proper use of context managers and file handling using aiofiles.
+assert r1 == "urgent-data:7:3"
+assert r2 == "data:8:1"
+assert r3 == "retry:3"
+assert r4 == "python-text:print()"
+assert route(Packet("control", ("retry", 0))) == "ignored"
+assert route({"kind": "text", "body": "x", "lang": "js"}) == "ignored"
+assert route(Packet("data", {"id": True, "chunks": ["x"]})) == "data:True:1"
 
-ASSERTIONS:
-----------------------------------------
-assert issubclass(LoggingService, BaseService)
-assert issubclass(MonitoringService, BaseService)
-assert asyncio.iscoroutinefunction(LoggingService('Logger', 'logfile.txt').start_service)
-assert asyncio.iscoroutinefunction(MonitoringService('Monitor', 'http://localhost:8000').start_service)
-assert asyncio.iscoroutinefunction(CombinedService().start_all_services)
-
-================================================================================
 
 ================================================================================
 Test Case #8
@@ -466,65 +499,59 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+import io
+import sys
+from typing import List, Tuple, Optional, Union
 
-class MyBaseClass:
-    def __init__(self, value):
-        self.value = value
-
-class MyDerivedClass(MyBaseClass):
-    def __init__(self, value, extra):
-        super().__init__(value)
-        self.extra = extra
-
-    async def async_method(self):
-        await asyncio.sleep(1)
-        print('Async task completed')
-
-class AnotherDerivedClass(MyDerivedClass):
-    def __init__(self, value, extra, additional):
-        super().__init__(value, extra)
-        self.additional = additional
-
-    async def complex_async_method(self):
+def find_first_negative(
+    values: List[int]
+) -> Tuple[Optional[int], str]:
+    """Find first negative using for/else inside try/except/else/finally.
+    
+    Returns (value_found_or_None, captured_output_string).
+    The for/else pattern is key: else fires only if loop
+    completes without break.
+    """
+    captured = io.StringIO()
+    old_stdout = sys.stdout
+    sys.stdout = captured
+    result = None
+    try:
+        for v in values:
+            if v < 0:
+                result = v
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        await asyncio.gather(
-            self.async_method(),
-            asyncio.sleep(0.5),
-        )
+                print(f"Found negative: {v}")
+                break
+        else:
+            print("No negatives found")
 
 
 SUFFIX CODE:
 ----------------------------------------
-        print(f'Value: {self.value}, Extra: {self.extra}, Additional: {self.additional}')
-        await self.async_method()
+    except TypeError as e:
+        print(f"TypeError: {e}")
+        result = "error"
+    else:
+        print("Search completed without error")
+    finally:
+        sys.stdout = old_stdout
+    return result, captured.getvalue()
 
-async def main():
-    obj = AnotherDerivedClass(1, 'extra', 'additional')
-    await obj.complex_async_method()
-
-if __name__ == '__main__':
-    asyncio.run(main())
+r1, out1 = find_first_negative([1, 2, -3, 4])
+r2, out2 = find_first_negative([1, 2, 3])
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the use of complex Python syntax features like multiple inheritance, super() calls, and async/await patterns. The completion involves the use of asyncio.gather to run multiple asynchronous tasks concurrently, which tests the model's understanding of asynchronous programming and proper indentation within a class method.
+assert r1 == -3, f"Expected -3 but got {r1}"
+assert "Found negative: -3" in out1
+assert r2 is None, f"Expected None but got {r2}"
+assert "No negatives found" in out2
 
-ASSERTIONS:
-----------------------------------------
-assert issubclass(AnotherDerivedClass, MyDerivedClass)
-assert hasattr(AnotherDerivedClass, 'complex_async_method')
-import asyncio
-obj = AnotherDerivedClass(1, 'extra', 'additional')
-async def test_method():
-    await obj.complex_async_method()
-asyncio.run(test_method())
-
-================================================================================
 
 ================================================================================
 Test Case #9
@@ -538,59 +565,58 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-class Resource:
-    def __init__(self, name):
-        self.name = name
+import os
+import tempfile
+
+class ManagedFile:
+    def __init__(self, path, mode='w'):
+        self.path = path
+        self.mode = mode
+        self.file = None
 
     def __enter__(self):
-        print(f'Entering {self.name}')
-        return self
+        self.file = open(self.path, self.mode)
+        return self.file
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        print(f'Exiting {self.name}')
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.file:
+            self.file.close()
+        return False
 
-class CustomError(Exception):
-    pass
+def safe_write(content, should_fail=False):
+    tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.txt')
+    path = tmp.name
+    tmp.close()
+    try:
+        with ManagedFile(path, 'w') as f:
+            f.write(content)
+            if should_fail:
 
-class CustomResourceHandler:
-    def process_resource(self):
-        try:
-            with Resource('CustomResource') as resource:
 
 GOLDEN COMPLETION:
 ----------------------------------------
+                raise RuntimeError("Intentional failure")
+        with ManagedFile(path, 'r') as f:
+            result = f.read()
 
-                if resource.name == 'CustomResource':
-                    raise CustomError('An error occurred with the custom resource')
 
 SUFFIX CODE:
 ----------------------------------------
+    except RuntimeError:
+        result = "FAILED"
+    finally:
+        os.unlink(path)
+    return result
 
-                print('Processing resource')
-        except CustomError as e:
-            print(f'Caught custom error: {e}')
-            return "error_caught"
-        except Exception as e:
-            print(f'Caught generic error: {e}')
-        else:
-            print('No errors encountered')
-        finally:
-            print('Cleanup if necessary')
-
-handler = CustomResourceHandler()
+ok = safe_write("good data")
+fail = safe_write("bad data", should_fail=True)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example for syntax completion as it involves a try/except/else/finally block with context manager error handling and custom exception raising. It tests the LLM's ability to handle complex nested structures and proper indentation.
+assert ok == "good data", f"Expected 'good data' but got {ok!r}"
+assert fail == "FAILED", f"Expected 'FAILED' but got {fail!r}"
 
-ASSERTIONS:
-----------------------------------------
-result = handler.process_resource()
-assert result == "error_caught", 'CustomError was not caught as expected'
-print('Test completed successfully')
-
-================================================================================
 
 ================================================================================
 Test Case #10
@@ -604,45 +630,62 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import contextlib
+class Level:
+    def __init__(self, name):
+        self.name = name
+        self.entered = False
+        self.exited = False
 
-@contextlib.contextmanager
-def managed_resource(name: str):
-    print(f"Acquiring resource: {name}")
-    resource = f"Resource({name})"
+    def __enter__(self):
+        self.entered = True
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.exited = True
+        return False
+
+def deep_nesting():
+    log = []
     try:
+        with Level("A") as a:
+            log.append(f"entered {a.name}")
+            try:
+                with Level("B") as b:
+                    log.append(f"entered {b.name}")
+                    try:
+                        with Level("C") as c:
+                            log.append(f"entered {c.name}")
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
+                            raise ValueError("error at C")
+                    except ValueError as e:
+                        log.append(f"caught: {e}")
+                        raise RuntimeError("escalated") from e
 
-        yield resource
 
 SUFFIX CODE:
 ----------------------------------------
+            except RuntimeError as e:
+                log.append(f"caught escalated: {e}")
+                log.append(f"original cause: {e.__cause__}")
+    except Exception as e:
+        log.append(f"outer: {e}")
+    return log, a, b, c
 
-    finally:
-        print(f"Releasing resource: {name}")
-        del resource
+log, a, b, c = deep_nesting()
 
-# Usage example
-try:
-    with managed_resource("MyResource") as res:
-        print(f"Using {res}")
-        assert res == "Resource(MyResource)"
-finally:
-    print("Done with resource management")
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the usage of a context manager with proper resource handling. The code within the `try` block should yield the resource and manage exceptions correctly. The completion must maintain the appropriate indentation and syntax for the context manager to function properly. The suffix code provides a concrete example of using the context manager, ensuring that the assertions check the resource management.
+assert a.entered and a.exited
+assert b.entered and b.exited
+assert c.entered and c.exited
+assert "caught: error at C" in log
+assert "caught escalated: escalated" in log
+assert any("original cause" in entry for entry in log)
 
-ASSERTIONS:
-----------------------------------------
-assert callable(managed_resource)
-with managed_resource("TestResource") as res:
-    assert res == "Resource(TestResource)"
-print("All assertions passed.")
-================================================================================
 
 ================================================================================
 Test Case #11
@@ -656,42 +699,65 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+from contextlib import ExitStack
 
-async def fetch_data(url: str) -> str:
-    # Simulate an async data fetch
-    await asyncio.sleep(1)
-    return f"Data from {url}"
+class Resource:
+    def __init__(self, log, name):
+        self.log = log
+        self.name = name
 
-async def main():
-    urls = ["http://example.com/1", "http://example.com/2", "http://example.com/3"]
-    tasks = [
+    def __enter__(self):
+        self.log.append(f"enter:{self.name}")
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.log.append(f"exit:{self.name}")
+        return False
+
+def manage(mode: str):
+    """Use ExitStack inside try/except/else/finally.
+
+    Enter alpha and beta through stack.enter_context.
+    Append use:<alpha>/<beta> unless mode == "lookup".
+    mode == "lookup" raises LookupError("missing") and is handled by the except.
+    The else block appends "else" only for the no-error path.
+    The finally block always appends "finally".
+    """
+    log = []
+    try:
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        fetch_data(url) for url in urls
+        with ExitStack() as stack:
+            alpha = stack.enter_context(Resource(log, "alpha"))
+            beta = stack.enter_context(Resource(log, "beta"))
+            if mode == "lookup":
+                raise LookupError("missing")
+            log.append(f"use:{alpha.name}/{beta.name}")
+    except LookupError as exc:
+        log.append(f"lookup:{exc}")
+    else:
+        log.append("else")
+    finally:
+        log.append("finally")
 
 
 SUFFIX CODE:
 ----------------------------------------
-    ]
-    results = await asyncio.gather(*tasks)
-    for result in results:
-        print(result)
+    return log
 
-if __name__ == "__main__":
-    asyncio.run(main())
+ok = manage("ok")
+missing = manage("lookup")
+print(ok)
+print(missing)
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case for checking the LLM's understanding of async/await patterns, especially the correct usage of list comprehensions within an async context. The prompt sets up an asynchronous function and an async main function that creates tasks, while the golden completion requires correctly forming a list comprehension of async function calls. The suffix includes gathering the tasks and printing results, which tests the LLM's ability to maintain consistency in the asynchronous structure.
+assert ok == ["enter:alpha", "enter:beta", "use:alpha/beta", "exit:beta", "exit:alpha", "else", "finally"], ok
+assert missing == ["enter:alpha", "enter:beta", "exit:beta", "exit:alpha", "lookup:missing", "finally"], missing
 
-ASSERTIONS:
-----------------------------------------
-assert asyncio.run(main()) == None
-
-================================================================================
 
 ================================================================================
 Test Case #12
@@ -705,61 +771,56 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+import functools
 
-async def fetch_data(url: str) -> dict:
-    # Simulate an async data fetch operation
-    await asyncio.sleep(1)
-    return {"data": "sample"}
+def log_call(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        wrapper.call_count = getattr(wrapper, 'call_count', 0) + 1
+        return func(*args, **kwargs)
+    wrapper.call_count = 0
+    return wrapper
 
-class DataProcessor:
-    async def process(self, url: str) -> dict:
-        try:
-            data = await fetch_data(url)
+class Registry:
+    _instances = {}
+
+    def __init__(self, name: str):
+        self.name = name
+
+    @classmethod
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        except asyncio.TimeoutError as e:
-            print(f"Timeout error: {e}")
+    @log_call
+    def create(cls, name: str) -> 'Registry':
+        if name not in cls._instances:
+            cls._instances[name] = cls(name)
+        return cls._instances[name]
 
 
 SUFFIX CODE:
 ----------------------------------------
-        except Exception as e:
-            print(f"Error fetching data: {e}")
-        else:
-            print("Data fetched successfully")
-        return data
 
-# Example usage
-async def main():
-    processor = DataProcessor()
-    result = await processor.process("http://example.com")
-    print(result)
+    @staticmethod
+    @log_call
+    def validate_name(name: str) -> bool:
+        return isinstance(name, str) and len(name) > 0
 
-# Run the example
-def run_example():
-    asyncio.run(main())
-
-run_example()
+r1 = Registry.create("alpha")
+r2 = Registry.create("alpha")
+r3 = Registry.create("beta")
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to handle async/await patterns combined with complex error handling using try/except blocks. The golden completion demonstrates the correct way to catch a specific exception (asyncio.TimeoutError) in an async function, ensuring the LLM understands async error handling. The suffix continues with general exception handling and normal flow, providing a clear distinction between the completion and subsequent code.
+assert r1 is r2, "Same name should return same instance"
+assert r1 is not r3
+assert r1.name == "alpha"
+assert Registry.create.call_count == 3
+assert Registry.validate_name("test") is True
+assert Registry.validate_name("") is False
 
-ASSERTIONS:
-----------------------------------------
-assert asyncio.iscoroutinefunction(fetch_data)
-assert asyncio.iscoroutinefunction(DataProcessor().process)
-assert DataProcessor().process.__code__.co_flags & 0x80  # Check if 'process' is an async function
-try:
-    asyncio.run(main())
-except Exception as e:
-    assert False, f"An unexpected exception occurred: {e}"
-
-================================================================================
 
 ================================================================================
 Test Case #13
@@ -773,81 +834,55 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import sqlite3
+from abc import ABC, abstractmethod
+from functools import cached_property
 
-class DatabaseManager:
-    def __init__(self, db_name: str):
-        self.db_name = db_name
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -> float: ...
 
-    def __enter__(self):
-        self.conn = sqlite3.connect(self.db_name)
-        self.cursor = self.conn.cursor()
-        return self.cursor
+    @abstractmethod
+    def perimeter(self) -> float: ...
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        if exc_type is not None:
-            self.conn.rollback()
-        else:
-            self.conn.commit()
-        self.conn.close()
+class Circle(Shape):
+    PI = 3.14159265
 
-class UserRepository:
-    def __init__(self, db_name: str):
-        self.db_name = db_name
+    def __init__(self, radius: float):
+        self._radius = radius
 
-    def add_user(self, user_id: int, user_name: str):
+    @property
+    def radius(self) -> float:
+        return self._radius
+
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        with DatabaseManager(self.db_name) as cursor:
-            cursor.execute('DELETE FROM users WHERE id = ?', (user_id,))
-            cursor.execute('INSERT INTO users (id, name) VALUES (?, ?)', (user_id, user_name))
+    def area(self) -> float:
+        return self.PI * self._radius ** 2
+
+    def perimeter(self) -> float:
+        return 2 * self.PI * self._radius
+
+    @classmethod
+    def unit_circle(cls) -> 'Circle':
 
 
 SUFFIX CODE:
 ----------------------------------------
-        print(f"User {user_name} added with ID {user_id}")
+        return cls(1.0)
 
-# Test case
-if __name__ == '__main__':
-    repo = UserRepository('test.db')
-    with DatabaseManager('test.db') as cursor:
-        cursor.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)')
-    repo.add_user(1, 'Alice')
-
-    # Verify user addition
-    with DatabaseManager('test.db') as cursor:
-        cursor.execute('SELECT name FROM users WHERE id = ?', (1,))
-        result = cursor.fetchone()
-    assert result[0] == 'Alice', f"Expected 'Alice', but got {result[0]}"
-
-    # Cleanup
-    with DatabaseManager('test.db') as cursor:
-        cursor.execute('DROP TABLE users')
+c = Circle(5)
+uc = Circle.unit_circle()
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example for checking the completion of context manager usage within a method, showing the correct structure and indentation for using the 'with' statement. The prompt sets up the context for a database operation, and the completion needs to properly implement the insertion of a user into the database table, while the suffix handles verification and cleanup, ensuring that the code is fully functional and syntactically correct.
+assert abs(c.area() - 3.14159265 * 25) < 1e-6
+assert abs(c.perimeter() - 2 * 3.14159265 * 5) < 1e-6
+assert uc.radius == 1.0
+assert abs(uc.area() - 3.14159265) < 1e-6
 
-ASSERTIONS:
-----------------------------------------
-repo = UserRepository('test.db')
-with DatabaseManager('test.db') as cursor:
-    cursor.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT)')
-
-repo.add_user(2, 'Bob')
-with DatabaseManager('test.db') as cursor:
-    cursor.execute('SELECT name FROM users WHERE id = ?', (2,))
-    result = cursor.fetchone()
-assert result[0] == 'Bob', f"Expected 'Bob', but got {result[0]}"
-
-with DatabaseManager('test.db') as cursor:
-    cursor.execute('DROP TABLE users')
-
-
-================================================================================
 
 ================================================================================
 Test Case #14
@@ -861,40 +896,84 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+class Guard:
+    def __init__(self, log, name):
+        self.log = log
+        self.name = name
 
-async def fetch_data(url: str) -> str:
-    await asyncio.sleep(1)
-    return f"Data from {url}"
+    def __enter__(self):
+        self.log.append(f"enter:{self.name}")
+        return self
 
-async def main():
-    urls = ["http://example.com/1", "http://example.com/2"]
-    tasks = [fetch_data(url) for url in urls]
-    
+    def __exit__(self, exc_type, exc, tb):
+        self.log.append(f"exit:{self.name}")
+        return False
+
+def audit_events(events):
+    """Audit events with nested Python control-flow syntax.
+
+    Inside Guard(log, "scan"), iterate over events.
+    Use match/case for dictionaries:
+    - {"kind": "stop", "code": int(code)} with code > 0 logs stop:<code> and breaks.
+    - {"kind": "skip"} continues without logging.
+    - {"kind": str(kind)} logs seen:<kind>.
+    If the loop does not break, the for/else block logs no-stop.
+    TypeError is caught outside the with block as type:<message>.
+    The try/else block logs clean only when no exception escaped the try.
+    The finally block always logs done.
+    """
+    log = []
+    try:
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    results = await asyncio.gather(*tasks)
-    
+        with Guard(log, "scan"):
+            for event in events:
+                match event:
+                    case {"kind": "stop", "code": int(code)} if code > 0:
+                        log.append(f"stop:{code}")
+                        break
+                    case {"kind": "skip"}:
+                        continue
+                    case {"kind": str(kind)}:
+                        log.append(f"seen:{kind}")
+                    case _:
+                        raise TypeError(f"bad event: {event!r}")
+            else:
+                log.append("no-stop")
+    except TypeError as exc:
+        log.append(f"type:{exc}")
+    else:
+        log.append("clean")
+    finally:
+        log.append("done")
+
 
 SUFFIX CODE:
 ----------------------------------------
-    for result in results:
-        print(result)
-    return results
+    return log
 
-results = asyncio.run(main())
+with_stop = audit_events([
+    {"kind": "start"},
+    {"kind": "skip"},
+    {"kind": "stop", "code": 3},
+    {"kind": "late"},
+])
+no_stop = audit_events([{"kind": "skip"}, {"kind": "tick"}])
+bad = audit_events([{"bad": True}])
+print(with_stop)
+print(no_stop)
+print(bad)
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the use of async/await patterns in Python, specifically the use of asyncio.gather for concurrently running multiple asynchronous tasks. The completion requires understanding the async/await syntax and proper function calls within an asynchronous context.
+assert with_stop == ["enter:scan", "seen:start", "stop:3", "exit:scan", "clean", "done"], with_stop
+assert no_stop == ["enter:scan", "seen:tick", "no-stop", "exit:scan", "clean", "done"], no_stop
+assert bad == ["enter:scan", "exit:scan", "type:bad event: {'bad': True}", "done"], bad
+assert audit_events([{"kind": "stop", "code": 0}]) == ["enter:scan", "seen:stop", "no-stop", "exit:scan", "clean", "done"]
 
-ASSERTIONS:
-----------------------------------------
-assert asyncio.iscoroutinefunction(fetch_data)
-assert asyncio.iscoroutinefunction(main)
-assert 'results' in locals()
-================================================================================
 
 ================================================================================
 Test Case #15
@@ -908,69 +987,64 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-class CustomError(Exception):
-    pass
+class Validated:
+    """A descriptor that validates values are within a range."""
 
-class Resource:
-    def __init__(self):
-        self.active = False
+    def __init__(self, min_val: float, max_val: float):
+        self.min_val = min_val
+        self.max_val = max_val
 
-    def __enter__(self):
-        self.active = True
-        return self
+    def __set_name__(self, owner, name):
+        self.storage_name = f'_validated_{name}'
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.active = False
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        return getattr(obj, self.storage_name, None)
 
-    def use(self):
-        if not self.active:
-            raise CustomError("Resource not active")
-        return "Resource is being used"
 
-# The following function demonstrates complex error handling patterns with context managers
-
-def complex_function(flag: bool):
-    try:
-        with Resource() as res:
 
 GOLDEN COMPLETION:
 ----------------------------------------
+    def __set__(self, obj, value):
+        if not (self.min_val <= value <= self.max_val):
+            raise ValueError(
+                f"Value {value} not in [{self.min_val}, {self.max_val}]"
+            )
+        setattr(obj, self.storage_name, value)
 
-            if not flag:
-                raise CustomError("Flag is False")
 
 SUFFIX CODE:
 ----------------------------------------
 
-            return res.use()
-    except CustomError as e:
-        return f"Caught CustomError: {str(e)}"
-    except Exception as e:
-        return f"Caught unexpected error: {str(e)}"
-    else:
-        return "No errors occurred"
-    finally:
-        print("Execution completed")
+class Config:
+    speed = Validated(0, 100)
+    volume = Validated(0, 10)
 
-# Test the function with different scenarios
-assert complex_function(True) == "Resource is being used"
-assert "Caught CustomError" in complex_function(False)
-assert complex_function(True) != "Caught CustomError"
+    def __init__(self, speed: float, volume: float):
+        self.speed = speed
+        self.volume = volume
 
-print("All assertions passed.")
+cfg = Config(50, 5)
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to understand and complete a nested try/except/else/finally block with context manager usage. The completion involves raising a custom exception based on a condition, which checks the LLM's understanding of error handling and context manager patterns. Proper indentation and nesting are crucial here.
+assert cfg.speed == 50
+assert cfg.volume == 5
+cfg.speed = 75
+assert cfg.speed == 75
+try:
+    cfg.speed = 200
+    assert False, "Should have raised ValueError"
+except ValueError:
+    pass
+try:
+    cfg.volume = -1
+    assert False, "Should have raised ValueError"
+except ValueError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-assert complex_function(True) == "Resource is being used"
-assert "Caught CustomError" in complex_function(False)
-assert complex_function(True) != "Caught CustomError"
-
-print("All assertions passed.")
-================================================================================
 
 ================================================================================
 Test Case #16
@@ -984,57 +1058,49 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-class ResourceHandler:
-    def __init__(self, resource):
-        self.resource = resource
+from typing import Dict
 
-    def process_resource(self):
-        try:
-            self.resource.open()
+def classify_status(code: int) -> str:
+    """Classify HTTP status codes into human-readable categories.
+    
+    Uses structural pattern matching (match/case).
+    Handles specific codes and a wildcard fallback.
+    """
+    match code:
+        case 200:
+            return "OK"
+        case 301 | 302:
+            return "Redirect"
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        case 404:
+            return "Not Found"
+        case 500:
+            return "Server Error"
+        case _:
+            return "Unknown"
 
 
 SUFFIX CODE:
 ----------------------------------------
-        finally:
-            self.resource.close()
 
-# Example usage:
-class MockResource:
-    def open(self):
-        pass
-    def close(self):
-        pass
+results: Dict[int, str] = {
+    code: classify_status(code)
+    for code in [200, 301, 302, 404, 500, 999]
+}
 
-resource = MockResource()
-handler = ResourceHandler(resource)
-handler.process_resource()
 
-# Assertions
-assert hasattr(resource, 'open')
-assert hasattr(resource, 'close')
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case examines the LLM's ability to complete a try/except/finally block properly. It ensures the LLM understands the flow of control in error handling and proper nesting of the syntax. The completion must include an appropriate error handling clause, which is a common and critical pattern in Python programming.
+assert results[200] == "OK"
+assert results[301] == "Redirect"
+assert results[302] == "Redirect"
+assert results[404] == "Not Found"
+assert results[500] == "Server Error"
+assert results[999] == "Unknown"
 
-ASSERTIONS:
-----------------------------------------
-assert hasattr(resource, 'open')
-assert hasattr(resource, 'close')
-# Ensure no exceptions are thrown during execution
-try:
-    handler.process_resource()
-    exception_raised = False
-except Exception:
-    exception_raised = True
-assert not exception_raised
-================================================================================
 
 ================================================================================
 Test Case #17
@@ -1048,63 +1114,53 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, Tuple
+from typing import Union
 
-class Base1:
-    def greet(self) -> str:
-        return 'Hello from Base1'
-
-class Base2:
-    def greet(self) -> str:
-        return 'Hello from Base2'
-
-class Child(Base1, Base2):
-    def greet(self) -> str:
-        return super().greet() + ' and Child'
-
-class MultiInheritanceExample(Child):
-    def __init__(self, values: List[int], config: Dict[str, str]):
-        self.values = values
-        self.config = config
-
-    def calculate(self) -> Tuple[int, int]:
-        total = sum(self.values)
-        count = len(self.values)
-        return total, count
-
+def process_command(command: Union[dict, str]) -> str:
+    """Process game commands using pattern matching.
+    
+    Supports move with direction/steps, rotate with angle,
+    and fallback for unknown/invalid commands.
+    """
+    match command:
+        case {"action": "move", "direction": d, "steps": s} if s > 0:
+            return f"Moving {d} by {s} steps"
+        case {"action": "move", "direction": d, "steps": s} if s <= 0:
+            return "Cannot move zero or negative steps"
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    def greet(self) -> str:
-        return super().greet() + ' with MultiInheritanceExample'
-
+        case {"action": "rotate", "angle": a} if -360 <= a <= 360:
+            return f"Rotating by {a} degrees"
+        case {"action": "rotate", "angle": a}:
+            return f"Invalid angle: {a}"
+        case {"action": action}:
+            return f"Unknown action: {action}"
+        case _:
+            return "Invalid command"
 
 
 SUFFIX CODE:
 ----------------------------------------
-example = MultiInheritanceExample([1, 2, 3, 4], {'key': 'value'})
-assert example.greet() == 'Hello from Base1 and Child with MultiInheritanceExample'
-assert example.calculate() == (10, 4)
 
-# Cleanup resources
-example = None
+r1 = process_command({"action": "move", "direction": "north", "steps": 5})
+r2 = process_command({"action": "move", "direction": "south", "steps": 0})
+r3 = process_command({"action": "rotate", "angle": 90})
+r4 = process_command({"action": "rotate", "angle": 500})
+r5 = process_command({"action": "jump"})
+r6 = process_command("invalid")
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's understanding of multiple inheritance and the usage of super() calls in a nested class structure. The `golden_completion` demonstrates correct syntax for overriding methods in a derived class and invoking the parent class method using super(). This ensures that the model can handle complex inheritance scenarios and maintain proper method resolution order (MRO).
+assert r1 == "Moving north by 5 steps"
+assert r2 == "Cannot move zero or negative steps"
+assert r3 == "Rotating by 90 degrees"
+assert r4 == "Invalid angle: 500"
+assert r5 == "Unknown action: jump"
+assert r6 == "Invalid command"
 
-ASSERTIONS:
-----------------------------------------
-example = MultiInheritanceExample([1, 2, 3, 4], {'key': 'value'})
-assert example.greet() == 'Hello from Base1 and Child with MultiInheritanceExample'
-assert example.calculate() == (10, 4)
-
-# Cleanup resources
-example = None
-
-================================================================================
 
 ================================================================================
 Test Case #18
@@ -1118,64 +1174,66 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict
+from dataclasses import dataclass
+from typing import Optional
 
-class ParentA:
-    def __init__(self, a: int):
-        self.a = a
+@dataclass
+class Point:
+    x: float
+    y: float
+    label: Optional[str] = None
 
-    def display_a(self) -> str:
-        return f"Value of a: {self.a}"
+@dataclass
+class Line:
+    start: Point
+    end: Point
 
-class ParentB:
-    def __init__(self, b: str):
-        self.b = b
-
-    def display_b(self) -> str:
-        return f"Value of b: {self.b}"
-
-class Child(ParentA, ParentB):
-    def __init__(self, a: int, b: str, c: List[int]):
+def describe_geometry(shape) -> str:
+    match shape:
+        case Point(x=0, y=0):
+            return "origin"
+        case Point(x=x, y=0) if x > 0:
+            return f"positive x-axis at {x}"
+        case Point(x=0, y=y) if y > 0:
+            return f"positive y-axis at {y}"
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        super().__init__(a)
+        case Point(x=x, y=y, label=str(lbl)):
+            return f"labeled point '{lbl}' at ({x}, {y})"
+        case Point(x=x, y=y):
+            return f"point at ({x}, {y})"
+        case Line(start=Point(x=sx, y=sy), end=Point(x=ex, y=ey)) if sx == ex:
+            return f"vertical line from y={sy} to y={ey}"
+        case Line(start=s, end=e):
+            return f"line from ({s.x}, {s.y}) to ({e.x}, {e.y})"
 
 
 SUFFIX CODE:
 ----------------------------------------
+        case _:
+            return "unknown shape"
 
-        ParentB.__init__(self, b)
-        self.c = c
+r1 = describe_geometry(Point(0, 0))
+r2 = describe_geometry(Point(5, 0))
+r3 = describe_geometry(Point(0, 3))
+r4 = describe_geometry(Point(1, 2, "A"))
+r5 = describe_geometry(Point(1, 2))
+r6 = describe_geometry(Line(Point(3, 0), Point(3, 10)))
+r7 = describe_geometry(Line(Point(0, 0), Point(5, 5)))
 
-    def display_all(self) -> Dict[str, str]:
-        return {
-            'a': self.display_a(),
-            'b': self.display_b(),
-            'c': f"Values in c: {self.c}"
-        }
 
-# Test cases to validate the implementation
-child = Child(5, 'test', [1, 2, 3])
-assert child.display_a() == 'Value of a: 5'
-assert child.display_b() == 'Value of b: test'
-assert child.display_all() == {'a': 'Value of a: 5', 'b': 'Value of b: test', 'c': 'Values in c: [1, 2, 3]'}
-
-print("All assertions passed!")
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates the use of multiple inheritance and super() calls in Python. The prompt sets up a class hierarchy with ParentA and ParentB, and a Child class that inherits from both. The completion requires the correct use of super() to initialize both parent classes, showcasing the LLM's understanding of complex inheritance structures. The provided assertions verify that the initialization and method calls on the Child class work as expected, ensuring the syntax and functionality are correct.
+assert r1 == "origin"
+assert r2 == "positive x-axis at 5"
+assert r3 == "positive y-axis at 3"
+assert r4 == "labeled point 'A' at (1, 2)"
+assert r5 == "point at (1, 2)"
+assert r6 == "vertical line from y=0 to y=10"
+assert r7 == "line from (0, 0) to (5, 5)"
 
-ASSERTIONS:
-----------------------------------------
-child = Child(5, 'test', [1, 2, 3])
-assert child.display_a() == 'Value of a: 5'
-assert child.display_b() == 'Value of b: test'
-assert child.display_all() == {'a': 'Value of a: 5', 'b': 'Value of b: test', 'c': 'Values in c: [1, 2, 3]'}
-
-================================================================================
 
 ================================================================================
 Test Case #19
@@ -1189,55 +1247,51 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, Callable, TypeVar
+from typing import Union, List
 
-T = TypeVar('T')
+def parse_record(
+    record: Union[list, str, tuple]
+) -> str:
+    """Parse structured records using sequence pattern matching.
+    
+    Supports various list formats with different fields.
+    Uses star capture for variable-length records.
+    """
+    match record:
+        case [name, age] if isinstance(age, int) and age >= 0:
+            return f"Person: {name}, age {age}"
 
-class DataProcessor:
-    def __init__(self, data: List[Dict[str, T]]) -> None:
-        self.data = data
-
-    def process(self, transform: Callable[[T], T]) -> List[Dict[str, T]]:
 
 GOLDEN COMPLETION:
 ----------------------------------------
+        case [name, age, *hobbies] if len(hobbies) > 0:
+            return f"Person: {name}, age {age}, hobbies: {', '.join(hobbies)}"
+        case [name]:
+            return f"Person: {name}, no other info"
+        case []:
+            return "Empty record"
+        case _:
+            return "Invalid record"
 
-        if not callable(transform):
-            raise ValueError('transform must be callable')
 
 SUFFIX CODE:
 ----------------------------------------
 
-        result = []
-        for item in self.data:
-            new_item = {key: transform(value) for key, value in item.items()}
-            result.append(new_item)
-        return result
+r1 = parse_record(["Alice", 30])
+r2 = parse_record(["Bob", 25, "chess", "hiking"])
+r3 = parse_record(["Charlie"])
+r4 = parse_record([])
+r5 = parse_record("not a list")
 
-data = [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
-processor = DataProcessor(data)
-transformed_data = processor.process(lambda x: x * 2)
 
-assert transformed_data == [{'a': 2, 'b': 4}, {'a': 6, 'b': 8}]
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case checks the LLM's ability to handle type hints with complex generics and function annotation syntax. It requires the model to insert a validation check for a callable parameter within a method, ensuring proper syntax and indentation are maintained. The test also verifies the ability to raise appropriate exceptions based on type checking.
+assert r1 == "Person: Alice, age 30"
+assert r2 == "Person: Bob, age 25, hobbies: chess, hiking"
+assert r3 == "Person: Charlie, no other info"
+assert r4 == "Empty record"
+assert r5 == "Invalid record"
 
-ASSERTIONS:
-----------------------------------------
-data = [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
-processor = DataProcessor(data)
-try:
-    processor.process(123)
-except ValueError as e:
-    assert str(e) == 'transform must be callable'
-else:
-    assert False, 'Expected ValueError not raised'
-
-transformed_data = processor.process(lambda x: x * 2)
-assert transformed_data == [{'a': 2, 'b': 4}, {'a': 6, 'b': 8}]
-================================================================================
 
 ================================================================================
 Test Case #20
@@ -1251,54 +1305,63 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+from dataclasses import dataclass
+from typing import Union
 
-class DataLoader:
-    async def load_data(self) -> str:
-        await asyncio.sleep(1)
-        return "data"
+@dataclass
+class Success:
+    value: object
 
-class Processor:
-    async def process(self, data: str) -> str:
-        await asyncio.sleep(1)
-        return data.upper()
+@dataclass
+class Error:
+    code: int
+    message: str
 
-class ResultSaver:
-    async def save(self, result: str) -> None:
-        await asyncio.sleep(1)
-        print(f"Result saved: {result}")
+@dataclass
+class Warning:
+    code: int
+    message: str
 
-async def main():
-    loader = DataLoader()
-    processor = Processor()
-    saver = ResultSaver()
-
-    data = await loader.load_data()
-    processed_data = await processor.process(data)
+def handle_result(result: Union[Success, Error, Warning]) -> str:
+    match result:
+        case Success(value=v) if isinstance(v, list):
+            return f"Success with list of {len(v)} items"
+        case Success(value=v):
+            return f"Success: {v}"
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    await saver.save(processed_data)
+        case Error(code=c, message=m) | Warning(code=c, message=m) if c >= 500:
+            return f"Critical ({c}): {m}"
+        case Error(code=c, message=m):
+            return f"Error ({c}): {m}"
+        case Warning(code=c, message=m):
+            return f"Warning ({c}): {m}"
+        case _:
+            return "Unrecognized result"
 
 
 SUFFIX CODE:
 ----------------------------------------
-    print("Processing complete.")
 
-if __name__ == '__main__':
-    asyncio.run(main())
+r1 = handle_result(Success([1, 2, 3]))
+r2 = handle_result(Success("hello"))
+r3 = handle_result(Error(500, "Internal"))
+r4 = handle_result(Warning(500, "Critical warning"))
+r5 = handle_result(Error(404, "Not found"))
+r6 = handle_result(Warning(200, "Low priority"))
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to complete an async/await pattern with proper indentation and nesting. The golden completion demonstrates the correct use of `await` within an asynchronous function and maintains the proper flow of async operations. The test ensures that the LLM understands how to chain async calls and properly await their results.
+assert r1 == "Success with list of 3 items"
+assert r2 == "Success: hello"
+assert r3 == "Critical (500): Internal"
+assert r4 == "Critical (500): Critical warning"
+assert r5 == "Error (404): Not found"
+assert r6 == "Warning (200): Low priority"
 
-ASSERTIONS:
-----------------------------------------
-assert asyncio.run(main()) is None
-
-================================================================================
 
 ================================================================================
 Test Case #21
@@ -1312,47 +1375,56 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict
-
-class DataProcessor:
-    def __init__(self, data: List[Dict[str, int]]):
-        self.data = data
-
-    def process_data(self) -> List[Dict[str, int]]:
-        result = []
-        for item in self.data:
-            new_item = {}
+def format_name(
+    # first and last are positional-only
+    # title and suffix are keyword-only with defaults
+    # Use / to separate positional-only
+    # Use * to start keyword-only section
+    # Both have str type annotations
+    # Default values: title='', suffix=''
+    # The function joins non-empty parts with spaces
+    # Example: format_name('John', 'Doe', title='Dr.')
+    # Returns: 'Dr. John Doe'
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            for key, value in item.items():
-                new_item[key] = value * 2
+    first: str,
+    last: str,
+    /,
+    *,
+    title: str = "",
+    suffix: str = "",
 
 
 SUFFIX CODE:
 ----------------------------------------
-            result.append(new_item)
-        return result
+) -> str:
+    parts = []
+    if title:
+        parts.append(title)
+    parts.append(first)
+    parts.append(last)
+    if suffix:
+        parts.append(suffix)
+    return " ".join(parts)
 
-# Example usage
-if __name__ == '__main__':
-    processor = DataProcessor([{'a': 1, 'b': 2}, {'a': 3, 'b': 4}])
-    processed = processor.process_data()
-    print(processed)
+r1 = format_name("John", "Doe")
+r2 = format_name("Jane", "Doe", title="Dr.")
+r3 = format_name("Bob", "Smith", title="Mr.", suffix="Jr.")
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to properly complete a nested loop and dictionary manipulation, maintaining the correct indentation and structure. The scenario includes a class method that processes a list of dictionaries, and the expected completion involves iterating over dictionary items and modifying their values. The correct completion ensures that the nested loop and dictionary operations are properly indented and syntactically correct.
+assert r1 == "John Doe"
+assert r2 == "Dr. Jane Doe"
+assert r3 == "Mr. Bob Smith Jr."
+try:
+    format_name(first="John", last="Doe")
+    assert False, "Should not accept keyword arguments for positional-only params"
+except TypeError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-processor = DataProcessor([{'a': 1, 'b': 2}, {'a': 3, 'b': 4}])
-processed = processor.process_data()
-assert processed == [{'a': 2, 'b': 4}, {'a': 6, 'b': 8}], f"Unexpected processed data: {processed}"
-
-================================================================================
 
 ================================================================================
 Test Case #22
@@ -1366,43 +1438,60 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import TypeVar, Generic
+from typing import Any, Optional
 
-T = TypeVar('T')
+def make_request(
+    # url is positional-only (already separated by /)
+    url: str,
+    /,
+    # Next: method with default, *args for extra paths,
+    # then keyword-only: headers, timeout, and **kwargs
+    # method defaults to 'GET', timeout to 30.0
+    # headers is Optional[dict[str, str]] defaulting to None
 
-class ComplexGeneric(Generic[T]):
-    def __init__(self, data: T) -> None:
-        self.data = data
-
-    def get_data(self) -> T:
-        return self.data
-
-# Example usage
-example = ComplexGeneric(
 
 GOLDEN COMPLETION:
 ----------------------------------------
-data=[1, 2, 3]
+    method: str = "GET",
+    *args: str,
+    headers: Optional[dict[str, str]] = None,
+    timeout: float = 30.0,
+    **kwargs: Any,
+
 
 SUFFIX CODE:
 ----------------------------------------
+) -> dict:
+    result = {
+        "url": url,
+        "method": method,
+        "extra_paths": list(args),
+        "headers": headers or {},
+        "timeout": timeout,
+        "options": kwargs,
+    }
+    return result
+
+r = make_request(
+    "https://api.example.com", "POST", "v1", "users",
+    headers={"Auth": "token"}, timeout=10.0, retry=True
 )
-assert isinstance(example.get_data(), list)
-
-# Cleanup code if any
-# No resources to cleanup in this example
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is useful for evaluating the LLM's capability to handle complex type hints with generics in Python. The completion requires the model to understand how to instantiate a generic class correctly with a specific type. The following suffix then checks the type of the returned data, ensuring proper syntax and type consistency.
+assert r["url"] == "https://api.example.com"
+assert r["method"] == "POST"
+assert r["extra_paths"] == ["v1", "users"]
+assert r["headers"] == {"Auth": "token"}
+assert r["timeout"] == 10.0
+assert r["options"] == {"retry": True}
+try:
+    make_request(url="https://example.com")
+    assert False, "url should be positional-only"
+except TypeError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-example = ComplexGeneric(data=[1, 2, 3])
-assert isinstance(example.get_data(), list)
-assert example.get_data() == [1, 2, 3]
-================================================================================
 
 ================================================================================
 Test Case #23
@@ -1416,67 +1505,51 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, TypeVar, Generic
+from typing import overload, Union
 
-T = TypeVar('T')
+# The overload decorators declare the type signatures
+# for static type checkers. The actual implementation
+# follows without @overload and must handle all cases.
 
-class Container(Generic[T]):
-    def __init__(self, values: List[T]) -> None:
-        self._values = values
+@overload
+def convert(value: str) -> int: ...
+@overload
+def convert(value: int) -> str: ...
+@overload
+def convert(value: float) -> str: ...
 
-    def get_values(self) -> List[T]:
-        return self._values
-
-    def add_value(self, value: T) -> None:
-        self._values.append(value)
-
-    def __eq__(self, other):
-        if not isinstance(other, Container):
-            return False
-        return self._values == other._values
-
-    def __hash__(self):
-        return hash(tuple(self._values))
-
-# The following function uses type hints with complex generics
-# It accepts a list of Container objects and returns a dictionary
-# mapping each container to its list of values
-
-def process_containers(containers: List[Container[T]]) -> Dict[Container[T], List[T]]:
-    result = {}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    for container in containers:
-        result[container] = container.get_values()
+def convert(value: Union[str, int, float]) -> Union[int, str]:
+    if isinstance(value, str):
+        return int(value)
+    elif isinstance(value, (int, float)):
+        return str(value)
+    else:
+        raise TypeError(f"Unsupported type: {type(value)}")
 
 
 SUFFIX CODE:
 ----------------------------------------
-    return result
 
-# Create some container instances and process them
-container1 = Container([1, 2, 3])
-container2 = Container(['a', 'b', 'c'])
-containers = [container1, container2]
-processed = process_containers(containers)
-
-assert processed[container1] == [1, 2, 3]
-assert processed[container2] == ['a', 'b', 'c']
-
-print('All assertions passed!')
+a = convert("42")
+b = convert(42)
+c = convert(3.14)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case focuses on type hints with complex generics in Python. The function `process_containers` uses type hints to specify that it takes a list of `Container` objects and returns a dictionary mapping each `Container` to its list of values. The completion involves iterating over the list of containers and filling the dictionary accordingly. This tests the LLM's ability to handle nested type hints and maintain consistent indentation and syntax.
+assert a == 42 and isinstance(a, int)
+assert b == "42" and isinstance(b, str)
+assert c == "3.14" and isinstance(c, str)
+try:
+    convert([1, 2])
+    assert False, "Should raise TypeError"
+except TypeError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-assert process_containers([Container([1, 2]), Container([3, 4])]) == {Container([1, 2]): [1, 2], Container([3, 4]): [3, 4]}
-
-================================================================================
 
 ================================================================================
 Test Case #24
@@ -1490,51 +1563,58 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, Any, Union
+from typing import Callable, Optional
+from dataclasses import dataclass, field
 
-class DataProcessor:
-    def __init__(self, data: List[Dict[str, Any]]) -> None:
-        self.data = data
+@dataclass
+class Pipeline:
+    steps: list = field(default_factory=list)
+    name: str = "default"
 
-    def process_data(self) -> List[Union[str, int]]:
-        processed_data = []
-        for item in self.data:
-            name = item.get('name')
-            age = item.get('age')
-            if name and isinstance(age, int):
-                processed_data.append(name)
-                processed_data.append(age)
+def build_pipeline(
+    # *transforms collects callable positional args
+    *transforms: Callable[[int], int],
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            else:
-                processed_data.append('Unknown')
-                processed_data.append(-1)
+    name: str = "pipeline",
+    initial: int = 0,
+    validator: Optional[Callable[[int], bool]] = None,
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return processed_data
+) -> Pipeline:
+    p = Pipeline(name=name)
+    value = initial
+    for t in transforms:
+        value = t(value)
+        if validator and not validator(value):
+            raise ValueError(f"Validation failed at value {value}")
+        p.steps.append(value)
+    return p
 
-data = [{'name': 'Alice', 'age': 30}, {'name': 'Bob', 'age': 25}]
-processor = DataProcessor(data)
-result = processor.process_data()
-assert result == ['Alice', 30, 'Bob', 25]
+result = build_pipeline(
+    lambda x: x + 10,
+    lambda x: x * 2,
+    lambda x: x - 5,
+    name="math_pipe",
+    initial=5,
+    validator=lambda v: v >= 0,
+)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to complete a complex Python syntax pattern involving type hints with complex generics. The scenario demonstrates proper usage of type hints for function arguments and return types. The completion requires the model to follow established indentation and structure, ensuring proper nesting within the function. The golden completion introduces an else block to handle cases where the name or age is missing or invalid, showcasing proper handling of different data conditions.
+assert result.name == "math_pipe"
+assert result.steps == [15, 30, 25]
+try:
+    build_pipeline(lambda x: x - 100, initial=50, validator=lambda v: v >= 0)
+    assert False, "Should have raised ValueError"
+except ValueError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-data = [{'name': 'Alice', 'age': 30}, {'name': 'Bob', 'age': 25}, {'name': None, 'age': 'unknown'}, {'name': 'Charlie', 'age': None}]
-processor = DataProcessor(data)
-result = processor.process_data()
-assert result == ['Alice', 30, 'Bob', 25, 'Unknown', -1, 'Unknown', -1]
-
-================================================================================
 
 ================================================================================
 Test Case #25
@@ -1548,50 +1628,68 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-class Base1:
-    def greet(self):
-        return 'Hello from Base1'
+from typing import TypeVar, Generic, ClassVar
+from typing import Protocol, runtime_checkable
 
-class Base2:
-    def greet(self):
-        return 'Hello from Base2'
+T = TypeVar('T')
 
-class Derived(Base1, Base2):
-    def greet(self):
-        base1_greeting = Base1.greet(self)
-        base2_greeting = Base2.greet(self)
-        return f'{base1_greeting} and {base2_greeting}'
+@runtime_checkable
+class Serializable(Protocol):
+    def serialize(self) -> str: ...
 
-# The Derived class correctly calls methods from both Base1 and Base2 using super()
-class AdvancedDerived(Derived):
-    def greet(self):
-        result = super().greet()
+class PluginBase(Generic[T]):
+    _registry: ClassVar[dict[str, type]] = {}
+
+    def __init_subclass__(cls, /, plugin_name: str = "", **kwargs):
+        super().__init_subclass__(**kwargs)
+        name = plugin_name or cls.__name__.lower()
+        cls._registry[name] = cls
+
+    @classmethod
+    def get_plugin(cls, name: str) -> type:
+        if name not in cls._registry:
+            raise KeyError(f"Plugin '{name}' not found")
+        return cls._registry[name]
+
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        result += ' with additional functionality'
+class JsonPlugin(PluginBase[dict], plugin_name="json"):
+    def __init__(self, data: dict):
+        self.data = data
+    def serialize(self) -> str:
+        import json
+        return json.dumps(self.data)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return f'{result} and Hello from AdvancedDerived'
 
-# Testing the functionality
-adv_derived = AdvancedDerived()
-assert adv_derived.greet() == 'Hello from Base1 and Hello from Base2 with additional functionality and Hello from AdvancedDerived'
+class TextPlugin(PluginBase[str], plugin_name="text"):
+    def __init__(self, text: str):
+        self.text = text
+    def serialize(self) -> str:
+        return self.text
+
+jp = JsonPlugin({"key": "value"})
+tp = TextPlugin("hello")
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case checks the LLM's ability to correctly handle multiple inheritance and the usage of super() calls in Python. It ensures the model understands how to chain method calls from multiple base classes and add additional behavior in a derived class. The completion must properly integrate with the established method chaining and inheritance pattern, maintaining correct syntax and indentation.
+assert PluginBase.get_plugin("json") is JsonPlugin
+assert PluginBase.get_plugin("text") is TextPlugin
+assert jp.serialize() == '{"key": "value"}'
+assert tp.serialize() == "hello"
+assert isinstance(jp, Serializable)
+assert isinstance(tp, Serializable)
+try:
+    PluginBase.get_plugin("missing")
+    assert False, "Should raise KeyError"
+except KeyError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-adv_derived = AdvancedDerived()
-assert adv_derived.greet() == 'Hello from Base1 and Hello from Base2 with additional functionality and Hello from AdvancedDerived'
-
-================================================================================
 
 ================================================================================
 Test Case #26
@@ -1605,55 +1703,42 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-class Parent1:
-    def __init__(self, name):
-        self.name = name
+from typing import List, Union
 
-    def greet(self):
-        return f"Hello from {self.name}"
+# Recursive generator to flatten arbitrarily nested lists
+# Handles any depth of nesting using yield from delegation
+# Example: [1, [2, [3]]] -> [1, 2, 3]
 
-class Parent2:
-    def __init__(self, age):
-        self.age = age
+NestedList = Union[int, List['NestedList']]
 
-    def age_info(self):
-        return f"Age is {self.age}"
-
-class Child(Parent1, Parent2):
-    def __init__(self, name, age, school):
-        Parent1.__init__(self, name)
+def flatten(nested_list: NestedList):
+    """Yield all non-list elements from a nested list structure."""
+    for item in nested_list:
+        if isinstance(item, list):
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        Parent2.__init__(self, age)
+            yield from flatten(item)
+        else:
+            yield item
 
 
 SUFFIX CODE:
 ----------------------------------------
-        self.school = school
 
-    def school_info(self):
-        return f"School is {self.school}"
-
-child_instance = Child("Alice", 12, "Wonderland High")
-assert child_instance.greet() == "Hello from Alice"
-assert child_instance.age_info() == "Age is 12"
-assert child_instance.school_info() == "School is Wonderland High"
+data = [1, [2, [3, 4], 5], [6, 7]]
+result = list(flatten(data))
+print(result)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to correctly implement multiple inheritance and proper usage of the super() calls in Python. The prompt sets up a scenario with two parent classes and a child class that inherits from both. The completion must demonstrate correct initialization of both parent classes within the child's __init__ method. The suffix includes assertions that verify the correct behavior of methods inherited from both parents and the child class, ensuring structural integrity and syntactical correctness.
+assert list(flatten([1, [2, [3, 4], 5], [6, 7]])) == [1, 2, 3, 4, 5, 6, 7]
+assert list(flatten([])) == []
+assert list(flatten([1, 2, 3])) == [1, 2, 3]
+assert list(flatten([[[[1]]]])) == [1]
 
-ASSERTIONS:
-----------------------------------------
-child_instance = Child("Alice", 12, "Wonderland High")
-assert child_instance.greet() == "Hello from Alice"
-assert child_instance.age_info() == "Age is 12"
-assert child_instance.school_info() == "School is Wonderland High"
-
-================================================================================
 
 ================================================================================
 Test Case #27
@@ -1667,48 +1752,50 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, Union
+# Generator that acts as a running accumulator using the send() protocol.
+# Usage:
+#   gen = accumulator()
+#   next(gen)           # prime the generator, returns 0
+#   gen.send(10)        # returns 10 (running total)
+#   gen.send(20)        # returns 30
+#   gen.send(None)      # stops and returns final total via StopIteration
 
-class DataProcessor:
-    def process_data(self, data: List[Union[int, str]]) -> Dict[str, int]:
-        result = {}
-        for item in data:
-            if isinstance(item, int):
-                result['int'] = result.get('int', 0) + 1
-            elif isinstance(item, str):
-                result['str'] = result.get('str', 0) + 1
+def accumulator():
+    """A generator that accumulates sent values. Send None to finish."""
+    total = 0
+    while True:
+        value = yield total
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            else:
-                raise ValueError(f"Unsupported data type: {type(item)}")
+        if value is None:
+            return total
+        total += value
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return result
 
-data = [1, 'a', 2, 'b', 3, 'c']
-processor = DataProcessor()
-result = processor.process_data(data)
-assert result == {'int': 3, 'str': 3}
+gen = accumulator()
+next(gen)  # prime the generator
+gen.send(10)
+gen.send(20)
+result = gen.send(30)
+print(result)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to handle complex type hints with generics and properly raise exceptions for unsupported types. It checks if the model can correctly complete the nested if-else structure with proper indentation and error handling.
+gen = accumulator()
+next(gen)
+gen.send(10)
+gen.send(20)
+assert gen.send(30) == 60
+gen2 = accumulator()
+next(gen2)
+assert gen2.send(5) == 5
 
-ASSERTIONS:
-----------------------------------------
-data = [1, 'a', 2, 'b', 3, 'c']
-processor = DataProcessor()
-try:
-    result = processor.process_data(data)
-    assert result == {'int': 3, 'str': 3}
-except ValueError as e:
-    assert False, f"Unexpected ValueError: {e}"
-================================================================================
 
 ================================================================================
 Test Case #28
@@ -1722,49 +1809,58 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, Any, Union
+# A stateful counter generator supporting:
+# - next(): increment by current step and yield count
+# - send(n): change the step to n
+# - throw(ResetSignal): reset count to starting value
 
-# Function with type hints including complex generics
-class DataProcessor:
-    def __init__(self, data: List[Dict[str, Union[int, str]]]) -> None:
-        self.data = data
+class ResetSignal(Exception):
+    """Exception used to signal the counter to reset."""
+    pass
 
-    def process_data(self) -> List[Dict[str, Any]]:
+def stateful_counter(start=0, step=1):
+    """Generator that counts with adjustable step and reset capability."""
+    count = start
+    while True:
+        try:
+            sent = yield count
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
+            if sent is not None:
+                step = sent
+            count += step
+        except ResetSignal:
+            count = start
 
-        processed_data = [
-            {k: (v * 2 if isinstance(v, int) else v) for k, v in item.items()}
-            for item in self.data
-        ]
 
 SUFFIX CODE:
 ----------------------------------------
 
-        return processed_data
+counter = stateful_counter(0, 1)
+assert next(counter) == 0
+assert next(counter) == 1
+assert next(counter) == 2
+counter.send(5)
+result = next(counter)
+print(f"After step change: {result}")
+counter.throw(ResetSignal)
+result_after_reset = next(counter)
+print(f"After reset: {result_after_reset}")
 
-# Example usage
-if __name__ == '__main__':
-    sample_data = [
-        {'id': 1, 'value': 'A'},
-        {'id': 2, 'value': 'B'},
-        {'id': 3, 'value': 100}
-    ]
-    processor = DataProcessor(sample_data)
-    result = processor.process_data()
-    print(result)
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the use of type hints with complex generics in Python. The function `process_data` processes a list of dictionaries where the values can be either integers or strings. The completion involves a nested list and dictionary comprehension, which tests the model's ability to handle complex syntax and proper nesting. This example is a good test case as it requires understanding of type annotations, list comprehensions, and conditional logic within comprehensions.
+c = stateful_counter(0, 1)
+assert next(c) == 0
+assert next(c) == 1
+assert next(c) == 2
+c.send(5)
+assert next(c) == 12
+c.throw(ResetSignal)
+assert next(c) == 5
 
-ASSERTIONS:
-----------------------------------------
-processor = DataProcessor([{'id': 1, 'value': 'A'}, {'id': 2, 'value': 'B'}, {'id': 3, 'value': 100}])
-result = processor.process_data()
-assert result == [{'id': 2, 'value': 'A'}, {'id': 4, 'value': 'B'}, {'id': 6, 'value': 200}], 'The processed data does not match the expected output'
-================================================================================
 
 ================================================================================
 Test Case #29
@@ -1778,52 +1874,47 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Tuple, Dict
+import math
+from typing import Generator
 
-class DataProcessor:
-    def process_data(self, data: List[Dict[str, Tuple[int, float]]]) -> List[Dict[str, float]]:
-        processed_data = []
-        for item in data:
-            processed_item = {}
+# Generate squares of prime numbers below a given threshold.
+# Uses a nested helper function for primality testing.
+
+def prime_squares_below(n: int) -> Generator[int, None, None]:
+    """Generate squares of primes below n.
+
+    Args:
+        n: Upper bound (exclusive) for prime candidates.
+
+    Yields:
+        The square of each prime below n.
+    """
+    def is_prime(x: int) -> bool:
+        if x < 2:
+            return False
+        return all(x % i != 0 for i in range(2, int(math.sqrt(x)) + 1))
+
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            for key, (int_val, float_val) in item.items():
-                processed_item[key] = float_val
+    primes = (x for x in range(2, n) if is_prime(x))
+    return (p * p for p in primes)
 
 
 SUFFIX CODE:
 ----------------------------------------
-            processed_data.append(processed_item)
-        return processed_data
 
-data = [
-    {'values': (1, 2.0)},
-    {'values': (2, 3.5)},
-]
-processor = DataProcessor()
-result = processor.process_data(data)
-assert isinstance(result, list)
-assert all(isinstance(d, dict) for d in result)
-assert all('values' in d for d in result)
-assert result[0]['values'] == 2.0
-assert result[1]['values'] == 3.5
+result = list(prime_squares_below(20))
+print(result)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example of complex generics type hints in Python. It involves nested data structures with lists, dictionaries, and tuples, which are processed within a class method. The completion requires understanding of proper iteration and unpacking of these nested structures, maintaining correct indentation and syntax. The assertions verify that the processed data has the expected structure and values.
+assert list(prime_squares_below(10)) == [4, 9, 25, 49]
+assert list(prime_squares_below(2)) == []
+assert list(prime_squares_below(20)) == [4, 9, 25, 49, 121, 169, 289, 361]
 
-ASSERTIONS:
-----------------------------------------
-assert isinstance(result, list)
-assert all(isinstance(d, dict) for d in result)
-assert all('values' in d for d in result)
-assert result[0]['values'] == 2.0
-assert result[1]['values'] == 3.5
-
-================================================================================
 
 ================================================================================
 Test Case #30
@@ -1837,54 +1928,49 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+def sub_generator(items):
+    total = 0
+    for item in items:
+        total += item
+        yield item
+    return total
 
-class DataFetcher:
-    async def fetch_data(self, url: str) -> str:
-        print(f"Fetching data from {url}")
-        await asyncio.sleep(1)
-        return "data from " + url
-
-class DataProcessor:
-    async def process_data(self, data: str) -> str:
-        print(f"Processing data: {data}")
-        await asyncio.sleep(1)
-        return data.upper()
-
-async def main():
-    fetcher = DataFetcher()
-    processor = DataProcessor()
-    url = "http://example.com/api"
-    raw_data = await fetcher.fetch_data(url)
+def delegating_generator(lists):
+    totals = []
+    for lst in lists:
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    processed_data = await processor.process_data(raw_data)
+        total = yield from sub_generator(lst)
+        totals.append(total)
+    yield totals
 
 
 SUFFIX CODE:
 ----------------------------------------
-    print(f"Processed Data: {processed_data}")
-    return processed_data, raw_data, fetcher, processor
 
-if __name__ == "__main__":
-    processed_data, raw_data, fetcher, processor = asyncio.run(main())
+gen = delegating_generator([[1, 2, 3], [4, 5]])
+yielded = []
+try:
+    while True:
+        yielded.append(next(gen))
+except StopIteration:
+    pass
+print(f"Yielded: {yielded}")
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to complete an async/await pattern correctly. The context involves fetching and processing data asynchronously, which requires the LLM to understand the async/await syntax, proper indentation, and method chaining. The completion ensures that the async function calls are properly awaited, and the entire flow maintains syntactic correctness.
+gen = delegating_generator([[1, 2, 3], [4, 5]])
+yielded = []
+try:
+    while True:
+        yielded.append(next(gen))
+except StopIteration:
+    pass
+assert yielded == [1, 2, 3, 4, 5, [6, 9]]
 
-ASSERTIONS:
-----------------------------------------
-    assert isinstance(fetcher, DataFetcher)
-    assert isinstance(processor, DataProcessor)
-    assert raw_data == "data from http://example.com/api"
-    assert processed_data == "DATA FROM HTTP://EXAMPLE.COM/API"
-    print("All assertions passed!")
-
-================================================================================
 
 ================================================================================
 Test Case #31
@@ -1898,46 +1984,42 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+from typing import List, Dict, Any
 
-class Example:
-    async def task(self, name: str, delay: int) -> str:
-        await asyncio.sleep(delay)
-        return f"Task {name} completed"
+# Sort a list of employee records by multiple criteria:
+# Primary: age descending (oldest first)
+# Secondary: name ascending (alphabetical tiebreaker)
 
-    async def run_tasks(self):
-        tasks = [
-            self.task("A", 1),
-            self.task("B", 2),
-            self.task("C", 3),
-        ]
-        results = await asyncio.gather(
+data: List[Dict[str, Any]] = [
+    {'name': 'Alice', 'age': 30},
+    {'name': 'Bob', 'age': 25},
+    {'name': 'Charlie', 'age': 35},
+]
+
+# Use sorted() with a lambda key that returns a tuple
+sorted_data = sorted(data,
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            *tasks
+    key=lambda x: (-x['age'], x['name'])
+)
+
+print(f"Sorted {len(sorted_data)} records by age desc, name asc")
+
 
 SUFFIX CODE:
 ----------------------------------------
-        )
-        for result in results:
-            print(result)
 
-example = Example()
-asyncio.run(example.run_tasks())
+print(sorted_data)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to correctly complete async/await patterns involving the asyncio.gather method. The prompt sets up an async method and a list of coroutine tasks. The golden completion is '*tasks', which correctly unpacks the list of tasks into the gather method. This is a good test case because it requires understanding of async/await syntax, list unpacking, and the asyncio library.
+assert sorted_data[0]['name'] == 'Charlie'
+assert sorted_data[1]['name'] == 'Alice'
+assert sorted_data[2]['name'] == 'Bob'
 
-ASSERTIONS:
-----------------------------------------
-example = Example()
-results = asyncio.run(example.run_tasks())
-assert results is None
-
-================================================================================
 
 ================================================================================
 Test Case #32
@@ -1951,51 +2033,47 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+from functools import reduce
+from typing import Callable, Any
 
-class AsyncProcessor:
-    def __init__(self):
-        self.results = []
+# A function pipeline builder that composes multiple functions.
+# Functions are applied left-to-right:
+#   make_pipeline(f, g, h)(x) == h(g(f(x)))
+# An empty pipeline returns the identity function.
+#
+# Implementation uses functools.reduce with nested lambdas.
 
-    async def process(self, value: int) -> int:
-        await asyncio.sleep(1)
-        return value * 2
-
-    async def gather_results(self, values: list[int]) -> list[int]:
-        tasks = []
-        for value in values:
+def make_pipeline(*functions: Callable[[Any], Any]) -> Callable[[Any], Any]:
+    """Create a pipeline that applies functions left-to-right."""
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            task = asyncio.create_task(self.process(value))
-            tasks.append(task)
+    if not functions:
+        return lambda x: x
+    return lambda x: reduce(lambda acc, fn: fn(acc), functions, x)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        gathered_results = await asyncio.gather(*tasks)
-        self.results.extend(gathered_results)
-        return self.results
 
-async def main():
-    processor = AsyncProcessor()
-    values = [1, 2, 3, 4]
-    results = await processor.gather_results(values)
-    assert results == [2, 4, 6, 8], f"Unexpected results: {results}"
+pipeline = make_pipeline(
+    lambda x: x * 2,
+    lambda x: x + 10,
+    lambda x: x ** 2
+)
+result = pipeline(5)
+print(f"Pipeline result: {result}")
 
-asyncio.run(main())
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to correctly implement async/await patterns in Python, particularly the creation and management of asyncio tasks. The completion must include the proper use of `asyncio.create_task` and the correct handling of the task list, demonstrating understanding of asynchronous programming structures.
+pipeline = make_pipeline(lambda x: x * 2, lambda x: x + 10, lambda x: x ** 2)
+assert pipeline(5) == 400
+assert pipeline(0) == 100
+identity = make_pipeline()
+assert identity(42) == 42
 
-ASSERTIONS:
-----------------------------------------
-assert asyncio.iscoroutinefunction(AsyncProcessor().process), "process method should be a coroutine function"
-assert asyncio.iscoroutinefunction(AsyncProcessor().gather_results), "gather_results method should be a coroutine function"
-
-================================================================================
 
 ================================================================================
 Test Case #33
@@ -2009,58 +2087,40 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, Union
+# Memoized Fibonacci implementation using a single lambda expression.
+# This leverages Python's mutable default argument trick:
+# The _cache dict persists across calls because default arguments
+# are evaluated once at function definition time.
+#
+# The lambda must use only expressions (no statements), so we
+# use dict.setdefault() to both store and return the computed value.
+# _cache.setdefault(key, value) returns _cache[key] if it exists,
+# otherwise sets _cache[key] = value and returns value.
 
-class DataProcessor:
-    def process_data(self, data: List[Union[int, str]], options: Dict[str, Union[bool, int]]):
-        processed_data = []
-        for item in data:
-            if isinstance(item, int):
-                processed_data.append(item * 2)
-            elif isinstance(item, str):
-                processed_data.append(item.upper())
-        
-        result = {
-            'data': processed_data,
-            'options': options
-        }
+fib = lambda n, _cache={0: 0, 1: 1}: (
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if options.get('verbose'):
-            print('Processing data:', processed_data)
-        if 'multiplier' in options:
-            result['data'] = [x * options['multiplier'] if isinstance(x, int) else x for x in result['data']]
+    _cache[n] if n in _cache else _cache.setdefault(n, fib(n - 1) + fib(n - 2))
+)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return result
 
-def main():
-    processor = DataProcessor()
-    data = [1, 'hello', 2, 'world']
-    options = {'verbose': True, 'multiplier': 3}
-    result = processor.process_data(data, options)
-    print(result)
+results = [fib(i) for i in range(10)]
+print(results)
 
-if __name__ == '__main__':
-    main()
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the use of type hints with complex generics in function annotations within a class method. It requires the completion to maintain the correct syntax and indentation while adding functionality to process and modify the data based on the options provided. The test ensures that the LLM correctly handles nested blocks, type hints, and maintains structural integrity.
+assert fib(0) == 0
+assert fib(1) == 1
+assert fib(10) == 55
+assert fib(20) == 6765
+assert [fib(i) for i in range(10)] == [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
 
-ASSERTIONS:
-----------------------------------------
-processor = DataProcessor()
-data = [1, 'hello', 2, 'world']
-options = {'verbose': True, 'multiplier': 3}
-result = processor.process_data(data, options)
-assert result['data'] == [6, 'HELLO', 12, 'WORLD']
-assert result['options'] == options
-================================================================================
 
 ================================================================================
 Test Case #34
@@ -2074,58 +2134,40 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict
+from functools import reduce
+from typing import List
 
-class DataProcessor:
-    def __init__(self, data: List[Dict[str, int]]) -> None:
-        self.data = data
+# Functional programming pipeline using reduce, map, and filter:
+# 1. Start with numbers 1 through 10
+# 2. Filter to keep only even numbers: [2, 4, 6, 8, 10]
+# 3. Square each: [4, 16, 36, 64, 100]
+# 4. Sum them all: 220
 
-    def process_data(self) -> Dict[str, int]:
-        result = {}
-        for item in self.data:
-            for key, value in item.items():
-                if key in result:
-                    result[key] += value
-                else:
-                    result[key] = value
-        return result
+numbers: List[int] = list(range(1, 11))
 
-class AdvancedProcessor(DataProcessor):
-    def __init__(self, data: List[Dict[str, int]], multiplier: int) -> None:
-        super().__init__(data)
-        self.multiplier = multiplier
-
-    def process_data(self) -> Dict[str, int]:
-        base_result = super().process_data()
+result = reduce(
+    lambda a, b: a + b,
+    map(
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        base_result = {key: value * self.multiplier for key, value in base_result.items()}
+        lambda x: x ** 2,
+        filter(lambda x: x % 2 == 0, numbers)
+    )
+)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return base_result
 
-# Test the AdvancedProcessor class
-sample_data = [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
-processor = AdvancedProcessor(sample_data, 10)
-result = processor.process_data()
+print(f"Result: {result}")
 
-# Assertions to verify correctness
-assert result == {'a': 40, 'b': 60}, f"Expected {{'a': 40, 'b': 60}}, but got {result}"
 
-print('All tests passed.')
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is useful because it involves multiple inheritance and super() calls, which are advanced Python features. The completion must correctly use the inherited method, modify its result, and maintain proper indentation and nesting. This scenario tests the LLM's understanding of complex class structures and method overriding in Python.
+assert result == 220
 
-ASSERTIONS:
-----------------------------------------
-assert result == {'a': 40, 'b': 60}, f"Expected {{'a': 40, 'b': 60}}, but got {result}"
-================================================================================
 
 ================================================================================
 Test Case #35
@@ -2139,48 +2181,58 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
-import aiohttp
+from typing import List, Callable
 
-class AsyncHandler:
-    async def fetch_data(self, url: str) -> str:
-        async with aiohttp.ClientSession() as session:
+def group_and_sort(
+    items: List[dict],
+    group_key: str,
+    sort_key: Callable
+) -> dict:
+    groups = {}
+    for item in items:
+        key = item[group_key]
+        groups.setdefault(key, []).append(item)
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            async with session.get(url) as response:
-                data = await response.text()
+    return {
+        k: sorted(v, key=sort_key)
+        for k, v in sorted(groups.items())
+    }
 
 
 SUFFIX CODE:
 ----------------------------------------
-            return data
 
-    async def process_data(self, data: str) -> dict:
-        await asyncio.sleep(1)
-        return {'processed': data}
+employees = [
+    {'dept': 'eng', 'name': 'Zara', 'salary': 90000},
+    {'dept': 'eng', 'name': 'Alice', 'salary': 120000},
+    {'dept': 'hr', 'name': 'Bob', 'salary': 80000},
+    {'dept': 'hr', 'name': 'Diana', 'salary': 95000},
+    {'dept': 'eng', 'name': 'Mona', 'salary': 110000},
+]
 
-async def main():
-    handler = AsyncHandler()
-    raw_data = await handler.fetch_data('http://example.com')
-    processed_data = await handler.process_data(raw_data)
-    assert 'processed' in processed_data
+result = group_and_sort(
+    employees,
+    'dept',
+    lambda x: (-x['salary'], x['name'])
+)
+for dept, members in result.items():
+    print(f"{dept}: {[m['name'] for m in members]}")
 
-if __name__ == '__main__':
-    asyncio.run(main())
 
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case focuses on demonstrating the proper use of async/await patterns and context managers in Python. The completion involves nested async with statements and awaits, which are crucial for maintaining asynchronous flow and resource management. It ensures that the model can handle these complex syntactical structures correctly while maintaining proper indentation and formatting.
+result = group_and_sort(
+    employees,
+    'dept',
+    lambda x: (-x['salary'], x['name'])
+)
+assert list(result.keys()) == ['eng', 'hr']
+assert [m['name'] for m in result['eng']] == ['Alice', 'Mona', 'Zara']
+assert [m['name'] for m in result['hr']] == ['Diana', 'Bob']
 
-ASSERTIONS:
-----------------------------------------
-assert asyncio.iscoroutinefunction(AsyncHandler.fetch_data)
-assert asyncio.iscoroutinefunction(AsyncHandler.process_data)
-
-================================================================================
 
 ================================================================================
 Test Case #36
@@ -2194,72 +2246,44 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict
+import asyncio
 
-class Base:
-    def __init__(self, name: str):
+class AsyncResource:
+    def __init__(self, name):
         self.name = name
+        self.is_open = False
 
-    def get_name(self) -> str:
-        return self.name
+    async def __aenter__(self):
+        await asyncio.sleep(0.01)
+        self.is_open = True
+        return self
 
-class DerivedOne(Base):
-    def __init__(self, name: str, value: int, **kwargs):
-        super().__init__(name, **kwargs)
-        self.value = value
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await asyncio.sleep(0.01)
+        self.is_open = False
+        return False
 
-    def get_value(self) -> int:
-        return self.value
-
-class DerivedTwo(Base):
-    def __init__(self, name: str, data: List[str], **kwargs):
-        super().__init__(name, **kwargs)
-        self.data = data
-
-    def get_data(self) -> List[str]:
-        return self.data
-
-class Combined(DerivedOne, DerivedTwo):
-    def __init__(self, name: str, value: int, data: List[str]):
+async def use_resource():
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        super().__init__(name=name, value=value, data=data)
+    async with AsyncResource("db") as res:
+        assert res.is_open
+        return res.name
 
 
 SUFFIX CODE:
 ----------------------------------------
-    def get_all_info(self) -> Dict[str, str]:
-        return {
-            'name': self.get_name(),
-            'value': str(self.get_value()),
-            'data': ', '.join(self.get_data())
-        }
 
-# Test cases to verify the functionality
-combined = Combined('example', 42, ['data1', 'data2'])
-assert combined.get_name() == 'example'
-assert combined.get_value() == 42
-assert combined.get_data() == ['data1', 'data2']
-assert combined.get_all_info() == {'name': 'example', 'value': '42', 'data': 'data1, data2'}
+result = asyncio.run(use_resource())
+print(f"Used resource: {result}")
 
-print('All assertions passed.')
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates multiple inheritance with the use of super() calls in Python. It tests the LLM's ability to handle complex initialization patterns in a multiple inheritance scenario and ensure proper chaining of constructors. The golden completion is essential for correctly initializing the second parent class.
+assert asyncio.run(use_resource()) == "db"
 
-ASSERTIONS:
-----------------------------------------
-combined = Combined('example', 42, ['data1', 'data2'])
-assert combined.get_name() == 'example'
-assert combined.get_value() == 42
-assert combined.get_data() == ['data1', 'data2']
-assert combined.get_all_info() == {'name': 'example', 'value': '42', 'data': 'data1, data2'}
-
-print('All assertions passed.')
-================================================================================
 
 ================================================================================
 Test Case #37
@@ -2275,48 +2299,35 @@ PREFIX CODE:
 ----------------------------------------
 import asyncio
 
-class AsyncHandler:
-    async def fetch_data(self, data_id: int) -> str:
-        await asyncio.sleep(1)
-        return f"Data {data_id}"
+async def async_range(start, stop, step=1):
+    current = start
+    while current < stop:
+        await asyncio.sleep(0.001)
+        yield current
+        current += step
 
-    async def handle_data(self, data_id: int) -> str:
+async def collect_items():
+    items = []
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
+    async for i in async_range(0, 10, 3):
+        items.append(i * i)
+    return items
 
-        data = await self.fetch_data(data_id)
-        processed_data = data.upper()
 
 SUFFIX CODE:
 ----------------------------------------
 
-        return processed_data
+result = asyncio.run(collect_items())
+print(f"Collected: {result}")
 
-# Create an instance of the handler and run the async methods
-handler = AsyncHandler()
 
-async def main():
-    result = await handler.handle_data(123)
-    print(result)
-
-# Run the async main function
-asyncio.run(main())
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the model's ability to complete an async function using the async/await pattern correctly. It includes calling another async function within the method and returning the processed data. The model needs to handle the indentation properly and ensure the async/await syntax is used correctly.
+assert asyncio.run(collect_items()) == [0, 9, 36, 81]
 
-ASSERTIONS:
-----------------------------------------
-handler = AsyncHandler()
-
-async def test_async():
-    result = await handler.handle_data(123)
-    assert result == 'DATA 123'
-
-asyncio.run(test_async())
-================================================================================
 
 ================================================================================
 Test Case #38
@@ -2330,71 +2341,45 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import TypeVar, Generic, List
+import asyncio
 
-T = TypeVar('T')
+async def risky_task(n: int) -> str:
+    await asyncio.sleep(0.01)
+    if n % 3 == 0:
+        raise ValueError(f"Bad value: {n}")
+    return f"ok:{n}"
 
-class Node(Generic[T]):
-    def __init__(self, value: T):
-        self.value = value
-        self.children: List[Node[T]] = []
+async def run_with_error_handling(values):
+    tasks = [risky_task(v) for v in values]
 
-    def add_child(self, child: 'Node[T]') -> None:
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if not isinstance(child, Node):
-            raise TypeError('child must be an instance of Node')
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    successes = [r for r in results if isinstance(r, str)]
+    failures = [r for r in results if isinstance(r, Exception)]
+    return successes, failures
+
 
 SUFFIX CODE:
 ----------------------------------------
-        self.children.append(child)
 
-class Tree(Generic[T]):
-    def __init__(self, root: Node[T]):
-        self.root = root
+async def main():
+    ok, errs = await run_with_error_handling([1, 2, 3, 4, 5, 6])
+    print(f"Successes: {ok}")
+    print(f"Failures: {len(errs)}")
+    return ok, errs
 
-    def traverse(self) -> List[T]:
-        result: List[T] = []
-        def _traverse(node: Node[T]):
-            result.append(node.value)
-            for child in node.children:
-                _traverse(child)
-        _traverse(self.root)
-        return result
-
-# Example usage
-if __name__ == '__main__':
-    root = Node(1)
-    child1 = Node(2)
-    child2 = Node(3)
-    root.add_child(child1)
-    root.add_child(child2)
-    tree = Tree(root)
-    assert tree.traverse() == [1, 2, 3]
+ok, errs = asyncio.run(main())
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case involves complex Python syntax features, specifically using type hints with complex generics. The `Node` class is generic and works with any type `T`. The golden completion adds a type check to ensure that only instances of `Node` can be added as children, which is a common pattern in strongly-typed code. This tests the model's ability to handle type annotations and enforce type safety in a generic context.
+ok, errs = asyncio.run(main())
+assert ok == ['ok:1', 'ok:2', 'ok:4', 'ok:5']
+assert len(errs) == 2
+assert all(isinstance(e, ValueError) for e in errs)
 
-ASSERTIONS:
-----------------------------------------
-root = Node(1)
-child1 = Node(2)
-child2 = Node(3)
-invalid_child = 'not a node'
-root.add_child(child1)
-root.add_child(child2)
-try:
-    root.add_child(invalid_child)
-    assert False, 'TypeError was not raised'
-except TypeError as e:
-    assert str(e) == 'child must be an instance of Node'
-tree = Tree(root)
-assert tree.traverse() == [1, 2, 3]
-
-================================================================================
 
 ================================================================================
 Test Case #39
@@ -2408,57 +2393,50 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import Dict, Union
+import asyncio
 
-class Base:
-    def __init__(self, name: str):
-        self.name = name
+class AsyncPool:
+    def __init__(self, size):
+        self.size = size
+        self.semaphore = None
 
-class Mixin:
-    def mixin_method(self) -> str:
-        return 'Mixin method called'
+    async def __aenter__(self):
+        self.semaphore = asyncio.Semaphore(self.size)
+        return self
 
-class Derived(Base, Mixin):
-    def __init__(self, name: str, value: int):
-        super().__init__(name)
-        self.value = value
+    async def __aexit__(self, *args):
+        self.semaphore = None
 
-    def derived_method(self) -> Dict[str, Union[str, int]]:
-        result = {
-            'name': self.name,
-            'value': self.value,
-            'mixin': self.mixin_method(),
+    async def run(self, coro):
+        async with self.semaphore:
+            return await coro
+
+async def worker(n):
+    await asyncio.sleep(0.01)
+    return n * 10
+
+async def main():
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            'description': f'{self.name} has value {self.value}'
+    async with AsyncPool(3) as pool:
+        tasks = [pool.run(worker(i)) for i in range(5)]
+        results = await asyncio.gather(*tasks)
+    return sorted(results)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        }
-        return result
 
-derived_instance = Derived('Example', 42)
-result = derived_instance.derived_method()
-
-assert result['name'] == 'Example'
-assert result['value'] == 42
-assert result['mixin'] == 'Mixin method called'
-print('All assertions passed!')
+output = asyncio.run(main())
+print(f"Pool results: {output}")
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it involves multiple inheritance and the use of the super() call to initialize the base class. It also includes a method that returns a complex data structure with type hints. The golden completion demonstrates the correct use of f-string formatting within a dictionary construction, maintaining consistent indentation and proper syntax. This tests the LLM's ability to handle nested structures and complex type annotations.
+assert asyncio.run(main()) == [0, 10, 20, 30, 40]
 
-ASSERTIONS:
-----------------------------------------
-assert 'description' in result
-assert result['description'] == 'Example has value 42'
-
-================================================================================
 
 ================================================================================
 Test Case #40
@@ -2472,75 +2450,50 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+import asyncio
+from typing import Union
 
-class CustomError(Exception):
-    pass
+# Demonstrate asyncio.wait_for for adding timeouts to async operations.
+# If the operation takes longer than timeout_sec, return "timed out".
 
-class ResourceHandler:
-    def __init__(self):
-        self.tempfile = None
+async def slow_operation(duration: float, label: str) -> str:
+    """Simulate a slow I/O-bound operation."""
+    await asyncio.sleep(duration)
+    return f"{label} done"
 
-    def open_tempfile(self):
-        self.tempfile = tempfile.NamedTemporaryFile(delete=False)
-        return self.tempfile
-
-    def close_tempfile(self):
-        if self.tempfile:
-            self.tempfile.close()
-            os.unlink(self.tempfile.name)
-
-    def process_file(self, filepath: str) -> str:
-        # Simulate file processing
-        with open(filepath, 'r') as file:
-            data = file.read()
-            if 'error' in data:
-                raise CustomError('Error found in file')
-            return data.upper()
-
-handler = ResourceHandler()
-try:
-    temp_file = handler.open_tempfile()
-    with open(temp_file.name, 'w') as f:
-        f.write('sample text')
-
-    # Nested try/except/else/finally
+async def run_with_timeout(duration: float, timeout_sec: float) -> str:
     try:
-        result = handler.process_file(temp_file.name)
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    except FileNotFoundError:
-        print('File not found')
+        result = await asyncio.wait_for(
+            slow_operation(duration, "task"),
+            timeout=timeout_sec
+        )
+        return result
+    except asyncio.TimeoutError:
+        return "timed out"
 
 
 SUFFIX CODE:
 ----------------------------------------
-        print('Processing succeeded:', result)
-    except CustomError as e:
-        print('Caught custom error:', e)
-    else:
-        print('No errors encountered')
-finally:
-    handler.close_tempfile()
 
-# Assertions to verify the behavior
-try:
-    assert os.path.exists(temp_file.name) == False, 'Temp file should be deleted'
-except AssertionError as e:
-    print(e)
+async def main():
+    r1 = await run_with_timeout(0.01, 1.0)
+    r2 = await run_with_timeout(2.0, 0.01)
+    return r1, r2
+
+result = asyncio.run(main())
+print(result)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case examines the model's capability to handle nested try/except/else/finally blocks with multiple except clauses, ensuring proper error handling and resource management. It also verifies the correct nesting and indentation of complex control structures.
+r1, r2 = asyncio.run(main())
+assert r1 == "task done"
+assert r2 == "timed out"
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #41
@@ -2554,78 +2507,43 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
-import io
-import sys
+from typing import List, Tuple
 
-class ResourceHandler:
-    def __init__(self):
-        self.resource = None
+# Format a tabular report of items with aligned columns.
+# Uses f-string format specification for alignment:
+#   < left-align, > right-align, .2f two decimal places
 
-    def setup(self):
-        self.resource = tempfile.NamedTemporaryFile(delete=False)
-        self.resource.write(b'Initial content')
-        self.resource.close()
-
-    def cleanup(self):
-        if self.resource:
-            os.remove(self.resource.name)
-
-captured_output = io.StringIO()
-sys.stdout = captured_output
-
-handler = ResourceHandler()
-handler.setup()
-resource_path = handler.resource.name
-
-try:
-    with open(handler.resource.name, 'r') as file:
-        content = file.read()
-        if 'Initial' in content:
-            # Simulate processing
-            for i in range(3):
-                if i == 2:
-                    raise ValueError('Simulated error')
-                else:
-                    print(f'Processing step {i}')
-        else:
-            print('Content not as expected')
+def format_report(items: List[Tuple[str, int, float]]) -> str:
+    """Create a formatted table with headers, separator, and data rows."""
+    lines = []
+    lines.append(f"{'Item':<20}{'Qty':>8}{'Price':>12}")
+    lines.append("-" * 40)
+    for name, qty, price in items:
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-except FileNotFoundError:
-    print('File not found')
+        lines.append(f"{name:<20}{qty:>8}{price:>12.2f}")
+    return "\n".join(lines)
 
 
 SUFFIX CODE:
 ----------------------------------------
-except ValueError as e:
-    print(f'Error occurred: {e}')
-else:
-    print('Processing completed successfully')
-finally:
-    handler.cleanup()
+
+items = [("Widget", 100, 9.99), ("Gadget", 50, 24.5), ("Doohickey", 200, 1.5)]
+report = format_report(items)
+print(report)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case checks the ability of the LLM to complete complex nested control structures, including multiple try/except blocks with different exception handling, and ensures that the LLM can maintain proper indentation and syntax. The prefix sets up a resource, processes it within nested control structures, and expects the LLM to handle a specific exception correctly, followed by cleanup.
+report = format_report([("Widget", 100, 9.99)])
+assert "Widget" in report
+assert "9.99" in report
+lines = report.split("\n")
+assert len(lines) == 3
+assert lines[0].startswith("Item")
 
-ASSERTIONS:
-----------------------------------------
-sys.stdout = sys.__stdout__
-output = captured_output.getvalue()
-
-assert 'Processing step 0' in output
-assert 'Processing step 1' in output
-assert 'Error occurred: Simulated error' in output
-
-assert not os.path.exists(resource_path), 'File was not cleaned up properly'
-
-
-================================================================================
 
 ================================================================================
 Test Case #42
@@ -2639,64 +2557,49 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
+from typing import List, Tuple, Any
 
-class FileManager:
-    def __init__(self, filename):
-        self.filename = filename
+# Format a table with dynamic column widths and alignment.
+# col_widths is a list of (width, align_char) tuples where
+# align_char is '<' for left or '>' for right alignment.
+# Uses nested f-strings: f"{val:{align}{width}}" where the
+# format spec itself is computed from variables.
 
-    def __enter__(self):
-        self.file = open(self.filename, 'w')
-        return self.file
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if self.file:
-            self.file.close()
-
-class DatabaseConnection:
-    def __init__(self, db_name):
-        self.db_name = db_name
-
-    def __enter__(self):
-        self.connection = self.connect_to_database()
-        return self.connection
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if self.connection:
-            self.connection.close()
-
-    def connect_to_database(self):
-        # Mocking a database connection
-        return open(os.devnull, 'w')
-
-filename = 'example.txt'
-
-# Using nested context managers for FileManager and DatabaseConnection
-with FileManager(filename) as file_mgr:
-    with DatabaseConnection('example_db') as db_conn:
+def format_table(data: List[List[Any]], col_widths: List[Tuple[int, str]]) -> str:
+    """Format data into an aligned table using nested f-strings."""
+    rows = []
+    for row in data:
+        formatted = " | ".join(
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        file_mgr.write('Writing to file...')
+            f"{str(val):{align}{width}}"
+            for val, (width, align) in zip(row, col_widths)
+        )
+        rows.append(formatted)
+    return "\n".join(rows)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        db_conn.write('Data written to database.')
 
-# Ensure file cleanup
-assert os.path.exists(filename), 'File should exist after context manager closes.'
+data = [
+    ["Alice", 30, 95.5],
+    ["Bob", 25, 87.3],
+]
+col_widths = [(10, "<"), (5, ">"), (8, ">")]
+print(format_table(data, col_widths))
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to handle nested context managers, ensuring proper resource management and cleanup. The test focuses on maintaining correct indentation and syntactical structure within the nested context managers.
+result = format_table(data, col_widths)
+lines = result.strip().split("\n")
+assert len(lines) == 2
+assert "Alice" in lines[0]
+assert "Bob" in lines[1]
 
-ASSERTIONS:
-----------------------------------------
-assert os.path.exists(filename), 'File should be created within context manager.'
-assert open(filename).read() == 'Writing to file...', 'File should contain written data.'
-================================================================================
 
 ================================================================================
 Test Case #43
@@ -2710,72 +2613,51 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+class LogEntry:
+    def __init__(self, level, message, context=None):
+        self.level = level
+        self.message = message
+        self.context = context
 
-class CustomException(Exception):
-    pass
+    def __repr__(self):
+        return f"LogEntry({self.level!r}, {self.message!r})"
 
-class ResourceHandler:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.file = None
+    def __str__(self):
+        return f"[{self.level}] {self.message}"
 
-    def __enter__(self):
-        self.file = open(self.file_path, 'w')
-        return self.file
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if self.file:
-            self.file.close()
-        if exc_type:
-            raise CustomException('An error occurred')
-
-try:
-    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-        temp_file.write(b'Temporary file content')
-        temp_file_path = temp_file.name
-
-    with ResourceHandler(temp_file_path) as file:
-        file.write('Writing to temp file')
-        # Insert nested try/except/else/finally block here
+    def format_log(self, verbose=False):
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        try:
-            file.write('More content')
-        except IOError as e:
-            print(f'IO error occurred: {e}')
-        else:
-            print('Write successful')
-        finally:
-            print('Inner finally block executed')
+        ctx = f" ctx={self.context!r}" if self.context else ""
+        if verbose:
+            return f"{self!r}{ctx}"
+        return f"{self!s}{ctx}"
+
 
 SUFFIX CODE:
 ----------------------------------------
-        print('End of resource handling')
-except CustomException as ce:
-    print(f'Caught custom exception: {ce}')
+
+entry = LogEntry("ERROR", "disk full", {"host": "srv1"})
+print(entry.format_log(verbose=False))
+print(entry.format_log(verbose=True))
+
+entry2 = LogEntry("INFO", "started")
+print(entry2.format_log())
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example of nested control structures, specifically nested try/except/else/finally blocks within a context manager. It ensures that the LLM can correctly handle indentation and proper nesting of multiple exception handling blocks. The scenario also includes resource management and cleanup, making it comprehensive and realistic.
+e = LogEntry("ERROR", "fail", {"k": "v"})
+assert "ERROR" in e.format_log()
+assert "LogEntry(" in e.format_log(verbose=True)
+assert "ctx=" in e.format_log(verbose=True)
+e2 = LogEntry("INFO", "ok")
+assert "ctx=" not in e2.format_log()
+assert e2.format_log() == "[INFO] ok"
+assert e2.format_log(verbose=True) == "LogEntry('INFO', 'ok')"
 
-ASSERTIONS:
-----------------------------------------
-finally:
-    assert os.path.exists(temp_file_path), "File should exist before deletion"
-    with open(temp_file_path, 'r') as f:
-        content = f.read()
-    assert 'Writing to temp file' in content, "Should contain first write"
-    assert 'More content' in content, "Should contain second write"
-
-    os.remove(temp_file_path)
-    print('Temporary file deleted')
-
-================================================================================
 
 ================================================================================
 Test Case #44
@@ -2789,81 +2671,54 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+from typing import List, Dict, Any
 
-class CustomError(Exception):
-    pass
+# Summarize student scores with grades and formatted output.
+# Grade thresholds: A >= 90, B >= 80, C >= 70, else F.
+# Output format: "Name: avg=XX.X (Grade) [score1, score2, ...]"
 
-class ResourceHandler:
-    def __init__(self):
-        self.resource = None
-
-    def __enter__(self):
-        self.resource = tempfile.NamedTemporaryFile(delete=False)
-        self.resource.write(b'Temporary file content')
-        self.resource.flush()
-        return self.resource
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.resource:
-            self.resource.close()
-            os.unlink(self.resource.name)
-
-class AnotherResourceHandler:
-    def __init__(self):
-        self.resource = None
-
-    def __enter__(self):
-        self.resource = tempfile.NamedTemporaryFile(delete=False)
-        self.resource.write(b'Another temporary file content')
-        self.resource.flush()
-        return self.resource
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.resource:
-            self.resource.close()
-            os.unlink(self.resource.name)
-
-try:
-    with ResourceHandler() as res1:
+def summarize_scores(students: List[Dict[str, Any]]) -> List[str]:
+    """Create a summary line for each student with average and grade."""
+    summaries = []
+    for student in students:
+        scores = student['scores']
+        avg = sum(scores) / len(scores)
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        with AnotherResourceHandler() as res2:
-            print(f'Resource 2: {res2.name}')
-        print('Resource 2 handled successfully')
+        grade = 'A' if avg >= 90 else 'B' if avg >= 80 else 'C' if avg >= 70 else 'F'
+        summaries.append(
+            f"{student['name']}: avg={avg:.1f} ({grade}) "
+            f"[{', '.join(str(s) for s in scores)}]"
+        )
+    return summaries
 
 
 SUFFIX CODE:
 ----------------------------------------
-        print(f'Resource 1: {res1.name}')
-    print('Resource 1 handled successfully')
-except CustomError as e:
-    print(f'Caught custom error: {e}')
-finally:
-    print('Execution completed')
 
-try:
-    with AnotherResourceHandler() as res2:
-        print(f'Resource 2: {res2.name}')
-    print('Resource 2 handled successfully')
-except CustomError as e:
-    print(f'Caught custom error: {e}')
-finally:
-    print('Execution completed')
+students = [
+    {'name': 'Alice', 'scores': [95, 87, 92]},
+    {'name': 'Bob', 'scores': [72, 68, 75]},
+    {'name': 'Charlie', 'scores': [88, 91, 84]},
+]
+for line in summarize_scores(students):
+    print(line)
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests nested context manager usage with proper resource handling and cleanup. The nested context managers ensure that resources are properly managed and cleaned up, even in the presence of exceptions. The test checks for correct indentation, resource handling, and cleanup procedures. Assertions verify that resources are handled and cleaned up correctly, and the completion must properly handle nested context managers.
+result = summarize_scores(students)
+assert len(result) == 3
+assert 'Alice' in result[0]
+assert '91.3' in result[0]
+assert '(A)' in result[0]
+assert 'Bob' in result[1]
+assert '(C)' in result[1]
+assert 'Charlie' in result[2]
+assert '(B)' in result[2]
 
-ASSERTIONS:
-----------------------------------------
-assert os.path.exists(res1.name) == False
-assert os.path.exists(res2.name) == False
-
-================================================================================
 
 ================================================================================
 Test Case #45
@@ -2877,73 +2732,57 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+import datetime
 
-class FileProcessor:
-    def __init__(self, filename):
-        self.filename = filename
-        self.file = None
+class Event:
+    def __init__(self, name, dt, duration_min, tags=None):
+        self.name = name
+        self.dt = dt
+        self.duration_min = duration_min
+        self.tags = tags or []
 
-    def __enter__(self):
-        self.file = open(self.filename, 'w')
-        return self.file
+    def format_duration(self):
+        h, m = divmod(self.duration_min, 60)
+        return f"{h}h{m:02d}m" if h else f"{m}m"
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        if self.file:
-            self.file.close()
-
-class ErrorLogger:
-    def __init__(self, log_filename):
-        self.log_filename = log_filename
-        self.log_file = None
-
-    def __enter__(self):
-        self.log_file = open(self.log_filename, 'a')
-        return self.log_file
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if self.log_file:
-            self.log_file.close()
-
-try:
-    temp_dir = tempfile.mkdtemp()
-    input_filename = os.path.join(temp_dir, 'input.txt')
-    log_filename = os.path.join(temp_dir, 'log.txt')
+    def to_line(self, width=50):
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    with FileProcessor(input_filename) as file, ErrorLogger(log_filename) as log_file:
-        file.write('Test content')
-        log_file.write('File written successfully\n')
+        tags_str = f" [{', '.join(self.tags)}]" if self.tags else ""
+        return (
+            f"{self.name:<{width - 25}}"
+            f"{self.dt:%Y-%m-%d %H:%M}  "
+            f"{self.format_duration():>6}"
+            f"{tags_str}"
+        )
 
 
 SUFFIX CODE:
 ----------------------------------------
-    with open(input_filename, 'r') as f:
-        content = f.read()
-        assert content == 'Test content', 'Content mismatch'
+
+events = [
+    Event("Team Meeting", datetime.datetime(2024, 6, 15, 9, 30), 90, ["work", "weekly"]),
+    Event("Lunch", datetime.datetime(2024, 6, 15, 12, 0), 45),
+]
+for e in events:
+    print(e.to_line())
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to handle nested context managers, which is a common pattern in resource management. The nested with statements ensure proper resource handling, with assertions verifying the correctness of operations. This tests the model's understanding of indentation and nesting in complex syntax structures.
+e1 = Event("Test", datetime.datetime(2024, 1, 1, 10, 0), 90, ["a"])
+line = e1.to_line()
+assert "Test" in line
+assert "2024-01-01 10:00" in line
+assert "1h30m" in line
+assert "[a]" in line
+e2 = Event("Short", datetime.datetime(2024, 1, 1, 10, 0), 30)
+line2 = e2.to_line()
+assert "30m" in line2
+assert "[" not in line2
 
-ASSERTIONS:
-----------------------------------------
-
-    assert os.path.exists(input_filename), 'Input file does not exist'
-    assert os.path.exists(log_filename), 'Log file does not exist'
-    with open(log_filename, 'r') as log_file:
-        log_content = log_file.read()
-        assert 'File written successfully' in log_content, 'Log content mismatch'
-finally:
-    os.remove(input_filename)
-    os.remove(log_filename)
-    os.rmdir(temp_dir)
-
-================================================================================
 
 ================================================================================
 Test Case #46
@@ -2957,78 +2796,53 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import os
-import tempfile
+from typing import Dict, Type
 
-class FileManager:
-    def __init__(self):
-        self.temp_file = None
+# Plugin registration system using __init_subclass__.
+# Subclasses are automatically registered when they are defined.
+# If plugin_name is provided, use it; otherwise default to
+# the lowercase class name.
 
-    def __enter__(self):
-        self.temp_file = tempfile.NamedTemporaryFile(delete=False)
-        return self.temp_file
+class Plugin:
+    """Base class that auto-registers subclasses in _registry."""
+    _registry: Dict[str, Type['Plugin']] = {}
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.temp_file:
-            try:
-                self.temp_file.close()
-            except Exception as e:
-                print(f"Error closing file: {e}")
-            finally:
-                os.remove(self.temp_file.name)
+    def __init_subclass__(cls, *, plugin_name=None, **kwargs):
+        super().__init_subclass__(**kwargs)
 
-class DatabaseConnection:
-    def __init__(self):
-        self.connected = False
-
-    def __enter__(self):
-        self.connected = True
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.connected = False
-
-    def execute_query(self):
-        if not self.connected:
-            raise ConnectionError("Not connected to the database")
-        return "Query Result"
-
-def perform_operations():
-    with FileManager() as file, DatabaseConnection() as db_conn:
-        file.write(b"Some initial data\n")
-        result = db_conn.execute_query()
-        file.write(result.encode())
-        
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        file.flush()
+        name = plugin_name or cls.__name__.lower()
+        Plugin._registry[name] = cls
 
 
 SUFFIX CODE:
 ----------------------------------------
 
-        filename = file.name
+class AuthPlugin(Plugin, plugin_name="auth"):
+    def run(self):
+        return "authenticating"
 
-        assert os.path.exists(filename)
-        assert db_conn.connected
+class LogPlugin(Plugin, plugin_name="log"):
+    def run(self):
+        return "logging"
 
-    assert not os.path.exists(filename)
-    assert not db_conn.connected
+class DefaultPlugin(Plugin):
+    def run(self):
+        return "default"
 
-    return filename
-
-print("Operations completed successfully.")
+print(Plugin._registry)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates nested context managers and proper resource handling. It ensures that the LLM understands the use of multiple with statements, proper resource management, and cleanup. The golden completion focuses on ensuring data is flushed to the file before proceeding, which is a critical step in file I/O operations.
+assert "auth" in Plugin._registry
+assert "log" in Plugin._registry
+assert "defaultplugin" in Plugin._registry
+assert Plugin._registry["auth"] is AuthPlugin
+assert Plugin._registry["log"]().run() == "logging"
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #47
@@ -3042,60 +2856,63 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List
-import asyncio
+from typing import Any
 
-class Base1:
-    def greet(self) -> str:
-        return 'Hello from Base1'
+# A type-enforcing map that uses __class_getitem__ to enable
+# the subscription syntax: TypedMap[str, int] creates an
+# instance that only accepts str keys and int values.
 
-class Base2:
-    def greet(self) -> str:
-        return 'Hello from Base2'
+class TypedMap:
+    """A dictionary-like class with runtime type checking."""
 
-class Derived(Base1, Base2):
-    async def async_greet(self) -> str:
-        await asyncio.sleep(0.1)
-        return super().greet()
+    def __init__(self, key_type: type, val_type: type):
+        self._key_type = key_type
+        self._val_type = val_type
+        self._data: dict = {}
 
-async def main() -> List[str]:
-    d = Derived()
-    results = []
-    results.append(await d.async_greet())
-    # Insert additional async calls here
+    def __class_getitem__(cls, params):
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    results.append(await d.async_greet())
+        key_type, val_type = params
+        return cls(key_type, val_type)
 
 
 SUFFIX CODE:
 ----------------------------------------
-    return results
 
-# Main entry point for async execution
-if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    results = loop.run_until_complete(main())
-    for result in results:
-        print(result)
+    def put(self, key, value):
+        if not isinstance(key, self._key_type):
+            raise TypeError(f"Key must be {self._key_type.__name__}")
+        if not isinstance(value, self._val_type):
+            raise TypeError(f"Value must be {self._val_type.__name__}")
+        self._data[key] = value
+
+    def get(self, key):
+        return self._data.get(key)
+
+m = TypedMap[str, int]
+m.put("age", 30)
+print(m.get("age"))
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the combination of multiple inheritance, async/await patterns, and the use of super() calls in Python. It requires the model to understand the proper usage of these features, including handling of async functions and inheritance method resolution order. The golden completion adds an additional async call, which tests the model's ability to maintain correct indentation and syntax within an existing async function.
+m = TypedMap[str, int]
+m.put("x", 1)
+assert m.get("x") == 1
+try:
+    m.put(123, "bad")
+    assert False, "Should have raised TypeError"
+except TypeError:
+    pass
+try:
+    m.put("y", "bad")
+    assert False, "Should have raised TypeError"
+except TypeError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-d = Derived()
-loop = asyncio.get_event_loop()
-results = loop.run_until_complete(main())
-assert len(results) == 2
-assert results[0] == 'Hello from Base1'
-assert results[1] == 'Hello from Base1'
-
-================================================================================
 
 ================================================================================
 Test Case #48
@@ -3109,63 +2926,70 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-import asyncio
+# Descriptor with __set_name__ for automatic attribute name discovery.
+# Uses a private storage name to avoid infinite recursion in __get__/__set__.
+# Validates that values fall within min_val and max_val bounds.
 
-class BaseA:
-    def __init__(self, value):
-        self.value = value
+class ValidatedField:
+    """A descriptor that validates numeric bounds on attribute assignment."""
 
-    def common_method(self):
-        return f"BaseA: {self.value}"
+    def __init__(self, min_val=None, max_val=None):
+        self.min_val = min_val
+        self.max_val = max_val
 
-class BaseB:
-    def __init__(self, value):
-        self.value = value
+    def __set_name__(self, owner, name):
+        self.name = name
+        self.storage_name = f"_validated_{name}"
 
-    def common_method(self):
-        return f"BaseB: {self.value}"
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        return getattr(obj, self.storage_name, None)
 
-class Derived(BaseA, BaseB):
-    def __init__(self, value, extra):
-        BaseA.__init__(self, value)
-        BaseB.__init__(self, value)
-        self.extra = extra
-
-    async def async_method(self):
-        await asyncio.sleep(1)
-        return f"Derived: {self.value}, Extra: {self.extra}"
-
+    def __set__(self, obj, value):
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    def common_method(self):
-        return f"Derived: {self.value}, Extra: {self.extra}"
-
+        if self.min_val is not None and value < self.min_val:
+            raise ValueError(f"{self.name} must be >= {self.min_val}")
+        if self.max_val is not None and value > self.max_val:
+            raise ValueError(f"{self.name} must be <= {self.max_val}")
+        setattr(obj, self.storage_name, value)
 
 
 SUFFIX CODE:
 ----------------------------------------
-async def main():
-    obj = Derived(10, 'extra')
-    result = await obj.async_method()
-    assert result == 'Derived: 10, Extra: extra'
 
-# Run the async main method
-asyncio.run(main())
+class Product:
+    price = ValidatedField(min_val=0)
+    quantity = ValidatedField(min_val=0, max_val=1000)
+
+p = Product()
+p.price = 9.99
+p.quantity = 100
+print(f"Price: {p.price}, Qty: {p.quantity}")
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's capability to handle multiple inheritance, super() calls, and async/await patterns in Python. The prefix sets up a complex class hierarchy with multiple inheritance and an asynchronous method, creating a realistic scenario where the LLM must correctly implement a method that overrides inherited behavior and integrates asynchronous operations. The assertions check that the method behaves as expected, ensuring structural integrity and syntactic correctness.
+p = Product()
+p.price = 10
+assert p.price == 10
+p.quantity = 500
+assert p.quantity == 500
+try:
+    p.price = -1
+    assert False, "Should raise ValueError"
+except ValueError:
+    pass
+try:
+    p.quantity = 1001
+    assert False, "Should raise ValueError"
+except ValueError:
+    pass
+assert Product.price is not None
 
-ASSERTIONS:
-----------------------------------------
-obj = Derived(10, 'extra')
-assert obj.common_method() == 'Derived: 10, Extra: extra'
-assert asyncio.run(obj.async_method()) == 'Derived: 10, Extra: extra'
-
-================================================================================
 
 ================================================================================
 Test Case #49
@@ -3179,65 +3003,65 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-from typing import List, Dict, Union
+from typing import runtime_checkable, Protocol, Iterable
 
-class BaseA:
-    def __init__(self, a: int):
-        self.a = a
+@runtime_checkable
+class Renderable(Protocol):
+    def render(self) -> str: ...
 
-    def method_a(self) -> str:
-        return f"BaseA: {self.a}"
+@runtime_checkable
+class Sizeable(Protocol):
+    def size(self) -> int: ...
 
-class BaseB:
-    def __init__(self, b: str):
-        self.b = b
-
-    def method_b(self) -> str:
-        return f"BaseB: {self.b}"
-
-class Derived(BaseA, BaseB):
-    def __init__(self, a: int, b: str, c: List[int]):
-        BaseA.__init__(self, a)
-        BaseB.__init__(self, b)
-        self.c = c
-
-    def combined_method(self) -> Dict[str, Union[str, List[int]]]:
-        base_a_result = self.method_a()
+def render_all(items: Iterable[Renderable]) -> str:
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        base_b_result = self.method_b()
+    parts = []
+    for item in items:
+        if not isinstance(item, Renderable):
+            raise TypeError(f"{type(item).__name__} is not Renderable")
+        parts.append(item.render())
+    return "\n".join(parts)
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return {
-            'BaseA': base_a_result,
-            'BaseB': base_b_result,
-            'List': self.c
-        }
 
-derived = Derived(10, 'test', [1, 2, 3])
-result = derived.combined_method()
+class Widget:
+    def __init__(self, label):
+        self.label = label
+    def render(self) -> str:
+        return f"<Widget: {self.label}>"
+    def size(self) -> int:
+        return len(self.label)
 
-# Assertions to verify the correctness of the code
-assert result['BaseA'] == 'BaseA: 10'
-assert result['BaseB'] == 'BaseB: test'
-assert result['List'] == [1, 2, 3]
+class Text:
+    def __init__(self, content):
+        self.content = content
+    def render(self) -> str:
+        return self.content
+
+widgets = [Widget("btn"), Text("hello")]
+print(render_all(widgets))
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example of multiple inheritance and the correct use of super() calls in Python. It tests the ability to properly initialize parent classes and merge their initialization logic in a derived class. The provided golden completion ensures that the super() function is used correctly to call the __init__ methods of both base classes, maintaining proper initialization flow and inheritance structure.
+assert isinstance(Widget("x"), Renderable)
+assert isinstance(Widget("x"), Sizeable)
+assert isinstance(Text("x"), Renderable)
+assert not isinstance(Text("x"), Sizeable)
+result = render_all([Widget("a"), Text("b")])
+assert "<Widget: a>" in result
+assert "b" in result
+try:
+    render_all([42])
+    assert False, "Should raise TypeError"
+except TypeError:
+    pass
 
-ASSERTIONS:
-----------------------------------------
-assert derived.a == 10
-assert derived.b == 'test'
-assert derived.c == [1, 2, 3]
-
-================================================================================
 
 ================================================================================
 Test Case #50
@@ -3251,60 +3075,55 @@ Language: python
 
 PREFIX CODE:
 ----------------------------------------
-class BaseA:
-    def __init__(self, value: int):
-        self.value = value
+class EventSystem:
+    _handlers = {}
 
-    def display(self) -> str:
-        return f"BaseA value: {self.value}"
+    def __init_subclass__(cls, *, event_type=None, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if event_type:
+            EventSystem._handlers.setdefault(event_type, []).append(cls)
 
-class BaseB:
-    def __init__(self, name: str):
-        self.name = name
-
-    def display(self) -> str:
-        return f"BaseB name: {self.name}"
-
-class Derived(BaseA, BaseB):
-    def __init__(self, value: int, name: str):
-        BaseA.__init__(self, value)
-        BaseB.__init__(self, name)
-
-    def display(self) -> str:
-        baseA_display = BaseA.display(self)
-        baseB_display = BaseB.display(self)
-        return f"{baseA_display}, {baseB_display}"
-
-# Create an instance of the Derived class
+    @classmethod
+    def dispatch(cls, event_type, data):
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-derived_instance = Derived(10, 'TestName')
+        results = []
+        for handler_cls in cls._handlers.get(event_type, []):
+            handler = handler_cls()
+            results.append(handler.handle(data))
+        return results
 
 
 SUFFIX CODE:
 ----------------------------------------
-# Display the values
-result = derived_instance.display()
-print(result)
 
-# Test assertions
-assert 'BaseA value: 10' in result
-assert 'BaseB name: TestName' in result
+class LogHandler(EventSystem, event_type="error"):
+    def handle(self, data):
+        return f"LOG: {data}"
 
-# Cleanup resources
-# (No resources to clean up in this example)
+class AlertHandler(EventSystem, event_type="error"):
+    def handle(self, data):
+        return f"ALERT: {data}"
+
+class MetricHandler(EventSystem, event_type="metric"):
+    def handle(self, data):
+        return f"METRIC: {data}"
+
+results = EventSystem.dispatch("error", "disk full")
+print(results)
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's understanding of multiple inheritance and proper usage of super() calls. The completion involves initializing a class that inherits from two base classes and ensuring the derived class correctly initializes both base classes. This tests the LLM's ability to handle complex class inheritance structures and maintain correct initialization order, as well as its understanding of method resolution order and proper syntax.
+results = EventSystem.dispatch("error", "test")
+assert len(results) == 2
+assert "LOG: test" in results
+assert "ALERT: test" in results
+metric_results = EventSystem.dispatch("metric", "cpu=80")
+assert metric_results == ["METRIC: cpu=80"]
+empty = EventSystem.dispatch("unknown", "x")
+assert empty == []
 
-ASSERTIONS:
-----------------------------------------
-assert derived_instance.value == 10
-assert derived_instance.name == 'TestName'
-assert derived_instance.display() == 'BaseA value: 10, BaseB name: TestName'
 
-================================================================================

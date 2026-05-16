@@ -1,1516 +1,1194 @@
 SYNTAX_COMPLETION_SYSTEM_PROMPT = """
-You are an expert C++ developer tasked with creating benchmark examples for testing syntax completion and language-specific structure capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to complete complex syntactical patterns and nested structures.
+You are an expert C++ benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable C++ that passes all assertions.
+Your task is to generate one high-quality C++ Syntax Completion
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can correctly
+complete complex syntactical structures and nested scope patterns
+in modern C++, including RAII lifetime control, template syntax,
+fold expressions, constexpr branching, and smart-pointer
+ownership transfer.
 
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test understanding of language-specific syntax. Choose ONE syntax pattern to test (rotate through them):
-    Syntax Categories:
-    a. Nested Control Structures
-    - Multiple levels of if/else conditions
-    - Nested loop structures (for/while/do-while combinations)
-    - Try/catch with multiple catch blocks
-    - RAII patterns with scope-based resource management
-    - Range-based for loops with complex iterators
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-    b. Complex C++ Syntax Features
-    - Class inheritance and virtual function overrides
-    - Template metaprogramming patterns
-    - Move semantics and perfect forwarding
-    - Lambda expressions with captures
-    - SFINAE and type traits
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-    c. Multi-line Syntax Patterns
-    - Method chaining patterns
-    - Builder pattern implementations
-    - Fluent interface structures
-    - Stream formatting operations
-    - Function overloading resolution
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-syntax-completion"
+  - language: "cpp"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Syntax Completion task
 
-    d. Error Handling Patterns
-    - Try/catch combinations with exception hierarchies
-    - RAII-based resource management
-    - Error code propagation patterns
-    - Exception safety guarantees
-    - Smart pointer usage for resource management
-    
-2. Ensure patterns demonstrate proper nesting and indentation
-3. Create ground truth completions that maintain syntactic correctness
-4. Write assertions that meaningfully test structural integrity and syntax validity
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable C++
-    - All assertions must pass when code is run
-    - Include necessary header files
-    - Handle cleanup of resources using RAII principles
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+Requirements:
 
-When generating examples:
-1. Focus on complex syntactical structures and patterns
-2. Test handling of nested code blocks
-3. Ensure patterns include proper error handling syntax
-4. Include edge cases in syntax formatting
-5. Keep code focused on demonstrating language-specific features
+1. Realistic syntax scenarios.
+   Use advanced C++ syntax structures that exercise scope-
+   sensitive lifetime and type-level reasoning. Representative
+   domains include:
+   - Fold expressions: unary/binary left and right folds with
+     parameter packs, comma-fold side effects, fold-based
+     string joining with index counters
+   - constexpr if: multi-branch type dispatch with is_integral_v,
+     is_floating_point_v, is_same_v, recursive container branches
+   - RAII lifetime control: unique_ptr reset/release/swap inside
+     nested blocks, destructor ordering from declaration order,
+     scope-guard dismiss patterns, optional emplace/reset
+     destruction timing
+   - Structured bindings: if-init with map::insert pair
+     destructuring, range-for over map with const auto& [k, v],
+     tuple unpacking across function boundaries
+   - Variadic templates: recursive parameter-pack expansion,
+     sizeof...(Ts), base-case specialization, std::apply with
+     tuple expansion
+   - Lambda syntax: init-capture with std::move, mutable keyword,
+     trailing return types, generic lambdas with auto parameters
+   - Smart-pointer ownership: unique_ptr move into inner scope,
+     shared_ptr copy/reset reference counting, custom-deleter
+     reset construction-before-deletion ordering
+   - std::visit with overloaded pattern: aggregate brace nesting
+     with multiple typed lambdas, variant dispatch
+   - Concepts and SFINAE: requires clauses with compound
+     requirements, enable_if return-type placement, mutually
+     exclusive overloads via type traits
+   - Move semantics: move constructor/assignment with source
+     invalidation, self-assignment guards, std::exchange idiom
+   - Lock-guard nesting: scoped_lock declaration order
+     controlling unlock sequence, nested mutex scopes
+   - Monadic optional chaining: and_then / transform composition,
+     nested optional-returning function pipelines
+   The syntax pattern should be embedded in a plausible function
+   or class, not presented as isolated trivia.
+
+2. Difficulty.
+   The completion should require resolving at least two syntactic
+   constraints: correct brace/scope nesting, template angle-
+   bracket balancing, RAII destruction ordering, parameter-pack
+   expansion placement, or lifetime-sensitive statement sequencing.
+   The task should not be solvable by copying a nearby line.
+   Hidden assertions should verify observable side effects of the
+   syntax (e.g., destructor log order, return values) rather than
+   just compilation success.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must compile and execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than syntax reasoning, invalid C++, or
+   overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 SYNTAX_COMPLETION_USER_PROMPT = """
-You are helping create a benchmark for syntax completion capabilities. Your task is to generate a coding scenario that tests an LLM's ability to complete
-complex syntactical structures and maintain proper formatting in C++ code. The scenario should include:
-
-Generate a single JSONL entry testing syntax completion capabilities. Choose ONE syntax pattern to test (rotate through them):
-    Syntax Categories:
-    a. Nested Control Structures
-    - Multiple levels of if/else conditions
-    - Nested loop structures (for/while/do-while combinations)
-    - Try/catch with multiple catch blocks
-    - RAII patterns with scope-based resource management
-    - Range-based for loops with complex iterators
-
-    b. Complex C++ Syntax Features
-    - Class inheritance and virtual function overrides
-    - Template metaprogramming patterns
-    - Move semantics and perfect forwarding
-    - Lambda expressions with captures
-    - SFINAE and type traits
-
-    c. Multi-line Syntax Patterns
-    - Method chaining patterns
-    - Builder pattern implementations
-    - Fluent interface structures
-    - Stream formatting operations
-    - Function overloading resolution
-
-    d. Error Handling Patterns
-    - Try/catch combinations with exception hierarchies
-    - RAII-based resource management
-    - Error code propagation patterns
-    - Exception safety guarantees
-    - Smart pointer usage for resource management
+Generate one C++ Syntax Completion evaluation instance. Choose a
+domain from the representative list in the system prompt (fold
+expressions, constexpr if, RAII lifetime control, structured
+bindings, variadic templates, lambda syntax, smart-pointer
+ownership, std::visit with overloaded, concepts/SFINAE, move
+semantics, lock-guard nesting, or monadic optional chaining).
 
 CRITICAL JSON FORMATTING REQUIREMENTS:
 1. Your response MUST be a syntactically valid JSON object
 2. PROPERLY ESCAPE all special characters in strings:
    - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
 3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-syntax-completion"
+- id: unique numeric identifier
+- testsource: "devbench-syntax-completion"
 - language: "cpp"
-- prefix: The code that comes before the completion (may or may not establish the syntax pattern)
-- suffix: The code that follows the completion (may or may not establish the syntax pattern) - should be DIFFERENT from the golden completion AND should include necessary assertions
-- golden_completion: The syntactically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Leave this field as an empty string - all assertions should be integrated into the suffix code
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-CRITICAL JSON FIELD REQUIREMENTS:
-1. ALWAYS include ALL required JSON fields listed above, even if empty
-2. The "assertions" field MUST be present with an empty string value: "assertions": ""
-3. Do NOT omit any fields from your JSON object
-4. Format example showing required empty assertions field:
-   {"id": "42", ..., "assertions": ""}
-5. INCORRECT: {"id": "42", ...} - missing assertions field
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must compile and execute successfully
+6. Include at least one edge case assertion
 
-CRITICAL CHANGE - NEW SUFFIX REQUIREMENTS:
-1. The suffix must contain both execution code AND assertion code
-2. Include assert() statements DIRECTLY IN THE SUFFIX at the appropriate places
-3. All assertions must be placed in the same function/class as the code being tested
-4. DO NOT create separate assertion functions or classes
-5. Place assertions immediately after the code that should be tested
-6. Never duplicate any golden_completion code in the suffix
-7. The assertions must pass when the combined prefix + golden_completion + suffix is run
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require resolving at least two
+   syntactic constraints from prefix/suffix
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, type definitions, or related code
+4. The prefix should demonstrate an incomplete implementation
 
-Header Inclusion Requirements:
-1. Do NOT include header files unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix (including assertions)
-   - golden_completion
-2. Every included header must serve a clear purpose
-3. Do not include "just in case" headers that aren't used
-4. All required header inclusions must appear in the prefix section
-5. If a header is only needed for the golden_completion, it must still appear in the prefix
-6. Make sure to include <cassert> header for assert() statements
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be within proper C++ scope boundaries
+2. Do not place executable statements or assertions at global
+   scope; includes, type aliases, constants, class/struct
+   definitions, and helper function definitions are allowed
+3. All code blocks must have matching braces
+4. Include only headers that are actually used
+5. The code must be fully executable C++
 
-
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility classes, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper indentation when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-syntax-completion", "language":
+"cpp", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable C++ code
-2. All assertions must pass when code is run
-3. Include all necessary header files
-4. Mock external dependencies
-5. Clean up resources properly using RAII principles
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-CRITICAL CODE STRUCTURE REQUIREMENTS:
-1. NEVER place code outside of functions or classes
-2. ALL code must be contained within proper C++ scope boundaries
-3. DO NOT place assertions or standalone code statements at the global/namespace level
-4. ALL assertions must be contained within functions (such as main() or other functions)
-5. ALWAYS ensure code is properly nested within appropriate class and function structures
-6. NEVER generate code that would compile as a partial class
-7. NEVER duplicate class definitions - each class must be defined only once
-8. Verify that the beginning and end of classes and functions are properly matched with braces {}
-9. DO NOT leave any code statements outside of function bodies
-10. Place all assertions within appropriate functions (main(), test(), etc.)
-
-CRITICAL ASSERTION PLACEMENT:
-1. All assert() statements must be placed DIRECTLY IN THE SUFFIX code
-2. Assertions should be placed immediately after the code that needs to be verified
-3. Assertions must be within the same function as the code being tested
-4. Assertions must be executed BEFORE any cleanup code
-5. Assertions must be properly indented to match the surrounding code structure
-6. Use assert(condition) format for all assertions
-7. Make sure <cassert> is included for assert() statements
-
-Requirements:
-1. The scenario should demonstrate complex syntax patterns
-2. The completion section should focus on language-specific structures
-3. The pattern should follow proper indentation and nesting rules
-4. Ground truth should maintain consistent formatting
-5. Assertions should verify structural integrity
-6. Include comments indicating expected syntax and formatting
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-syntax-completion", "language": "cpp", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-8. Have you included all assertions DIRECTLY IN THE SUFFIX code?
-9. Have you verified that assertions will pass when the code is executed?
-10. Is the assertions field included with an empty string value ("assertions": "")?
-11. Have you verified that ALL required fields are present in your JSON?
-12. Have you verified your example is NOT one of the prohibited trivial examples?
-13. Does your example meet ALL the complexity validation criteria?
-14. Does your example demonstrate genuinely advanced C++ features?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/catch blocks if needed
-- Maintain correct execution order
-- ALL ASSERTIONS SHOULD BE IN THE SUFFIX, not in a separate assertions field
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions compile?
+5. Does the golden_completion resolve multiple syntax constraints?
+6. Is the task non-trivial and not solvable by copying a line?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
 
 NL2CODE_CODE2NL_SYSTEM_PROMPT = """
-You are an expert C++ developer tasked with creating benchmark examples for testing bidirectional translation between code and natural language capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to translate between code and documentation in both directions.
+You are an expert C++ benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable C++ that passes all assertions.
+Your task is to generate one high-quality C++ Code2NL/NL2Code
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can produce
+precise Doxygen-style documentation for C++ standard-library
+code, or implement code from detailed documentation, requiring
+exact technical keywords about API semantics, complexity,
+mutation, iterator validity, and edge-case behavior.
 
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test code-to-comment and comment-to-code translation from these domains (rotate through them):
-    Business Logic:
-    - Financial calculations (portfolio analysis, risk assessment)
-    - Data transformations (ETL processes, data cleaning)
-    - Business rules validation (compliance checks, policy enforcement)
-    - Workflow orchestration (task scheduling, pipeline management)
-    - Domain modeling (business entities, relationship handling)
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-    Technical Features:
-    - API integrations (authentication, rate limiting)
-    - Cache management (invalidation, refresh strategies)
-    - Data structures (custom collections, specialized containers)
-    - Configuration management (dynamic settings, feature flags)
-    - Resource management (RAII, smart pointers, memory management)
-2. Ensure patterns demonstrate clear alignment between documentation and implementation, with the following requirements (alternate between these):
-    For Code-to-Natural Language (50% of test cases):
-    - Generate comprehensive documentation for:
-        * Method implementations
-        * Class definitions
-        * Namespace-level code
-        * Complex algorithms
-        * Error handling logic
-    - Documentation should include:
-        * Detailed Doxygen-style documentation comments
-        * Implementation comments explaining complex logic
-        * Usage examples
-        * Parameter descriptions
-        * Return value documentation
-        * Error scenarios and handling
-        * Performance characteristics
-    
-    For Natural Language-to-Code (50% of test cases):
-    - Test implementation of:
-        * Complex business rules
-        * Technical requirements
-        * Algorithm descriptions
-        * Error handling specifications
-        * Interface contracts
-3. Create ground truth completions that maintain consistency between comments and code
-4. Write assertions that meaningfully test documentation accuracy and code correctness:
-    - For documentation tests:
-        * Check presence of key domain terms
-        * Verify coverage of important concepts
-        * Validate documentation structure
-        * Don't require exact string matches
-    - For implementation tests:
-        * Verify functional requirements
-        * Test edge cases
-        * Check error handling
-        * Validate return values
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable C++
-    - All assertions must pass when code is run
-    - Include necessary header inclusions
-    - Handle cleanup of resources with RAII principles
-    - Use proper error handling (exceptions, error codes)
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-When generating examples:
-1. Focus on bidirectional translation between code and natural language
-2. Test accuracy of generated documentation
-3. Ensure patterns include proper documentation conventions
-4. Include edge cases in documentation clarity
-5. Keep both code and comments focused on clear communication
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-code2NL-NL2code"
+  - language: "cpp"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Code2NL/NL2Code task
 
-Avoid These Common Patterns:
-1. Trivial mathematical functions (factorial, fibonacci)
-2. Simple data structure operations (stack, queue)
-3. Basic string manipulations (palindrome, anagram)
-4. Elementary algorithms (bubble sort, binary search)
-5. Textbook examples (hello world variations)
+Requirements:
 
-Focus on realistic scenarios that demonstrate:
-1. Complex business logic translation
-2. Technical requirement implementation
-3. Error handling documentation
-4. API usage patterns
-5. Resource management strategies
+1. Realistic documentation and implementation scenarios.
+   Use C++ standard library APIs and idioms where precise
+   documentation wording separates correct from generic
+   descriptions. Representative domains include:
+   - Algorithm documentation: copy_if with back_inserter and
+     predicate call count, next_permutation false/reset behavior,
+     equal_range sorted precondition and half-open interval,
+     sample without-replacement and URBG seed determinism,
+     stable_sort vs sort stability guarantees, rotate_copy
+     non-mutating output order, transform_exclusive_scan
+     transform-before-scan and exclusive semantics
+   - Container semantics: map try_emplace no-overwrite pair
+     return, unordered_map reserve/rehash and load factor,
+     set::merge node-transfer without copying, list::splice
+     O(1) node-relink without allocation, deque segmented
+     non-contiguous storage, priority_queue top-then-pop void
+     return and max-heap default
+   - Smart-pointer precision: unique_ptr release non-deleting
+     raw-pointer handoff, shared_ptr aliasing constructor
+     stored-vs-managed distinction, weak_ptr::lock nullptr on
+     expiry, shared_ptr custom deleter type-erasure and
+     reference-counting destruction, unique_ptr deleter-as-type
+   - C++17 vocabulary types: optional value_or eager evaluation,
+     any_cast pointer-vs-value overloads with null-on-mismatch,
+     variant std::visit active-alternative dispatch, string_view
+     non-owning dangling lifetime and no null-terminator
+   - Threading documentation: scoped_lock multi-mutex deadlock
+     avoidance, unique_lock deferred state machine, promise/
+     future shared-state and get invalidation, condition_variable
+     spurious-wakeup predicate requirement
+   - Numeric and text: accumulate left-fold order and init-type,
+     partition not-stable and partition-point return, rotate
+     left-rotation and iterator-to-original-first return,
+     std::exchange old-value return and single-expression idiom,
+     std::forward conditional value-category preservation,
+     std::clamp UB when lo > hi
+   - NL2Code implementations: trie insert with node creation and
+     is_end marking, quickselect partition-based kth-element,
+     balanced parentheses with stack, LRU cache with list::splice,
+     RPN evaluator with operand ordering, run-length encoding
+   The documentation or code should be embedded in a plausible
+   function or class, not presented as isolated trivia.
+
+2. Difficulty.
+   For Code2NL tasks: the documentation must require at least two
+   precise technical keywords that generic summaries omit (e.g.,
+   "node transfer" + "source mutation" for set::merge; "type-
+   erased" + "reference counting" for shared_ptr custom deleters).
+   For NL2Code tasks: the implementation must handle at least one
+   edge case not obvious from the function signature (e.g., empty
+   string, all-equal elements, self-referential input).
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must compile and execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. For Code2NL
+   tasks, assertions should check substring presence of required
+   technical keywords (e.g., assert(doc.find("node") !=
+   std::string::npos)). For NL2Code tasks, assertions should
+   verify functional behavior and edge cases. Assertions must not
+   hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than documentation precision or
+   implementation reasoning, invalid C++, or overly simplified
+   textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 NL2CODE_CODE2NL_USER_PROMPT = """
-You are helping create a benchmark for code-natural language translation capabilities. Your task is to generate a coding scenario that tests an LLM's ability to translate
-between C++ code and documentation effectively. The scenario should include:
+Generate one C++ Code2NL/NL2Code evaluation instance. Choose a
+domain from the representative list in the system prompt
+(algorithm documentation, container semantics, smart-pointer
+precision, C++17 vocabulary types, threading documentation,
+numeric and text APIs, or NL2Code implementations).
 
-Generate a single JSONL entry testing code-to-comment and comment-to-code capabilities.
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-code2NL-NL2code"
+- id: unique numeric identifier
+- testsource: "devbench-code2NL-NL2code"
 - language: "cpp"
-- prefix: The segment that establishes the code-comment relationship before the completion
-- suffix: The segment that follows the completion with code or comments
-- golden_completion: The accurate completion that translates between code and comments and that maintains consistency with prefix/suffix and will pass all assertions AND should include necessary assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Leave this field as an empty string - all assertions should be integrated into the suffix code
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-CRITICAL JSON FIELD REQUIREMENTS:
-1. ALWAYS include ALL required JSON fields listed above, even if empty
-2. The "assertions" field MUST be present with an empty string value: "assertions": ""
-3. Do NOT omit any fields from your JSON object
-4. Format example showing required empty assertions field:
-   {"id": "42", ..., "assertions": ""}
-5. INCORRECT: {"id": "42", ...} - missing assertions field
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must compile and execute successfully
+6. For Code2NL tasks, use substring checks for required keywords:
+   assert(doc.find("keyword") != std::string::npos)
+7. For NL2Code tasks, verify functional behavior and edge cases
+8. Include at least one edge case assertion
 
-CRITICAL CHANGE - NEW SUFFIX REQUIREMENTS:
-1. The suffix must contain both execution code AND assertion code
-2. Include assert() statements DIRECTLY IN THE SUFFIX at the appropriate places
-3. All assertions must be placed in the same function/class as the code being tested
-4. DO NOT create separate assertion functions or classes
-5. Place assertions immediately after the code that should be tested
-6. Never duplicate any golden_completion code in the suffix
-7. The assertions must pass when the combined prefix + golden_completion + suffix is run
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require resolving at least two
+   contextual constraints from prefix/suffix
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, type definitions, or related code
+4. The prefix should demonstrate an incomplete implementation
 
-Header Inclusion Requirements:
-1. Do NOT include header inclusions unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix (including assertions)
-   - golden_completion
-2. Every included header must serve a clear purpose
-3. Do not include "just in case" headers that aren't used
-4. All required header inclusions must appear in the prefix section
-5. If a header is only needed for the golden_completion, it must still appear in the prefix
-6. Make sure to include <cassert> header for assert() statements
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be within proper C++ scope boundaries
+2. Do not place executable statements or assertions at global
+   scope; includes, type aliases, constants, class/struct
+   definitions, and helper function definitions are allowed
+3. All code blocks must have matching braces
+4. Include only headers that are actually used
+5. The code must be fully executable C++
 
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper methods, utility classes, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a method/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper indentation when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The code or comment to translate can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct translation.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-code2NL-NL2code", "language":
+"cpp", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable C++ code
-2. All assertions must pass when code is run
-3. Include all necessary header files
-4. Mock external dependencies
-5. Clean up resources properly using RAII principles
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-CRITICAL CODE STRUCTURE REQUIREMENTS:
-1. NEVER place code outside of functions or classes
-2. ALL code must be contained within proper C++ scope boundaries
-3. DO NOT place assertions or standalone code statements at the global/namespace level
-4. ALL assertions must be contained within functions (such as main() or other functions)
-5. ALWAYS ensure code is properly nested within appropriate class and function structures
-6. NEVER generate code that would compile as a partial class
-7. NEVER duplicate class definitions - each class must be defined only once
-8. Verify that the beginning and end of classes and functions are properly matched with braces {}
-9. DO NOT leave any code statements outside of function bodies
-10. Place all assertions within appropriate functions (main(), test(), etc.)
-
-CRITICAL ASSERTION PLACEMENT:
-1. All assert() statements must be placed DIRECTLY IN THE SUFFIX code
-2. Assertions should be placed immediately after the code that needs to be verified
-3. Assertions must be within the same function as the code being tested
-4. Assertions must be executed BEFORE any cleanup code
-5. Assertions must be properly indented to match the surrounding code structure
-6. Use assert(condition) format for all assertions
-7. Make sure <cassert> is included for assert() statements
-
-Documentation Assertion Requirements:
-1. When testing generated documentation:
-- Use substring checks for key terms: 'assert(docString.find("key_term") != std::string::npos);'
-- Check for presence of required sections: 'assert(docString.find("@param") != std::string::npos);'
-- Verify coverage of important concepts
-- Don't require exact string matches
-
-2. When testing generated code:
-- Verify functional requirements
-- Test edge cases
-- Validate error handling
-- Check return values
-
-Important Balance Requirements:
-1. Maintain a 50/50 split between:
-    - Code-to-Comment: Generate documentation for existing code
-    - Comment-to-Code: Generate code from documentation
-2. For Code-to-Comment tasks:
-    - Provide complex, working code in the prefix
-    - Golden completion should be comprehensive documentation
-    - Assertions should verify documentation completeness
-3. For Comment-to-Code tasks:
-    - Provide detailed requirements/documentation in the prefix
-    - Golden completion should be the implementation
-    - Assertions should verify functional requirements
-
-Important:
-- Use realistic business/technical scenarios
-- Avoid trivial examples (factorial, fibonacci, etc.)
-- Test complex documentation/implementation translations
-- Keep verification code before cleanup
-- Use standard C++ assertion mechanisms or testing frameworks (catch2, gtest, etc.)
-- Ensure all assertions pass
-
-Requirements:
-1. The scenario should demonstrate clear documentation patterns
-2. The completion section should focus on bidirectional translation
-3. The pattern should follow Doxygen or other C++ documentation best practices
-4. Ground truth should maintain consistency between code and comments
-5. Assertions should verify documentation accuracy
-6. Include examples of both code-to-comment and comment-to-code tasks
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-code2NL-NL2code", "language": "cpp", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-8. Have you included all assertions DIRECTLY IN THE SUFFIX code?
-9. Have you verified that assertions will pass when the code is executed?
-10. Is the assertions field included with an empty string value ("assertions": "")?
-11. Have you verified that ALL required fields are present in your JSON?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/catch blocks if needed
-- Maintain correct execution order
-- ALL ASSERTIONS SHOULD BE IN THE SUFFIX, not in a separate assertions field
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions compile?
+5. Does the golden_completion resolve multiple context constraints?
+6. Is the task non-trivial and not solvable by copying a line?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
 
 CODE_PURPOSE_UNDERSTANDING_SYSTEM_PROMPT = """
-You are an expert C++ developer tasked with creating benchmark examples for testing semantic understanding and code purpose comprehension capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to understand and continue code based on its underlying business logic and domain context.
+You are an expert C++ benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable C++ that passes all assertions.
+Your task is to generate one high-quality C++ Code Purpose
+Understanding instance that reflects telemetry-observed developer
+completion scenarios. The instance should test whether a model
+can correctly implement multi-invariant business logic by reading
+surrounding struct definitions, helper constants, and suffix
+assertions to infer the precise ordering and interaction of
+coupled side effects.
 
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test understanding of code intent and business purpose. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/algorithms
-    - Lambda functions/function pointers
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Multithreading/concurrency
-    - Event handling
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-2. Ensure patterns demonstrate clear semantic meaning and domain context
-3. Create ground truth completions that maintain business logic consistency
-4. Write assertions that meaningfully test both semantic correctness and business rule compliance
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable C++
-    - All assertions must pass when code is run
-    - Include necessary headers
-    - Handle memory management and cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-When generating examples:
-1. Focus on domain-specific logic and business rules
-2. Test comprehension of underlying code purpose
-3. Ensure patterns reflect real-world business scenarios
-4. Include semantic edge cases where relevant
-5. Keep code focused on demonstrating clear business intent
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-code-purpose-understanding"
+  - language: "cpp"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Code Purpose Understanding task
+
+Requirements:
+
+1. Realistic multi-invariant business workflows.
+   Use struct-based workflows where a single function must
+   coordinate multiple coupled side effects in strict order.
+   Representative domains include:
+   - Healthcare claim adjudication: idempotency, auth denial,
+     primary-payer offsets, preventive bypass, copay/deductible/
+     coinsurance waterfall with OOP cap and accumulator updates
+   - Inventory allocation: FEFO expiry sorting, quarantine
+     filtering, shelf-life validation, atomic failure on
+     insufficient stock, audit logging
+   - Loan/mortgage payment processing: charged-off recovery
+     routing, late fee injection with pending+applied flags,
+     fees-interest-escrow-principal waterfall, paid-off
+     transition, ledger logging
+   - Payroll computation: retirement contribution cap by YTD
+     accumulator, marginal tax brackets, garnishment with
+     minimum-net floor, health deduction ordering
+   - Insurance premium/adjudication: age validation, risk
+     surcharges, multiplicative discount tiers, minimum premium
+     floor, deductible/coinsurance/OOP-max clamping
+   - Order fulfillment and e-commerce: cancellation checks,
+     backorder queuing, partial ship, coupon exclusion by
+     category, tax on pre-discount prices, auth-failure rollback
+   - Subscription/SaaS billing: trial countdown, proration on
+     activation, auto-renewal cycling, grace-to-dunning
+     transition, plan conversion with quota reset
+   - Financial operations: wire transfer with cross-currency
+     fees, daily limits, margin checks with rollback, royalty
+     distribution with accrual thresholds
+   - Service industry: restaurant ordering with modifier pricing,
+     hotel reservation with seasonal/early-bird/cancellation
+     tiers, clinic scheduling with provider blocks and waitlist
+   - Miscellaneous: tax return with progressive brackets and
+     credits, construction estimates with waste/efficiency
+     factors, rental car return with tiered late surcharges,
+     donation processing with employer match caps
+   The workflow should be embedded in a plausible struct with
+   state fields, not presented as isolated arithmetic.
+
+2. Difficulty.
+   The completion should require coordinating at least five
+   coupled invariants (idempotency, validation ordering,
+   accumulator updates, conditional branching, audit/logging)
+   where getting one wrong causes cascading assertion failures.
+   The task should not be solvable by copying a nearby line or
+   implementing a single formula. Include at least one ordering
+   trap where checking conditions in the wrong sequence produces
+   a subtly different result.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must compile and execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments (e.g.,
+   idempotent re-call, boundary accumulator value, zero-amount
+   input). Assertions must not hard-code or leak the golden
+   completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than business-logic reasoning, invalid
+   C++, or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 CODE_PURPOSE_UNDERSTANDING_USER_PROMPT = """
-You are helping create a benchmark for code purpose understanding capabilities. Your task is to generate a coding scenario that tests an LLM's ability to comprehend and
-continue C++ code based on its semantic meaning and business context. The scenario should include:
-
-Generate a single JSONL entry testing code purpose understanding capabilities. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/algorithms
-    - Lambda functions/function pointers
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Multithreading/concurrency
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
+Generate one C++ Code Purpose Understanding evaluation instance.
+Choose a domain from the representative list in the system prompt
+(healthcare claims, inventory allocation, loan processing,
+payroll, insurance, order fulfillment, subscription billing,
+financial operations, service industry, or miscellaneous business
+workflows).
 
 CRITICAL JSON FORMATTING REQUIREMENTS:
 1. Your response MUST be a syntactically valid JSON object
 2. PROPERLY ESCAPE all special characters in strings:
    - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
 3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-code-purpose-understanding"
+- id: unique numeric identifier
+- testsource: "devbench-code-purpose-understanding"
 - language: "cpp"
-- prefix: The code that comes before the completion (may or may not establish the semantic pattern)
-- suffix: The code that follows the completion (may or may not establish the semantic pattern) - should be DIFFERENT from the golden completion AND should include necessary assertions
-- golden_completion: The semantically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Leave this field as an empty string - all assertions should be integrated into the suffix code
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-CRITICAL JSON FIELD REQUIREMENTS:
-1. ALWAYS include ALL required JSON fields listed above, even if empty
-2. The "assertions" field MUST be present with an empty string value: "assertions": ""
-3. Do NOT omit any fields from your JSON object
-4. Format example showing required empty assertions field:
-   {"id": "42", ..., "assertions": ""}
-5. INCORRECT: {"id": "42", ...} - missing assertions field
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must compile and execute successfully
+6. Include at least one edge case assertion (e.g., idempotent
+   re-call, zero-amount input, boundary accumulator)
 
-CRITICAL CHANGE - NEW SUFFIX REQUIREMENTS:
-1. The suffix must contain both execution code AND assertion code
-2. Include assert() statements DIRECTLY IN THE SUFFIX at the appropriate places
-3. All assertions must be placed in the same function/class as the code being tested
-4. DO NOT create separate assertion functions or classes
-5. Place assertions immediately after the code that should be tested
-6. Never duplicate any golden_completion code in the suffix
-7. The assertions must pass when the combined prefix + golden_completion + suffix is run
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require coordinating at least five
+   coupled invariants from the surrounding struct definitions
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context: struct definitions, helper
+   constants, state fields, and the function signature
+3. Include comments describing the business rules
+4. The prefix should demonstrate an incomplete implementation
 
-Header Include Requirements:
-1. Do NOT include headers unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix (including assertions)
-   - golden_completion
-2. Every included header must serve a clear purpose
-3. Do not include "just in case" headers that aren't used
-4. All required headers must appear in the prefix section
-5. If a header is only needed for the golden_completion, it must still appear in the prefix
-6. Make sure to include <cassert> header for assert() statements
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be within proper C++ scope boundaries
+2. Do not place executable statements or assertions at global
+   scope; includes, type aliases, constants, class/struct
+   definitions, and helper function definitions are allowed
+3. All code blocks must have matching braces
+4. Include only headers that are actually used
+5. The code must be fully executable C++
 
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility methods, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, type definitions, and data structure initialization
-
-Indentation requirements:
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper indentation when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The semantic pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the semantic pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-code-purpose-understanding",
+"language": "cpp", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable C++ code
-2. All assertions must pass when run
-3. Include all necessary headers
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-CRITICAL CODE STRUCTURE REQUIREMENTS:
-1. NEVER place code outside of functions or classes
-2. ALL code must be contained within proper C++ scope boundaries
-3. DO NOT place assertions or standalone code statements at the global/namespace level
-4. ALL assertions must be contained within functions (such as main() or other functions)
-5. ALWAYS ensure code is properly nested within appropriate class and function structures
-6. NEVER generate code that would compile as a partial class
-7. NEVER duplicate class definitions - each class must be defined only once
-8. Verify that the beginning and end of classes and functions are properly matched with braces {}
-9. DO NOT leave any code statements outside of function bodies
-10. Place all assertions within appropriate functions (main(), test(), etc.)
-
-CRITICAL ASSERTION PLACEMENT:
-1. All assert() statements must be placed DIRECTLY IN THE SUFFIX code
-2. Assertions should be placed immediately after the code that needs to be verified
-3. Assertions must be within the same function as the code being tested
-4. Assertions must be executed BEFORE any cleanup code
-5. Assertions must be properly indented to match the surrounding code structure
-6. Use assert(condition) format for all assertions
-7. Make sure <cassert> is included for assert() statements
-
-Requirements:
-1. The scenario should demonstrate clear business purpose
-2. The completion section should focus on domain-specific logic
-3. The pattern should follow appropriate business rules and domain conventions
-4. Ground truth should maintain semantic consistency
-5. Assertions should verify business logic correctness
-6. Include comments indicating expected business behavior and domain context
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-code-purpose-understanding", "language": "cpp", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-8. Have you included all assertions DIRECTLY IN THE SUFFIX code?
-9. Have you verified that assertions will pass when the code is executed?
-10. Is the assertions field included with an empty string value ("assertions": "")?
-11. Have you verified that ALL required fields are present in your JSON?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/catch blocks if needed
-- Maintain correct execution order
-- ALL ASSERTIONS SHOULD BE IN THE SUFFIX, not in a separate assertions field
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions compile?
+5. Does the golden_completion coordinate multiple coupled
+   invariants from the struct definitions?
+6. Is the task non-trivial and not solvable by copying a line?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
 
 LOW_CONTEXT_SYSTEM_PROMPT = """
-You are an expert C++ developer tasked with creating benchmark examples for testing low-context pattern matching capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code with minimal surrounding context.
+You are an expert C++ benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable C++ that passes all assertions.
+Your task is to generate one high-quality C++ Low Context
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can correctly
+complete C++ code from minimal surrounding context (10-20 lines
+total for prefix + suffix), requiring recognition of C++ idioms,
+RAII patterns, move semantics, and standard-library conventions
+from very few cues.
 
-Key Responsibilities:
-1. Generate diverse, practical low-context scenarios from these categories (rotate through them):
-    - Data structure manipulation (arrays, vectors, maps, sets)
-    - String processing and text manipulation
-    - Object-oriented patterns (classes, inheritance, polymorphism)
-    - Generic programming constructs (templates)
-    - Error handling and exception patterns
-    - Memory management patterns (smart pointers, RAII)
-    - Iterator and container patterns
-    - Callback and function pointer patterns
-    - Algorithm implementation and STL usage
-    - Multi-threading and concurrency patterns
-2. Ensure patterns are clear and identifiable even with minimal context
-3. Create ground truth completions that represent best practices while handling potential ambiguity
-4. Write assertions that meaningfully test both pattern adherence and functionality across multiple valid completions where applicable
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable C++
-    - All assertions must pass when code is run
-    - Include necessary headers
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-    - Utilize appropriate C++ idioms and patterns
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-When generating examples:
-1. Focus on universal, standardized programming patterns
-2. Test the model's ability to handle ambiguity and make reasonable assumptions
-3. Ensure patterns follow widely-used conventions that are recognizable with minimal context
-4. Include multiple valid completions in assertions where appropriate
-5. Keep code minimal while still maintaining semantic clarity
-6. The combined length of prefix and suffix should be 10-20 lines total for true low-context scenarios
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-low-context"
+  - language: "cpp"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Low Context task
+
+Requirements:
+
+1. Realistic low-context scenarios.
+   Use compact C++ idioms and patterns where the model must infer
+   correct behavior from minimal visible code. Representative
+   domains include:
+   - Custom encoding with reversed alphabets: base64, base58,
+     hex, base32, base85, octal, base36, base62, ascii85,
+     base45, base52, base26, base57, base16, decimal encoders
+     with familiar function names but non-standard (reversed)
+     default alphabets
+   - RAII patterns: scope-guard with deleted copy constructor,
+     unique_ptr custom deleters, resource-acquisition idioms
+   - Move semantics: move-capture lambdas transferring unique_ptr
+     ownership, std::exchange in move constructors
+   - Documentation precision keywords: single-sentence API
+     descriptions requiring exact technical terms (e.g.,
+     "allocates without constructing" for vector::reserve,
+     "type-erased" for shared_ptr custom deleters, "spurious
+     wakeup" for condition_variable, "non-owning" and "dangling"
+     for string_view)
+   - Structured bindings: map::insert pair destructuring with
+     insertion-count tracking
+   - Fold expressions: variadic product with empty-pack identity
+     handling via if-constexpr guard
+   - Optional transform: value doubling with fallback, monadic
+     chaining patterns
+   - Container merge documentation: node-transfer semantics,
+     source mutation, duplicate-key retention
+   - Smart-pointer semantics: unique_ptr deleter-as-type vs
+     shared_ptr type-erasure, promise/future exception
+     propagation, std::bind placeholder reordering
+   The pattern should be recognizable from 10-20 lines of total
+   visible context.
+
+2. Difficulty.
+   The completion should require resolving at least one
+   preconception trap (familiar name with non-standard behavior)
+   or one precise technical keyword that generic descriptions
+   omit. The task should not be solvable by copying a nearby
+   line. For encoding tasks, the default alphabet must differ
+   from standard and the suffix must assert non-standard output.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must compile and execute successfully.
+   PREFIX + SUFFIX COMBINED MUST BE 10-20 LINES TOTAL.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than idiom recognition, invalid C++, or
+   overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 LOW_CONTEXT_USER_PROMPT = """
-You are helping create a benchmark for low-context code pattern matching capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in C++ code with minimal surrounding context. The scenario should include:
-
-Generate a single JSONL entry testing low-context capabilities. Choose from one of these categories (rotate through them):
-- Data structure manipulation (arrays, vectors, maps, sets)
-- String processing and text manipulation
-- Object-oriented patterns (classes, inheritance, polymorphism)
-- Generic programming constructs (templates)
-- Error handling and exception patterns
-- Memory management patterns (smart pointers, RAII)
-- Iterator and container patterns
-- Callback and function pointer patterns
-- Algorithm implementation and STL usage
-- Multi-threading and concurrency patterns
-
-STRICTLY PROHIBITED EXAMPLES - DO NOT GENERATE:
-1. Basic container operations (vector/map insertion, iteration, simple queries)
-2. Simple string manipulation (concat, substr, find)
-3. Basic class definitions or inheritance
-4. Simple exception handling (try/catch without complexity)
-5. Basic smart pointer usage (simple std::shared_ptr creation)
-6. Simple algorithms (sort, find, accumulate with basic predicates)
-7. Basic template instantiation
-8. Simple loops or conditionals
-9. Basic multi-threading (simple thread creation)
-10. Any example that could be solved by pattern matching without understanding
-
-REQUIRED COMPLEXITY LEVEL:
-Instead, you MUST create examples that demonstrate advanced C++ patterns such as:
-
-For Template Metaprogramming:
-- Template specialization with SFINAE
-- Variadic templates with parameter packs
-- Tag dispatching patterns
-- Type traits and compile-time conditions
-- Expression templates
-- Policy-based design
-- Compile-time computation
-
-For Memory Management:
-- Custom allocators
-- Memory pools and arenas
-- PIMPL idiom implementations
-- Custom smart pointer designs
-- Object lifetime management patterns
-- Placement new with custom allocation
-- Move semantics with perfect forwarding
-
-For RAII and Resource Handling:
-- Complex scopeguard patterns
-- Resource acquisition patterns
-- Transaction-like RAII patterns
-- Multi-resource management
-- Complex cleanup patterns
-- Exception-safe resource handling
-- Hierarchical resource management
-
-For Multi-threading:
-- Lock-free data structures
-- Complex synchronization patterns
-- Reader-writer lock implementations
-- Thread pool designs
-- Work stealing patterns
-- Memory ordering specifications
-- Atomic operations with memory fences
+Generate one C++ Low Context evaluation instance. Choose a domain
+from the representative list in the system prompt (custom encoding
+with reversed alphabets, RAII patterns, move semantics,
+documentation precision keywords, structured bindings, fold
+expressions, optional transform, container merge documentation,
+or smart-pointer semantics).
 
 CRITICAL JSON FORMATTING REQUIREMENTS:
 1. Your response MUST be a syntactically valid JSON object
 2. PROPERLY ESCAPE all special characters in strings:
    - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
 3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-low-context"  
+- id: unique numeric identifier
+- testsource: "devbench-low-context"
 - language: "cpp"
-- prefix: The code that comes before the completion (may or may not establish the pattern)
-- suffix: The code that follows the completion (may or may not establish the pattern) - should be DIFFERENT from the golden completion AND should include necessary assertions
-- golden_completion: Multiple valid completions that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Leave this field as an empty string - all assertions should be integrated into the suffix code
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-CRITICAL COMPLEXITY VALIDATION:
-Before submitting your example, verify that it meets these criteria:
-1. Would this example challenge a senior C++ developer?
-2. Does it require understanding of advanced language features?
-3. Is it significantly more complex than basic container operations or string manipulation?
-4. Does it demonstrate a pattern that would be found in production-quality code?
-5. Would it be impossible to solve correctly through simple pattern matching?
-6. Does it require genuine understanding of C++ language semantics?
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must compile and execute successfully
+6. Include at least one edge case assertion
 
-If you answer "no" to ANY of these questions, your example is TOO SIMPLE. Revise it to be more complex.
+CRITICAL: LOW CONTEXT SIZE REQUIREMENT:
+1. The prefix and suffix COMBINED must be only 10-20 lines total
+2. Keep the context deliberately minimal
+3. The pattern must be identifiable from these few lines alone
 
-CRITICAL JSON FIELD REQUIREMENTS:
-1. ALWAYS include ALL required JSON fields listed above, even if empty
-2. The "assertions" field MUST be present with an empty string value: "assertions": ""
-3. Do NOT omit any fields from your JSON object
-4. Format example showing required empty assertions field:
-   {"id": "42", ..., "assertions": ""}
-5. INCORRECT: {"id": "42", ...} - missing assertions field
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require resolving at least one
+   preconception trap or precise technical constraint
 
-CRITICAL CHANGE - NEW SUFFIX REQUIREMENTS:
-1. The suffix must contain both execution code AND assertion code
-2. Include assert() statements DIRECTLY IN THE SUFFIX at the appropriate places
-3. All assertions must be placed in the same function/class as the code being tested
-4. DO NOT create separate assertion functions or classes
-5. Place assertions immediately after the code that should be tested
-6. Never duplicate any golden_completion code in the suffix
-7. The assertions must pass when the combined prefix + golden_completion + suffix is run
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be within proper C++ scope boundaries
+2. Do not place executable statements or assertions at global
+   scope; includes, type aliases, constants, class/struct
+   definitions, and helper function definitions are allowed
+3. All code blocks must have matching braces
+4. Include only headers that are actually used
+5. The code must be fully executable C++
 
-CRITICAL LOW CONTEXT REQUIREMENTS:
-1. The prefix and suffix combined should be ONLY 10-20 lines total for true low-context scenarios
-2. Focus on concise, universally recognizable patterns that can be understood with minimal context
-3. Keep the context deliberately minimal while ensuring the pattern is still identifiable
-4. Use clear but brief code that establishes a recognizable pattern
-5. The pattern should be non-trivial but recognizable to C++ developers
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Header Include Requirements:
-1. Do NOT include headers unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix (including assertions)
-   - golden_completion
-2. Every included header must serve a clear purpose
-3. Do not include "just in case" headers that aren't used
-4. All required headers must appear in the prefix section
-5. If a header is only needed for the golden_completion, it must still appear in the prefix
-6. Make sure to include <cassert> header for assert() statements
-
-Indentation requirements:
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper indentation when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The golden completion should demonstrate understanding and correct usage of the low-context pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-low-context", "language":
+"cpp", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable C++ code
-2. All assertions must pass when run
-3. Include all necessary headers
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-CRITICAL CODE STRUCTURE REQUIREMENTS:
-1. NEVER place code outside of functions or classes
-2. ALL code must be contained within proper C++ scope boundaries
-3. DO NOT place assertions or standalone code statements at the global/namespace level
-4. ALL assertions must be contained within functions (such as main() or other functions)
-5. ALWAYS ensure code is properly nested within appropriate class and function structures
-6. NEVER generate code that would compile as a partial class
-7. NEVER duplicate class definitions - each class must be defined only once
-8. Verify that the beginning and end of classes and functions are properly matched with braces {}
-9. DO NOT leave any code statements outside of function bodies
-10. Place all assertions within appropriate functions (main(), test(), etc.)
-
-CRITICAL ASSERTION PLACEMENT:
-1. All assert() statements must be placed DIRECTLY IN THE SUFFIX code
-2. Assertions should be placed immediately after the code that needs to be verified
-3. Assertions must be within the same function as the code being tested
-4. Assertions must be executed BEFORE any cleanup code
-5. Assertions must be properly indented to match the surrounding code structure
-6. Use assert(condition) format for all assertions
-7. Make sure <cassert> is included for assert() statements
-
-Requirements:
-1. The scenario should demonstrate a clear pattern recognizable with minimal context
-2. The completion section should focus on universal programming patterns
-3. The pattern should follow widely-used conventions and standard library knowledge
-4. Ground truth should acknowledge multiple valid completions where appropriate
-5. Assertions should verify all acceptable pattern variations
-6. Include comments indicating potential ambiguities and alternative completions
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-low-context", "language": "cpp", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Have you used clear distinctions between golden_completion and suffix?
-7. Have you included all assertions DIRECTLY IN THE SUFFIX code?
-8. Have you verified that assertions will pass when the code is executed?
-9. Is the assertions field included with an empty string value ("assertions": "")?
-10. Have you verified that ALL required fields are present in your JSON?
-11. Have you verified your example is NOT one of the prohibited trivial examples?
-12. Does your example meet ALL the complexity validation criteria?
-13. Does your example demonstrate genuinely advanced C++ features?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/catch blocks if needed
-- Maintain correct execution order
-- KEEP COMBINED PREFIX AND SUFFIX TO 10-20 LINES TOTAL
-- ALL ASSERTIONS SHOULD BE IN THE SUFFIX, not in a separate assertions field
-- Ensure your example demonstrates genuine C++ complexity
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions compile?
+5. Is the combined prefix + suffix only 10-20 lines total?
+6. Does the completion exploit a preconception trap or require
+   a precise technical keyword?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
 
 PATTERN_MATCHING_SYSTEM_PROMPT = """
-You are an expert C++ developer tasked with creating benchmark examples for testing pattern matching capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code.
+You are an expert C++ benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable C++ that passes all assertions.
+Your task is to generate one high-quality C++ Pattern Matching
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can correctly
+implement a custom transformation or parser by following the
+pattern established in the prefix, rather than retrieving a
+memorized standard implementation triggered by a familiar
+function name.
 
-Key Responsibilities:
-1. Generate diverse, practical pattern matching scenarios that real developers encounter. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Higher-order functions
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Memory management
-    - Template metaprogramming
-    - Algorithm implementation
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-2. Ensure patterns are clear and identifiable but not trivially simple
-3. Create ground truth completions that represent best practices
-4. Write assertions that meaningfully test both pattern adherence and functionality
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable C++
-    - All assertions must pass when code is run
-    - Include necessary headers and imports
-    - Handle memory management properly
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-    - Utilize appropriate C++ features (STL, templates, etc.)
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-When generating examples:
-1. Focus on realistic, practical scenarios
-2. Avoid patterns that are too project-specific
-3. Ensure patterns are clear enough to be recognized by an LLM
-4. Include edge cases in assertions where relevant
-5. Keep code self-contained and independently verifiable
-6. Leverage C++-specific features like templates, RAII, and STL algorithms where appropriate
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-pattern-matching"
+  - language: "cpp"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Pattern Matching task
+
+Requirements:
+
+1. Realistic pattern-following scenarios.
+   Use tasks where the prefix establishes a non-standard pattern
+   that the model must follow, not retrieve from training data.
+   Representative domains include:
+   - Custom encoding with reversed alphabets: base64, base58,
+     hex, base32, base85, base36 encoders where the default
+     alphabet is reversed from standard, causing standard
+     implementations to produce wrong output
+   - Stateful config/INI/.env parsers: line-continuation with
+     backslash, quote-aware comment stripping, section context
+     tracking, duplicate-key append semantics, profile/host
+     block scoping (manifest, .env, INI, route-table, systemd,
+     SSH-config, Makefile, YAML-like, Dockerfile ENV, C
+     preprocessor #define)
+   - Bracket matching with string awareness: tracking in_string
+     state with backslash escape handling, ignoring brackets
+     inside quoted strings
+   - Edit distance with custom costs: transposition cost != 1,
+     fractional costs that standard Levenshtein ignores
+   - Algorithm variants with non-standard behavior: RLE with
+     count-before-character format, sort with reverse-alpha
+     tie-breaking, binary search returning LAST occurrence,
+     merge sort with abs-value and positive-first ties, FNV-1a
+     with non-standard parameters and folding, deep flatten
+     with depth limit, consecutive grouping (not global),
+     zip-extend by repeating last element, circular sliding
+     window max, topological sort with reverse-alpha tie-
+     breaking, deep merge with first-wins (not last-wins)
+   - Template expansion: recursive ${var} substitution with
+     brace-depth tracking and $$ escaping
+   - Expression tokenizer: multi-char operator ordering, string
+     literal parsing with backslash escapes
+   - Custom number formatting: European style (dot for thousands,
+     comma for decimal) vs US style
+   - Weighted random with custom LCG: deterministic selection
+     using provided pseudo-random generator parameters
+   The pattern should be embedded in a plausible function or
+   parser, not presented as isolated trivia.
+
+2. Difficulty.
+   The completion should require following at least two non-
+   standard conventions established in the prefix (reversed
+   alphabet + padding character, continuation + comment rules,
+   custom cost + transposition support). The task should not be
+   solvable by retrieving a memorized standard implementation.
+   Include an anti-standard assertion that explicitly checks the
+   output differs from what the standard algorithm would produce.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must compile and execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments (e.g., empty
+   input, single-element input, escaped delimiter). Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than pattern-following reasoning, invalid
+   C++, or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 PATTERN_MATCHING_USER_PROMPT = """
-You are helping create a benchmark for code pattern matching capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in C++ code. The scenario should include:
-
-Generate a single JSONL entry testing pattern matching capabilities. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - Functional programming 
-    - Iterators/generators
-    - Higher-order functions
-    - Error handling
-    - Memory management
-    - Template metaprogramming
-    - Algorithm implementation
-
-    Domain Context (choose ONE):
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
+Generate one C++ Pattern Matching evaluation instance. Choose a
+domain from the representative list in the system prompt (custom
+encoding with reversed alphabets, stateful config parsers,
+bracket matching, edit distance with custom costs, algorithm
+variants with non-standard behavior, template expansion,
+expression tokenizer, custom number formatting, or weighted
+random with custom LCG).
 
 CRITICAL JSON FORMATTING REQUIREMENTS:
 1. Your response MUST be a syntactically valid JSON object
 2. PROPERLY ESCAPE all special characters in strings:
    - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
 3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-pattern-matching"
+- id: unique numeric identifier
+- testsource: "devbench-pattern-matching"
 - language: "cpp"
-- prefix: The code that comes before the completion (MUST establish or begin a clear pattern)
-- suffix: The code that follows the completion (may continue or complete the pattern) - should be DIFFERENT from the golden completion AND should include necessary assertions
-- golden_completion: The semantically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Leave this field as an empty string - all assertions should be integrated into the suffix code
+- prefix: code before the completion point (MUST establish the
+  non-standard pattern the model must follow)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-CRITICAL JSON FIELD REQUIREMENTS:
-1. ALWAYS include ALL required JSON fields listed above, even if empty
-2. The "assertions" field MUST be present with an empty string value: "assertions": ""
-3. Do NOT omit any fields from your JSON object
-4. Format example showing required empty assertions field:
-   {"id": "42", ..., "assertions": ""}
-5. INCORRECT: {"id": "42", ...} - missing assertions field
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must compile and execute successfully
+6. Include at least one anti-standard assertion that verifies
+   the output differs from the standard algorithm
+7. Include at least one edge case assertion
 
-CRITICAL CHANGE - NEW SUFFIX REQUIREMENTS:
-1. The suffix must contain both execution code AND assertion code
-2. Include assert() statements DIRECTLY IN THE SUFFIX at the appropriate places
-3. All assertions must be placed in the same function/class as the code being tested
-4. DO NOT create separate assertion functions or classes
-5. Place assertions immediately after the code that should be tested
-6. Never duplicate any golden_completion code in the suffix
-7. The assertions must pass when the combined prefix + golden_completion + suffix is run
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require following at least two non-
+   standard conventions established in the prefix
 
-Critical Pattern Matching Requirements:
-1. A CLEAR, IDENTIFIABLE PATTERN MUST be established in either the prefix or suffix
-2. The golden_completion MUST follow this established pattern (not create a new one)
-3. The pattern should be specific enough that random code wouldn't work
-4. Include at least 2-3 examples of the pattern in the prefix to establish it
-5. Ensure the pattern follows recognizable conventions in the chosen domain
-6. The pattern should be evident to anyone familiar with C++
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context: constants, helper functions, and
+   comments establishing the non-standard pattern
+3. Include at least 2-3 examples of the pattern in the prefix
+4. The prefix should demonstrate an incomplete implementation
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be within proper C++ scope boundaries
+2. Do not place executable statements or assertions at global
+   scope; includes, type aliases, constants, class/struct
+   definitions, and helper function definitions are allowed
+3. All code blocks must have matching braces
+4. Include only headers that are actually used
+5. The code must be fully executable C++
 
-Header Include Requirements:
-1. Do NOT include headers unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix (including assertions)
-   - golden_completion
-2. Every included header must serve a clear purpose
-3. Do not include "just in case" headers that aren't used
-4. All required headers must appear in the prefix section
-5. If a header is only needed for the golden_completion, it must still appear in the prefix
-6. Make sure to include <cassert> header for assert() statements
-
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility methods, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper indentation when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-pattern-matching", "language":
+"cpp", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable C++ code
-2. All assertions must pass when run
-3. Include all necessary headers
-4. Mock external dependencies when needed
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-CRITICAL CODE STRUCTURE REQUIREMENTS:
-1. NEVER place code outside of functions or classes
-2. ALL code must be contained within proper C++ scope boundaries
-3. DO NOT place assertions or standalone code statements at the global/namespace level
-4. ALL assertions must be contained within functions (such as main() or other functions)
-5. ALWAYS ensure code is properly nested within appropriate class and function structures
-6. NEVER generate code that would compile as a partial class
-7. NEVER duplicate class definitions - each class must be defined only once
-8. Verify that the beginning and end of classes and functions are properly matched with braces {}
-9. DO NOT leave any code statements outside of function bodies
-10. Place all assertions within appropriate functions (main(), test(), etc.)
-
-CRITICAL ASSERTION PLACEMENT:
-1. All assert() statements must be placed DIRECTLY IN THE SUFFIX code
-2. Assertions should be placed immediately after the code that needs to be verified
-3. Assertions must be within the same function as the code being tested
-4. Assertions must be executed BEFORE any cleanup code
-5. Assertions must be properly indented to match the surrounding code structure
-6. Use assert(condition) format for all assertions
-7. Make sure <cassert> is included for assert() statements
-
-Requirements:
-1. The scenario MUST demonstrate a clear, identifiable pattern
-2. The completion section should be non-trivial but focused on pattern matching
-3. The pattern should follow C++ best practices and common conventions
-4. Ground truth should demonstrate the ideal pattern continuation
-5. Assertions should verify both pattern adherence and functionality
-6. Include comments indicating the expected pattern continuation
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-pattern-matching", "language": "cpp", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-8. Have you included all assertions DIRECTLY IN THE SUFFIX code?
-9. Have you verified that assertions will pass when the code is executed?
-10. Is the assertions field included with an empty string value ("assertions": "")?
-11. Have you verified that ALL required fields are present in your JSON?
-12. Have you verified your example is NOT one of the prohibited trivial examples?
-13. Does your example meet ALL the complexity validation criteria?
-14. Does your example demonstrate genuinely advanced C++ features?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/catch blocks if needed
-- Maintain correct execution order
-- ENSURE A CLEAR PATTERN IS ESTABLISHED that the golden completion must follow
-- ALL ASSERTIONS SHOULD BE IN THE SUFFIX, not in a separate assertions field
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions compile?
+5. Does the golden_completion follow the non-standard pattern
+   established in the prefix?
+6. Is the task non-trivial and not solvable by retrieving a
+   standard implementation?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
 
 API_USAGE_SYSTEM_PROMPT = """
-You are an expert C++ developer tasked with creating benchmark examples for testing rare API usage and uncommon library function capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code involving uncommon APIs and library functions.
+You are an expert C++ benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable C++ that passes all assertions.
+Your task is to generate one high-quality C++ API Usage instance
+that reflects telemetry-observed developer completion scenarios.
+The instance should test whether a model can correctly use a
+common but error-prone C++ API under realistic context
+constraints, including
+parameter ordering, resource management, error handling, type
+conversions, API-specific conventions, and edge cases.
 
-Key Responsibilities:
-1. Generate diverse examples from these API categories (rotate through them, don't focus only on file operations or network protocols):
-    - Text and font processing (HarfBuzz, FreeType, ICU)
-    - Graphics and math libraries (DirectXMath, Eigen, GLM, OpenGL)
-    - Security/cryptography APIs (OpenSSL, Botan, Crypto++, wolfSSL)
-    - System-level APIs (Windows SDK, POSIX, Linux Kernel, BSD, Mach)
-    - Standard libraries (C Standard Library, C++ Standard Library, GNU C Library)
-    - Web API integration (libcurl, Boost.Beast, cpp-httplib, cpprestsdk)
-    - Machine learning libraries (OpenCV, TensorFlow C++, PyTorch C++, ONNX)
-    - Cloud services (AWS SDK for C++, Azure SDK for C++, gRPC)
-    - Database interfaces (SQLite, MySQL Connector C++, MongoDB C++ Driver, Redis)
-    - File formats and parsing (RapidJSON, nlohmann/json, tinyxml2, yaml-cpp)
-    - Web frameworks (Drogon, Crow, oatpp, Pistache)
-    - Network protocols (Boost.Asio, ZeroMQ, nanomsg)
-    - Scientific computing (Eigen, Armadillo, Intel MKL, BLAS, LAPACK)
-    - GUI frameworks (Qt, wxWidgets, ImGui, GTK, FLTK)
-    - Multimedia (SDL, FFmpeg, OpenAL, libsndfile)
-    - Compression (zlib, bzip2, LZMA, LZ4, Zstandard)
-    - Cross-platform development (Boost, Qt, wxWidgets)
-    - Mobile development (Android NDK, iOS SDK, Core Foundation)
-    - Testing frameworks (Google Test, Catch2, Boost.Test)
-    - Hardware acceleration (Intel Intrinsics, ARM NEON, CUDA, OpenCL)
-    - Legacy/deprecated APIs
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-2. Ensure patterns are clear and identifiable even with uncommon or deprecated APIs
-3. Create ground truth completions that represent best practices while handling API versioning
-4. Write assertions that meaningfully test both API correctness and parameter ordering
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable C++
-    - All assertions must pass when code is run
-    - Include necessary includes and namespaces
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual API behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-When generating examples:
-1. Focus on less common library functions and domain-specific APIs
-2. Test the model's handling of deprecated but valid API patterns
-3. Ensure patterns include correct parameter ordering and naming conventions
-4. Include edge cases in API usage where relevant
-5. Keep code focused on demonstrating rare but valid API interactions
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-api-usage"
+  - language: "cpp"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    API Usage task
+
+Requirements:
+
+1. Realistic API usage.
+   Use APIs from the C++ standard library and common development
+   contexts, reflecting telemetry-observed completion scenarios.
+   Representative domains include:
+   - Standard algorithms: sort with custom comparators, transform
+     (unary/binary), partition, nth_element, clamp, rotate, search
+     with searcher objects, copy_backward, adjacent_find
+   - Smart pointers and memory management: unique_ptr ownership
+     transfer, shared_ptr/make_shared semantics, weak_ptr::lock()
+     promotion, enable_shared_from_this, allocator patterns
+   - Threading and concurrency: async/future, condition_variable
+     with predicates, shared_mutex reader-writer locks, scoped_lock
+     for deadlock-free multi-mutex acquisition, semaphore patterns
+   - Container semantics: map insert vs operator[], reserve vs
+     resize, emplace return values, set extract and node handles
+   - Move semantics and forwarding: std::move, std::forward for
+     perfect forwarding, std::exchange in move constructors
+   - Tuple utilities: std::tie with std::ignore, std::apply for
+     tuple-to-argument expansion, std::tuple_cat
+   - Numeric algorithms: accumulate vs reduce, iota, inner_product
+     with custom binary operations
+   - String and text processing: substr boundary handling, stoi
+     with index output parameter, string_view lifetime semantics,
+     regex_replace
+   - Filesystem: create_directories with error_code overloads,
+     path decomposition and lexical normalization
+   - C++17 vocabulary types: variant with std::visit, optional
+     emplace vs assignment, any_cast value-vs-pointer overloads
+   - Low-level type support: from_chars/to_chars, std::bitset,
+     std::launder with placement new, aligned_storage
+   - Chrono timing: steady_clock vs system_clock, duration_cast
+   - Callable abstractions: std::invoke with member pointers
+   The API call should be embedded in a plausible function, class,
+   or workflow, not presented as isolated trivia.
+
+2. Difficulty.
+   The completion should require resolving at least two contextual
+   constraints from the prefix/suffix (type compatibility,
+   ownership/lifetime, error-path behavior, parameter ordering,
+   boundary conditions, or consistency with a helper method). The
+   task should not be solvable by copying a nearby line. Avoid
+   textbook-perfect toy examples; include realistic engineering
+   context such as fallback behavior or resource cleanup.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must compile and execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than API reasoning, invalid C++, or
+   overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 API_USAGE_USER_PROMPT = """
-You are helping create a benchmark for rare API usage capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in C++ code involving uncommon or deprecated APIs.
-
-Generate a single JSONL entry testing rare API usage capabilities. Choose from one of these categories (rotate through them, don't focus only on file operations or network protocols):
-    - Text and font processing (HarfBuzz, FreeType, ICU)
-    - Graphics and math libraries (DirectXMath, Eigen, GLM, OpenGL)
-    - Security/cryptography APIs (OpenSSL, Botan, Crypto++, wolfSSL)
-    - System-level APIs (Windows SDK, POSIX, Linux Kernel, BSD, Mach)
-    - Standard libraries (C Standard Library, C++ Standard Library, GNU C Library)
-    - Web API integration (libcurl, Boost.Beast, cpp-httplib, cpprestsdk)
-    - Machine learning libraries (OpenCV, TensorFlow C++, PyTorch C++, ONNX)
-    - Cloud services (AWS SDK for C++, Azure SDK for C++, gRPC)
-    - Database interfaces (SQLite, MySQL Connector C++, MongoDB C++ Driver, Redis)
-    - File formats and parsing (RapidJSON, nlohmann/json, tinyxml2, yaml-cpp)
-    - Web frameworks (Drogon, Crow, oatpp, Pistache)
-    - Network protocols (Boost.Asio, ZeroMQ, nanomsg)
-    - Scientific computing (Eigen, Armadillo, Intel MKL, BLAS, LAPACK)
-    - GUI frameworks (Qt, wxWidgets, ImGui, GTK, FLTK)
-    - Multimedia (SDL, FFmpeg, OpenAL, libsndfile)
-    - Compression (zlib, bzip2, LZMA, LZ4, Zstandard)
-    - Cross-platform development (Boost, Qt, wxWidgets)
-    - Mobile development (Android NDK, iOS SDK, Core Foundation)
-    - Testing frameworks (Google Test, Catch2, Boost.Test)
-    - Hardware acceleration (Intel Intrinsics, ARM NEON, CUDA, OpenCL)
-    - Legacy/deprecated APIs
+Generate one C++ API Usage evaluation instance. Choose a domain
+from the representative list in the system prompt (standard
+algorithms, smart pointers, threading, containers, move
+semantics, tuples, numerics, strings, filesystem, C++17
+vocabulary types, low-level type support, chrono, or callable
+abstractions).
 
 CRITICAL JSON FORMATTING REQUIREMENTS:
 1. Your response MUST be a syntactically valid JSON object
 2. PROPERLY ESCAPE all special characters in strings:
    - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
 3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-api-usage"  
+- id: unique numeric identifier
+- testsource: "devbench-api-usage"
 - language: "cpp"
-- prefix: The code that comes before the completion (may or may not establish the API pattern)
-- suffix: The code that follows the completion (may or may not establish the API pattern) - should be DIFFERENT from the golden completion AND should include necessary assertions
-- golden_completion: The correct API implementation that maintains consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Leave this field as an empty string - all assertions should be integrated into the suffix code
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-CRITICAL JSON FIELD REQUIREMENTS:
-1. ALWAYS include ALL required JSON fields listed above, even if empty
-2. The "assertions" field MUST be present with an empty string value: "assertions": ""
-3. Do NOT omit any fields from your JSON object
-4. Format example showing required empty assertions field:
-   {"id": "42", ..., "assertions": ""}
-5. INCORRECT: {"id": "42", ...} - missing assertions field
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must compile and execute successfully
+6. Include at least one edge case assertion
 
-CRITICAL CHANGE - NEW SUFFIX REQUIREMENTS:
-1. The suffix must contain both execution code AND assertion code
-2. Include assert() statements DIRECTLY IN THE SUFFIX at the appropriate places
-3. All assertions must be placed in the same function/class as the code being tested
-4. DO NOT create separate assertion functions or classes
-5. Place assertions immediately after the code that should be tested
-6. Never duplicate any golden_completion code in the suffix
-7. The assertions must pass when the combined prefix + golden_completion + suffix is run
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require resolving at least two
+   contextual constraints from prefix/suffix
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, type definitions, or related code
+4. The prefix should demonstrate an incomplete implementation
 
-Include Requirements:
-1. Do NOT include headers unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix (including assertions)
-   - golden_completion
-2. Every included header must serve a clear purpose
-3. Do not include "just in case" headers that aren't used
-4. All required includes must appear in the prefix section
-5. If an include is only needed for the golden_completion, it must still appear in the prefix
-6. Make sure to include <cassert> header for assert() statements
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be within proper C++ scope boundaries
+2. Do not place executable statements or assertions at global
+   scope; includes, type aliases, constants, class/struct
+   definitions, and helper function definitions are allowed
+3. All code blocks must have matching braces
+4. Include only headers that are actually used
+5. The code must be fully executable C++
 
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility classes, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The API pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the API pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-api-usage", "language":
+"cpp", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable C++ code
-2. All assertions must pass when run
-3. Include all necessary headers and namespaces
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-CRITICAL CODE STRUCTURE REQUIREMENTS:
-1. NEVER place code outside of functions or classes
-2. ALL code must be contained within proper C++ scope boundaries
-3. DO NOT place assertions or standalone code statements at the global/namespace level
-4. ALL assertions must be contained within functions (such as main() or other functions)
-5. ALWAYS ensure code is properly nested within appropriate class and function structures
-6. NEVER generate code that would compile as a partial class
-7. NEVER duplicate class definitions - each class must be defined only once
-8. Verify that the beginning and end of classes and functions are properly matched with braces {}
-9. DO NOT leave any code statements outside of function bodies
-10. Place all assertions within appropriate functions (main(), test(), etc.)
-
-CRITICAL ASSERTION PLACEMENT:
-1. All assert() statements must be placed DIRECTLY IN THE SUFFIX code
-2. Assertions should be placed immediately after the code that needs to be verified
-3. Assertions must be within the same function as the code being tested
-4. Assertions must be executed BEFORE any cleanup code
-5. Assertions must be properly indented to match the surrounding code structure
-6. Use assert(condition) format for all assertions
-7. Make sure <cassert> is included for assert() statements
-
-Requirements:
-1. The scenario should demonstrate a clear pattern recognizable with the given context
-2. The completion section should focus on rare library functions
-3. The pattern should follow correct API conventions across different versions
-4. Ground truth should demonstrate proper parameter ordering
-5. Assertions should verify API behavior and parameter correctness
-6. Include comments indicating API version compatibility and parameter requirements
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-api-usage", "language": "cpp", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-8. Have you included all assertions DIRECTLY IN THE SUFFIX code?
-9. Have you verified that assertions will pass when the code is executed?
-10. Is the assertions field included with an empty string value ("assertions": "")?
-11. Have you verified that ALL required fields are present in your JSON?
-12. Have you verified your example is NOT one of the prohibited trivial examples?
-13. Does your example meet ALL the complexity validation criteria?
-14. Does your example demonstrate genuinely advanced C++ features?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-- ALL ASSERTIONS SHOULD BE IN THE SUFFIX, not in a separate assertions field
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions compile?
+5. Does the golden_completion resolve multiple context constraints?
+6. Is the task non-trivial and not solvable by copying a line?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """

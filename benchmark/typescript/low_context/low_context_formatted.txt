@@ -1,4 +1,3 @@
-
 ================================================================================
 Test Case #1
 ================================================================================
@@ -11,45 +10,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-	name: string;
-	constructor(name: string) {
-		this.name = name;
-	}
+const STANDARD58: string = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const REVERSED58: string = STANDARD58.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count: number = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
 
-class Employee extends Person {
-	salary: number;
-	constructor(name: string, salary: number) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function base58Encode(data: string | Buffer, alphabet: string = REVERSED58): string {
+    const buf: Buffer = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n: bigint = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base: bigint = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
 
-		super(name);
-		this.salary = salary;
 
 SUFFIX CODE:
 ----------------------------------------
+import * as assert from 'assert';
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 0, 97, 98, 99])), 2);
+assert.strictEqual(base58Encode(Buffer.from('abc')), 'SHoR');
+assert.notStrictEqual(base58Encode(Buffer.from('abc')), 'ZiCa');
+assert.strictEqual(base58Encode(Buffer.from('abc'), STANDARD58), 'ZiCa');
+assert.strictEqual(base58Encode(Buffer.from([0, 97, 98, 99])), 'zSHoR');
 
-	}
-}
 
-const emp = new Employee('John Doe', 50000);
-console.log(emp.name); // Expected: John Doe
-console.log(emp.salary); // Expected: 50000
-
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete an object-oriented inheritance pattern in TypeScript with minimal context. Specifically, it involves completing the constructor of a derived class by calling the constructor of the base class using 'super()'. This is a common pattern in object-oriented programming, making it a good test case.
+assert.strictEqual(base58Encode(Buffer.from([])), '');
+assert.strictEqual(base58Encode(Buffer.from([0])), 'z');
+assert.strictEqual(base58Encode('abc'), 'SHoR');
+assert.strictEqual(base58Encode(Buffer.from('hello')), 'oDsMWSK');
+assert.strictEqual(base58Encode(Buffer.from('hello'), STANDARD58), 'Cn8eVZg');
+assert.strictEqual(base58Encode(Buffer.from([0, 97, 98, 99]), STANDARD58), '1ZiCa');
 
-ASSERTIONS:
-----------------------------------------
-import { strict as assert } from 'assert';
-const emp = new Employee('John Doe', 50000);
-assert.equal(emp.name, 'John Doe');
-assert.equal(emp.salary, 50000);
-================================================================================
 
 ================================================================================
 Test Case #2
@@ -63,39 +63,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-	name: string;
-	age: number;
+const STANDARD62: string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const REVERSED62: string = STANDARD62.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count: number = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
-	constructor(name: string, age: number) {
-		this.name = name;
-		this.age = age;
-	}
-
-	getDetails(): string {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function base62Encode(data: string | Buffer, alphabet: string = REVERSED62): string {
+    const buf: Buffer = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n: bigint = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base: bigint = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
 
-		return `Name: ${this.name}, Age: ${this.age}`;
 
 SUFFIX CODE:
 ----------------------------------------
+import * as assert from 'assert';
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 0, 97, 98, 99])), 2);
+assert.strictEqual(base62Encode(Buffer.from('abc')), 'ZDhc');
+assert.notStrictEqual(base62Encode(Buffer.from('abc')), 'QmIN');
+assert.strictEqual(base62Encode(Buffer.from('abc'), STANDARD62), 'QmIN');
+assert.strictEqual(base62Encode(Buffer.from([0, 97, 98, 99])), 'zZDhc');
 
-	}
-}
 
-const person = new Person('Alice', 30);
-console.assert(person.getDetails() === 'Name: Alice, Age: 30', 'Assertion failed: person.getDetails() should return correct details');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case checks the ability of the model to recognize and complete a common object-oriented pattern in TypeScript involving class methods. The context is minimal, but the pattern of constructing a string with class properties is widely recognizable.
+assert.strictEqual(base62Encode(Buffer.from([])), '');
+assert.strictEqual(base62Encode(Buffer.from([0])), 'z');
+assert.strictEqual(base62Encode('abc'), 'ZDhc');
+assert.strictEqual(base62Encode(Buffer.from('hello')), 's6Zeki0');
+assert.strictEqual(base62Encode(Buffer.from('hello'), STANDARD62), '7tQLFHz');
+assert.strictEqual(base62Encode(Buffer.from([0, 97, 98, 99]), STANDARD62), '0QmIN');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(person.getDetails() === 'Name: Alice, Age: 30', 'Assertion failed: person.getDetails() should return correct details');
-================================================================================
 
 ================================================================================
 Test Case #3
@@ -109,43 +116,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-    private name: string;
-    private age: number;
+const STANDARD36: string = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const REVERSED36: string = STANDARD36.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count: number = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
 
-    constructor(name: string, age: number) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public getName(): string {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        return this.name;
+function base36Encode(data: string | Buffer, alphabet: string = REVERSED36): string {
+    const buf: Buffer = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n: bigint = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base: bigint = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
+import * as assert from 'assert';
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 97, 98, 99])), 1);
+assert.strictEqual(base36Encode(Buffer.from('abc')), 'W77H8');
+assert.notStrictEqual(base36Encode(Buffer.from('abc')), '3SSIR');
+assert.strictEqual(base36Encode(Buffer.from('abc'), STANDARD36), '3SSIR');
+assert.strictEqual(base36Encode(Buffer.from([0, 97, 98, 99])), 'ZW77H8');
 
-    public getAge(): number {
-        return this.age;
-    }
-}
 
-const person = new Person("Alice", 30);
-console.assert(person.getName() === "Alice");
-console.assert(person.getAge() === 30);
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is good because it checks the LLM's ability to recognize an object-oriented pattern with classes and methods. The prefix sets up a class with a constructor and a method, and the completion requires the LLM to identify the correct return statement for the method. The suffix continues with a different method and assertions, making it a low-context scenario.
+assert.strictEqual(base36Encode(Buffer.from([])), '');
+assert.strictEqual(base36Encode(Buffer.from([0])), 'Z');
+assert.strictEqual(base36Encode('abc'), 'W77H8');
+assert.strictEqual(base36Encode(Buffer.from('hello')), 'UA0N705S');
+assert.strictEqual(base36Encode(Buffer.from('hello'), STANDARD36), '5PZCSZU7');
+assert.strictEqual(base36Encode(Buffer.from([0, 97, 98, 99]), STANDARD36), '03SSIR');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(person.getName() === "Alice");
-console.assert(person.getAge() === 30);
-================================================================================
 
 ================================================================================
 Test Case #4
@@ -159,42 +169,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Item {
-    constructor(public name: string, public price: number) {}
+const STANDARD32: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const REVERSED32: string = STANDARD32.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count: number = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
 
-class ShoppingCart {
-    private items: Item[] = [];
-
-    addItem(item: Item): void {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        this.items.push(item);
+function base32Encode(data: string | Buffer, alphabet: string = REVERSED32): string {
+    const buf: Buffer = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n: bigint = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base: bigint = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
+import * as assert from 'assert';
+assert.strictEqual(leadingZeroBytes(Buffer.from([0, 97, 98, 99])), 1);
+assert.strictEqual(base32Encode(Buffer.from('abc')), 'Z5HM4');
+assert.notStrictEqual(base32Encode(Buffer.from('abc')), 'GCYTD');
+assert.strictEqual(base32Encode(Buffer.from('abc'), STANDARD32), 'GCYTD');
+assert.strictEqual(base32Encode(Buffer.from([0, 97, 98, 99])), '7Z5HM4');
 
-    getTotal(): number {
-        return this.items.reduce((total, item) => total + item.price, 0);
-    }
-}
 
-// Testing the ShoppingCart
-const cart = new ShoppingCart();
-cart.addItem(new Item("Apple", 1.5));
-cart.addItem(new Item("Banana", 0.75));
-console.assert(cart.getTotal() === 2.25, "Total should be 2.25");
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it involves a common object-oriented pattern: managing a collection of items within a class and performing operations on that collection. The pattern of adding an item to an array and calculating a total is universally recognizable with minimal context. The LLM must complete the method to add an item to the internal array, which is a typical task in such scenarios.
+assert.strictEqual(base32Encode(Buffer.from([])), '');
+assert.strictEqual(base32Encode(Buffer.from([0])), '7');
+assert.strictEqual(base32Encode('abc'), 'Z5HM4');
+assert.strictEqual(base32Encode(Buffer.from('hello')), 'S6NJHE4Q');
+assert.strictEqual(base32Encode(Buffer.from('hello'), STANDARD32), 'NBSWY3DP');
+assert.strictEqual(base32Encode(Buffer.from([0, 97, 98, 99]), STANDARD32), 'AGCYTD');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(cart.getTotal() === 2.25, "Total should be 2.25");
-================================================================================
 
 ================================================================================
 Test Case #5
@@ -208,33 +222,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-function filterEvenNumbers(arr: number[]): number[] {
-	return arr.filter(num => 
+const STANDARD16: string = '0123456789ABCDEF';
+const REVERSED16: string = STANDARD16.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-num % 2 === 0
+function base16Encode(data: string | Buffer, alphabet: string = REVERSED16): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-);
-}
+const assert = require('assert');
+const r5 = base16Encode(Buffer.from('abc'));
+assert.strictEqual(r5, '9E9D9C');
+assert.notStrictEqual(r5, '616263');
+assert.strictEqual(base16Encode(Buffer.from('abc'), STANDARD16), '616263');
+assert.strictEqual(base16Encode(Buffer.from([0, 0, 1])), 'FFE');
 
-const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const evenNumbers = filterEvenNumbers(numbers);
-console.log(evenNumbers); // Should output: [2, 4, 6, 8, 10]
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case focuses on functional programming constructs, specifically filtering an array. The pattern of using the filter method is clear and recognizable with minimal context. The completion is simple yet tests the LLM's understanding of predicates and array methods.
+assert.strictEqual(base16Encode(Buffer.from([])), '');
+assert.strictEqual(base16Encode(Buffer.from([0])), 'F');
+assert.strictEqual(base16Encode('abc'), '9E9D9C');
+assert.strictEqual(base16Encode(Buffer.from('hello')), '979A939390');
+assert.strictEqual(base16Encode(Buffer.from('hello'), STANDARD16), '68656C6C6F');
+assert.strictEqual(base16Encode(Buffer.from([0, 97, 98]), STANDARD16), '06162');
 
-ASSERTIONS:
-----------------------------------------
-import { strict as assert } from 'assert';
-const result = filterEvenNumbers([1, 2, 3, 4, 5]);
-assert.deepEqual(result, [2, 4], 'Filtered array should only contain even numbers');
-assert.deepEqual(filterEvenNumbers([]), [], 'Empty array should return empty array');
-================================================================================
 
 ================================================================================
 Test Case #6
@@ -248,40 +275,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-function processArray(arr: number[]): number[] {
-	return arr.map(num => num * 2);
+const STANDARD8: string = '01234567';
+const REVERSED8: string = STANDARD8.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
 
-function filterArray(arr: number[]): number[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function octalEncode(data: string | Buffer, alphabet: string = REVERSED8): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
 
-	return arr.filter(num => num > 5);
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+const r6 = octalEncode(Buffer.from('A'));
+assert.strictEqual(r6, '676');
+assert.notStrictEqual(r6, '101');
+assert.strictEqual(octalEncode(Buffer.from('A'), STANDARD8), '101');
+assert.strictEqual(octalEncode(Buffer.from([0, 0, 1])), '776');
 
-}
 
-const inputArray = [1, 2, 3, 4, 5];
-const processedArray = processArray(inputArray);
-const filteredArray = filterArray(processedArray);
-
-console.log(filteredArray);
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it tests the model's ability to recognize and complete a common array manipulation pattern (filtering elements based on a condition) with minimal context. The prefix establishes an array processing pattern, and the suffix shows the usage of the functions without duplicating the completion code. The completion should return a filtered array based on a condition, which is a widely-used pattern.
+assert.strictEqual(octalEncode(Buffer.from([])), '');
+assert.strictEqual(octalEncode(Buffer.from([0])), '7');
+assert.strictEqual(octalEncode('A'), '676');
+assert.strictEqual(octalEncode(Buffer.from('abc')), '47516634');
+assert.strictEqual(octalEncode(Buffer.from('hello')), '1363244711620');
+assert.strictEqual(octalEncode(Buffer.from('hello'), STANDARD8), '6414533066157');
 
-ASSERTIONS:
-----------------------------------------
-const inputArray = [1, 2, 3, 4, 5];
-const processedArray = processArray(inputArray);
-const filteredArray = filterArray(processedArray);
-
-console.assert(JSON.stringify(filteredArray) === JSON.stringify([6, 8, 10]), 'Filtered array does not match expected output');
-================================================================================
 
 ================================================================================
 Test Case #7
@@ -295,35 +328,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class User {
-	constructor(public name: string, public age: number) {}
-}
+type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
-function createUser(name: string, age: number): User {
-	
 
 GOLDEN COMPLETION:
 ----------------------------------------
-return new User(name, age);
+function tryCatch<T>(fn: () => T): Result<T, Error> {
+    try { return { ok: true, value: fn() }; }
+    catch (e) { return { ok: false, error: e instanceof Error ? e : new Error(String(e)) }; }
+}
+function mapResult<T, U, E>(r: Result<T, E>, fn: (v: T) => U): Result<U, E> {
+    return r.ok ? { ok: true, value: fn(r.value) } : r;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-}
+import * as assert from 'assert';
+const good = tryCatch(() => 42);
+assert.strictEqual(good.ok, true);
+if (good.ok) assert.strictEqual(good.value, 42);
+const bad = tryCatch(() => { throw new Error('fail'); });
+assert.strictEqual(bad.ok, false);
+if (!bad.ok) assert.strictEqual(bad.error.message, 'fail');
 
-const user = createUser('Alice', 30);
-console.assert(user.name === 'Alice', 'User name should be Alice');
-console.assert(user.age === 30, 'User age should be 30');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example of a low-context scenario as it provides a clear pattern of object creation through a class and a factory function. The completion involves recognizing the need to instantiate a class and return it within a function. The minimal context provided in the prefix and suffix should be sufficient for an LLM to identify the appropriate completion. The assertions verify the correctness of the object creation and ensure that the function correctly initializes the properties of the User object.
+const r1 = tryCatch(() => 'hello');
+assert.strictEqual(r1.ok, true);
+if (r1.ok) assert.strictEqual(r1.value, 'hello');
+const r2 = tryCatch(() => { throw 'string error'; });
+assert.strictEqual(r2.ok, false);
+if (!r2.ok) assert.strictEqual(r2.error.message, 'string error');
+const r3 = mapResult(tryCatch(() => 10), (x: number) => x * 2);
+assert.strictEqual(r3.ok, true);
+if (r3.ok) assert.strictEqual(r3.value, 20);
+const r4 = mapResult(tryCatch(() => { throw new Error('no'); }) as Result<number, Error>, (x: number) => x * 2);
+assert.strictEqual(r4.ok, false);
+if (!r4.ok) assert.strictEqual(r4.error.message, 'no');
 
-ASSERTIONS:
-----------------------------------------
-const user = createUser('Alice', 30);
-console.assert(user.name === 'Alice', 'User name should be Alice');
-console.assert(user.age === 30, 'User age should be 30');
-================================================================================
 
 ================================================================================
 Test Case #8
@@ -337,48 +381,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-	name: string;
-	constructor(name: string) {
-		this.name = name;
-	}
+const STANDARD32HEX: string = '0123456789ABCDEFGHIJKLMNOPQRSTUV';
+const REVERSED32HEX: string = STANDARD32HEX.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
 
-const people: Person[] = [
-	new Person('Alice'),
-	new Person('Bob'),
-	new Person('Charlie')
-];
-
-function getNames(people: Person[]): string[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function base32hexEncode(data: string | Buffer, alphabet: string = REVERSED32HEX): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
 
-	return people.map(person => person.name);
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+const r8 = base32hexEncode(Buffer.from('abc'));
+assert.strictEqual(r8, 'PT7CS');
+assert.notStrictEqual(r8, '62OJ3');
+assert.strictEqual(base32hexEncode(Buffer.from('abc'), STANDARD32HEX), '62OJ3');
+assert.strictEqual(base32hexEncode(Buffer.from([0, 0, 1])), 'VVU');
 
-}
 
-const names = getNames(people);
-console.assert(names.length === 3, 'Expected 3 names');
-console.assert(names.includes('Alice'), 'Expected name Alice');
-console.assert(names.includes('Bob'), 'Expected name Bob');
-console.assert(names.includes('Charlie'), 'Expected name Charlie');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is designed to evaluate the model's ability to recognize and complete a common object-oriented pattern involving classes and array manipulation. Despite the minimal context, the pattern of mapping over an array of objects to extract a property is a widely-used convention. The assertions verify the correct behavior by checking the length and contents of the resulting array.
+assert.strictEqual(base32hexEncode(Buffer.from([])), '');
+assert.strictEqual(base32hexEncode(Buffer.from([0])), 'V');
+assert.strictEqual(base32hexEncode('abc'), 'PT7CS');
+assert.strictEqual(base32hexEncode(Buffer.from('hello')), 'IUD974SG');
+assert.strictEqual(base32hexEncode(Buffer.from('hello'), STANDARD32HEX), 'D1IMOR3F');
+assert.strictEqual(base32hexEncode(Buffer.from([0, 97, 98]), STANDARD32HEX), '0OB2');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(names.length === 3, 'Expected 3 names');
-console.assert(names.includes('Alice'), 'Expected name Alice');
-console.assert(names.includes('Bob'), 'Expected name Bob');
-console.assert(names.includes('Charlie'), 'Expected name Charlie');
-================================================================================
 
 ================================================================================
 Test Case #9
@@ -392,48 +434,43 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-	name: string;
-	age: number;
-
-	constructor(name: string, age: number) {
-		this.name = name;
-		this.age = age;
-	}
+type State = 'red' | 'yellow' | 'green';
+type Event = 'timer' | 'emergency' | 'reset';
+// Transitions: timer cycles green->yellow->red->green;
+// emergency always goes to red; reset always goes to green.
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-	increaseAge(years: number) {
-		this.age += years;
-	}
+function transition(state: State, event: Event): State {
+    if (event === 'emergency') return 'red';
+    if (event === 'reset') return 'green';
+    return ({ green: 'yellow', yellow: 'red', red: 'green' } as Record<State, State>)[state];
+}
+function runMachine(events: Event[], initial: State = 'red'): State[] {
+    return events.reduce<State[]>((acc, e) => [...acc, transition(acc[acc.length - 1], e)], [initial]);
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-
-	greet() {
-		return `Hello, my name is ${this.name}`;
-	}
-}
-
-const person = new Person("Alice", 30);
-console.log(person.greet());
+import * as assert from 'assert';
+assert.strictEqual(transition('red', 'timer'), 'green');
+assert.strictEqual(transition('green', 'timer'), 'yellow');
+assert.strictEqual(transition('yellow', 'emergency'), 'red');
+assert.strictEqual(transition('green', 'reset'), 'green');
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is designed to evaluate the LLM's ability to recognize object-oriented patterns in TypeScript, specifically the definition and usage of a class with methods. The completion involves adding a method to the class, which is a common pattern in object-oriented programming. The minimal context provided should be sufficient for the LLM to understand the expected pattern and continue it correctly.
+assert.strictEqual(transition('yellow', 'timer'), 'red');
+assert.strictEqual(transition('red', 'emergency'), 'red');
+assert.strictEqual(transition('red', 'reset'), 'green');
+assert.deepStrictEqual(runMachine(['timer', 'timer', 'timer']), ['red', 'green', 'yellow', 'red']);
+assert.deepStrictEqual(runMachine(['timer', 'emergency', 'timer']), ['red', 'green', 'red', 'green']);
+assert.deepStrictEqual(runMachine(['timer'], 'green'), ['green', 'yellow']);
+assert.deepStrictEqual(runMachine([]), ['red']);
 
-ASSERTIONS:
-----------------------------------------
-import assert from 'assert';
-
-const person = new Person('Alice', 30);
-person.increaseAge(5);
-assert.strictEqual(person.age, 35);
-
-================================================================================
 
 ================================================================================
 Test Case #10
@@ -447,54 +484,46 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class User {
-	name: string;
-	constructor(name: string) {
-		this.name = name;
-	}
+const STANDARD10: string = '0123456789';
+const REVERSED10: string = STANDARD10.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let count = 0;
+    for (const b of data) { if (b !== 0) break; count++; }
+    return count;
 }
 
-class UserManager {
-	users: User[] = [];
-
-	addUser(name: string): void {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function decimalEncode(data: string | Buffer, alphabet: string = REVERSED10): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : Buffer.from(data);
+    let n = BigInt('0x' + (buf.length ? buf.toString('hex') : '0'));
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
 
-		this.users.push(new User(name));
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+const r10 = decimalEncode(Buffer.from('A'));
+assert.strictEqual(r10, '34');
+assert.notStrictEqual(r10, '65');
+assert.strictEqual(decimalEncode(Buffer.from('A'), STANDARD10), '65');
+assert.strictEqual(decimalEncode(Buffer.from([0, 0, 1])), '998');
 
-	}
 
-	removeUser(name: string): void {
-		this.users = this.users.filter(user => user.name !== name);
-	}
-}
-
-const manager = new UserManager();
-manager.addUser("Alice");
-manager.addUser("Bob");
-console.assert(manager.users.length === 2, "Expected 2 users");
-console.assert(manager.users.some(user => user.name === "Alice"), "Expected Alice in users");
-manager.removeUser("Alice");
-console.assert(manager.users.length === 1, "Expected 1 user after removal");
-console.assert(!manager.users.some(user => user.name === "Alice"), "Expected Alice to be removed");
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is a good example of an object-oriented pattern involving class instantiation and method definition. The prefix establishes a User class and part of a UserManager class with an addUser method. The completion requires recognizing the pattern of adding a new user to the users array, which is a common task. The suffix continues with a removeUser method and some assertions to verify the correctness of the addUser and removeUser methods. The test checks if the model can correctly complete the addUser method by following the established pattern of creating a new User instance and adding it to the users array.
+assert.strictEqual(decimalEncode(Buffer.from([])), '');
+assert.strictEqual(decimalEncode(Buffer.from([0])), '9');
+assert.strictEqual(decimalEncode('A'), '34');
+assert.strictEqual(decimalEncode(Buffer.from('abc')), '3617820');
+assert.strictEqual(decimalEncode(Buffer.from('hello')), '551621796752');
+assert.strictEqual(decimalEncode(Buffer.from('hello'), STANDARD10), '448378203247');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(manager.users.length === 2, "Expected 2 users");
-console.assert(manager.users.some(user => user.name === "Alice"), "Expected Alice in users");
-manager.removeUser("Alice");
-console.assert(manager.users.length === 1, "Expected 1 user after removal");
-console.assert(!manager.users.some(user => user.name === "Alice"), "Expected Alice to be removed");
-================================================================================
 
 ================================================================================
 Test Case #11
@@ -508,31 +537,44 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-const numbers: number[] = [1, 2, 3, 4, 5];
+const BASE85_STD: string = Array.from({length: 85}, (_, i) => String.fromCharCode(0x21 + i)).join('');
+const BASE85_REV: string = BASE85_STD.split('').reverse().join('');
+function leadingZeros85(data: Buffer): number {
+    let c = 0; for (const b of data) { if (b !== 0) break; c++; } return c;
+}
 
-function doubleAndFilterEven(nums: number[]): number[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function base85Encode(data: Buffer | string, alphabet: string = BASE85_REV): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : data;
+    if (buf.length === 0) return '';
+    let n = BigInt('0x' + buf.toString('hex'));
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeros85(buf)) + out.reverse().join('');
+}
 
-	return nums.map(num => num * 2).filter(num => num % 2 === 0);
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+assert.strictEqual(base85Encode(Buffer.from('abc')), 'kTXN');
+assert.notStrictEqual(base85Encode(Buffer.from('abc')), '+B>H');
+assert.strictEqual(base85Encode(Buffer.from('abc'), BASE85_STD), '+B>H');
+assert.strictEqual(base85Encode(Buffer.from([0, 97, 98, 99])), 'ukTXN');
 
-}
 
-const result = doubleAndFilterEven(numbers);
-console.assert(JSON.stringify(result) === JSON.stringify([4, 8]), 'Test failed: expected [4, 8]');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a common array manipulation pattern in TypeScript. The pattern involves mapping and filtering an array, which is a universal and widely-used convention in functional programming with arrays. The prefix establishes the context of an array of numbers and a function that processes this array. The suffix provides a test case to validate the correctness of the function, ensuring the model can complete the middle portion accurately. The assertions verify that the function correctly doubles the numbers and filters out the even ones, matching the expected result.
+assert.strictEqual(base85Encode(Buffer.from([])), '');
+assert.strictEqual(base85Encode(Buffer.from([0])), 'u');
+assert.strictEqual(base85Encode('abc'), 'kTXN');
+assert.strictEqual(base85Encode(Buffer.from('hello')), 'teqIt*_');
+assert.strictEqual(base85Encode(Buffer.from('hello'), BASE85_STD), '"1%M"l7');
+assert.strictEqual(base85Encode(Buffer.from([0, 97, 98, 99]), BASE85_STD), '!+B>H');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(JSON.stringify(result) === JSON.stringify([4, 8]), 'Test failed: expected [4, 8]');
-================================================================================
 
 ================================================================================
 Test Case #12
@@ -546,39 +588,44 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-function processItems(items: number[]): number[] {
+const Z85_STD: string = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#";
+const Z85_REV: string = Z85_STD.split('').reverse().join('');
+function leadingZerosZ(data: Buffer): number {
+    let c = 0; for (const b of data) { if (b !== 0) break; c++; } return c;
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  if (!items) {
-    throw new Error('No items provided');
-  }
+function z85Encode(data: Buffer | string, alphabet: string = Z85_REV): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : data;
+    if (buf.length === 0) return '';
+    let n = BigInt('0x' + buf.toString('hex'));
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZerosZ(buf)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-  return items.map(item => item * 2);
-}
+const assert = require('assert');
+assert.strictEqual(z85Encode(Buffer.from('abc')), '>PTJ');
+assert.notStrictEqual(z85Encode(Buffer.from('abc')), 'axtD');
+assert.strictEqual(z85Encode(Buffer.from('abc'), Z85_STD), 'axtD');
+assert.strictEqual(z85Encode(Buffer.from([0, 97, 98, 99])), '#>PTJ');
 
-const result = processItems([1, 2, 3, 4]);
-console.log(result); // [2, 4, 6, 8]
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the model's ability to recognize and complete a common error handling pattern in TypeScript. The function `processItems` processes an array of numbers by doubling each item. The completion involves adding an error check for the `items` parameter, ensuring it is provided before proceeding. This pattern is common and should be easily recognizable with minimal context. The suffix continues the function's logic, ensuring the pattern is distinct and understandable.
+assert.strictEqual(z85Encode(Buffer.from([])), '');
+assert.strictEqual(z85Encode(Buffer.from([0])), '#');
+assert.strictEqual(z85Encode('abc'), '>PTJ');
+assert.strictEqual(z85Encode(Buffer.from('hello')), '$!}E$9.');
+assert.strictEqual(z85Encode(Buffer.from('hello'), Z85_STD), '1g4I1(m');
+assert.strictEqual(z85Encode(Buffer.from([0, 97, 98, 99]), Z85_STD), '0axtD');
 
-ASSERTIONS:
-----------------------------------------
-import assert from 'assert';
-
-try {
-  processItems(null as any);
-  assert.fail('Expected an error to be thrown');
-} catch (error) {
-  assert.strictEqual((error as Error).message, 'No items provided');
-}
-const result = processItems([1, 2, 3, 4]);
-assert.deepStrictEqual(result, [2, 4, 6, 8]);
-================================================================================
 
 ================================================================================
 Test Case #13
@@ -592,37 +639,45 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-const numbers: number[] = [1, 2, 3, 4, 5];
-const doubledNumbers: number[] = numbers.map(num =>
+const B91_STD: string = Array.from({length: 94}, (_, i) => String.fromCharCode(0x21 + i)).filter(c => c !== '"' && c !== "'" && c !== '\\').join('');
+const B91_REV: string = B91_STD.split('').reverse().join('');
+function leadingZeros91(data: Buffer): number {
+    let c = 0; for (const b of data) { if (b !== 0) break; c++; } return c;
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
- num * 2);
+function base91Encode(data: Buffer | string, alphabet: string = B91_REV): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : data;
+    if (buf.length === 0) return '';
+    let n = BigInt('0x' + buf.toString('hex'));
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeros91(buf)) + out.reverse().join('');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-console.log(doubledNumbers);
-// Expected output: [2, 4, 6, 8, 10]
+const assert = require('assert');
+assert.strictEqual(B91_STD.length, 91);
+assert.strictEqual(base91Encode(Buffer.from('abc')), 'vS>1');
+assert.notStrictEqual(base91Encode(Buffer.from('abc')), '+Mcp');
+assert.strictEqual(base91Encode(Buffer.from('abc'), B91_STD), '+Mcp');
+assert.strictEqual(base91Encode(Buffer.from([0, 97, 98, 99])), '~vS>1');
 
-const squaredNumbers: number[] = numbers.map(num => num * num);
-console.log(squaredNumbers);
-// Expected output: [1, 4, 9, 16, 25]
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it checks the model's ability to recognize and complete a common array manipulation pattern using the map function. The pattern should be clear even with minimal context, as the prefix and suffix provide enough information to identify the expected transformation.
+assert.strictEqual(base91Encode(Buffer.from([])), '');
+assert.strictEqual(base91Encode(Buffer.from([0])), '~');
+assert.strictEqual(base91Encode('abc'), 'vS>1');
+assert.strictEqual(base91Encode(Buffer.from('hello')), '60OHF<');
+assert.strictEqual(base91Encode(Buffer.from('hello'), B91_STD), 'kqQXZe');
+assert.strictEqual(base91Encode(Buffer.from([0, 97, 98, 99]), B91_STD), '!+Mcp');
 
-ASSERTIONS:
-----------------------------------------
-import * as assert from 'assert';
-
-const numbers: number[] = [1, 2, 3, 4, 5];
-const doubledNumbers: number[] = numbers.map(num => num * 2);
-assert.deepStrictEqual(doubledNumbers, [2, 4, 6, 8, 10]);
-
-const squaredNumbers: number[] = numbers.map(num => num * num);
-assert.deepStrictEqual(squaredNumbers, [1, 4, 9, 16, 25]);
-================================================================================
 
 ================================================================================
 Test Case #14
@@ -636,32 +691,45 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-function processStrings(strings: string[]): string[] {
+type Shape = { kind: 'circle'; r: number } | { kind: 'rect'; w: number; h: number };
+const guardLog: string[] = [];
+function isCircle(s: Shape): s is { kind: 'circle'; r: number } {
+    guardLog.push(s.kind); return s.kind === 'circle';
+}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function filterShapes(shapes: Shape[]): { circles: Shape[]; log: string[] } {
+    guardLog.length = 0;
+    const circles = shapes.filter(isCircle);
+    return { circles, log: [...guardLog] };
+}
 
-	strings = strings.filter(str => str.length > 0);
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+const shapes: Shape[] = [
+    { kind: 'circle', r: 5 }, { kind: 'rect', w: 3, h: 4 }, { kind: 'circle', r: 10 }
+];
+const r14 = filterShapes(shapes);
+assert.strictEqual(r14.circles.length, 2);
+assert.deepStrictEqual(r14.log, ['circle', 'rect', 'circle']);
 
-	return strings.map(str => str.toUpperCase());
-}
 
-const input = ["hello", "world"];
-const expectedOutput = ["HELLO", "WORLD"];
-const result = processStrings(input);
-console.assert(JSON.stringify(result) === JSON.stringify(expectedOutput), 'Test failed: Unexpected output');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a common string processing pattern. The prefix function signature and the suffix's use of map indicate a pattern of processing strings in an array. The golden completion involves filtering out empty strings, a reasonable and common step in string processing. The assertions check that the final output meets expectations, ensuring the pattern is correctly recognized and applied.
+const r14b = filterShapes([{ kind: 'rect', w: 1, h: 1 }]);
+assert.strictEqual(r14b.circles.length, 0);
+assert.deepStrictEqual(r14b.log, ['rect']);
+const r14c = filterShapes([]);
+assert.deepStrictEqual(r14c.log, []);
+assert.deepStrictEqual(r14c.circles, []);
+// Verify log is a snapshot, not a reference
+guardLog.push('extra');
+assert.deepStrictEqual(r14c.log, []);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(JSON.stringify(result) === JSON.stringify(expectedOutput), 'Test failed: Unexpected output');
-================================================================================
 
 ================================================================================
 Test Case #15
@@ -675,56 +743,42 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-	name: string;
-	constructor(name: string) {
-		this.name = name;
-	}
+type Factory<T> = () => T;
+const registry = new Map<string, Factory<unknown>>();
+function registerFactory<T>(name: string, f: Factory<T>): void {
+    registry.set(name, f as Factory<unknown>);
 }
-class Dog extends Animal {
-	breed: string;
-	constructor(name: string, breed: string) {
-		super(name);
-		this.breed = breed;
-	}
-	bark() {
-		return `${this.name} barks!`;
-	}
-}
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-class Cat extends Animal {
-	color: string;
-	constructor(name: string, color: string) {
-		super(name);
-		this.color = color;
-	}
-	meow() {
-		return `${this.name} meows!`;
-	}
+function create<T>(name: string): T {
+    const f = registry.get(name);
+    if (f) return f() as T;
+    return JSON.parse(name) as T;
 }
 
 
 SUFFIX CODE:
 ----------------------------------------
-const myDog = new Dog('Rex', 'German Shepherd');
-console.assert(myDog.name === 'Rex', 'Name should be Rex');
-console.assert(myDog.breed === 'German Shepherd', 'Breed should be German Shepherd');
-console.assert(myDog.bark() === 'Rex barks!', 'Bark message should be correct');
+const assert = require('assert');
+registerFactory('empty', () => ({}));
+registerFactory('list', () => [1, 2, 3]);
+assert.deepStrictEqual(create('empty'), {});
+assert.deepStrictEqual(create('list'), [1, 2, 3]);
+assert.deepStrictEqual(create('{"x":1}'), { x: 1 });
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is designed to evaluate the LLM's ability to recognize and extend object-oriented patterns using TypeScript classes and inheritance with minimal context. The prefix provides a clear example of a class hierarchy with methods and properties, and the golden completion requires the LLM to create a similar but distinct class following the same pattern. The suffix includes assertions to verify the correctness of object instantiation and method behavior.
+assert.deepStrictEqual(create('[4,5]'), [4, 5]);
+assert.deepStrictEqual(create('"hello"'), 'hello');
+registerFactory('num', () => 42);
+assert.strictEqual(create('num'), 42);
+// Registry takes priority over JSON-parseable names
+registerFactory('{"x":1}', () => 'override');
+assert.strictEqual(create('{"x":1}'), 'override');
 
-ASSERTIONS:
-----------------------------------------
-const myCat = new Cat('Whiskers', 'Black');
-console.assert(myCat.name === 'Whiskers', 'Name should be Whiskers');
-console.assert(myCat.color === 'Black', 'Color should be Black');
-console.assert(myCat.meow() === 'Whiskers meows!', 'Meow message should be correct');
-================================================================================
 
 ================================================================================
 Test Case #16
@@ -738,41 +792,35 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Animal {
-	name: string;
-	constructor(name: string) {
-		this.name = name;
-	}
-}
-class Dog extends Animal {
-	breed: string;
-	constructor(name: string, breed: string) {
+// Transform each element: floor((value * multiplier) / divisor)
+// Default multiplier=3, default divisor=2 (i.e., floor(1.5x) by default)
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-
-		super(name);
+function transformTuple(values: number[], multiplier: number = 3, divisor: number = 2): number[] {
+    return values.map(v => Math.floor((v * multiplier) / divisor));
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+// Default: floor(v * 3 / 2) = floor(1.5 * v)
+assert.deepStrictEqual(transformTuple([2, 5, 7]), [3, 7, 10]);
+assert.deepStrictEqual(transformTuple([4, 9], 2, 3), [2, 6]);
+assert.deepStrictEqual(transformTuple([10], 1, 1), [10]);
 
-		this.breed = breed;
-	}
-}
-const myDog = new Dog("Rex", "German Shepherd");
-console.assert(myDog.name === "Rex", "Name should be Rex");
-console.assert(myDog.breed === "German Shepherd", "Breed should be German Shepherd");
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete an object-oriented pattern involving class inheritance in TypeScript. The prefix establishes a base class and a derived class, while the golden completion requires the model to correctly use the 'super' keyword to call the parent class constructor. This pattern is a fundamental concept in object-oriented programming and is universally recognizable with minimal context.
+assert.deepStrictEqual(transformTuple([]), []);
+assert.deepStrictEqual(transformTuple([1]), [1]);
+assert.deepStrictEqual(transformTuple([0, 100]), [0, 150]);
+assert.deepStrictEqual(transformTuple([3, 3, 3], 5, 3), [5, 5, 5]);
+// Verify floor behavior for odd values
+assert.deepStrictEqual(transformTuple([1, 3, 5]), [1, 4, 7]);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(myDog.name === "Rex", "Name should be Rex");
-console.assert(myDog.breed === "German Shepherd", "Breed should be German Shepherd");
-================================================================================
 
 ================================================================================
 Test Case #17
@@ -786,43 +834,47 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-function processArray(arr: number[]): number[] {
-	return arr.map(num => num * 2);
+function stablePartitionInPlace<T>(items: T[], keep: (x: T) => boolean): number {
+    const yes: T[] = [], no: T[] = [];
+    for (const item of items) (keep(item) ? yes : no).push(item);
+    items.splice(0, items.length, ...yes, ...no);
+    return yes.length;
 }
+stablePartitionInPlace.doc =
 
-function filterArray(arr: number[]): number[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-
-	return arr.filter(num => num > 5);
+`Stably partitions the array in place.
+Calls keep exactly once per item and preserves relative order.
+Mutates the original array to kept items followed by rejected items.
+Returns the split index, which is the number of kept items.`
 
 
 SUFFIX CODE:
 ----------------------------------------
+;
+const assert = require('assert');
+const arr17 = [3, 1, 4, 2];
+const idx17 = stablePartitionInPlace(arr17, x => x % 2 === 0);
+assert.deepStrictEqual(arr17, [4, 2, 3, 1]);
+assert.strictEqual(idx17, 2);
+assert.match(stablePartitionInPlace.doc, /in place/i);
+assert.match(stablePartitionInPlace.doc, /split index/i);
 
-	return arr.filter(num => num % 2 === 0);
-}
 
-const input = [1, 2, 3, 4, 5];
-const processed = processArray(input);
-const filtered = filterArray(processed);
-
-console.log(filtered); // [4, 8]
-
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case checks the model's ability to recognize and complete a functional programming pattern with array methods in TypeScript. The prefix establishes a pattern with the map method, and the suffix uses the filter method. The completion requires understanding how to filter an array based on a given condition, maintaining consistency with the functional style and array manipulation context. Multiple valid completions are possible, making it a good test of the model's pattern recognition abilities.
+assert.match(stablePartitionInPlace.doc, /once per item/i);
+assert.match(stablePartitionInPlace.doc, /relative order/i);
+assert.match(stablePartitionInPlace.doc, /mutates? the original array/i);
+assert.match(stablePartitionInPlace.doc, /kept items followed by rejected items/i);
+assert.match(stablePartitionInPlace.doc, /number of kept items/i);
+let calls17 = 0;
+const arr17b = ['a', 'bb', 'c'];
+assert.strictEqual(stablePartitionInPlace(arr17b, x => { calls17++; return x.length === 1; }), 2);
+assert.strictEqual(calls17, 3);
 
-ASSERTIONS:
-----------------------------------------
-import * as assert from 'assert';
-const input = [1, 2, 3, 4, 5];
-const processed = processArray(input);
-const filtered = filterArray(processed);
-assert.deepStrictEqual(filtered, [6, 8, 10]);
-================================================================================
 
 ================================================================================
 Test Case #18
@@ -836,47 +888,36 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Example {
-	private data: number[];
+type Light = 'red' | 'yellow' | 'green';
+// Transition: red->green, green->yellow, yellow->red
+// If emergency=true, ALWAYS go to 'red' regardless of current state
 
-	constructor() {
-		this.data = [1, 2, 3, 4, 5];
-	}
-
-	public getData(): number[] {
-		return this.data;
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function advanceN(start: Light, n: number, emergAt: number = -1): Light[] {
+    const nxt: Record<Light, Light> = { red: 'green', green: 'yellow', yellow: 'red' };
+    const r: Light[] = [start]; let c = start;
+    for (let i = 0; i < n; i++) { c = i === emergAt ? 'red' : nxt[c]; r.push(c); }
+    return r;
+}
 
-	}
-
-	public addData(value: number): void {
-		this.data.push(value);
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+assert.deepStrictEqual(advanceN('red', 3), ['red', 'green', 'yellow', 'red']);
+assert.deepStrictEqual(advanceN('green', 2, 1), ['green', 'yellow', 'red']);
 
-	}
 
-	public sumData(): number {
-		return this.data.reduce((acc, val) => acc + val, 0);
-	}
-}
-
-const example = new Example();
-console.assert(example.getData().length === 5, 'Expected array length to be 5');
-console.assert(example.sumData() === 15, 'Expected sum of array elements to be 15');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to recognize and complete an object-oriented pattern involving class methods and array manipulation with minimal context. The prefix establishes a pattern of class definition with a constructor and a method, and the completion continues this pattern by adding another method for manipulating the array. The suffix introduces a different method and assertions to verify the behavior, ensuring the model can infer the correct pattern completion.
+assert.deepStrictEqual(advanceN('red', 0), ['red']);
+assert.deepStrictEqual(advanceN('yellow', 4), ['yellow', 'red', 'green', 'yellow', 'red']);
+// Emergency at step 0 means first transition goes to red
+assert.deepStrictEqual(advanceN('green', 3, 0), ['green', 'red', 'green', 'yellow']);
+assert.deepStrictEqual(advanceN('red', 1, 0), ['red', 'red']);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(example.getData().length === 6, 'Expected array length to be 6 after adding an element');
-console.assert(example.getData()[5] === 6, 'Expected the last element to be 6 after adding it');
-================================================================================
 
 ================================================================================
 Test Case #19
@@ -890,41 +931,37 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-function processData(data: number[]): number {
-	let sum = 0;
-	for (const num of data) {
-		sum += num;
-	}
-	return sum;
-}
+// Accumulate values. When running sum >= threshold, reset sum to 0 and count a reset.
+// Record the sum AFTER potential reset for each value.
 
-function getAverage(data: number[]): number {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function accumulate(vals: number[], thresh: number): { totals: number[]; resets: number } {
+    let sum = 0, resets = 0; const totals: number[] = [];
+    for (const v of vals) { sum += v; if (sum >= thresh) { resets++; sum = 0; } totals.push(sum); }
+    return { totals, resets };
+}
 
-	const total = processData(data);
 
 SUFFIX CODE:
 ----------------------------------------
-
-	return total / data.length;
-}
-
-const data = [1, 2, 3, 4, 5];
-const average = getAverage(data);
-console.assert(average === 3, `Expected 3, but got ${average}`);
+const assert = require('assert');
+assert.deepStrictEqual(
+    accumulate([3, 4, 5, 2, 8, 1], 10),
+    { totals: [3, 7, 0, 2, 0, 1], resets: 2 }
+);
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it involves a clear and simple pattern of reusing a function to process data. The prefix establishes the pattern of summing numbers in an array, and the completion requires recognizing that the same sum calculation should be used to compute the average in the getAverage function. The suffix provides a different context where the completion is applied. This tests the LLM's ability to recognize and continue patterns with minimal context.
+assert.deepStrictEqual(accumulate([1, 2, 3], 100), { totals: [1, 3, 6], resets: 0 });
+assert.deepStrictEqual(accumulate([], 5), { totals: [], resets: 0 });
+assert.deepStrictEqual(accumulate([10], 10), { totals: [0], resets: 1 });
+assert.deepStrictEqual(accumulate([5, 5, 5, 5], 10), { totals: [5, 0, 5, 0], resets: 2 });
+// Exact threshold triggers reset
+assert.deepStrictEqual(accumulate([3, 7], 10), { totals: [3, 0], resets: 1 });
 
-ASSERTIONS:
-----------------------------------------
-console.assert(getAverage([1, 2, 3, 4, 5]) === 3, 'Test case 1 failed');
-console.assert(getAverage([10, 20, 30, 40, 50]) === 30, 'Test case 2 failed');
-================================================================================
 
 ================================================================================
 Test Case #20
@@ -938,35 +975,43 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-function processString(input: string): string {
-    let result = input.trim();
+// Mini glob: '^' at start = anchor start, '$' at end = anchor end
+// '*' = match any chars. No anchor = substring match.
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    result = result.replace(/\s+/g, ' ');
+function miniMatch(pat: string, text: string): boolean {
+    let p = pat, aS = p[0] === '^', aE = p[p.length - 1] === '$';
+    if (aS) p = p.slice(1); if (aE) p = p.slice(0, -1);
+    const parts = p.split('*');
+    if (parts.length === 1) return aS && aE ? text === p : aS ? text.startsWith(p) : aE ? text.endsWith(p) : text.includes(p);
+    let pos = 0;
+    for (let i = 0; i < parts.length; i++) { if (!parts[i]) continue; const idx = text.indexOf(parts[i], pos); if (idx < 0 || (i === 0 && aS && idx !== 0)) return false; pos = idx + parts[i].length; }
+    return !aE || parts[parts.length - 1] === '' || text.endsWith(parts[parts.length - 1]);
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    return result.toUpperCase();
-}
-
-const input = "  hello world  ";
-const expectedOutput = "HELLO WORLD";
-const output = processString(input);
-console.assert(output === expectedOutput, `Expected ${expectedOutput}, but got ${output}`);
+const assert = require('assert');
+assert.strictEqual(miniMatch('^hello*world$', 'hello beautiful world'), true);
+assert.strictEqual(miniMatch('^hello*world$', 'say hello world'), false);
+assert.strictEqual(miniMatch('*test*', 'this is a test case'), true);
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it involves string processing and text manipulation, which are common tasks in programming. The completion involves a standard pattern of replacing multiple whitespace characters with a single space, which is a recognizable and widely-used string manipulation technique. The minimal context provided should be sufficient for an LLM to infer the expected pattern.
+assert.strictEqual(miniMatch('^abc$', 'abc'), true);
+assert.strictEqual(miniMatch('^abc$', 'abcd'), false);
+assert.strictEqual(miniMatch('abc', 'xxabcxx'), true);
+assert.strictEqual(miniMatch('^abc', 'abcdef'), true);
+assert.strictEqual(miniMatch('abc$', 'xyzabc'), true);
+assert.strictEqual(miniMatch('^a*c$', 'abc'), true);
+assert.strictEqual(miniMatch('^a*c$', 'ac'), true);
+assert.strictEqual(miniMatch('^a*c$', 'aXYZc'), true);
+assert.strictEqual(miniMatch('^a*c$', 'aXYZcd'), false);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(output === expectedOutput, `Expected ${expectedOutput}, but got ${output}`);
-
-================================================================================
 
 ================================================================================
 Test Case #21
@@ -980,49 +1025,43 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-	name: string;
-	age: number;
-
-	constructor(name: string, age: number) {
-		this.name = name;
-		this.age = age;
-	}
+const STANDARD64: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const REVERSED64: string = STANDARD64.split("").reverse().join("");
+function leadingZeroBytes(data: Buffer): number {
+    let c = 0; for (const b of data) { if (b !== 0) break; c++; } return c;
 }
 
-const people: Person[] = [
-	new Person('Alice', 30),
-	new Person('Bob', 25),
-];
-
-function getNames(people: Person[]): string[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function base64Encode(data: string | Buffer, alphabet: string = REVERSED64): string {
+    const buf = typeof data === "string" ? Buffer.from(data) : data;
+    let n = buf.length ? BigInt("0x" + buf.toString("hex")) : 0n;
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join("");
+}
 
-	return people.map(person => person.name);
 
 SUFFIX CODE:
 ----------------------------------------
+import { strict as assert } from "assert";
+assert.equal(base64Encode(Buffer.from("abc")), "np2c");
+assert.notEqual(base64Encode(Buffer.from("abc")), "YWJj");
+assert.equal(base64Encode(Buffer.from("abc"), STANDARD64), "YWJj");
+assert.equal(base64Encode(Buffer.from("hi"), STANDARD64), "Ghp");
 
-}
 
-const names = getNames(people);
-console.assert(names.includes('Alice'), 'Alice should be in the names array');
-console.assert(names.includes('Bob'), 'Bob should be in the names array');
-console.assert(names.length === 2, 'There should be exactly two names in the array');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to recognize and complete a pattern of extracting specific properties from an array of objects using the map function. The context is minimal but includes enough information to identify the pattern of iterating over an array and transforming it.
+assert.equal(base64Encode(Buffer.from([])), "");
+assert.equal(base64Encode(Buffer.from([0])), "/");
+assert.equal(base64Encode("abc"), "np2c");
+assert.equal(base64Encode(Buffer.from("hello")), "5eak5OQ");
+assert.equal(base64Encode(Buffer.from("hello"), STANDARD64), "GhlbGxv");
+assert.equal(base64Encode(Buffer.from([0, 97, 98, 99]), STANDARD64), "AYWJj");
 
-ASSERTIONS:
-----------------------------------------
-
-console.assert(names.includes('Alice'), 'Alice should be in the names array');
-console.assert(names.includes('Bob'), 'Bob should be in the names array');
-console.assert(names.length === 2, 'There should be exactly two names in the array');
-================================================================================
 
 ================================================================================
 Test Case #22
@@ -1036,43 +1075,43 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Person {
-	constructor(public name: string, public age: number) {}
+const STANDARD45: string = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";  // QR base45
+const REVERSED45: string = STANDARD45.split("").reverse().join("");
+function leadingZeroBytes(data: Buffer): number {
+    let c = 0; for (const b of data) { if (b !== 0) break; c++; } return c;
 }
 
-const people: Person[] = [
-	new Person('Alice', 30),
-	new Person('Bob', 25),
-	new Person('Charlie', 35)
-];
-
-function getNamesOverAge(age: number): string[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-
-	return people.filter(person => person.age > age).map(person => person.name);
+function base45Encode(data: string | Buffer, alphabet: string = REVERSED45): string {
+    const buf = typeof data === "string" ? Buffer.from(data) : data;
+    let n = buf.length ? BigInt("0x" + buf.toString("hex")) : 0n;
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join("");
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
+import { strict as assert } from "assert";
+assert.equal(base45Encode(Buffer.from("AB")), " XX");
+assert.notEqual(base45Encode(Buffer.from("AB")), "8BB");
+assert.equal(base45Encode(Buffer.from("AB"), STANDARD45), "8BB");
+assert.equal(base45Encode(Buffer.from("abc")), "/J/DZ");
 
-}
 
-console.log(getNamesOverAge(28)); // Should print: [ 'Alice', 'Charlie' ]
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case because it involves a common data structure manipulation pattern (filtering and mapping an array of objects). The pattern should be recognizable with minimal context as it follows a standard array manipulation sequence in TypeScript. The completion must correctly use TypeScript's array methods to filter and map the array based on the provided age criterion.
+assert.equal(base45Encode(Buffer.from([])), "");
+assert.equal(base45Encode(Buffer.from([0])), ":");
+assert.equal(base45Encode("abc"), "/J/DZ");
+assert.equal(base45Encode(Buffer.from("hello")), "/ 065+2$");
+assert.equal(base45Encode(Buffer.from("hello"), STANDARD45), "18:%*4.7");
+assert.equal(base45Encode(Buffer.from([0, 97, 98, 99]), STANDARD45), "01P1V9");
 
-ASSERTIONS:
-----------------------------------------
-import { strict as assert } from 'assert';
-
-const result = getNamesOverAge(28);
-assert.deepStrictEqual(result, ['Alice', 'Charlie']);
-
-================================================================================
 
 ================================================================================
 Test Case #23
@@ -1086,45 +1125,43 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-class Calculator {
-	add(a: number, b: number): number {
-		return a + b;
-	}
+const STANDARD26: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const REVERSED26: string = STANDARD26.split("").reverse().join("");
+function leadingZeroBytes(data: Buffer): number {
+    let c = 0; for (const b of data) { if (b !== 0) break; c++; } return c;
+}
 
-	divide(a: number, b: number): number {
-		if (b === 0) {
-			throw new Error('Division by zero');
-		}
-		return a / b;
-	}
-
-	multiply(a: number, b: number): number {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function base26Encode(data: string | Buffer, alphabet: string = REVERSED26): string {
+    const buf = typeof data === "string" ? Buffer.from(data) : data;
+    let n = buf.length ? BigInt("0x" + buf.toString("hex")) : 0n;
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join("");
+}
 
-		return a * b;
 
 SUFFIX CODE:
 ----------------------------------------
+import { strict as assert } from "assert";
+assert.equal(base26Encode(Buffer.from("hi")), "YMLY");
+assert.notEqual(base26Encode(Buffer.from("hi")), "BNOB");
+assert.equal(base26Encode(Buffer.from("hi"), STANDARD26), "BNOB");
+assert.equal(base26Encode(Buffer.from("abc")), "MAWXO");
 
-	}
-}
 
-const calc = new Calculator();
-console.log(calc.multiply(3, 4));
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This is a good test case as it requires the LLM to recognize a common pattern in class method definitions and complete the multiplication method appropriately. The context provided by the other methods (add and divide) is minimal yet sufficient to establish the pattern of basic arithmetic operations in the Calculator class.
+assert.equal(base26Encode(Buffer.from([])), "");
+assert.equal(base26Encode(Buffer.from([0])), "Z");
+assert.equal(base26Encode("abc"), "MAWXO");
+assert.equal(base26Encode(Buffer.from("hello")), "XWEOCOGGM");
+assert.equal(base26Encode(Buffer.from("hello"), STANDARD26), "CDVLXLTTN");
+assert.equal(base26Encode(Buffer.from([0, 97, 98, 99]), STANDARD26), "ANZDCL");
 
-ASSERTIONS:
-----------------------------------------
-const calc = new Calculator();
-console.assert(calc.multiply(3, 4) === 12, '3 * 4 should equal 12');
-console.assert(calc.multiply(0, 5) === 0, '0 * 5 should equal 0');
-console.assert(calc.multiply(-1, 5) === -5, '-1 * 5 should equal -5');
-================================================================================
 
 ================================================================================
 Test Case #24
@@ -1138,34 +1175,45 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-const data = [1, 2, 3, 4, 5];
+function consumeFront<T>(items: T[], n: number): T[] {
+    if (n < 0) throw new RangeError('negative n');
+    const take = Math.min(n, items.length);
+    return items.splice(0, take);
+}
+consumeFront.doc =
 
-// Filter out odd numbers
-const evenNumbers = data.filter(
 
 GOLDEN COMPLETION:
 ----------------------------------------
-num => num % 2 === 0
+`Removes items from the front of the original array.
+Returns the removed items in their original order.
+If n exceeds the array length, it drains the array.
+Throws RangeError for negative n.`
+
 
 SUFFIX CODE:
 ----------------------------------------
-);
+;
+const assert = require('assert');
+const arr24 = [1, 2, 3];
+assert.deepStrictEqual(consumeFront(arr24, 2), [1, 2]);
+assert.deepStrictEqual(arr24, [3]);
+assert.match(consumeFront.doc, /front/i);
+assert.match(consumeFront.doc, /removed items/i);
+assert.throws(() => consumeFront(arr24, -1), RangeError);
 
-// Check if the result is correct
-console.assert(evenNumbers.length === 2);
-console.assert(evenNumbers.includes(2));
-console.assert(evenNumbers.includes(4));
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case focuses on a common array manipulation pattern: filtering. The prefix sets up an array and begins a filter operation. The expected completion is a function that filters out odd numbers, which is a universally recognizable pattern. The suffix contains assertions to verify the correctness of the filtering operation, ensuring that the model correctly identifies and completes the pattern.
+assert.match(consumeFront.doc, /original array/i);
+assert.match(consumeFront.doc, /original order/i);
+assert.match(consumeFront.doc, /drains? the array/i);
+assert.match(consumeFront.doc, /RangeError/i);
+assert.match(consumeFront.doc, /negative n/i);
+const arr24b = ['a', 'b'];
+assert.deepStrictEqual(consumeFront(arr24b, 5), ['a', 'b']);
+assert.deepStrictEqual(arr24b, []);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(evenNumbers.length === 2);
-console.assert(evenNumbers.includes(2));
-console.assert(evenNumbers.includes(4));
-================================================================================
 
 ================================================================================
 Test Case #25
@@ -1179,46 +1227,37 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Filter<T> = (value: T) => boolean;
-type MappedFilter<T> = { [K in keyof T]: Filter<T[K]> };
+// Tiny template: {= key =} interpolates from vars, uppercased by default.
+// If raw is true, no uppercasing.
+type TplOpts = { raw?: boolean };
 
-function applyFilters<T>(obj: T, filters: MappedFilter<T>): Partial<T> {
-    const result: Partial<T> = {};
-    for (const key in filters) {
-        if (filters[key](obj[key])) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            result[key] = obj[key];
+function renderTemplate(tpl: string, vars: Record<string, string>, opts: TplOpts = {}): string {
+    return tpl.replace(/\{=\s*(\w+)\s*=\}/g, (_, key) => {
+        const val = vars[key] ?? "";
+        return opts.raw ? val : val.toUpperCase();
+    });
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-        }
-    }
-    return result;
-}
+import { strict as assert } from "assert";
+assert.equal(renderTemplate("Hello {= name =}!", { name: "world" }), "Hello WORLD!");
+assert.equal(renderTemplate("{= a =}-{= b =}", { a: "Foo", b: "Bar" }), "FOO-BAR");
+assert.equal(renderTemplate("{= a =}", { a: "Foo" }, { raw: true }), "Foo");
 
-const filters = {
-    name: (value: string) => value.startsWith('A'),
-    age: (value: number) => value > 20
-};
 
-const person = { name: 'Alice', age: 25, location: 'Wonderland' };
-const filteredPerson = applyFilters(person, filters);
-console.assert(filteredPerson.name === 'Alice');
-console.assert(filteredPerson.age === 25);
-console.assert(filteredPerson.location === undefined);
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to understand and complete an advanced TypeScript pattern involving conditional types and mapped types. The prefix establishes the pattern of using mapped types to create a type-safe filter function, while the suffix demonstrates the function's application. The golden completion requires understanding both TypeScript's type system and the functional logic of the `applyFilters` function, making it a suitable challenge for a senior TypeScript developer.
+assert.equal(renderTemplate("no vars", {}), "no vars");
+assert.equal(renderTemplate("{= x =}", {}), "");
+assert.equal(renderTemplate("{= x =}{= y =}", { x: "hi", y: "lo" }), "HILO");
+assert.equal(renderTemplate("{=x=}", { x: "test" }), "TEST");
+assert.equal(renderTemplate("a {= name =} b", { name: "Mix" }, { raw: true }), "a Mix b");
 
-ASSERTIONS:
-----------------------------------------
-console.assert(filteredPerson.name === 'Alice');
-console.assert(filteredPerson.age === 25);
-console.assert(filteredPerson.location === undefined);
-================================================================================
 
 ================================================================================
 Test Case #26
@@ -1232,42 +1271,51 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type ExtractFunction<T> = T extends (...args: any[]) => infer R ? R : never;
-type FunctionMap = {
-  add: (a: number, b: number) => number;
-  concat: (a: string, b: string) => string;
-};
-
-function applyFunction<K extends keyof FunctionMap>(key: K, ...args: Parameters<FunctionMap[K]>): ExtractFunction<FunctionMap[K]> {
+class RollingAverage {
+    private values: number[] = []; private sum = 0;
+    constructor(private size: number) {}
+    add(x: number): number | null {
+        this.values.push(x); this.sum += x;
+        if (this.values.length > this.size) this.sum -= this.values.shift()!;
+        return this.values.length === this.size ? this.sum / this.size : null;
+    }
+}
+(RollingAverage as any).addDoc =
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  const fn = FunctionMap[key];
-  return fn(...args);
+`Adds one value to a fixed-size sliding window.
+Returns null until the window is full.
+After the window is full, evicts the oldest value and returns the current-window average.
+Maintains a running sum as state.`
 
 
 SUFFIX CODE:
 ----------------------------------------
-}
+;
+const assert = require('assert');
+const avg26 = new RollingAverage(3);
+assert.strictEqual(avg26.add(3), null);
+assert.strictEqual(avg26.add(6), null);
+assert.strictEqual(avg26.add(9), 6);
+assert.strictEqual(avg26.add(12), 9);
+assert.match((RollingAverage as any).addDoc, /null/i);
+assert.match((RollingAverage as any).addDoc, /average/i);
 
-const result1 = applyFunction('add', 1, 2);
-const result2 = applyFunction('concat', 'hello', 'world');
 
-console.assert(result1 === 3, 'Addition result should be 3');
-console.assert(result2 === 'helloworld', 'Concatenation result should be helloworld');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example requires understanding of advanced TypeScript type system features such as conditional types with `infer`, and proper inference and application of function types from a mapped type. The low-context prefix and suffix ensure that the LLM must correctly infer the function type and implement the function call with appropriate type safety.
+assert.match((RollingAverage as any).addDoc, /fixed-size sliding window/i);
+assert.match((RollingAverage as any).addDoc, /until the window is full/i);
+assert.match((RollingAverage as any).addDoc, /evicts? the oldest/i);
+assert.match((RollingAverage as any).addDoc, /current-window average/i);
+assert.match((RollingAverage as any).addDoc, /running sum/i);
+const avg26b = new RollingAverage(2);
+assert.strictEqual(avg26b.add(10), null);
+assert.strictEqual(avg26b.add(20), 15);
+assert.strictEqual(avg26b.add(30), 25);
 
-ASSERTIONS:
-----------------------------------------
-const result1 = applyFunction('add', 1, 2);
-const result2 = applyFunction('concat', 'hello', 'world');
-console.assert(result1 === 3, 'Addition result should be 3');
-console.assert(result2 === 'helloworld', 'Concatenation result should be helloworld');
-================================================================================
 
 ================================================================================
 Test Case #27
@@ -1281,44 +1329,41 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends Array<infer U> ? U : T;
+type Brand<T, B extends string> = T & { __brand: B };
+type PositiveInt = Brand<number, "PositiveInt">;
+class ValidationError extends Error { constructor(msg: string) { super(msg); this.name = "ValidationError"; } }
 
-function flatMap<T, U>(arr: T[], fn: (item: Flatten<T>) => U[]): U[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-return arr.reduce((acc, item) => acc.concat(fn(item as Flatten<T>)), [] as U[]);
+function toPositiveInt(n: number): PositiveInt {
+    if (!Number.isInteger(n) || n <= 0) throw new ValidationError(`${n} is not a positive integer`);
+    return n as PositiveInt;
+}
+function addPositive(a: PositiveInt, b: PositiveInt): PositiveInt {
+    return (a + b) as PositiveInt;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-}
+import { strict as assert } from "assert";
+const five = toPositiveInt(5);
+const three = toPositiveInt(3);
+assert.equal(addPositive(five, three), 8);
+assert.throws(() => toPositiveInt(-1), ValidationError);
+assert.throws(() => toPositiveInt(0), ValidationError);
 
-const numbers: number[] = [1, 2, 3];
-const result = flatMap(numbers, (n) => [n, n * 2]);
-console.assert(result.length === 6, 'Expected length of 6');
-console.assert(result[0] === 1, 'Expected first element to be 1');
-console.assert(result[1] === 2, 'Expected second element to be 2');
-console.assert(result[2] === 2, 'Expected third element to be 2');
-console.assert(result[3] === 4, 'Expected fourth element to be 4');
-console.assert(result[4] === 3, 'Expected fifth element to be 3');
-console.assert(result[5] === 6, 'Expected sixth element to be 6');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a higher-order function pattern with advanced TypeScript type inference. The `Flatten` type uses conditional types and `infer` to properly type the elements being mapped over. The `flatMap` function applies a transformation and flattens the result, demonstrating complex type manipulation and functional programming. The completion should correctly implement the pattern, and the assertions validate the functionality and type safety of the implementation.
+assert.throws(() => toPositiveInt(3.5), ValidationError);
+assert.throws(() => toPositiveInt(-100), ValidationError);
+assert.equal(toPositiveInt(1), 1);
+assert.equal(addPositive(toPositiveInt(10), toPositiveInt(20)), 30);
+const p = toPositiveInt(42);
+assert.equal(typeof p, "number");
 
-ASSERTIONS:
-----------------------------------------
-const numbers: number[] = [1, 2, 3];
-const result = flatMap(numbers, (n) => [n, n * 2]);
-console.assert(result.length === 6, 'Expected length of 6');
-console.assert(result[0] === 1, 'Expected first element to be 1');
-console.assert(result[1] === 2, 'Expected second element to be 2');
-console.assert(result[2] === 2, 'Expected third element to be 2');
-console.assert(result[3] === 4, 'Expected fourth element to be 4');
-console.assert(result[4] === 3, 'Expected fifth element to be 3');
-console.assert(result[5] === 6, 'Expected sixth element to be 6');
-================================================================================
 
 ================================================================================
 Test Case #28
@@ -1332,34 +1377,43 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends Array<infer U> ? U : T;
-function flattenArray<T>(arr: T[]): Flatten<T>[] {
+type Schema = Record<string, "string" | "number" | "boolean">;
+// Validates obj matches schema. Strict mode (default): rejects extra keys.
+// Returns { valid: boolean; errors: string[] }
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
- return arr.reduce((acc, val) => acc.concat(val), [] as Flatten<T>[]);
+function validateObj(obj: Record<string, unknown>, schema: Schema, strict: boolean = true): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+    for (const [k, t] of Object.entries(schema)) {
+        if (!(k in obj)) errors.push(`missing:${k}`);
+        else if (typeof obj[k] !== t) errors.push(`type:${k}`);
+    }
+    if (strict) for (const k of Object.keys(obj)) { if (!(k in schema)) errors.push(`extra:${k}`); }
+    return { valid: errors.length === 0, errors };
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-}
+import { strict as assert } from "assert";
+const schema: Schema = { name: "string", age: "number" };
+assert.deepEqual(validateObj({ name: "A", age: 1 }, schema), { valid: true, errors: [] });
+assert.equal(validateObj({ name: "A", age: 1, extra: true }, schema).valid, false);
+assert.equal(validateObj({ name: "A", age: 1, extra: true }, schema, false).valid, true);
 
-const nestedArray = [[1, 2], [3, 4]];
-const result = flattenArray(nestedArray);
 
-console.assert(Array.isArray(result), 'Result should be an array');
-console.assert(result.length === 4, 'Result array should have 4 elements');
-console.assert(result[0] === 1 && result[1] === 2 && result[2] === 3 && result[3] === 4, 'Result array should be flattened');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a type-safe array flattening function in TypeScript. The pattern involves using conditional types with `infer` for type extraction and demonstrating a common type-safe operation with arrays. The low-context scenario requires the model to understand how to reduce and concatenate arrays while preserving type integrity, which is a non-trivial task requiring advanced TypeScript knowledge.
+assert.deepEqual(validateObj({}, schema).errors, ["missing:name", "missing:age"]);
+assert.deepEqual(validateObj({ name: 1, age: "x" }, schema).errors, ["type:name", "type:age"]);
+const r = validateObj({ name: "B", age: 2, x: 1, y: 2 }, schema);
+assert.equal(r.valid, false);
+assert.ok(r.errors.includes("extra:x"));
+assert.ok(r.errors.includes("extra:y"));
+assert.equal(validateObj({ name: "B", age: 2, x: 1 }, schema, false).valid, true);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(Array.isArray(result), 'Result should be an array');
-console.assert(result.length === 4, 'Result array should have 4 elements');
-console.assert(result[0] === 1 && result[1] === 2 && result[2] === 3 && result[3] === 4, 'Result array should be flattened');
-================================================================================
 
 ================================================================================
 Test Case #29
@@ -1373,53 +1427,41 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends Array<infer U> ? U : T;
+type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+type Step<A, B> = (a: A) => Result<B>;
 
-function flatMap<T, U>(array: T[], callback: (value: T) => U | U[]): U[] {
-    const result: U[] = [];
-    for (const value of array) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        const res = callback(value);
-        if (Array.isArray(res)) {
-            result.push(...res);
-        } else {
-            result.push(res);
-        }
+function pipeline<T>(input: T, ...steps: Step<any, any>[]): Result<any> {
+    let current: Result<any> = { ok: true, value: input };
+    for (const step of steps) {
+        if (!current.ok) return current;
+        current = step(current.value);
+    }
+    return current;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-    return result;
-}
+import { strict as assert } from "assert";
+const double: Step<number, number> = n => ({ ok: true, value: n * 2 });
+const failIfBig: Step<number, number> = n => n > 100 ? { ok: false, error: "too big" } : { ok: true, value: n };
+const stringify: Step<number, string> = n => ({ ok: true, value: String(n) });
+assert.deepEqual(pipeline(5, double, stringify), { ok: true, value: "10" });
+assert.deepEqual(pipeline(60, double, failIfBig), { ok: false, error: "too big" });
 
-const numbers = [1, 2, 3];
-const strings = flatMap(numbers, n => [n.toString(), (n * 2).toString()]);
 
-// assertions
-console.assert(strings.length === 6, 'Expected length of 6');
-console.assert(strings[0] === '1', 'Expected first element to be "1"');
-console.assert(strings[1] === '2', 'Expected second element to be "2"');
-console.assert(strings[2] === '2', 'Expected third element to be "2"');
-console.assert(strings[3] === '4', 'Expected fourth element to be "4"');
-console.assert(strings[4] === '3', 'Expected fifth element to be "3"');
-console.assert(strings[5] === '6', 'Expected sixth element to be "6"');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to handle advanced type inference with conditional types and higher-order functions. The use of 'infer' in conditional types to extract the element type from an array and the implementation of a flatMap function with proper type handling require a deep understanding of TypeScript's type system. The minimal context provided ensures that the LLM must recognize and complete the pattern correctly, demonstrating its ability to infer and apply complex type transformations.
+assert.deepEqual(pipeline(1), { ok: true, value: 1 });
+assert.deepEqual(pipeline(3, double, double, double), { ok: true, value: 24 });
+const alwaysFail: Step<any, any> = _ => ({ ok: false, error: "fail" });
+const shouldNotRun: Step<any, any> = _ => { throw new Error("should not run"); };
+assert.deepEqual(pipeline(1, alwaysFail, shouldNotRun), { ok: false, error: "fail" });
+assert.deepEqual(pipeline(10, double, failIfBig, stringify), { ok: true, value: "20" });
 
-ASSERTIONS:
-----------------------------------------
-console.assert(strings.length === 6, 'Expected length of 6');
-console.assert(strings[0] === '1', 'Expected first element to be "1"');
-console.assert(strings[1] === '2', 'Expected second element to be "2"');
-console.assert(strings[2] === '2', 'Expected third element to be "2"');
-console.assert(strings[3] === '4', 'Expected fourth element to be "4"');
-console.assert(strings[4] === '3', 'Expected fifth element to be "3"');
-console.assert(strings[5] === '6', 'Expected sixth element to be "6"');
-================================================================================
 
 ================================================================================
 Test Case #30
@@ -1433,37 +1475,41 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends Array<infer U> ? U : T;
-type DeepFlatten<T> = T extends Array<infer U> ? DeepFlatten<U> : T;
-
-// Test data
-const nestedArray: number[][][] = [[[1, 2], [3, 4]], [[5, 6]]];
+type Tagged = { tag: string; [k: string]: unknown };
+type Handlers = Record<string, (obj: Tagged) => unknown> & { _?: (obj: Tagged) => unknown };
+// match: dispatch on obj.tag. Use handlers[tag] if present, else handlers["_"].
+// If no match and no "_", throw Error("no handler for <tag>").
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-function deepFlatten<T>(arr: T[]): DeepFlatten<T>[] {
-    return arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? deepFlatten(val) : val), [] as DeepFlatten<T>[]);
+function match(obj: Tagged, handlers: Handlers): unknown {
+    const handler = handlers[obj.tag] ?? handlers["_"];
+    if (!handler) throw new Error(`no handler for ${obj.tag}`);
+    return handler(obj);
 }
+
 
 SUFFIX CODE:
 ----------------------------------------
-const flatArray: number[] = deepFlatten(nestedArray);
+import { strict as assert } from "assert";
+const h: Handlers = {
+    circle: (o) => Math.PI * ((o as any).r ** 2),
+    rect: (o) => (o as any).w * (o as any).h,
+    _: () => 0,
+};
+assert.equal(match({ tag: "circle", r: 1 }, h), Math.PI);
+assert.equal(match({ tag: "rect", w: 3, h: 4 }, h), 12);
+assert.equal(match({ tag: "unknown" }, h), 0);
 
-// Assertions
-console.assert(flatArray.length === 6, 'The flattened array should have 6 elements');
-console.assert(flatArray[0] === 1 && flatArray[5] === 6, 'The elements should be 1 through 6');
 
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example requires an understanding of advanced TypeScript type system features, particularly conditional and recursive types. The `DeepFlatten` type recursively flattens nested arrays, and the `deepFlatten` function must correctly implement this type behavior. The low context is maintained by providing only the necessary type definitions and a nested array test case. The golden completion demonstrates the correct implementation of a deeply recursive flatten function with proper type handling.
+assert.throws(() => match({ tag: "triangle" }, { circle: () => 1 }), /no handler for triangle/);
+assert.equal(match({ tag: "a" }, { a: () => 42 }), 42);
+assert.equal(match({ tag: "b" }, { _: () => -1 }), -1);
+assert.equal(match({ tag: "x", val: 10 }, { x: (o) => (o as any).val + 1 }), 11);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(flatArray.length === 6, 'The flattened array should have 6 elements');
-console.assert(flatArray[0] === 1 && flatArray[5] === 6, 'The elements should be 1 through 6');
-================================================================================
 
 ================================================================================
 Test Case #31
@@ -1477,53 +1523,48 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type ExtractFunction<Obj> = {
-	[K in keyof Obj]: Obj[K] extends (...args: any[]) => any ? K : never
-}[keyof Obj];
+const RHEX = 'fedcba9876543210';
+// urlEncode: every non-alphanumeric char -> %HH using REVERSED hex alphabet.
+// Standard hex: '0123456789abcdef'. RHEX maps: 0->f, 1->e, ..., f->0.
+// The hex digits in %HH use RHEX, not standard hex.
+function urlEncode(input: string): string {
 
-interface Service {
-	doSomething(): void;
-	value: number;
-}
-
-const service: Service = {
-	doSomething() {
-		console.log('Doing something');
-	},
-	value: 42
-};
-
-function callFunction<T, K extends ExtractFunction<T>>(obj: T, key: K): ReturnType<T[K]> {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+    return Array.from(input).map(ch => {
+        if (/[a-zA-Z0-9]/.test(ch)) return ch;
+        const code = ch.charCodeAt(0);
+        const hi = RHEX[(code >> 4) & 0xf];
+        const lo = RHEX[code & 0xf];
+        return '%' + hi + lo;
+    }).join('');
 
-	return obj[key]();
 
 SUFFIX CODE:
 ----------------------------------------
-
 }
 
-const result = callFunction(service, 'doSomething');
+const assert = require('assert');
+assert.strictEqual(urlEncode('abc'), 'abc');
+// Space is 0x20 -> RHEX[2]=d, RHEX[0]=f -> %df
+assert.strictEqual(urlEncode(' '), '%df');
+assert.notStrictEqual(urlEncode(' '), '%20');
+assert.strictEqual(urlEncode('a!b'), 'a%deb');
 
-// Assertions
-import * as assert from 'assert';
-assert.strictEqual(result, undefined);
 
-// Cleanup (if any)
-// No resources to clean up in this example
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete an advanced TypeScript pattern involving conditional types and function extraction from an object. The `ExtractFunction` type and the `callFunction` function are non-trivial and require understanding of advanced TypeScript features. The minimal context provided challenges the LLM to infer the correct completion.
+// '@' is 0x40 -> RHEX[4]=b, RHEX[0]=f -> %bf
+assert.strictEqual(urlEncode('@'), '%bf');
+// '#' is 0x23 -> RHEX[2]=d, RHEX[3]=c -> %dc
+assert.strictEqual(urlEncode('#'), '%dc');
+assert.strictEqual(urlEncode('hello world'), 'hello%dfworld');
+assert.strictEqual(urlEncode(''), '');
+// '+' is 0x2B -> RHEX[2]=d, RHEX[11]=4 -> %d4
+// '=' is 0x3D -> RHEX[3]=c, RHEX[13]=2 -> %c2
+assert.strictEqual(urlEncode('a+b=c'), 'a%d4b%c2c');
 
-ASSERTIONS:
-----------------------------------------
-import * as assert from 'assert';
-const result = callFunction(service, 'doSomething');
-assert.strictEqual(result, undefined);
-================================================================================
 
 ================================================================================
 Test Case #32
@@ -1537,37 +1578,45 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Filter<T> = (item: T) => boolean;
+// htmlEscape: convert ALL non-alphanumeric characters to &#DDD; numeric entities.
+// DDD is the decimal char code, no zero-padding.
+// Standard HTML escaping only escapes <>&"'. This escapes EVERYTHING non-alnum.
+function htmlEscape(input: string): string {
 
-function filterArray<T>(arr: T[], filter: Filter<T>): T[] {
-    return arr.filter(filter);
-}
-
-const isEven: Filter<number> = (num) => num % 2 === 0;
-const numbers = [1, 2, 3, 4, 5, 6];
-const evenNumbers = filterArray(numbers, isEven);
 
 GOLDEN COMPLETION:
 ----------------------------------------
-console.assert(JSON.stringify(evenNumbers) === '[2,4,6]', 'Expected [2,4,6] for even numbers');
+    return Array.from(input).map(ch => {
+        if (/[a-zA-Z0-9]/.test(ch)) return ch;
+        return '&#' + ch.charCodeAt(0) + ';';
+    }).join('');
+
 
 SUFFIX CODE:
 ----------------------------------------
+}
 
-console.log(evenNumbers);
+const assert = require('assert');
+assert.strictEqual(htmlEscape('abc'), 'abc');
+// Space -> &#32;  (not &nbsp; or left as-is)
+assert.strictEqual(htmlEscape(' '), '&#32;');
+// '<' -> &#60; (not &lt;)
+assert.strictEqual(htmlEscape('<'), '&#60;');
+assert.notStrictEqual(htmlEscape('<'), '&lt;');
+assert.strictEqual(htmlEscape('a b'), 'a&#32;b');
 
-const isOdd: Filter<number> = (num) => num % 2 !== 0;
-const oddNumbers = filterArray(numbers, isOdd);
-console.log(oddNumbers);
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the use of higher-order functions with generics in TypeScript. The pattern involves defining a type for a filter function, using it to filter arrays, and then writing assertions to verify the correctness of the filtered results. This requires the model to understand functional programming constructs and generics in TypeScript.
+assert.strictEqual(htmlEscape(''), '');
+assert.strictEqual(htmlEscape('>'), '&#62;');
+assert.strictEqual(htmlEscape('&'), '&#38;');
+assert.strictEqual(htmlEscape('"'), '&#34;');
+assert.strictEqual(htmlEscape("'"), '&#39;');
+assert.strictEqual(htmlEscape('x<y>z'), 'x&#60;y&#62;z');
+assert.strictEqual(htmlEscape('a&b'), 'a&#38;b');
+assert.strictEqual(htmlEscape('hello world!'), 'hello&#32;world&#33;');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(JSON.stringify(evenNumbers) === '[2,4,6]', 'Expected [2,4,6] for even numbers');
-================================================================================
 
 ================================================================================
 Test Case #33
@@ -1581,52 +1630,47 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Merge<A, B> = {
-  [K in keyof A | keyof B]: K extends keyof B ? B[K] : K extends keyof A ? A[K] : never;
-};
+const HEX_ALPHA = 'fedcba9876543210';
+// hexEncode: encode each byte of the UTF-8 string using the custom hex alphabet.
+// Standard hex uses '0123456789abcdef'. This uses HEX_ALPHA instead.
+function hexEncode(input: string): string {
 
-interface Person {
-  name: string;
-  age: number;
-}
-
-interface Employee {
-  employeeId: number;
-  department: string;
-}
-
-const person: Person = { name: 'Alice', age: 30 };
-const employee: Employee = { employeeId: 123, department: 'Engineering' };
-
-const merged:
 
 GOLDEN COMPLETION:
 ----------------------------------------
-Merge<Person, Employee> = { ...person, ...employee };
+    const bytes = Buffer.from(input, 'utf-8');
+    let result = '';
+    for (const b of bytes) {
+        result += HEX_ALPHA[(b >> 4) & 0xf] + HEX_ALPHA[b & 0xf];
+    }
+    return result;
 
 
 SUFFIX CODE:
 ----------------------------------------
+}
 
-console.log(merged);
+const assert = require('assert');
+// 'A' = 0x41 -> HEX_ALPHA[4]='b', HEX_ALPHA[1]='e' -> 'be'
+assert.strictEqual(hexEncode('A'), 'be');
+assert.notStrictEqual(hexEncode('A'), '41');
+// 'a' = 0x61 -> HEX_ALPHA[6]='9', HEX_ALPHA[1]='e' -> '9e'
+assert.strictEqual(hexEncode('a'), '9e');
+assert.strictEqual(hexEncode('AB'), 'bebd');
 
-// Ensure the merged object has properties from both Person and Employee
-console.assert(merged.name === 'Alice');
-console.assert(merged.age === 30);
-console.assert(merged.employeeId === 123);
-console.assert(merged.department === 'Engineering');
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example challenges an LLM to correctly merge two types using advanced TypeScript type features. It requires understanding of conditional types, union types, and intersection types. The pattern of merging objects and types is common in production code, and the LLM must infer the correct type manipulation to maintain type safety. The provided assertions test the properties of the merged object, ensuring the correct implementation.
+assert.strictEqual(hexEncode(''), '');
+// 'B' = 0x42 -> HEX_ALPHA[4]='b', HEX_ALPHA[2]='d' -> 'bd'
+assert.strictEqual(hexEncode('B'), 'bd');
+// '0' = 0x30 -> HEX_ALPHA[3]='c', HEX_ALPHA[0]='f' -> 'cf'
+assert.strictEqual(hexEncode('0'), 'cf');
+// ' ' = 0x20 -> HEX_ALPHA[2]='d', HEX_ALPHA[0]='f' -> 'df'
+assert.strictEqual(hexEncode(' '), 'df');
+assert.strictEqual(hexEncode('abc'), '9e9d9c');
+assert.strictEqual(hexEncode('Hi'), 'b796');
 
-ASSERTIONS:
-----------------------------------------
-console.assert(merged.name === 'Alice');
-console.assert(merged.age === 30);
-console.assert(merged.employeeId === 123);
-console.assert(merged.department === 'Engineering');
-================================================================================
 
 ================================================================================
 Test Case #34
@@ -1640,44 +1684,41 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type TupleToUnion<T extends any[]> = T[number];
+// rollingHash: custom 16-bit hash. For each char:
+//   hash = ((hash * 37 + charCode) ^ (hash >>> 3)) & 0xFFFF
+// Start with hash = 0. Return final hash as a number.
+function rollingHash(input: string): number {
 
-type Flatten<T> = T extends (infer U)[] ? U : T;
-
-type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
-
-type Merge<T> = UnionToIntersection<Flatten<T>>;
-
-type Foo = {a: string; b: number};
-type Bar = {b: number; c: boolean};
-
-type Merged = Merge<[Foo, Bar]>;
-
-const obj: Merged = {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-"a": "hello", "b": 42, "c": true
+    let hash = 0;
+    for (let i = 0; i < input.length; i++) {
+        hash = ((hash * 37 + input.charCodeAt(i)) ^ (hash >>> 3)) & 0xFFFF;
+    }
+    return hash;
+
 
 SUFFIX CODE:
 ----------------------------------------
-};
+}
 
-console.assert(obj.a === 'hello');
-console.assert(obj.b === 42);
-console.assert(obj.c === true);
+const assert = require('assert');
+assert.strictEqual(rollingHash(''), 0);
+// 'a' = 97: hash = ((0*37+97) ^ (0>>>3)) & 0xFFFF = 97
+assert.strictEqual(rollingHash('a'), 97);
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to handle advanced type manipulation in TypeScript, specifically focusing on merging complex types using conditional types, union-to-intersection conversions, and type inference. The completion requires understanding of how the Merge type works and correctly providing the properties for the merged type. This is a non-trivial task that involves several advanced TypeScript features.
+// 'ab': hash after 'a' = 97, then ((97*37 + 98) ^ (97>>>3)) & 0xFFFF
+//   = (3589 + 98) ^ 12 = 3687 ^ 12 = 3691
+assert.strictEqual(rollingHash('ab'), 3691);
+assert.strictEqual(rollingHash('abc'), rollingHash('abc'));
+assert.notStrictEqual(rollingHash('abc'), rollingHash('cba'));
+assert.strictEqual(typeof rollingHash('test'), 'number');
+assert.ok(rollingHash('hello') >= 0 && rollingHash('hello') <= 0xFFFF);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(obj.a === 'hello');
-console.assert(obj.b === 42);
-console.assert(obj.c === true);
-================================================================================
 
 ================================================================================
 Test Case #35
@@ -1691,45 +1732,47 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type ExtractFunctionReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+// MinQueue: .pop() returns item with LOWEST priority.
+// Ties broken by REVERSE insertion order (last inserted first).
+class MinQueue<T> {
+    private items: [T, number, number][] = []; // [val, pri, seq]
+    private seq = 0;
+    push(val: T, pri: number) { this.items.push([val, pri, this.seq++]); }
 
-function example() {
-	function add(a: number, b: number): number {
-		return a + b;
-	}
-	function greet(name: string): string {
-		return `Hello, ${name}!`;
-	}
-
-	const addReturnType: ExtractFunctionReturnType<typeof add> = 5;
-	const greetReturnType: ExtractFunctionReturnType<typeof greet> = "Hello, TypeScript!";
-	const unknownFunction: ExtractFunctionReturnType<
 
 GOLDEN COMPLETION:
 ----------------------------------------
-(() => boolean)
+    pop(): T | undefined {
+        if (!this.items.length) return undefined;
+        let b = 0;
+        for (let i = 1; i < this.items.length; i++) {
+            if (this.items[i][1] < this.items[b][1] || (this.items[i][1] === this.items[b][1] && this.items[i][2] > this.items[b][2])) b = i;
+        }
+        return this.items.splice(b, 1)[0][0];
+    }
+
 
 SUFFIX CODE:
 ----------------------------------------
-> = true;
-
-	console.log(addReturnType);
-	console.log(greetReturnType);
 }
-
-example();
-
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a complex TypeScript type extraction pattern using conditional types with `infer`. The `ExtractFunctionReturnType` type is designed to extract the return type of a function. The completion involves recognizing the pattern and correctly inferring the return type of a provided function type.
-
-ASSERTIONS:
-----------------------------------------
 const assert = require('assert');
-assert.strictEqual(typeof addReturnType, 'number');
-assert.strictEqual(typeof greetReturnType, 'string');
-assert.strictEqual(typeof unknownFunction, 'boolean');
-================================================================================
+const q = new MinQueue<string>();
+q.push('first', 1); q.push('second', 1); q.push('third', 2);
+assert.strictEqual(q.pop(), 'second');
+assert.strictEqual(q.pop(), 'first');
+assert.strictEqual(q.pop(), 'third');
+
+
+HIDDEN ASSERTIONS:
+----------------------------------------
+const q2 = new MinQueue<number>();
+assert.strictEqual(q2.pop(), undefined);
+q2.push(10, 5); q2.push(20, 3); q2.push(30, 3); q2.push(40, 1);
+assert.strictEqual(q2.pop(), 40);
+assert.strictEqual(q2.pop(), 30);
+assert.strictEqual(q2.pop(), 20);
+assert.strictEqual(q2.pop(), 10);
+
 
 ================================================================================
 Test Case #36
@@ -1743,42 +1786,48 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Box<T> = { value: T };
+// interleaveBytes: interleave the bits of two 8-bit numbers, LSB first.
+// For a and b, output bit 2i comes from bit i of a, bit 2i+1 from bit i of b.
+// Bit 0 is LSB. Result is a 16-bit number.
+function interleaveBytes(a: number, b: number): number {
 
-type UnboxArray<T> = T extends Array<infer U> ? U : T;
-
-function createBox<T>(value: T): Box<T> {
-    return { value };
-}
-
-const stringBox = createBox("hello");
-const numberArrayBox = createBox([1, 2, 3]);
-
-function unbox<T>(box: Box<T>): UnboxArray<T> {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    return box.value as UnboxArray<T>;
+    let result = 0;
+    for (let i = 0; i < 8; i++) {
+        result |= ((a >> i) & 1) << (2 * i);
+        result |= ((b >> i) & 1) << (2 * i + 1);
+    }
+    return result;
+
 
 SUFFIX CODE:
 ----------------------------------------
 }
 
-const unboxedString = unbox(stringBox);
-const unboxedNumberArray = unbox(numberArrayBox);
+const assert = require('assert');
+// a=0b00000001 (1), b=0b00000000 (0): bit 0 of a=1 -> result bit 0 = 1 -> 0b01 = 1
+assert.strictEqual(interleaveBytes(1, 0), 1);
+// a=0, b=1: bit 0 of b=1 -> result bit 1 = 1 -> 0b10 = 2
+assert.strictEqual(interleaveBytes(0, 1), 2);
+// a=3 (0b11), b=0: bits 0,1 of a -> result bits 0,2 -> 0b00000101 = 5
+assert.strictEqual(interleaveBytes(3, 0), 5);
 
-console.assert(unboxedString === "hello", "Expected 'hello'");
-console.assert(unboxedNumberArray === 1, "Expected 1");
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This scenario tests the LLM's ability to recognize and complete a type-level pattern involving conditional types and inferred types. The key challenge is understanding how to correctly unbox the value within a generic Box type, particularly when the boxed value could be an array. The completion requires recognizing the pattern of using conditional types with 'infer' to extract the type from the array, if applicable, and returning the correct type accordingly. This example tests advanced TypeScript features such as conditional types, type inference, and generic functions, making it a good test case for low-context pattern matching capabilities in an LLM.
+// a=0xFF, b=0x00: every even bit set -> 0x5555
+assert.strictEqual(interleaveBytes(0xFF, 0x00), 0x5555);
+// a=0x00, b=0xFF: every odd bit set -> 0xAAAA
+assert.strictEqual(interleaveBytes(0x00, 0xFF), 0xAAAA);
+// a=0xFF, b=0xFF: all bits set -> 0xFFFF
+assert.strictEqual(interleaveBytes(0xFF, 0xFF), 0xFFFF);
+assert.strictEqual(interleaveBytes(0, 0), 0);
+// a=0b10 (2), b=0b01 (1): a bit0=0,bit1=1 -> res bits 0,2; b bit0=1 -> res bit1
+// result: bit0=0, bit1=1, bit2=1 -> 0b110 = 6
+assert.strictEqual(interleaveBytes(2, 1), 6);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(unboxedString === "hello", "Expected 'hello'");
-console.assert(unboxedNumberArray === 1, "Expected 1");
-================================================================================
 
 ================================================================================
 Test Case #37
@@ -1792,49 +1841,45 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type DeepReadonly<T> = {
-    readonly [P in keyof T]: T[P] extends object ? DeepReadonly<T[P]> : T[P];
-};
+type Shape =
+    | { kind: 'circle'; radius: number }
+    | { kind: 'rect'; w: number; h: number }
+    | { kind: 'tri'; base: number; height: number };
 
-function freezeObject<T>(obj: T): DeepReadonly<T> {
-    Object.freeze(obj);
+// areaOf: returns area. Circle uses PI truncated to 3.14 (NOT Math.PI).
+// Rect returns w*h. Tri returns base*height/2. Unknown kind returns -1.
+function areaOf(s: Shape): number {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    Object.keys(obj).forEach(key => {
-        const value = obj[key];
-        if (typeof value === 'object' && value !== null) {
-            freezeObject(value);
-        }
-    });
+    switch (s.kind) {
+        case 'circle': return 3.14 * s.radius * s.radius;
+        case 'rect': return s.w * s.h;
+        case 'tri': return s.base * s.height / 2;
+        default: return -1;
+    }
 
 
 SUFFIX CODE:
 ----------------------------------------
-    return obj as DeepReadonly<T>;
 }
 
-const original = { a: { b: { c: 42 } } };
-const frozen = freezeObject(original);
-
-try {
-    (frozen.a.b.c as any) = 100;
-} catch (e) {
-    console.log('Cannot modify readonly property');
-}
-
-console.assert(frozen.a.b.c === 42, 'The value should remain unchanged');
+const assert = require('assert');
+assert.strictEqual(areaOf({ kind: 'circle', radius: 10 }), 314);
+assert.notStrictEqual(areaOf({ kind: 'circle', radius: 10 }), Math.PI * 100);
+assert.strictEqual(areaOf({ kind: 'rect', w: 3, h: 4 }), 12);
+assert.strictEqual(areaOf({ kind: 'tri', base: 6, height: 4 }), 12);
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving advanced TypeScript types and type-safe immutability. The `DeepReadonly` type uses conditional types and mapped types to recursively make an object deeply readonly. The `freezeObject` function should recursively freeze nested objects, ensuring immutability. This requires understanding of TypeScript's type system and how to apply Object.freeze correctly in a recursive manner.
+assert.strictEqual(areaOf({ kind: 'circle', radius: 1 }), 3.14);
+assert.strictEqual(areaOf({ kind: 'circle', radius: 5 }), 78.5);
+assert.strictEqual(areaOf({ kind: 'rect', w: 0, h: 100 }), 0);
+assert.strictEqual(areaOf({ kind: 'tri', base: 10, height: 5 }), 25);
+assert.strictEqual(areaOf({ kind: 'circle', radius: 0 }), 0);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(frozen.a.b.c === 42, 'The value should remain unchanged');
-================================================================================
 
 ================================================================================
 Test Case #38
@@ -1848,43 +1893,47 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
+interface Cfg { retries: number; timeout: number; verbose: boolean; }
+const DEFAULTS: Cfg = { retries: 3, timeout: 1000, verbose: false };
+// buildConfig: merge overrides into DEFAULTS. Numeric overrides get DOUBLED.
+// Boolean overrides get NEGATED. Unset fields use DEFAULTS as-is.
+function buildConfig(overrides: Partial<Cfg>): Cfg {
 
-async function getData(): Promise<number> {
-  return 42;
-}
-
-async function processData() {
-  const data: 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-UnwrapPromise<ReturnType<typeof getData>> = 
+    const r = { ...DEFAULTS };
+    for (const k of Object.keys(overrides) as (keyof Cfg)[]) {
+        const v = overrides[k];
+        if (typeof v === 'number') (r as any)[k] = v * 2;
+        else if (typeof v === 'boolean') (r as any)[k] = !v;
+    }
+    return r;
+
 
 SUFFIX CODE:
 ----------------------------------------
-await getData();
-  console.log(data);
 }
+const assert = require('assert');
+const c1 = buildConfig({ retries: 5 });
+assert.strictEqual(c1.retries, 10);
+assert.strictEqual(c1.timeout, 1000);
+assert.strictEqual(c1.verbose, false);
+const c2 = buildConfig({ verbose: true });
+assert.strictEqual(c2.verbose, false);
 
-processData();
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to handle complex type inference with conditional types and the 'infer' keyword. The scenario involves unwrapping a promise return type, which is a non-trivial task requiring understanding of advanced TypeScript type system features. The minimal context provided (a type alias and a function returning a promise) establishes a clear pattern for the model to follow.
+const c3 = buildConfig({ timeout: 500 });
+assert.strictEqual(c3.timeout, 1000);
+assert.strictEqual(c3.retries, 3);
+const c4 = buildConfig({ retries: 0, verbose: false });
+assert.strictEqual(c4.retries, 0);
+assert.strictEqual(c4.verbose, true);
+const c5 = buildConfig({});
+assert.deepStrictEqual(c5, { retries: 3, timeout: 1000, verbose: false });
 
-ASSERTIONS:
-----------------------------------------
-import assert from 'assert';
-
-async function test() {
-  const data: UnwrapPromise<ReturnType<typeof getData>> = await getData();
-  assert.strictEqual(data, 42, 'The data should be 42');
-  assert.strictEqual(typeof data, 'number', 'The data should be a number');
-}
-
-test();
-================================================================================
 
 ================================================================================
 Test Case #39
@@ -1898,55 +1947,41 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };
+// zipMerge: for each pair (a[i], b[i]):
+// Both strings -> concatenate b[i]+a[i] (REVERSED order, not a+b).
+// Both numbers -> a[i]-b[i]. Otherwise -> null.
+function zipMerge(a: (string|number)[], b: (string|number)[]): (string|number|null)[] {
 
-interface User {
-  name: string;
-  address: {
-    street: string;
-    city: string;
-  };
-}
-
-const user: DeepReadonly<User> = {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-"name": "John Doe",
-  "address": {
-    "street": "123 Main St",
-    "city": "Anytown"
-  }
+    const r: (string|number|null)[] = [];
+    for (let i = 0; i < a.length; i++) {
+        if (typeof a[i] === 'string' && typeof b[i] === 'string') r.push((b[i] as string) + (a[i] as string));
+        else if (typeof a[i] === 'number' && typeof b[i] === 'number') r.push((a[i] as number) - (b[i] as number));
+        else r.push(null);
+    }
+    return r;
 
 
 SUFFIX CODE:
 ----------------------------------------
-};
-
-user.name = "New Name"; // This should cause a TypeScript error
-user.address.city = "New City"; // This should also cause a TypeScript error
-
-console.log(user);
-
-const isReadonly = <T>(obj: T): obj is DeepReadonly<T> => true;
-
-if (isReadonly(user)) {
-  console.log("User is deeply readonly");
 }
+const assert = require('assert');
+assert.deepStrictEqual(zipMerge(['hello'], ['world']), ['worldhello']);
+assert.notDeepStrictEqual(zipMerge(['hello'], ['world']), ['helloworld']);
+assert.deepStrictEqual(zipMerge([10], [3]), [7]);
+assert.deepStrictEqual(zipMerge([1], ['a']), [null]);
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to complete a TypeScript type-level pattern involving DeepReadonly, which recursively makes all properties of an object readonly. The provided completion must match the established pattern, ensuring that the user object is deeply readonly. The scenario also includes type-checking logic to ensure the readonly properties are enforced.
+assert.deepStrictEqual(zipMerge([], []), []);
+assert.deepStrictEqual(zipMerge(['a', 'b'], ['c', 'd']), ['ca', 'db']);
+assert.deepStrictEqual(zipMerge([5, 2], [3, 8]), [2, -6]);
+assert.deepStrictEqual(zipMerge(['x', 1], [2, 'y']), [null, null]);
+assert.deepStrictEqual(zipMerge(['foo', 10, 'bar'], ['baz', 5, 'qux']), ['bazfoo', 5, 'quxbar']);
 
-ASSERTIONS:
-----------------------------------------
-import assert from 'assert';
-
-assert.throws(() => { user.name = "New Name"; }, /Cannot assign to 'name'/);
-assert.throws(() => { user.address.city = "New City"; }, /Cannot assign to 'city'/);
-assert(isReadonly(user), 'User should be deeply readonly');
-================================================================================
 
 ================================================================================
 Test Case #40
@@ -1960,34 +1995,49 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends (infer U)[] ? U : T;
-type DeepFlatten<T> = T extends (infer U)[] ? DeepFlatten<U> : T;
-function flattenArray<T>(arr: T[]): Flatten<T>[] {
+// processOps: takes an array of [op, value] pairs. Maintains an accumulator starting at 0.
+// 'add': acc += value. 'mul': acc *= value. 'reset': acc = value.
+// SPECIAL: after each operation, if acc < 0, set acc = 0 (clamp to non-negative).
+// Returns the final accumulator value.
+function processOps(ops: [string, number][]): number {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  return arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val) : val), [] as Flatten<T>[]);
+    let acc = 0;
+    for (const [op, val] of ops) {
+        if (op === 'add') acc += val;
+        else if (op === 'mul') acc *= val;
+        else if (op === 'reset') acc = val;
+        if (acc < 0) acc = 0;
+    }
+    return acc;
+
 
 SUFFIX CODE:
 ----------------------------------------
-
 }
 
-const nestedArray = [[1, 2, [3, 4]], [5, 6]];
-const flatArray = flattenArray(nestedArray);
-console.assert(JSON.stringify(flatArray) === JSON.stringify([1, 2, [3, 4], 5, 6]), 'Test failed');
+const assert = require('assert');
+assert.strictEqual(processOps([]), 0);
+assert.strictEqual(processOps([['add', 5]]), 5);
+assert.strictEqual(processOps([['add', 5], ['mul', 3]]), 15);
+// Negative clamp: add -10 to 5 -> -5 -> clamped to 0
+assert.strictEqual(processOps([['add', 5], ['add', -10]]), 0);
+// After clamp, mul has no effect: 0*3=0
+assert.strictEqual(processOps([['add', 5], ['add', -10], ['mul', 3]]), 0);
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete the pattern of flattening nested arrays using recursive type definitions and functional programming constructs. The example requires understanding of conditional types, type inference, and array manipulation in TypeScript. The prefix defines utility types for flattening and deep flattening arrays, and the function signature for flattening an array. The suffix includes a test case to validate the functionality. The golden completion involves a recursive array reduction, which is a non-trivial pattern requiring deeper understanding of TypeScript's type system and array methods.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-const nestedArray = [[1, 2, [3, 4]], [5, 6]];
-const flatArray = flattenArray(nestedArray);
-console.assert(JSON.stringify(flatArray) === JSON.stringify([1, 2, [3, 4], 5, 6]), 'Test failed');
-================================================================================
+// reset sets acc directly, then clamp check
+assert.strictEqual(processOps([['reset', -5]]), 0);
+assert.strictEqual(processOps([['reset', 10]]), 10);
+assert.strictEqual(processOps([['add', 3], ['mul', -2]]), 0);
+assert.strictEqual(processOps([['add', 10], ['mul', 2], ['add', -5]]), 15);
+assert.strictEqual(processOps([['reset', 100], ['mul', 0]]), 0);
+assert.strictEqual(processOps([['add', 1], ['add', 1], ['mul', 5]]), 10);
+
 
 ================================================================================
 Test Case #41
@@ -2001,39 +2051,45 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends (infer U)[] ? U : T;
-type TupleToUnion<T> = T extends (infer U)[] ? U : never;
-
-function flattenArray<T>(arr: T[]): Flatten<T>[] {
+const STANDARD52 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const REVERSED52 = STANDARD52.split('').reverse().join('');
+function leadingZeroBytes(data: Buffer): number {
+    let c = 0;
+    for (const b of data) { if (b !== 0) break; c++; }
+    return c;
+}
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  return ([] as Flatten<T>[]).concat(...arr);
+function base52Encode(data: Buffer | string, alphabet: string = REVERSED52): string {
+    const buf = typeof data === 'string' ? Buffer.from(data) : data;
+    let n = buf.length ? BigInt('0x' + buf.toString('hex')) : 0n;
+    const base = BigInt(alphabet.length);
+    const out: string[] = [];
+    while (n > 0n) { out.push(alphabet[Number(n % base)]); n = n / base; }
+    return alphabet[0].repeat(leadingZeroBytes(buf)) + out.reverse().join('');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+assert.strictEqual(base52Encode(Buffer.from('ab')), 'qod');
+assert.notStrictEqual(base52Encode(Buffer.from('ab')), 'JLW');
+assert.strictEqual(base52Encode(Buffer.from('ab'), STANDARD52), 'JLW');
+assert.strictEqual(base52Encode(Buffer.from([0, 97, 98])), 'zqod');
 
-}
 
-const nestedArray = [[1, 2, 3], [4, 5], [6]];
-const flattened: number[] = flattenArray(nestedArray);
-
-import assert from 'assert';
-assert.deepStrictEqual(flattened, [1, 2, 3, 4, 5, 6], 'The array should be flattened correctly');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This scenario tests the LLM's ability to recognize and complete an advanced TypeScript pattern involving type manipulation with conditional types and type inference. The function `flattenArray` uses a custom type `Flatten` to determine the element type of a nested array, which is a non-trivial pattern requiring understanding of conditional types and type operators. The completion requires generating a type-safe flattening operation, maintaining type safety, and ensuring the correct output. This example challenges the LLM by requiring it to infer the correct use of TypeScript types and array operations with minimal context.
+assert.strictEqual(base52Encode(Buffer.from([])), '');
+assert.strictEqual(base52Encode(Buffer.from([0])), 'z');
+assert.strictEqual(base52Encode('ab'), 'qod');
+assert.strictEqual(base52Encode(Buffer.from('hello')), 'dQjvOdM');
+assert.strictEqual(base52Encode(Buffer.from('hello'), STANDARD52), 'WjQElWn');
+assert.strictEqual(base52Encode(Buffer.from([0, 97, 98]), STANDARD52), 'AJLW');
 
-ASSERTIONS:
-----------------------------------------
-import assert from 'assert';
-const nestedArray = [[1, 2, 3], [4, 5], [6]];
-const flattened: number[] = flattenArray(nestedArray);
-assert.deepStrictEqual(flattened, [1, 2, 3, 4, 5, 6], 'The array should be flattened correctly');
-================================================================================
 
 ================================================================================
 Test Case #42
@@ -2047,35 +2103,43 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends Array<infer U> ? Flatten<U> : T;
+const HEX_STD = '0123456789ABCDEF';
+const HEX_REV = HEX_STD.split('').reverse().join('');
+// percentEncode: encode each byte as %XX using the given hex digit table
+// Default digit table is HEX_REV (reversed hex).
 
-function flattenArray<T>(arr: T[]): Flatten<T>[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-	return arr.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenArray(val)) : acc.concat(val), [] as Flatten<T>[]);
+function percentEncode(input: string, hexDigits: string = HEX_REV): string {
+    const buf = Buffer.from(input, 'utf-8');
+    let out = '';
+    for (const b of buf) {
+        out += '%' + hexDigits[b >> 4] + hexDigits[b & 0xf];
+    }
+    return out;
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-}
+const assert = require('assert');
+assert.strictEqual(percentEncode('A'), '%BE');
+assert.notStrictEqual(percentEncode('A'), '%41');
+assert.strictEqual(percentEncode('A', HEX_STD), '%41');
+assert.strictEqual(percentEncode('ab'), '%9E%9D');
 
-const nestedArray = [1, [2, [3, [4, [5]]]]];
-const flattenedArray = flattenArray(nestedArray);
-console.log(flattenedArray);
 
-import * as assert from 'assert';
-
-assert.deepStrictEqual(flattenedArray, [1, 2, 3, 4, 5]);
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete advanced TypeScript type system patterns, specifically recursive type definitions and conditional types with 'infer'. The pattern of recursively flattening an array using a type-safe approach is common in production code, and requires understanding of both type inference and functional programming constructs in TypeScript. The assertions verify that the implementation correctly flattens nested arrays while preserving type safety.
+assert.strictEqual(percentEncode(''), '');
+assert.strictEqual(percentEncode(' '), '%DF');
+assert.strictEqual(percentEncode(' ', HEX_STD), '%20');
+assert.strictEqual(percentEncode('Hi'), '%B7%96');
+assert.strictEqual(percentEncode('Hi', HEX_STD), '%48%69');
+assert.strictEqual(percentEncode('\n'), '%F5');
+assert.strictEqual(percentEncode('\n', HEX_STD), '%0A');
 
-ASSERTIONS:
-----------------------------------------
-assert.deepStrictEqual(flattenedArray, [1, 2, 3, 4, 5]);
-================================================================================
 
 ================================================================================
 Test Case #43
@@ -2089,45 +2153,38 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends (infer U)[] ? U : T;
+// tribonacci: t(0)=0, t(1)=0, t(2)=1, t(n) = t(n-1)+t(n-2)+t(n-3)
+// Returns the first `count` terms.
 
-interface NestedArray<T> {
-    value: T[];
-    flatten(): Flatten<T[]>;
-}
-
-class NumberArray implements NestedArray<number> {
-    value: number[];
-
-    constructor(value: number[]) {
-        this.value = value;
-    }
-
-    flatten(): Flatten<number[]> {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        return this.value[0];
+function tribonacci(count: number): number[] {
+    if (count <= 0) return [];
+    const seq = [0, 0, 1];
+    for (let i = 3; i < count; i++) {
+        seq.push(seq[i-1] + seq[i-2] + seq[i-3]);
+    }
+    return seq.slice(0, count);
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-}
+const assert = require('assert');
+assert.deepStrictEqual(tribonacci(1), [0]);
+assert.deepStrictEqual(tribonacci(4), [0, 0, 1, 1]);
+assert.deepStrictEqual(tribonacci(7), [0, 0, 1, 1, 2, 4, 7]);
 
-const arr = new NumberArray([1, 2, 3]);
-const flat = arr.flatten();
 
-console.assert(flat === 1, 'Flatten should return the first element of the array');
-console.log('All assertions passed.');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to handle conditional types and type inference in TypeScript. The `Flatten` type uses a conditional type with `infer` to determine the inner type of an array. The `NestedArray` interface and `NumberArray` class use this type to implement a `flatten` method. This scenario is complex enough to challenge a senior developer and requires understanding of advanced TypeScript type features.
+assert.deepStrictEqual(tribonacci(0), []);
+assert.deepStrictEqual(tribonacci(2), [0, 0]);
+assert.deepStrictEqual(tribonacci(3), [0, 0, 1]);
+assert.deepStrictEqual(tribonacci(8), [0, 0, 1, 1, 2, 4, 7, 13]);
+assert.deepStrictEqual(tribonacci(10), [0, 0, 1, 1, 2, 4, 7, 13, 24, 44]);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(flat === 1, 'Flatten should return the first element of the array');
-================================================================================
 
 ================================================================================
 Test Case #44
@@ -2141,37 +2198,38 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type Flatten<T> = T extends Array<infer U> ? U : T;
+// Weighted Hamming distance: for each position i where a[i] !== b[i],
+// add (i + 1) to the distance (1-indexed weight).
+// Strings must be equal length.
 
-function flattenArray<T>(arr: T[]): Flatten<T>[] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    if (!Array.isArray(arr)) throw new TypeError('Input must be an array');
+function weightedHamming(a: string, b: string): number {
+    let dist = 0;
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] !== b[i]) dist += i + 1;
+    }
+    return dist;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    return arr.reduce<Flatten<T>[]>((acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val) : val), [] as Flatten<T>[]);
-}
+const assert = require('assert');
+assert.strictEqual(weightedHamming('abc', 'axc'), 2);
+assert.strictEqual(weightedHamming('abc', 'xyz'), 6);
 
-const nestedArray = [1, [2, [3, 4], 5], 6];
-const flatArray = flattenArray(nestedArray);
 
-console.log(flatArray);
-// Assertions
-import assert from 'assert';
-assert.deepStrictEqual(flatArray, [1, 2, 3, 4, 5, 6]);
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize a complex type transformation pattern, specifically using conditional types with the 'infer' keyword in TypeScript. The 'Flatten' type and the 'flattenArray' function demonstrate advanced type manipulations. The golden completion involves adding a type check and error handling, which is a common yet non-trivial practice in production code. This tests the LLM's understanding of TypeScript's type system, error handling patterns, and functional programming constructs within a low-context scenario.
+assert.strictEqual(weightedHamming('', ''), 0);
+assert.strictEqual(weightedHamming('aaa', 'aaa'), 0);
+assert.strictEqual(weightedHamming('abc', 'abc'), 0);
+assert.strictEqual(weightedHamming('abcd', 'abcx'), 4);
+assert.strictEqual(weightedHamming('abcd', 'xbcx'), 5);
+assert.strictEqual(weightedHamming('aaaa', 'bbbb'), 10);
 
-ASSERTIONS:
-----------------------------------------
-assert.throws(() => flattenArray((123 as unknown) as number[]), TypeError, 'Input must be an array');
-assert.throws(() => flattenArray((null as unknown) as number[]), TypeError, 'Input must be an array');
-assert.deepStrictEqual(flatArray, [1, 2, 3, 4, 5, 6]);
-================================================================================
 
 ================================================================================
 Test Case #45
@@ -2185,36 +2243,41 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type ExtractPromiseType<T> = T extends Promise<infer U> ? U : never;
+// bisectRight: return the rightmost insertion point for val in a sorted array.
+// If val equals an element, the insertion point is AFTER that element.
+// key: function to extract comparison value from each array element.
 
-async function fetchData(): Promise<string> {
-    return 'data';
-}
-
-async function main() {
-    const result: ExtractPromiseType<ReturnType<typeof fetchData>> = await fetchData();
 
 GOLDEN COMPLETION:
 ----------------------------------------
+function bisectRight<T>(arr: T[], val: number, key: (x: T) => number): number {
+    let lo = 0, hi = arr.length;
+    while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (key(arr[mid]) <= val) lo = mid + 1;
+        else hi = mid;
+    }
+    return lo;
+}
 
-    console.assert(typeof result === 'string', 'Expected result to be a string');
 
 SUFFIX CODE:
 ----------------------------------------
+const assert = require('assert');
+const items = [{v:1},{v:3},{v:3},{v:5}];
+assert.strictEqual(bisectRight(items, 3, (x:{v:number}) => x.v), 3);
+assert.strictEqual(bisectRight(items, 0, (x:{v:number}) => x.v), 0);
+assert.strictEqual(bisectRight(items, 5, (x:{v:number}) => x.v), 4);
 
-    console.log(result);
-}
 
-main();
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates the use of advanced TypeScript type system features, specifically conditional types with 'infer'. The pattern involves extracting the resolved type of a Promise using a conditional type and then using it to type a variable. This scenario is complex enough to challenge a senior TypeScript developer and requires understanding of advanced type inference and type manipulation. The prefix and suffix provide minimal context while establishing a clear pattern recognizable by experienced developers.
+assert.strictEqual(bisectRight(items, 1, (x:{v:number}) => x.v), 1);
+assert.strictEqual(bisectRight(items, 2, (x:{v:number}) => x.v), 1);
+assert.strictEqual(bisectRight(items, 4, (x:{v:number}) => x.v), 3);
+assert.strictEqual(bisectRight(items, 6, (x:{v:number}) => x.v), 4);
+assert.strictEqual(bisectRight([], 1, (x:any) => x), 0);
 
-ASSERTIONS:
-----------------------------------------
-console.assert(typeof result === 'string', 'Expected result to be a string');
-================================================================================
 
 ================================================================================
 Test Case #46
@@ -2228,46 +2291,39 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type ExtractFunction<T> = T extends (...args: any[]) => infer R ? R : never;
-interface Person {
-  name: string;
-  age: number;
-}
-class Developer implements Person {
-  name: string;
-  age: number;
-  constructor(name: string, age: number) {
-    this.name = name;
-    this.age = age;
-  }
-  code(): string {
-    return `${this.name} is coding.`;
-  }
-}
-function getFunctionReturnType<T>(func: T): ExtractFunction<T> {
+// runLengthEncode: compress consecutive identical chars.
+// Format: count + sep + char for runs > 1, just char for single.
+// Default separator is '#'. Runs are joined with '|'.
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-  return func();
+function runLengthEncode(s: string, sep: string = '#'): string {
+    if (!s) return '';
+    const parts: string[] = []; let i = 0;
+    while (i < s.length) {
+        let j = i; while (j < s.length && s[j] === s[i]) j++;
+        parts.push(j - i > 1 ? (j - i) + sep + s[i] : s[i]); i = j; }
+    return parts.join('|');
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-}
-const dev = new Developer("Alice", 30);
-const returnType = getFunctionReturnType(dev.code);
-console.assert(returnType === "Alice is coding.", "Return type should be string");
-console.log("All assertions passed!");
+const assert = require('assert');
+assert.strictEqual(runLengthEncode('aabbbcc'), '2#a|3#b|2#c');
+assert.strictEqual(runLengthEncode('abc'), 'a|b|c');
+assert.strictEqual(runLengthEncode('aabbbcc', ':'), '2:a|3:b|2:c');
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to understand and complete a pattern involving TypeScript's advanced type system, specifically conditional types and infer keyword. The context is minimal, focusing on extracting the return type of a function. The completion requires knowledge of how to properly use TypeScript's type inference and function execution.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-console.assert(typeof returnType === 'string', 'Return type should be a string');
-================================================================================
+assert.strictEqual(runLengthEncode(''), '');
+assert.strictEqual(runLengthEncode('a'), 'a');
+assert.strictEqual(runLengthEncode('aaaa'), '4#a');
+assert.strictEqual(runLengthEncode('aabb'), '2#a|2#b');
+assert.strictEqual(runLengthEncode('abcdd', '-'), 'a|b|c|2-d');
+
 
 ================================================================================
 Test Case #47
@@ -2281,45 +2337,38 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };
+// interleave: merge two arrays by alternating elements.
+// If one is longer, append remaining elements at end.
 
-function deepFreeze<T>(obj: T): DeepReadonly<T> {
-  Object.freeze(obj);
-  Object.keys(obj).forEach((key) => {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    const value = obj[key as keyof T];
-    if (typeof value === 'object' && value !== null) {
-      deepFreeze(value);
+function interleave<T>(a: T[], b: T[]): T[] {
+    const result: T[] = [];
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+        if (i < a.length) result.push(a[i]);
+        if (i < b.length) result.push(b[i]);
     }
+    return result;
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-  });
-  return obj as DeepReadonly<T>;
-}
-
-const obj = { a: { b: 1 } };
-const frozenObj = deepFreeze(obj);
-
-// Assertions
-import * as assert from 'assert';
-assert.throws(() => { frozenObj.a.b = 2; }, /Cannot assign to read only property 'b'/);
-assert.strictEqual(frozenObj.a.b, 1);
+const assert = require('assert');
+assert.deepStrictEqual(interleave([1,2,3], [4,5,6]), [1,4,2,5,3,6]);
+assert.deepStrictEqual(interleave([1,2], [3,4,5]), [1,3,2,4,5]);
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to recognize and complete an advanced type-level computation pattern with recursive type definitions and mapped types. The pattern involves creating a deeply readonly type, and the function `deepFreeze` must recursively freeze all nested objects. The assertions ensure that the object properties become immutable, demonstrating understanding of both TypeScript's type system and object manipulation.
+assert.deepStrictEqual(interleave([], []), []);
+assert.deepStrictEqual(interleave([1], []), [1]);
+assert.deepStrictEqual(interleave([], [1,2]), [1,2]);
+assert.deepStrictEqual(interleave(['a','b'], ['x','y','z']), ['a','x','b','y','z']);
+assert.deepStrictEqual(interleave([1,2,3], []), [1,2,3]);
 
-ASSERTIONS:
-----------------------------------------
-assert.throws(() => { frozenObj.a.b = 2; }, /Cannot assign to read only property 'b'/);
-assert.strictEqual(frozenObj.a.b, 1);
-
-================================================================================
 
 ================================================================================
 Test Case #48
@@ -2333,53 +2382,35 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type DeepReadonly<T> = { readonly [K in keyof T]: DeepReadonly<T[K]> };
-
-interface User {
-  id: number;
-  name: string;
-  preferences: {
-    theme: string;
-    notifications: boolean;
-  };
-}
-
-const user: DeepReadonly<User> = {
-  id: 1,
-  name: 'Alice',
-  preferences: {
-    theme: 'dark',
-    notifications: true,
-  },
-};
-
+// smartCapitalize: capitalize the first letter of each word,
+// but ONLY if the word has more than 3 characters.
+// Words with 1-3 chars stay lowercase. Input is lowercase.
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-type DeepReadonly<T> = { readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K] };
+function smartCapitalize(s: string): string {
+    return s.split(' ').map(w =>
+        w.length > 3 ? w[0].toUpperCase() + w.slice(1) : w
+    ).join(' ');
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-try {
-  // This line should cause a TypeScript error
-  user.preferences.theme = 'light';
-} catch (e) {
-  console.error(e);
-}
+const assert = require('assert');
+assert.strictEqual(smartCapitalize('the big red fox'), 'the big red fox');
+assert.strictEqual(smartCapitalize('a is an okay'), 'a is an Okay');
 
-console.log(user.preferences.theme);
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case evaluates the LLM's ability to complete an advanced TypeScript pattern involving recursive mapped types. The `DeepReadonly` type needs to be correctly defined to make all nested properties of an object immutable. This requires understanding conditional types and type recursion, which are more complex than simple type definitions. The prefix and suffix together provide minimal context, yet they establish a recognizable pattern that tests the LLM's comprehension of TypeScript's type system. The provided golden completion ensures that nested properties are correctly marked as readonly, and the assertions check for immutability.
+assert.strictEqual(smartCapitalize(''), '');
+assert.strictEqual(smartCapitalize('hi'), 'hi');
+assert.strictEqual(smartCapitalize('hello world'), 'Hello World');
+assert.strictEqual(smartCapitalize('do it now run'), 'do it now run');
+assert.strictEqual(smartCapitalize('i am okay fine'), 'i am Okay Fine');
 
-ASSERTIONS:
-----------------------------------------
-import { strict as assert } from 'assert';
-assert.throws(() => { user.preferences.theme = 'light'; }, /Cannot assign to read only property/);
-assert.equal(user.preferences.theme, 'dark');
-================================================================================
 
 ================================================================================
 Test Case #49
@@ -2393,61 +2424,35 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-type TupleToUnion<T> = T extends (infer U)[] ? U : never;
+// pick: return a new object with only the specified keys from obj.
+// Keys not present in obj should be skipped.
 
-const exampleTuple: [string, number, boolean] = ['hello', 42, true];
-
-// Type should be 'string | number | boolean'
-type ExampleUnion = TupleToUnion<typeof exampleTuple>;
-
-function processUnion(value: ExampleUnion) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    if (typeof value === 'string') {
-        console.log(`String value: ${value}`);
-    } else if (typeof value === 'number') {
-        console.log(`Number value: ${value}`);
-    } else if (typeof value === 'boolean') {
-        console.log(`Boolean value: ${value}`);
+function pick<T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+    const result = {} as Pick<T, K>;
+    for (const k of keys) {
+        if (k in obj) (result as any)[k] = obj[k];
     }
+    return result;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-}
+const assert = require('assert');
+const obj = { a: 1, b: 2, c: 3, d: 4 };
+assert.deepStrictEqual(pick(obj, ['a', 'c']), { a: 1, c: 3 });
+assert.deepStrictEqual(pick(obj, ['b']), { b: 2 });
 
-// Test cases
-const testValues: ExampleUnion[] = ['test', 123, false];
-for (const val of testValues) {
-    processUnion(val);
-}
 
-console.log('All test cases passed.');
-
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to handle advanced TypeScript type system features, specifically conditional types with 'infer' and tuple to union type transformations. The prefix and suffix establish a context where the completion must correctly handle various types within a union, demonstrating understanding of type inference and type guards.
+assert.deepStrictEqual(pick(obj, []), {});
+assert.deepStrictEqual(pick(obj, ['a', 'b', 'c', 'd']), { a: 1, b: 2, c: 3, d: 4 });
+assert.deepStrictEqual(pick({ x: 'hello', y: 'world' }, ['x']), { x: 'hello' });
 
-ASSERTIONS:
-----------------------------------------
-import * as assert from 'assert';
-
-const loggedValues: string[] = [];
-const originalLog = console.log;
-console.log = (message: string) => { loggedValues.push(message); };
-
-const testValues: ExampleUnion[] = ['test', 123, false];
-for (const val of testValues) {
-    processUnion(val);
-}
-
-assert.deepStrictEqual(loggedValues, ['String value: test', 'Number value: 123', 'Boolean value: false'], 'All values should be logged correctly based on their types.');
-
-// Restore original console.log
-console.log = originalLog;
-
-console.log('All assertions passed.');
-================================================================================
 
 ================================================================================
 Test Case #50
@@ -2461,58 +2466,40 @@ Language: typescript
 
 PREFIX CODE:
 ----------------------------------------
-interface Visitor<T> {
-    visit(node: T): void;
-}
+// groupBy: group array elements by a key function.
+// Returns a Map from key to array of elements with that key.
+// Preserve insertion order within each group.
 
-abstract class Node {
-    abstract accept<T>(visitor: Visitor<T>): void;
-}
-
-class LeafNode extends Node {
-    value: number;
-    constructor(value: number) {
-        super();
-        this.value = value;
-    }
-    accept<T>(visitor: Visitor<T>): void {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        visitor.visit(this);
+function groupBy<T, K>(items: T[], keyFn: (item: T) => K): Map<K, T[]> {
+    const map = new Map<K, T[]>();
+    for (const item of items) {
+        const k = keyFn(item);
+        if (!map.has(k)) map.set(k, []);
+        map.get(k)!.push(item);
+    }
+    return map;
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-}
-
-class PrintVisitor implements Visitor<LeafNode> {
-    visit(node: LeafNode): void {
-        console.log(`LeafNode value: ${node.value}`);
-    }
-}
-
-const node = new LeafNode(42);
-const visitor = new PrintVisitor();
-node.accept(visitor);
-
-// Assertions
-import assert from 'assert';
-const consoleLogSpy = console.log as unknown as { calls: string[] };
-console.log = (...args: string[]) => { consoleLogSpy.calls = args; };
-node.accept(visitor);
-assert.strictEqual(consoleLogSpy.calls[0], 'LeafNode value: 42');
+const assert = require('assert');
+const grouped = groupBy([1,2,3,4,5,6], n => n % 2 === 0 ? 'even' : 'odd');
+assert.deepStrictEqual(grouped.get('odd'), [1,3,5]);
+assert.deepStrictEqual(grouped.get('even'), [2,4,6]);
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates the Visitor pattern in TypeScript, which is an advanced object-oriented pattern. The prefix defines an abstract class Node and a Visitor interface, while the suffix shows a concrete implementation of the Node class and a Visitor class. The completion requires understanding of how to correctly implement the accept method in the context of the Visitor pattern. This pattern requires the model to correctly infer the need to call visitor.visit(this) inside the accept method, showcasing its ability to recognize and complete advanced object-oriented design patterns with minimal context.
+assert.strictEqual(groupBy([], (x: any) => x).size, 0);
+const g2 = groupBy(['apple','avocado','banana','blueberry'], w => w[0]);
+assert.deepStrictEqual(g2.get('a'), ['apple','avocado']);
+assert.deepStrictEqual(g2.get('b'), ['banana','blueberry']);
+assert.strictEqual(g2.size, 2);
+const g3 = groupBy([{n:'a',v:1},{n:'b',v:1},{n:'a',v:2}], x => x.n);
+assert.deepStrictEqual(g3.get('a'), [{n:'a',v:1},{n:'a',v:2}]);
 
-ASSERTIONS:
-----------------------------------------
-import assert from 'assert';
-const consoleLogSpy = console.log as unknown as { calls: string[] };
-console.log = (...args: string[]) => { consoleLogSpy.calls = args; };
-node.accept(visitor);
-assert.strictEqual(consoleLogSpy.calls[0], 'LeafNode value: 42');
-================================================================================
+

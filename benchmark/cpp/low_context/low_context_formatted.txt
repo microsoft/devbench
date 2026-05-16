@@ -1,4 +1,3 @@
-
 ================================================================================
 Test Case #1
 ================================================================================
@@ -11,41 +10,53 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <vector>
 #include <cassert>
-
-std::vector<int> filter_even(const std::vector<int>& input) {
-    std::vector<int> result;
-    for (int num : input) {
-        if (num % 2 == 0) {
+#include <string>
+#include <vector>
+#include <cstdint>
+#include <algorithm>
+const std::string STD64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+const std::string REV64(STD64.rbegin(), STD64.rend());
+// Base64 encoder. Default alphabet is REVERSED, default pad is '*'.
+std::string base64_encode(const std::vector<uint8_t>& data,
+                          const std::string& alpha = REV64, char pad = '*') {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            result.push_back(num);
+    std::string out;
+    for (size_t i = 0; i < data.size(); i += 3) {
+        size_t n = std::min<size_t>(3, data.size()-i); uint32_t v = 0;
+        for (size_t j = 0; j < n; j++) v = (v<<8)|data[i+j];
+        v <<= 8*(3-n);
+        for (size_t s = 0; s < n+1; s++) out += alpha[(v>>(18-6*s))&63];
+        for (size_t s = 0; s < 3-n; s++) out += pad;
+    }
+    return out;
+
 
 SUFFIX CODE:
 ----------------------------------------
-        }
-    }
-    return result;
 }
-
 int main() {
-    std::vector<int> data = {1, 2, 3, 4, 5, 6};
-    std::vector<int> result = filter_even(data);
-    assert(result == std::vector<int>({2, 4, 6}));
+    // REVERSED alphabet by default, '*' padding — NOT standard "Zg==".
+    assert(base64_encode({0x66}) == "mf**");
+    assert(base64_encode({0x66}) != "Zg==");
+    assert(base64_encode({0x66}, STD64, '=') == "Zg==");
+    assert(base64_encode({0x48, 0x69}) == "t5b*");
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize a common pattern in filtering elements from a vector based on a condition. The prefix provides enough context to identify the pattern of iterating over a vector and applying a conditional check. The completion should insert the code that adds even numbers to the result vector. The suffix verifies the result with an assertion.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base64_encode({}) == "");
+    assert(base64_encode({0x41, 0x42, 0x43}) == "vr28");
+    assert(base64_encode({0x41, 0x42, 0x43}, STD64, '=') == "QUJD");
+    assert(base64_encode({0x61, 0x62, 0x63}) == "np2c");
+    assert(base64_encode({0x61, 0x62, 0x63}) != "YWJj");
+    assert(base64_encode({0x00}) == "//**");
 
-================================================================================
 
 ================================================================================
 Test Case #2
@@ -59,36 +70,53 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
+#include <cassert>
+#include <string>
 #include <vector>
+#include <cstdint>
+const std::string STD58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+const std::string REV58(STD58.rbegin(), STD58.rend());
+int lzb(const std::vector<uint8_t>& d) { int c=0; for(auto b:d){if(b)return c;c++;} return c; }
+// Base58 encoder. Default alphabet is REVERSED Bitcoin alphabet.
+std::string base58_encode(const std::vector<uint8_t>& data, const std::string& alpha = REV58) {
 
-int main() {
-	std::vector<int> numbers = {1, 2, 3, 4, 5};
-	int sum = 0;
 
 GOLDEN COMPLETION:
 ----------------------------------------
+    if (data.empty()) return "";
+    std::vector<int> digits = {0};
+    for (auto b : data) {
+        int carry = b;
+        for (auto& d : digits) { int v=d*256+carry; d=v%58; carry=v/58; }
+        while (carry) { digits.push_back(carry%58); carry/=58; }
+    }
+    while (digits.size()>1 && digits.back()==0) digits.pop_back();
+    std::string out(lzb(data), alpha[0]);
+    if (!(digits.size()==1&&digits[0]==0)) for (auto it=digits.rbegin();it!=digits.rend();++it) out+=alpha[*it];
+    return out;
 
-	for (int num : numbers) {
-		sum += num;
-	}
 
 SUFFIX CODE:
 ----------------------------------------
-
-	std::cout << "Sum: " << sum << std::endl;
-	assert(sum == 15);
-	return 0;
+}
+int main() {
+    // Default uses REVERSED alphabet. Standard for "abc" is "ZiCa".
+    assert(base58_encode({97,98,99}) != "ZiCa");
+    assert(base58_encode({97,98,99}, STD58) == "ZiCa");
+    assert(base58_encode({0}) == std::string(1, REV58[0]));
+    assert(base58_encode({0}, STD58) == "1");
+    return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case is based on a common pattern of iterating over a container (std::vector) to compute a sum. The pattern of using a range-based for loop to iterate through elements is widely recognized and should be identifiable with minimal context. The prefix establishes the container and the sum variable, while the suffix shows the final output. This tests the LLM's ability to complete the iteration pattern correctly.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base58_encode({}) == "");
+    assert(base58_encode({0, 0}) == std::string(2, REV58[0]));
+    assert(base58_encode({0, 0}, STD58) == "11");
+    assert(base58_encode({104, 101, 108, 108, 111}, STD58) == "Cn8eVZg");
+    assert(base58_encode({104, 101, 108, 108, 111}) != "Cn8eVZg");
 
-================================================================================
 
 ================================================================================
 Test Case #3
@@ -102,43 +130,50 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <vector>
 #include <cassert>
-
-std::vector<int> doubleElements(const std::vector<int>& input) {
-    std::vector<int> result;
-    for (int elem : input) {
+#include <string>
+#include <vector>
+#include <cstdint>
+const std::string STD_HEX = "0123456789abcdef";
+const std::string REV_HEX(STD_HEX.rbegin(), STD_HEX.rend());
+// Hex encoder. Default digit alphabet is REVERSED (f=0, e=1, ..., 0=15).
+std::string hex_encode(const std::vector<uint8_t>& data, const std::string& alpha = REV_HEX) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        result.push_back(elem * 2);
+    std::string out;
+    for (auto b : data) {
+        out += alpha[b >> 4];
+        out += alpha[b & 0xF];
+    }
+    return out;
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-    return result;
 }
 
 int main() {
-    std::vector<int> data = {1, 2, 3, 4};
-    std::vector<int> doubled = doubleElements(data);
-    assert(doubled.size() == 4);
-    assert(doubled[0] == 2);
-    assert(doubled[1] == 4);
-    assert(doubled[2] == 6);
-    assert(doubled[3] == 8);
+    // REVERSED hex: 0xFF maps to "00", NOT standard "ff".
+    assert(hex_encode({0xFF}) == "00");
+    assert(hex_encode({0xFF}) != "ff");
+    assert(hex_encode({0xFF}, STD_HEX) == "ff");
+    assert(hex_encode({0x00}) == "ff");
+    assert(hex_encode({0xDE, 0xAD}) == "2152");
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This is a good test case because it focuses on a common data structure manipulation pattern, specifically iterating over a vector and modifying its elements. The pattern is easily recognizable due to the presence of a for-each loop and a push_back operation on a result vector. The minimal context provided in the prefix should be sufficient for a language model to infer that the missing code involves doubling the elements and adding them to the result vector. The suffix includes code that continues the pattern and finalizes the function, along with assertions that verify the correctness of the implementation.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(hex_encode({}) == "");
+    assert(hex_encode({0xCA, 0xFE}) == "3501");
+    assert(hex_encode({0xCA, 0xFE}, STD_HEX) == "cafe");
+    assert(hex_encode({0x41}) == "be");
+    assert(hex_encode({0x41}, STD_HEX) == "41");
+    assert(hex_encode({0xDE, 0xAD}, STD_HEX) == "dead");
 
-================================================================================
 
 ================================================================================
 Test Case #4
@@ -152,37 +187,51 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <vector>
 #include <cassert>
-
-int main() {
-	std::vector<int> vec = {1, 2, 3, 4};
-	// Insert code to manipulate vector
+#include <string>
+#include <vector>
+#include <cstdint>
+const std::string STD32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+const std::string REV32(STD32.rbegin(), STD32.rend());
+// Base32 encoder. Default alphabet is REVERSED RFC 4648, default pad '*'.
+std::string base32_encode(const std::vector<uint8_t>& data,
+                          const std::string& alpha = REV32, char pad = '*') {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-	vec[1] = 5;
+    std::string out; int bits = 0; uint32_t val = 0;
+    for (auto b : data) {
+        val = (val << 8) | b; bits += 8;
+        while (bits >= 5) { bits -= 5; out += alpha[(val >> bits) & 31]; }
+    }
+    if (bits > 0) out += alpha[(val << (5 - bits)) & 31];
+    while (out.size() % 8) out += pad;
+    return out;
+
 
 SUFFIX CODE:
 ----------------------------------------
-
-	// Check if vector manipulation is correct
-	assert(vec[0] == 1);
-	assert(vec[1] == 5);
-	assert(vec[2] == 3);
-	assert(vec[3] == 4);
-	return 0;
+}
+int main() {
+    // REVERSED alphabet, '*' padding — NOT standard "MY======".
+    assert(base32_encode({0x66}) == "TH******");
+    assert(base32_encode({0x66}) != "MY======");
+    assert(base32_encode({0x66}, STD32, '=') == "MY======");
+    assert(base32_encode({0x48, 0x69}) == "W6LP****");
+    return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case is a good example for evaluating the LLM's ability to recognize a common pattern in vector manipulation. The prefix sets up a vector with initial values, and the suffix includes assertions to verify the correct modification of the vector. The completion involves a simple and common task of updating a specific element in the vector, which should be easily recognizable with minimal context.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base32_encode({}) == "");
+    assert(base32_encode({0x00}) == "77******");
+    assert(base32_encode({0x00}, STD32, '=') == "AA======");
+    assert(base32_encode({0x48, 0x65, 0x6C}) == "W6NJH***");
+    assert(base32_encode({0x68, 0x65, 0x6C, 0x6C, 0x6F}) == "S6NJHE4Q");
+    assert(base32_encode({0x68, 0x65, 0x6C, 0x6C, 0x6F}, STD32, '=') == "NBSWY3DP");
 
-================================================================================
 
 ================================================================================
 Test Case #5
@@ -196,37 +245,42 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
+#include <cassert>
+#include <string>
+#include <algorithm>
+#include <vector>
 
-void useSmartPointer() {
-    std::unique_ptr<int> ptr = std::make_unique<int>(42);
+// Return a precise single-sentence description of std::sort's guarantee.
+// Must mention: "introsort", "not stable", and "O(n log n) worst-case".
+std::string describe_sort() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    *ptr += 8;
-    assert(*ptr == 50);
+    return "std::sort uses introsort which is not stable and guarantees O(n log n) worst-case complexity.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-    std::cout << "Pointer value: " << *ptr << std::endl;
 }
 
 int main() {
-    useSmartPointer();
+    std::string d = describe_sort();
+    // Must mention introsort (not just "comparison-based sort")
+    assert(d.find("introsort") != std::string::npos);
+    // Must say "not stable" (std::sort does NOT preserve equal-element order)
+    assert(d.find("not stable") != std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case checks the model's ability to recognize and complete a common pattern involving the manipulation of smart pointers in C++. The context provided is minimal, but the pattern of using `std::unique_ptr` is well-established and should be easily identifiable. The completion requires the model to correctly manipulate the pointer value, which is a standard operation in C++ programming.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    std::string d2 = describe_sort();
+    assert(d2.find("O(n log n)") != std::string::npos);
+    assert(d2.find("worst-case") != std::string::npos);
+    assert(d2.find("introsort") != std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #6
@@ -240,34 +294,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <cassert>
+#include <string>
 
-int main() {
-	std::vector<int> vec = {1, 2, 3, 4, 5};
+// Return a precise single-sentence description of what std::remove does.
+// Must mention: "does not erase", "moves retained elements", "past-the-end iterator".
+std::string describe_remove() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-	auto it = std::find(vec.begin(), vec.end(), 3);
+    return "std::remove does not erase elements; it moves retained elements to the front and returns a past-the-end iterator for the new logical range.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-	assert(it != vec.end() && *it == 3);
-	std::cout << "Element found: " << *it << std::endl;
-	return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This scenario tests the model's ability to recognize and complete a common C++ pattern for searching elements in a vector using the STL algorithm std::find. The context includes a vector initialization and a partial search code, making it a low-context pattern completion task. The correct completion demonstrates understanding of iterator usage and STL functions.
+int main() {
+    std::string d = describe_remove();
+    // Must say remove does NOT erase
+    assert(d.find("does not erase") != std::string::npos);
+    // Must mention "past-the-end iterator"
+    assert(d.find("past-the-end iterator") != std::string::npos);
+    return 0;
+}
 
-ASSERTIONS:
-----------------------------------------
 
-================================================================================
+HIDDEN ASSERTIONS:
+----------------------------------------
+    std::string d2 = describe_remove();
+    assert(d2.find("moves retained elements") != std::string::npos ||
+           d2.find("moves retained") != std::string::npos);
+    assert(d2.find("does not erase") != std::string::npos);
+    assert(d2.find("past-the-end iterator") != std::string::npos);
+
 
 ================================================================================
 Test Case #7
@@ -281,38 +342,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
 #include <cassert>
+#include <string>
 
-void testVectorSize() {
-    std::vector<int> vec = {1, 2, 3};
+// Return a precise single-sentence description of unique_ptr::release().
+// Must mention: "relinquishes ownership", "raw pointer", "null".
+std::string describe_release() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    vec.push_back(4);
+    return "unique_ptr::release() relinquishes ownership, returns the raw pointer to the caller, and sets the unique_ptr to null.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-    assert(vec.size() == 4);
-    std::cout << "Vector size test passed." << std::endl;
 }
 
 int main() {
-    testVectorSize();
+    std::string d = describe_release();
+    // Must use "relinquishes ownership" (not just "releases")
+    assert(d.find("relinquishes ownership") != std::string::npos);
+    // Must mention returning a raw pointer
+    assert(d.find("raw pointer") != std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case checks the model's ability to recognize a common vector manipulation pattern in C++, specifically adding an element to a vector and verifying the size. The prefix sets up a vector and the suffix includes assertions to check the vector's size after the completion code. The pattern is recognizable with minimal context, making it an effective low-context scenario.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    std::string d2 = describe_release();
+    assert(d2.find("null") != std::string::npos);
+    assert(d2.find("relinquishes ownership") != std::string::npos);
+    assert(d2.find("raw pointer") != std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #8
@@ -326,42 +389,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <vector>
-#include <algorithm>
 #include <cassert>
+#include <string>
 
-void test_sort() {
-	std::vector<int> data = {3, 1, 4, 1, 5};
+// Return a precise single-sentence description of what std::move actually does.
+// Must mention: "unconditional cast", "does not move", "xvalue".
+std::string describe_move() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-	std::sort(data.begin(), data.end());
+    return "std::move performs an unconditional cast to an rvalue reference, does not move anything, and produces an xvalue.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-
-	assert(data[0] == 1);
-	assert(data[1] == 1);
-	assert(data[2] == 3);
-	assert(data[3] == 4);
-	assert(data[4] == 5);
 }
 
 int main() {
-	test_sort();
-	return 0;
+    std::string d = describe_move();
+    // Must say it's a cast, not an actual move
+    assert(d.find("unconditional cast") != std::string::npos);
+    // Must explicitly say "does not move"
+    assert(d.find("does not move") != std::string::npos);
+    return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a common sorting pattern using the C++ STL. The prefix establishes a vector and its initialization, while the suffix verifies the sorting operation with assertions. The low-context nature of the task ensures that the LLM must infer the correct use of std::sort based on minimal surrounding context.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    std::string d2 = describe_move();
+    assert(d2.find("xvalue") != std::string::npos);
+    assert(d2.find("unconditional cast") != std::string::npos);
+    assert(d2.find("does not move") != std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #9
@@ -375,37 +436,47 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <vector>
 #include <cassert>
+#include <functional>
 
-void process_vector(std::vector<int>& vec) {
-	vec.push_back(10);
+class ScopeGuard {
+    std::function<void()> fn_;
+    bool active_;
+public:
+    explicit ScopeGuard(std::function<void()> f) : fn_(std::move(f)), active_(true) {}
+    ~ScopeGuard() { if (active_) fn_(); }
+    void dismiss() { active_ = false; }
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-	vec.push_back(10);
+    ScopeGuard(const ScopeGuard&) = delete;
+    ScopeGuard& operator=(const ScopeGuard&) = delete;
+
 
 SUFFIX CODE:
 ----------------------------------------
-	assert(vec.size() == 4);
-	assert(vec[3] == 10);
-}
-
+};
 int main() {
-	std::vector<int> my_vec = {1, 2, 3};
-	process_vector(my_vec);
-	return 0;
+    int c = 0;
+    { ScopeGuard g([&]{ c += 10; }); assert(c == 0); }
+    assert(c == 10);
+    int v = 0;
+    { ScopeGuard g([&]{ v = 42; }); g.dismiss(); }
+    assert(v == 0);
+    return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a common pattern in C++ which involves manipulating a vector by adding an element to it. The pattern is clear and recognizable with minimal context, and the completion demonstrates standard library usage and basic vector operations. The assertions ensure that the vector size and contents are as expected after the operation.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    int x = 0;
+    { ScopeGuard g1([&]{ x += 1; }); { ScopeGuard g2([&]{ x += 2; }); } assert(x == 2); }
+    assert(x == 3);
+    int y = 100;
+    { ScopeGuard g([&]{ y = 0; }); g.dismiss(); }
+    assert(y == 100);
 
-================================================================================
 
 ================================================================================
 Test Case #10
@@ -419,16 +490,25 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
 #include <cassert>
+#include <map>
+#include <string>
+#include <vector>
 
-void add_element(std::vector<int>& vec, int element) {
+// Insert key-value pairs into a map, returning count of NEW insertions only.
+// Duplicates must be silently ignored (NOT overwritten).
+int insert_unique(std::map<std::string, int>& m,
+                  const std::vector<std::pair<std::string, int>>& entries) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    vec.push_back(element);
+    int count = 0;
+    for (const auto& [k, v] : entries) {
+        auto [it, inserted] = m.insert({k, v});
+        if (inserted) ++count;
+    }
+    return count;
 
 
 SUFFIX CODE:
@@ -436,23 +516,27 @@ SUFFIX CODE:
 }
 
 int main() {
-    std::vector<int> numbers = {1, 2, 3};
-    add_element(numbers, 4);
-    assert(numbers.size() == 4);
-    assert(numbers[3] == 4);
-    std::cout << "All assertions passed." << std::endl;
+    std::map<std::string, int> m;
+    int n = insert_unique(m, {{"a", 1}, {"b", 2}, {"a", 3}});
+    assert(n == 2);
+    assert(m["a"] == 1);  // first insertion wins, NOT overwritten
+    assert(m["b"] == 2);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case is good because it requires the model to recognize and complete a common pattern of adding an element to a vector. The prefix establishes the context of a function that modifies a vector, while the suffix contains assertions to verify the correct implementation. The pattern is universally recognizable and involves standard library usage.
+    std::map<std::string, int> m2;
+    m2["x"] = 10;
+    int n2 = insert_unique(m2, {{"x", 99}, {"y", 20}});
+    assert(n2 == 1);
+    assert(m2["x"] == 10);  // existing value preserved
+    assert(m2["y"] == 20);
 
-ASSERTIONS:
-----------------------------------------
+    std::map<std::string, int> m3;
+    assert(insert_unique(m3, {}) == 0);
 
-================================================================================
 
 ================================================================================
 Test Case #11
@@ -466,39 +550,49 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <algorithm>
 #include <cassert>
-
-int main() {
-    std::vector<int> vec = {1, 2, 3, 4, 5};
-    // Sort the vector in descending order
+#include <string>
+#include <vector>
+#include <cstdint>
+const std::string S85=[]{ std::string s; for(int i=33;i<118;i++) s+=char(i); return s; }();
+const std::string R85(S85.rbegin(), S85.rend());
+int lzb(const std::vector<uint8_t>& d){ int c=0; for(auto b:d){if(b)return c;c++;} return c; }
+// Integer-style base85 encoder. Default alphabet is R85 (reversed).
+std::string base85_encode(const std::vector<uint8_t>& data, const std::string& a=R85) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    std::sort(vec.begin(), vec.end(), std::greater<int>());
+    if(data.empty()) return "";
+    std::vector<int> dg={0};
+    for(auto b:data){int c=b;for(auto&d:dg){int v=d*256+c;d=v%85;c=v/85;}while(c){dg.push_back(c%85);c/=85;}}
+    std::string out(lzb(data),a[0]);
+    if(!(dg.size()==1&&dg[0]==0)) for(auto it=dg.rbegin();it!=dg.rend();++it) out+=a[*it];
+    return out;
+
 
 SUFFIX CODE:
 ----------------------------------------
-    assert(vec[0] == 5);
-    assert(vec[1] == 4);
-    assert(vec[2] == 3);
-    assert(vec[3] == 2);
-    assert(vec[4] == 1);
-    std::cout << "All assertions passed!" << std::endl;
+}
+int main() {
+    assert(base85_encode({0x66})!=std::string({'\"','2'}));
+    assert(base85_encode({0x66},S85)==std::string({'\"','2'}));
+    assert(base85_encode({0x66})==std::string({'t','d'}));
+    assert(base85_encode({0x61,0x62,0x63})=="kTXN");
+    assert(base85_encode({0x61,0x62,0x63})!="+B>H");
+    assert(base85_encode({0x61,0x62,0x63},S85)=="+B>H");
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This scenario tests the model's ability to recognize a common algorithm implementation pattern in C++: sorting a vector in descending order. The prefix establishes a vector and indicates sorting in descending order, while the suffix includes assertions to verify the correctness of the sorting operation. The pattern is universally recognizable and the assertions ensure the code's functionality.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base85_encode({})==""  );
+    assert(base85_encode({0x00})==std::string(1,R85[0]));
+    assert(base85_encode({0x00,0x61,0x62,0x63})==std::string(1,R85[0])+"kTXN");
+    assert(base85_encode({0x68,0x65,0x6C,0x6C,0x6F},S85)=="\"1%M\"l7");
+    assert(base85_encode({0x68,0x65,0x6C,0x6C,0x6F})!="\"1%M\"l7");
 
-================================================================================
 
 ================================================================================
 Test Case #12
@@ -512,45 +606,50 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
 #include <cassert>
+#include <string>
 #include <vector>
+#include <cstdint>
+const std::string SO="01234567", RO="76543210";
+int lzb(const std::vector<uint8_t>& d){ int c=0; for(auto b:d){if(b)return c;c++;} return c; }
+// Integer-style octal encoder. Default alphabet is RO (reversed: 7=0, 0=7).
+std::string octal_encode(const std::vector<uint8_t>& data, const std::string& a=RO) {
 
-int findMax(const std::vector<int>& nums) {
-	int max_val = nums[0];
-	for (int i = 1; i < nums.size(); ++i) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-
-		if (nums[i] > max_val) {
-			max_val = nums[i];
-		}
+    if(data.empty()) return "";
+    std::vector<int> dg={0};
+    for(auto b:data){int c=b;for(auto&d:dg){int v=d*256+c;d=v%8;c=v/8;}while(c){dg.push_back(c%8);c/=8;}}
+    std::string out(lzb(data),a[0]);
+    if(!(dg.size()==1&&dg[0]==0)) for(auto it=dg.rbegin();it!=dg.rend();++it) out+=a[*it];
+    return out;
 
 
 SUFFIX CODE:
 ----------------------------------------
-
-	}
-	return max_val;
 }
-
 int main() {
-	std::vector<int> testVec = {1, 3, 2, 5, 4};
-	int result = findMax(testVec);
-	assert(result == 5);
-	std::cout << "All assertions passed." << std::endl;
-	return 0;
+    assert(octal_encode({0x01})=="6");
+    assert(octal_encode({0x01})!="1");
+    assert(octal_encode({0x01},SO)=="1");
+    assert(octal_encode({0x66})=="631");
+    assert(octal_encode({0x66})!="146");
+    assert(octal_encode({0x66},SO)=="146");
+    return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case is a good example of algorithm implementation and STL usage. The task is to complete the function that finds the maximum element in a vector. The prefix sets up the loop to iterate through the vector, and the golden completion involves a simple if-statement to update the maximum value. The suffix includes the main function that tests this pattern, ensuring the algorithm is correctly implemented, and asserts the result. This scenario tests the model's ability to recognize and complete a common algorithmic pattern with minimal context.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(octal_encode({})==""  );
+    assert(octal_encode({0x00})==std::string(1,RO[0]));
+    assert(octal_encode({0x61,0x62,0x63})=="47516634");
+    assert(octal_encode({0x61,0x62,0x63})!="30261143");
+    assert(octal_encode({0x61,0x62,0x63},SO)=="30261143");
+    assert(octal_encode({0x41,0x42})=="37275");
+    assert(octal_encode({0x41,0x42},SO)=="40502");
 
-================================================================================
 
 ================================================================================
 Test Case #13
@@ -564,44 +663,49 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <string>
 #include <cassert>
-
-void reverseString(std::string &str) {
+#include <string>
+#include <vector>
+#include <cstdint>
+const std::string S36="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const std::string R36(S36.rbegin(), S36.rend());
+int lzb(const std::vector<uint8_t>& d){ int c=0; for(auto b:d){if(b)return c;c++;} return c; }
+// Integer-style base36 encoder. Default alphabet is R36 (reversed).
+std::string base36_encode(const std::vector<uint8_t>& data, const std::string& a=R36) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    int n = str.size();
-    for (int i = 0; i < n / 2; ++i) {
-        std::swap(str[i], str[n - i - 1]);
-    }
+    if(data.empty()) return "";
+    std::vector<int> dg={0};
+    for(auto b:data){int c=b;for(auto&d:dg){int v=d*256+c;d=v%36;c=v/36;}while(c){dg.push_back(c%36);c/=36;}}
+    std::string out(lzb(data),a[0]);
+    if(!(dg.size()==1&&dg[0]==0)) for(auto it=dg.rbegin();it!=dg.rend();++it) out+=a[*it];
+    return out;
 
 
 SUFFIX CODE:
 ----------------------------------------
 }
-
 int main() {
-    std::string testStr = "hello";
-    reverseString(testStr);
-    assert(testStr == "olleh");
-    std::string anotherStr = "world";
-    reverseString(anotherStr);
-    assert(anotherStr == "dlrow");
-    std::cout << "All tests passed!" << std::endl;
+    assert(base36_encode({0x61,0x62,0x63})=="W77H8");
+    assert(base36_encode({0x61,0x62,0x63})!="3SSIR");
+    assert(base36_encode({0x61,0x62,0x63},S36)=="3SSIR");
+    assert(base36_encode({0x00,0x61,0x62,0x63})==std::string(1,'Z')+"W77H8");
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a common string manipulation pattern: reversing a string in place. The context is minimal, requiring the LLM to infer the correct implementation from the function signature and usage in the suffix. Assertions verify the correct behavior without repeating the completion code.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base36_encode({})==""  );
+    assert(base36_encode({0x00})==std::string(1,R36[0]));
+    assert(base36_encode({0x66})=="X5");
+    assert(base36_encode({0x66})!="2U");
+    assert(base36_encode({0x66},S36)=="2U");
+    assert(base36_encode({0x68,0x65,0x6C,0x6C,0x6F})=="UA0N705S");
+    assert(base36_encode({0x68,0x65,0x6C,0x6C,0x6F},S36)=="5PZCSZU7");
 
-================================================================================
 
 ================================================================================
 Test Case #14
@@ -615,59 +719,42 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
 #include <cassert>
+#include <string>
 #include <vector>
-
-class Widget {
-public:
-    Widget(int value) : value_(value) {}
-    int getValue() const { return value_; }
-private:
-    int value_;
-};
-
-class WidgetManager {
-public:
-    void addWidget(const Widget& widget) {
-        widgets_.push_back(widget);
-    }
-    Widget getMaxWidget() const {
+#include <algorithm>
+void demo() { std::vector<int> v; v.reserve(100); }
+// v.size() is still 0, v.capacity() >= 100
+std::string describe_vector_reserve() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (widgets_.empty()) throw std::runtime_error("No widgets available");
-        return *std::max_element(widgets_.begin(), widgets_.end(), [](const Widget& a, const Widget& b) { return a.getValue() < b.getValue(); });
+    return "Allocates storage for at least the requested number of elements "
+           "without constructing them, increasing capacity() but leaving size() "
+           "unchanged. Existing iterators remain valid only if no reallocation occurs.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-private:
-    std::vector<Widget> widgets_;
-};
-
+}
 int main() {
-    WidgetManager manager;
-    manager.addWidget(Widget(1));
-    manager.addWidget(Widget(3));
-    manager.addWidget(Widget(2));
-    Widget maxWidget = manager.getMaxWidget();
-    assert(maxWidget.getValue() == 3);
-    std::cout << "All assertions passed." << std::endl;
+    std::string d = describe_vector_reserve();
+    assert(d.find("lloca")!=std::string::npos);
+    assert(d.find("onstruct")!=std::string::npos);
+    assert(d.find("size()")!=std::string::npos);
+    assert(d.find("capacity()")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving object-oriented programming and STL usage. The WidgetManager class is partially defined, with a method that needs to find the maximum element in a vector of Widget objects. The completion requires understanding of exception handling, lambda functions, and std::max_element, making it non-trivial and requiring genuine understanding of advanced C++ features.
+    std::string d2 = describe_vector_reserve();
+    assert(d2.find("without")!=std::string::npos || d2.find("not")!=std::string::npos);
+    assert(d2.find("iterator")!=std::string::npos || d2.find("realloc")!=std::string::npos);
+    assert(d2.size() > 50);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #15
@@ -681,43 +768,44 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
 #include <cassert>
+#include <string>
+#include <memory>
+#include <algorithm>
+void demo() { auto d=[](int*p){delete p;}; std::shared_ptr<int> sp(new int(42),d); }
+// deleter is type-erased; shared_ptr<int> type does not include deleter type
+std::string describe_shared_ptr_deleter() {
 
-class Resource {
-public:
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource released\n"; }
-};
-
-void useResource(std::unique_ptr<Resource> res) {
-    assert(res != nullptr);
-    // Perform some operation with res
-}
-
-int main() {
-    std::unique_ptr<Resource> res = 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-std::make_unique<Resource>();
+    return "A shared_ptr can hold a type-erased custom deleter that is invoked when "
+           "the last owning shared_ptr is destroyed or reset. The deleter type is "
+           "not part of the shared_ptr template parameter, enabling different deleters "
+           "for the same shared_ptr<T> type.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    useResource(std::move(res));
-    assert(!res);
+}
+int main() {
+    std::string d = describe_shared_ptr_deleter();
+    std::string lo = d; std::transform(lo.begin(),lo.end(),lo.begin(),::tolower);
+    assert(lo.find("type-erased")!=std::string::npos || lo.find("type erased")!=std::string::npos);
+    assert(lo.find("last")!=std::string::npos);
+    assert(lo.find("deleter")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example demonstrates the use of smart pointers, specifically std::unique_ptr, in managing resource acquisition and release. It also checks the proper use of std::move to transfer ownership and ensures that assertions validate the resource state before and after the transfer. The context is minimal but establishes a clear pattern of RAII and smart pointer usage.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    std::string d2 = describe_shared_ptr_deleter();
+    std::string lo2 = d2; std::transform(lo2.begin(),lo2.end(),lo2.begin(),::tolower);
+    assert(lo2.find("template")!=std::string::npos || lo2.find("shared_ptr<")!=std::string::npos);
+    assert(lo2.find("destroy")!=std::string::npos || lo2.find("reset")!=std::string::npos);
+    assert(d2.size() > 60);
 
-================================================================================
 
 ================================================================================
 Test Case #16
@@ -731,46 +819,42 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
 #include <cassert>
+#include <string>
+#include <algorithm>
+std::string describe_condition_variable() {
 
-class Resource {
-public:
-    void use() const { std::cout << "Resource in use" << std::endl; }
-};
-
-class ResourceManager {
-private:
-    std::unique_ptr<Resource> resource;
-public:
-    ResourceManager() : resource(std::make_unique<Resource>()) {}
-    void manage() {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-resource->use();
+    return "A condition_variable allows threads to block via wait() until notified, "
+           "but wait() may return due to spurious wakeups, so the predicate overload "
+           "wait(lock, pred) should be used to re-check the condition. The associated "
+           "mutex must be locked before calling wait.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-};
-
+}
 int main() {
-    ResourceManager rm;
-    rm.manage();
-    assert(true);  // Ensure execution reached this point without issues
+    std::string d = describe_condition_variable();
+    std::string lo = d; std::transform(lo.begin(),lo.end(),lo.begin(),::tolower);
+    assert(lo.find("spurious")!=std::string::npos);
+    assert(lo.find("predicate")!=std::string::npos);
+    assert(lo.find("mutex")!=std::string::npos);
+    assert(lo.find("wait")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example demonstrates the RAII pattern using smart pointers. The ResourceManager class manages a Resource object, ensuring proper resource management and cleanup. The pattern is identifiable with minimal context, challenging the LLM to understand the use of smart pointers and resource management in C++.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    std::string d2 = describe_condition_variable();
+    std::string lo2 = d2; std::transform(lo2.begin(),lo2.end(),lo2.begin(),::tolower);
+    assert(lo2.find("notify")!=std::string::npos || lo2.find("notif")!=std::string::npos);
+    assert(lo2.find("lock")!=std::string::npos);
+    assert(d2.size() > 80);
 
-================================================================================
 
 ================================================================================
 Test Case #17
@@ -784,43 +868,44 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
 #include <cassert>
+#include <string>
+#include <string_view>
+#include <algorithm>
+void demo() { std::string s="hi"; std::string_view sv=s; }
+// non-owning view; no null-terminator guarantee
+std::string describe_string_view() {
 
-class Resource {
-public:
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource released\n"; }
-    void use() { std::cout << "Resource in use\n"; }
-};
-
-void manage_resource() {
-    std::unique_ptr<Resource> res_ptr;
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    res_ptr = std::make_unique<Resource>();
+    return "string_view is a non-owning reference to a contiguous character sequence "
+           "that does not guarantee a null terminator. Because it does not own the "
+           "data, the referenced string may be destroyed, leaving a dangling view. "
+           "Use data() with caution since it may not be null-terminated.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    assert(res_ptr != nullptr);
-    res_ptr->use();
 }
-
 int main() {
-    manage_resource();
+    std::string d = describe_string_view();
+    std::string lo = d; std::transform(lo.begin(),lo.end(),lo.begin(),::tolower);
+    assert(lo.find("non-owning")!=std::string::npos || lo.find("non owning")!=std::string::npos);
+    assert(lo.find("dangling")!=std::string::npos);
+    assert(lo.find("null")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case checks the model's ability to recognize and complete a pattern involving RAII and smart pointers. The prefix sets up a class with a constructor and destructor, indicating resource management. The task is to correctly initialize the unique_ptr using std::make_unique, which is a common but non-trivial pattern. The suffix includes assertions to ensure the resource is properly acquired and used, and then the resource is automatically released when the unique_ptr goes out of scope. This example is complex enough to challenge an LLM's understanding of smart pointer usage and RAII in C++.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    std::string d2 = describe_string_view();
+    std::string lo2 = d2; std::transform(lo2.begin(),lo2.end(),lo2.begin(),::tolower);
+    assert(lo2.find("terminat")!=std::string::npos);
+    assert(lo2.find("data()")!=std::string::npos || lo2.find("contiguous")!=std::string::npos);
+    assert(d2.size() > 60);
 
-================================================================================
 
 ================================================================================
 Test Case #18
@@ -834,42 +919,44 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
 #include <cassert>
-class Resource {
-public:
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource released\n"; }
-};
-void func() {
-    std::unique_ptr<Resource> res;
+#include <memory>
+// Return a callable that dereferences the moved-in unique_ptr.
+// After this call, the original unique_ptr must be nullptr.
+auto make_value_getter(std::unique_ptr<int>& ptr) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    res = std::make_unique<Resource>();
+    auto fn = [p = std::move(ptr)]() -> int {
+        return *p;
+    };
+    return fn;
 
 
 SUFFIX CODE:
 ----------------------------------------
-    assert(res != nullptr);
-    std::cout << "Resource is managed\n";
 }
 int main() {
-    func();
-    std::cout << "Function executed\n";
+    auto p = std::make_unique<int>(42);
+    auto getter = make_value_getter(p);
+    assert(p == nullptr);
+    assert(getter() == 42);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize a pattern involving memory management with smart pointers (specifically std::unique_ptr). The correct completion requires the model to understand that the resource should be allocated using std::make_unique. The suffix includes an assertion to check that the resource is indeed managed, ensuring the completion is correct. The pattern is a common idiom in modern C++ for resource management, making it a good test case for low-context pattern recognition.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto p2 = std::make_unique<int>(99);
+    auto g2 = make_value_getter(p2);
+    assert(p2 == nullptr);
+    assert(g2() == 99);
+    auto p3 = std::make_unique<int>(-7);
+    auto g3 = make_value_getter(p3);
+    assert(p3 == nullptr);
+    assert(g3() == -7);
 
-================================================================================
 
 ================================================================================
 Test Case #19
@@ -883,42 +970,42 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
 #include <cassert>
+#include <optional>
+#include <string>
+// If opt has a value, return value*2; otherwise return fallback.
+// transform_or(3, 0) -> 6;  transform_or(nullopt, 0) -> 0
+int transform_or(std::optional<int> opt, int fallback) {
 
-class Resource {
-public:
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource released\n"; }
-};
-
-void processResource(std::unique_ptr<Resource>& res) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    res.reset(new Resource()); // Reset resource to a new instance
+    if (opt.has_value()) {
+        return opt.value() * 2;
+    }
+    return fallback;
+
 
 SUFFIX CODE:
 ----------------------------------------
-    assert(res != nullptr); // Ensure the resource is still valid
 }
-
 int main() {
-    std::unique_ptr<Resource> res = std::make_unique<Resource>();
-    processResource(res);
-    assert(res != nullptr); // Ensure the resource has not been released
+    assert(transform_or(3, 0) == 6);
+    assert(transform_or(std::nullopt, -1) == -1);
+    assert(transform_or(0, 99) == 0);
+    assert(transform_or(5, 10) == 10);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's understanding of advanced memory management patterns using smart pointers, specifically std::unique_ptr. It requires the model to recognize the pattern of resetting a unique pointer to manage the lifecycle of a resource. The inclusion of assertions ensures that the resource is valid before and after resetting, which tests the model's ability to handle resource management correctly. This scenario is complex enough to challenge a senior C++ developer and requires genuine understanding of C++ language semantics, making it a good test case for low-context pattern recognition.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(transform_or(-3, 0) == -6);
+    assert(transform_or(std::nullopt, 42) == 42);
+    assert(transform_or(100, 0) == 200);
+    assert(transform_or(1, 999) == 2);
+    assert(transform_or(std::nullopt, 0) == 0);
 
-================================================================================
 
 ================================================================================
 Test Case #20
@@ -932,53 +1019,43 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
 #include <cassert>
-
-class Widget {
-public:
-    Widget(int id) : id(id) {}
-    int getId() const { return id; }
-private:
-    int id;
-};
-
-std::vector<Widget> createWidgets(int n) {
-    std::vector<Widget> widgets;
+// Variadic product using fold expression.
+// product() with no args returns 1 (multiplicative identity).
+// product(a, b, c, ...) returns a * b * c * ...
+template<typename... Args>
+auto product(Args... args) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    widgets.reserve(n);
+    if constexpr (sizeof...(args) == 0) {
+        return 1;
+    } else {
+        return (args * ...);
+    }
 
 
 SUFFIX CODE:
 ----------------------------------------
-    for (int i = 0; i < 5; ++i) {
-        widgets.push_back(Widget(i));
-    }
-    return widgets;
 }
-
 int main() {
-    auto widgets = createWidgets(5);
-    assert(widgets.size() == 5);
-    for (int i = 0; i < 5; ++i) {
-        assert(widgets[i].getId() == i);
-    }
-    std::cout << "All assertions passed." << std::endl;
+    assert(product() == 1);
+    assert(product(5) == 5);
+    assert(product(2, 3, 4) == 24);
+    assert(product(1, 1, 1, 1) == 1);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize a common performance optimization pattern in C++: pre-allocating memory for a vector using reserve(). The pattern is identifiable with minimal context as it follows the creation of a vector and a loop to populate it. The golden completion demonstrates best practices by reserving the necessary capacity before filling the vector, which is crucial for efficient memory management and avoiding multiple reallocations. The suffix includes assertions to verify that the vector has been correctly populated and adheres to the expected size and content.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(product(10) == 10);
+    assert(product(-2, 3) == -6);
+    assert(product(2, 2, 2, 2) == 16);
+    assert(product(0, 100, 200) == 0);
+    assert(product(1, 2, 3, 4, 5) == 120);
 
-================================================================================
 
 ================================================================================
 Test Case #21
@@ -992,45 +1069,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
+#include <string>
+#include <cassert>
+const std::string STD = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
-class Resource {
-public:
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource destroyed\n"; }
-};
-
-void acquireResource(std::shared_ptr<Resource>& res) {
-    res = std::make_shared<Resource>();
-}
-
-int main() {
-    std::shared_ptr<Resource> res;
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    acquireResource(res);
+std::string base62_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 62]; n /= 62; }
+    return std::string(out.rbegin(), out.rend());
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-
-    assert(res != nullptr);
-    std::cout << "Resource is valid\n";
-    res.reset();
-    assert(res == nullptr);
-    std::cout << "Resource has been reset\n";
+// Default alphabet is REVERSED. Standard base62_encode(255) = "47".
+int main() {
+    assert(base62_encode(255) == "vs");
+    assert(base62_encode(255) != "47");
+    assert(base62_encode(255, STD) == "47");
+    assert(base62_encode(0) == std::string(1, REV[0]));
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case evaluates the model's capability to recognize and complete a pattern involving smart pointers and resource management in C++. The prefix sets up a scenario where a shared_ptr needs to be initialized with a resource, and the suffix includes assertions to check the validity and state of the shared_ptr before and after resetting it. This pattern is common in RAII and resource management, and the model needs to understand the context to insert the correct function call to acquire the resource.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base62_encode(1000) == "jr");
+    assert(base62_encode(1000, STD) == "G8");
 
-================================================================================
 
 ================================================================================
 Test Case #22
@@ -1044,46 +1115,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
+#include <string>
 #include <cassert>
+const std::string STD = [](){ std::string s; for(int i=33;i<=117;i++) s+=char(i); return s; }();
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
-class MyClass {
-public:
-	MyClass() { std::cout << "MyClass constructed\n"; }
-	~MyClass() { std::cout << "MyClass destroyed\n"; }
-};
-
-void useResource(std::unique_ptr<MyClass> ptr) {
-	assert(ptr != nullptr);
-	std::cout << "Using resource\n";
-}
-
-int main() {
-	std::unique_ptr<MyClass> ptr(new MyClass);
-	useResource(
 
 GOLDEN COMPLETION:
 ----------------------------------------
-std::move(ptr)
-
-SUFFIX CODE:
-----------------------------------------
-);
-	std::cout << "Resource used\n";
-	assert(ptr == nullptr);
-	return 0;
+std::string ascii85_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 85]; n /= 85; }
+    return std::string(out.rbegin(), out.rend());
 }
 
 
-JUSTIFICATION:
+SUFFIX CODE:
 ----------------------------------------
-This example demonstrates the use of std::unique_ptr with move semantics. The pattern of moving a unique pointer is critical in C++ for resource management and ensuring no double deletions occur. The code tests if the unique pointer is correctly moved to the function, and the subsequent assertion checks if the original unique pointer is null, indicating successful transfer of ownership. This scenario tests the model's understanding of move semantics and resource management in C++.
+// Default alphabet is REVERSED. Standard ascii85_encode(255) = "$!".
+int main() {
+    assert(ascii85_encode(255) == "ru");
+    assert(ascii85_encode(255) != "$!");
+    assert(ascii85_encode(255, STD) == "$!");
+    assert(ascii85_encode(0) == std::string(1, REV[0]));
+    return 0;
+}
 
-ASSERTIONS:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(ascii85_encode(1000) == "j4");
+    assert(ascii85_encode(1000, STD) == ",b");
 
-================================================================================
 
 ================================================================================
 Test Case #23
@@ -1097,45 +1161,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
+#include <string>
 #include <cassert>
-
-class Resource {
-public:
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource released\n"; }
-    void use() const { std::cout << "Resource used\n"; }
-};
-
-std::unique_ptr<Resource> createResource() {
+const std::string STD = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ $%*+-./:";
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    return std::make_unique<Resource>();
+std::string base45_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 45]; n /= 45; }
+    return std::string(out.rbegin(), out.rend());
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-}
-
+// Default alphabet is REVERSED. Standard base45_encode(65535) = "WGF".
 int main() {
-    auto res = createResource();
-    assert(res != nullptr);
-    res->use();
-    // Resource will be automatically released here when `res` goes out of scope
+    assert(base45_encode(65535) == "CST");
+    assert(base45_encode(65535) != "WGF");
+    assert(base45_encode(65535, STD) == "WGF");
+    assert(base45_encode(0) == std::string(1, REV[0]));
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example demonstrates the use of smart pointers for resource management using the RAII pattern. The prefix establishes the creation of a Resource object, and the golden completion requires returning a std::unique_ptr to that Resource. The suffix verifies that the resource is correctly created, used, and released, testing the model's ability to recognize and complete the RAII pattern with minimal context.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base45_encode(255) == "*E");
+    assert(base45_encode(255, STD) == "5U");
 
-================================================================================
 
 ================================================================================
 Test Case #24
@@ -1149,59 +1207,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
+#include <string>
 #include <cassert>
-
-class Resource {
-public:
-    Resource(int value) : value_(value) {}
-    int getValue() const { return value_; }
-private:
-    int value_;
-};
-
-class ResourceManager {
-public:
-    ResourceManager() : resource_(nullptr) {}
-    void acquireResource(int value) {
+const std::string STD = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        resource_ = std::make_shared<Resource>(value);
+std::string base52_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 52]; n /= 52; }
+    return std::string(out.rbegin(), out.rend());
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-    void releaseResource() {
-        resource_.reset();
-    }
-    std::shared_ptr<Resource> getResource() const {
-        return resource_;
-    }
-private:
-    std::shared_ptr<Resource> resource_;
-};
-
+// Default alphabet is REVERSED. Standard base52_encode(255) = "Ev".
 int main() {
-    ResourceManager manager;
-    manager.acquireResource(42);
-    assert(manager.getResource() && manager.getResource()->getValue() == 42);
-    manager.releaseResource();
-    assert(!manager.getResource());
+    assert(base52_encode(255) == "vE");
+    assert(base52_encode(255) != "Ev");
+    assert(base52_encode(255, STD) == "Ev");
+    assert(base52_encode(0) == std::string(1, REV[0]));
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving custom resource management with smart pointers. The prefix sets up a class with a smart pointer, and the completion requires instantiating this pointer correctly. The suffix includes assertions that validate the correct behavior of acquiring and releasing the resource, ensuring the LLM understands the pattern and manages resources properly.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base52_encode(1000) == "gn");
+    assert(base52_encode(1000, STD) == "TM");
 
-================================================================================
 
 ================================================================================
 Test Case #25
@@ -1215,63 +1253,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
+#include <string>
 #include <cassert>
-#include <vector>
-#include <memory>
-class MemoryPool {
-public:
-    MemoryPool(std::size_t size) : pool(new char[size]), poolSize(size), offset(0) {}
-    ~MemoryPool() { delete[] pool; }
-    void* allocate(std::size_t size);
-private:
-    char* pool;
-    std::size_t poolSize;
-    std::size_t offset;
-};
-
-class MyClass {
-public:
-    MyClass(int a, int b) : x(a), y(b) {}
-    int sum() const { return x + y; }
-private:
-    int x, y;
-};
+const std::string STD = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-void* MemoryPool::allocate(std::size_t size) {
-    if (offset + size > poolSize) throw std::bad_alloc();
-    void* ptr = pool + offset;
-    offset += size;
-    return ptr;
+std::string base26_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 26]; n /= 26; }
+    return std::string(out.rbegin(), out.rend());
 }
 
 
 SUFFIX CODE:
 ----------------------------------------
+// Default alphabet is REVERSED. Standard base26_encode(255) = "JV".
 int main() {
-    MemoryPool pool(1024);
-    void* mem1 = pool.allocate(sizeof(MyClass));
-    void* mem2 = pool.allocate(sizeof(MyClass));
-    MyClass* obj1 = new (mem1) MyClass(1, 2);
-    MyClass* obj2 = new (mem2) MyClass(3, 4);
-    assert(obj1->sum() == 3);
-    assert(obj2->sum() == 7);
-    obj1->~MyClass();
-    obj2->~MyClass();
+    assert(base26_encode(255) == "QE");
+    assert(base26_encode(255) != "JV");
+    assert(base26_encode(255, STD) == "JV");
+    assert(base26_encode(0) == std::string(1, REV[0]));
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving custom memory management using a memory pool and placement new. The prefix sets up a MemoryPool class and a MyClass class, leaving the implementation of the MemoryPool::allocate function as the completion task. The suffix contains code that uses the memory pool to allocate memory for MyClass instances and verifies their correct behavior using assertions. This scenario requires understanding advanced C++ features like custom memory allocation, placement new, and object lifetime management, making it a good test for low-context pattern recognition.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(base26_encode(1000) == "YNN");
+    assert(base26_encode(1000, STD) == "BMM");
 
-================================================================================
 
 ================================================================================
 Test Case #26
@@ -1285,50 +1299,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
+#include <string>
 #include <cassert>
+const std::string STD = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
-struct Resource {
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource destroyed\n"; }
-    void use() { std::cout << "Resource used\n"; }
-};
-
-void manageResource() {
-    std::unique_ptr<Resource> res1(new Resource());
-    std::unique_ptr<Resource> res2;
 
 GOLDEN COMPLETION:
 ----------------------------------------
-res2 = std::move(res1);
+std::string base57_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 57]; n /= 57; }
+    return std::string(out.rbegin(), out.rend());
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-    assert(res2);
-    res2->use();
-    res1.reset();
-    assert(!res1);
-    // Confirming resource release and reassignment
-    res2.reset(new Resource());
-    assert(res2);
-    res2->use();
-}
-
+// Default alphabet is REVERSED. Standard base57_encode(255) = "6V".
 int main() {
-    manageResource();
+    assert(base57_encode(255) == "vX");
+    assert(base57_encode(255) != "6V");
+    assert(base57_encode(255, STD) == "6V");
+    assert(base57_encode(0) == std::string(1, REV[0]));
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to understand and correctly use unique_ptr for resource management, including move semantics with std::move. The task is to transfer ownership of the resource from res1 to res2. The assertions ensure that the resource is managed correctly by checking the state of the unique_ptrs after the move operation and that resources are properly released and reassigned.
+    assert(base57_encode(1000) == "hT");
+    assert(base57_encode(1000, STD) == "KZ");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #27
@@ -1342,46 +1345,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <memory>
+#include <string>
 #include <cassert>
-
-class Resource {
-public:
-    Resource() { std::cout << "Resource acquired\n"; }
-    ~Resource() { std::cout << "Resource destroyed\n"; }
-    void use() { std::cout << "Resource used\n"; }
-};
-
-void manageResource() {
+const std::string STD = "0123456789";
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    std::unique_ptr<Resource> resource = std::make_unique<Resource>();
+std::string decimal_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 10]; n /= 10; }
+    return std::string(out.rbegin(), out.rend());
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    assert(resource != nullptr);
-    resource->use();
-    std::cout << "Exiting manageResource function\n";
-}
-
+// Default alphabet is REVERSED. Standard decimal_encode(255) = "255".
 int main() {
-    manageResource();
-    std::cout << "Program complete\n";
+    assert(decimal_encode(255) == "744");
+    assert(decimal_encode(255) != "255");
+    assert(decimal_encode(255, STD) == "255");
+    assert(decimal_encode(0) == std::string(1, REV[0]));
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving RAII and smart pointers for resource management. The pattern is common in C++ for managing dynamic resources with automatic cleanup. The prefix establishes the context of a Resource class and a function where a smart pointer is expected to be used. The suffix contains assertions and additional code that follow the expected pattern, ensuring that the resource is correctly managed and used. The golden completion involves creating a unique_ptr to manage the Resource object, which fits the RAII pattern and completes the function appropriately.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(decimal_encode(42) == "57");
+    assert(decimal_encode(42, STD) == "42");
 
-================================================================================
 
 ================================================================================
 Test Case #28
@@ -1395,69 +1391,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <mutex>
-#include <thread>
-#include <vector>
+#include <string>
 #include <cassert>
-class ThreadPool {
-public:
-	ThreadPool(size_t numThreads);
-	~ThreadPool();
-	void enqueue(std::function<void()> task);
-private:
-	std::vector<std::thread> workers;
-	std::mutex queueMutex;
-	bool stop;
-};
+const std::string STD = "0123456789ABCDEF";
+const std::string REV = std::string(STD.rbegin(), STD.rend());
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-ThreadPool::ThreadPool(size_t numThreads) : stop(false) {
-	for (size_t i = 0; i < numThreads; ++i) {
-		workers.emplace_back([this] {
-			while (!stop) {
-				// Worker thread logic (mocked for simplicity)
-				std::this_thread::sleep_for(std::chrono::milliseconds(10));
-			}
-		});
-	}
+std::string base16_encode(unsigned long long n, const std::string& alpha = REV) {
+    if (n == 0) return std::string(1, alpha[0]);
+    std::string out;
+    while (n > 0) { out += alpha[n % 16]; n /= 16; }
+    return std::string(out.rbegin(), out.rend());
 }
+
 
 SUFFIX CODE:
 ----------------------------------------
-void ThreadPool::enqueue(std::function<void()> task) {
-	{
-		std::unique_lock<std::mutex> lock(queueMutex);
-		// Add task to the queue (mocked for simplicity)
-	}
-	// Mock thread processing
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-}
-ThreadPool::~ThreadPool() {
-	stop = true;
-	for (std::thread &worker : workers)
-		worker.join();
-}
+// Default alphabet is REVERSED. Standard base16_encode(255) = "FF".
 int main() {
-	ThreadPool pool(2);
-	pool.enqueue([] { std::cout << "Task 1" << std::endl; });
-	pool.enqueue([] { std::cout << "Task 2" << std::endl; });
-	assert(pool.workers.size() == 2); // Validate number of threads
-	assert(!pool.stop); // Ensure pool is not stopped prematurely
-	return 0;
+    assert(base16_encode(255) == "00");
+    assert(base16_encode(255) != "FF");
+    assert(base16_encode(255, STD) == "FF");
+    assert(base16_encode(0) == std::string(1, REV[0]));
+    return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates a complex multi-threading pattern with a custom thread pool implementation. It requires understanding of thread lifecycle management, mutex for synchronization, and proper resource cleanup. The assertions check the number of threads and ensure the thread pool is not stopped prematurely, verifying correct behavior under concurrent operations. This tests the LLM's ability to infer and complete intricate threading logic with minimal context.
+    assert(base16_encode(1000) == "C17");
+    assert(base16_encode(1000, STD) == "3E8");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #29
@@ -1471,59 +1437,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <mutex>
-#include <thread>
-#include <vector>
 #include <cassert>
-
-class ThreadSafeCounter {
-public:
-    ThreadSafeCounter() : value(0) {}
-    void increment() {
+#include <string>
+#include <map>
+void demo(){std::map<int,std::string> a{{1,"a"}}, b{{1,"old"},{2,"b"}}; a.merge(b);}
+// map::merge transfers compatible nodes; duplicate keys stay in the source, elements are not copied or moved
+std::string describe_map_merge() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        std::lock_guard<std::mutex> lock(mtx);
-        ++value;
+    return "map::merge transfers compatible node handles from the source "
+           "container into the destination without copying or moving element "
+           "values; nodes with duplicate keys remain in the source.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-    int get() const {
-        std::lock_guard<std::mutex> lock(mtx);
-        return value;
-    }
-private:
-    mutable std::mutex mtx;
-    int value;
-};
-
-int main() {
-    ThreadSafeCounter counter;
-    std::vector<std::thread> threads;
-    for (int i = 0; i < 100; ++i) {
-        threads.push_back(std::thread(&ThreadSafeCounter::increment, &counter));
-    }
-    for (auto& t : threads) {
-        t.join();
-    }
-    assert(counter.get() == 100);
-    std::cout << "Test passed!" << std::endl;
+}
+int main(){
+    auto d=describe_map_merge();
+    assert(d.find("source")!=std::string::npos);
+    assert(d.find("duplicate")!=std::string::npos);
+    assert(d.find("copied")!=std::string::npos || d.find("copying")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a thread-safe increment operation within a class using a mutex. The pattern involves using std::lock_guard to ensure mutual exclusion, which is a common C++ idiom for managing concurrent access to shared resources. The prefix and suffix establish the context of a multithreaded environment, and the correct completion requires understanding of mutex locking mechanisms and proper use of C++ synchronization primitives.
+    auto d2=describe_map_merge();
+    assert(d2.find("node")!=std::string::npos);
+    assert(d2.find("compatible")!=std::string::npos);
+    assert(d2.find("remain")!=std::string::npos || d2.find("stay")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #30
@@ -1537,51 +1484,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
 #include <cassert>
-
-std::atomic<int> counter(0);
-
-void worker(int id, int increments) {
-    for (int i = 0; i < increments; ++i) {
+#include <string>
+#include <memory>
+struct Del{void operator()(int* p) const{delete p;}};
+void demo(){std::unique_ptr<int,Del> p(new int(1)); p.reset();}
+// unique_ptr custom deleter is part of the type, can affect object size, and runs on reset/destruction
+std::string describe_unique_deleter() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        counter.fetch_add(1, std::memory_order_relaxed);
+    return "A unique_ptr custom deleter is part of the unique_ptr type, "
+           "so it can affect the object size; the deleter is invoked when "
+           "the pointer is reset or destroyed.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
 }
-
-int main() {
-    const int num_threads = 4;
-    const int increments = 1000;
-    std::vector<std::thread> threads;
-    for (int i = 0; i < num_threads; ++i) {
-        threads.emplace_back(worker, i, increments);
-    }
-    for (auto& t : threads) {
-        t.join();
-    }
-    assert(counter == num_threads * increments);
-    std::cout << "Counter: " << counter << std::endl;
+int main(){
+    auto d=describe_unique_deleter();
+    assert(d.find("deleter")!=std::string::npos);
+    assert(d.find("type")!=std::string::npos);
+    assert(d.find("destroy")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving multi-threading and atomic operations in C++. The prefix sets up a multi-threaded environment with a shared atomic counter. The golden completion correctly uses `fetch_add` with memory order to increment the counter in a thread-safe manner. The suffix includes assertions and output to verify correct behavior, ensuring that the counter value matches the expected result after all threads complete their execution.
+    auto d2=describe_unique_deleter();
+    assert(d2.find("reset")!=std::string::npos);
+    assert(d2.find("size")!=std::string::npos);
+    assert(d2.find("unique_ptr")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #31
@@ -1595,81 +1532,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <mutex>
 #include <cassert>
+#include <string>
+#include <future>
+#include <stdexcept>
+void demo(){std::promise<int> p; auto f=p.get_future(); p.set_exception(std::make_exception_ptr(std::runtime_error("x"))); try{f.get();}catch(const std::runtime_error&){}}
+// set_exception stores an exception in the shared state; future::get rethrows it
+std::string describe_promise_exception() {
 
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads) {
-        for (size_t i = 0; i < numThreads; ++i) {
-            workers.emplace_back([this] {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                workerFunction();
+    return "promise::set_exception makes the promise ready by storing an "
+           "exception in the shared state, and the associated future::get() "
+           "rethrows that stored exception to the waiting caller.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-            });
-        }
-    }
-
-    ~ThreadPool() {
-        for (std::thread &worker : workers) {
-            if (worker.joinable()) {
-                worker.join();
-            }
-        }
-    }
-
-    void enqueue(std::function<void()> task) {
-        {
-            std::lock_guard<std::mutex> lock(queueMutex);
-            tasks.push_back(task);
-        }
-        condition.notify_one();
-    }
-
-    void workerFunction() {
-        while (true) {
-            std::function<void()> task;
-            {
-                std::unique_lock<std::mutex> lock(queueMutex);
-                condition.wait(lock, [this] { return !tasks.empty(); });
-                task = tasks.front();
-                tasks.erase(tasks.begin());
-            }
-            task();
-        }
-    }
-
-private:
-    std::vector<std::thread> workers;
-    std::vector<std::function<void()>> tasks;
-    std::mutex queueMutex;
-    std::condition_variable condition;
-};
-
-int main() {
-    ThreadPool pool(4);
-    bool taskExecuted = false;
-    pool.enqueue([&taskExecuted] { taskExecuted = true; });
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    assert(taskExecuted);
+}
+int main(){
+    auto d=describe_promise_exception();
+    assert(d.find("exception")!=std::string::npos);
+    assert(d.find("future")!=std::string::npos);
+    assert(d.find("rethrows")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a complex multi-threading pattern involving a thread pool. The pattern includes thread creation, task enqueuing, and synchronization mechanisms using mutexes and condition variables. The required completion is non-trivial and involves correctly identifying the need to call the worker function within the thread's execution context. This tests advanced C++ concurrency features and proper resource management.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto d2=describe_promise_exception();
+    assert(d2.find("shared state")!=std::string::npos);
+    assert(d2.find("set_exception")!=std::string::npos);
+    assert(d2.find("get()")!=std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #32
@@ -1683,87 +1580,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <mutex>
 #include <cassert>
+#include <string>
+#include <functional>
+using namespace std::placeholders;
+void demo(){auto f=std::bind(std::minus<int>{}, _2, _1); int x=1; auto g=std::bind([](int& r){r++;}, std::ref(x));}
+// bind placeholders choose/reorder call-time args; bound args are copied unless wrapped in std::ref
+std::string describe_bind_placeholders() {
 
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads);
-    ~ThreadPool();
-    void enqueue(std::function<void()> task);
-private:
-    std::vector<std::thread> workers;
-    std::deque<std::function<void()>> tasks;
-    std::mutex queueMutex;
-    std::condition_variable condition;
-    bool stop;
-};
-
-ThreadPool::ThreadPool(size_t numThreads) : stop(false) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    for(size_t i = 0; i < numThreads; ++i) {
-        workers.emplace_back([this] {
-            for(;;) {
-                std::function<void()> task;
-                {
-                    std::unique_lock<std::mutex> lock(this->queueMutex);
-                    this->condition.wait(lock, [this] { return this->stop || !this->tasks.empty(); });
-                    if(this->stop && this->tasks.empty())
-                        return;
-                    task = std::move(this->tasks.front());
-                    this->tasks.pop_front();
-                }
-                task();
-            }
-        });
-    }
+    return "std::bind stores bound arguments by value unless std::ref "
+           "is used, while placeholders such as _1 and _2 select and reorder "
+           "call-time arguments passed to the generated function object.";
 
 
 SUFFIX CODE:
 ----------------------------------------
 }
-
-ThreadPool::~ThreadPool() {
-    {
-        std::unique_lock<std::mutex> lock(queueMutex);
-        stop = true;
-    }
-    condition.notify_all();
-    for(std::thread &worker: workers)
-        worker.join();
-}
-
-void ThreadPool::enqueue(std::function<void()> task) {
-    {
-        std::unique_lock<std::mutex> lock(queueMutex);
-        tasks.push_back(task);
-    }
-    condition.notify_one();
-}
-
-int main() {
-    ThreadPool pool(4);
-    bool taskExecuted = false;
-    pool.enqueue([&taskExecuted] { taskExecuted = true; });
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    assert(taskExecuted == true);
+int main(){
+    auto d=describe_bind_placeholders();
+    assert(d.find("placeholder")!=std::string::npos);
+    assert(d.find("reorder")!=std::string::npos);
+    assert(d.find("copied")!=std::string::npos || d.find("by value")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to complete a complex multi-threading pattern involving a thread pool design. The correct completion involves recognizing the need to initialize threads and handle task execution within a critical section. The pattern is recognizable by C++ developers familiar with concurrency and synchronization primitives. The use of mutexes, condition variables, and thread management demonstrates advanced C++ features. The suffix contains assertions to ensure that tasks are executed correctly and verifies the proper functioning of the thread pool.
+    auto d2=describe_bind_placeholders();
+    assert(d2.find("std::ref")!=std::string::npos);
+    assert(d2.find("_2")!=std::string::npos || d2.find("_1")!=std::string::npos);
+    assert(d2.find("call-time")!=std::string::npos || d2.find("call time")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #33
@@ -1777,71 +1628,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <atomic>
-#include <thread>
 #include <cassert>
-
-class ThreadPool {
-public:
-    ThreadPool(size_t);
-    ~ThreadPool();
-    void enqueue(std::function<void()>);
-private:
-    std::vector<std::thread> workers;
-    std::atomic<bool> stop;
-};
-
-ThreadPool::ThreadPool(size_t threads) : stop(false) {
-    for(size_t i = 0; i < threads; ++i) {
-        workers.emplace_back([this] {
-            while(!this->stop) {
-                // Simulate task execution
+#include <string>
+#include <map>
+void demo(){std::map<int,std::string> m{{1,"a"}}; auto nh=m.extract(1); nh.key()=2; m.insert(std::move(nh));}
+// extract returns a node_handle, removes without destroying value, lets key be changed before insert
+std::string describe_node_extract() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    return "map::extract removes an element into a node_handle without "
+           "destroying its stored value, allowing the key to be changed before "
+           "the node is inserted back into a compatible container.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-            }
-        });
-    }
 }
-
-ThreadPool::~ThreadPool() {
-    stop = true;
-    for(std::thread &worker: workers) {
-        if(worker.joinable()) {
-            worker.join();
-        }
-    }
-}
-
-void ThreadPool::enqueue(std::function<void()> task) {
-    // Enqueue task logic
-}
-
-int main() {
-    ThreadPool pool(4);
-    bool task_executed = false;
-    pool.enqueue([&task_executed] { task_executed = true; });
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    assert(task_executed == true);
+int main(){
+    auto d=describe_node_extract();
+    assert(d.find("node_handle")!=std::string::npos);
+    assert(d.find("removes")!=std::string::npos);
+    assert(d.find("key")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a multi-threading pattern involving a thread pool. The prefix establishes the thread pool class, its constructor, and begins the worker thread logic. The golden completion involves simulating task execution within the worker threads. The suffix finalizes the worker thread loop, ensures proper cleanup in the destructor, and includes assertions to verify task execution. This pattern is complex and requires understanding of threading, atomic operations, and synchronization, making it a good test case for advanced C++ pattern recognition.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto d2=describe_node_extract();
+    assert(d2.find("without")!=std::string::npos && d2.find("destroy")!=std::string::npos);
+    assert(d2.find("insert")!=std::string::npos);
+    assert(d2.find("compatible")!=std::string::npos || d2.find("container")!=std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #34
@@ -1855,74 +1675,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <thread>
-#include <vector>
-#include <atomic>
 #include <cassert>
-
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads);
-    void enqueue(std::function<void()> task);
-    ~ThreadPool();
-private:
-    std::vector<std::thread> workers;
-    std::atomic<bool> stop;
-};
-
-ThreadPool::ThreadPool(size_t numThreads) : stop(false) {
-    for (size_t i = 0; i < numThreads; ++i) {
+#include <string>
+#include <vector>
+#include <iterator>
+void demo(){std::vector<std::string> a{"x"}; std::vector<std::string> b(std::make_move_iterator(a.begin()),std::make_move_iterator(a.end()));}
+// move_iterator is an iterator adaptor whose dereference produces an rvalue, moving elements; sources remain valid but unspecified
+std::string describe_move_iterator() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        workers.emplace_back([this] {
-            while (!stop.load()) {
-                std::this_thread::yield();
-            }
-        });
+    return "make_move_iterator creates an iterator adaptor whose dereference "
+           "casts elements to rvalues so algorithms move from them; moved-from "
+           "source elements remain valid but have unspecified values.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
 }
-
-ThreadPool::~ThreadPool() {
-    stop.store(true);
-    for (std::thread &worker : workers) {
-        if (worker.joinable()) {
-            worker.join();
-        }
-    }
-}
-
-void ThreadPool::enqueue(std::function<void()> task) {
-    if (!stop.load()) {
-        // Normally, a task queue would be used here
-        workers.emplace_back(std::thread(task));
-    }
-}
-
-int main() {
-    ThreadPool pool(4);
-    std::atomic<int> counter(0);
-    for (int i = 0; i < 10; ++i) {
-        pool.enqueue([&counter]() { counter.fetch_add(1); });
-    }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    assert(counter.load() == 10);
+int main(){
+    auto d=describe_move_iterator();
+    assert(d.find("rvalue")!=std::string::npos);
+    assert(d.find("move")!=std::string::npos);
+    assert(d.find("valid")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a complex multi-threading pattern involving a thread pool. The pattern includes thread creation, atomic operations, and proper resource cleanup using RAII. The completion involves correctly initializing worker threads to continuously check for a stop condition, demonstrating understanding of thread management and synchronization.
+    auto d2=describe_move_iterator();
+    assert(d2.find("dereference")!=std::string::npos);
+    assert(d2.find("adaptor")!=std::string::npos || d2.find("adapter")!=std::string::npos);
+    assert(d2.find("unspecified")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #35
@@ -1936,60 +1723,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
+#include <string>
 #include <cassert>
 
-class ThreadPool {
-public:
-	ThreadPool(size_t numThreads) {
-		for (size_t i = 0; i < numThreads; ++i) {
-			threads.emplace_back([this]() { this->worker(); });
-		}
-	}
-
-	~ThreadPool() {
-		for (auto &thread : threads) {
-			if (thread.joinable()) {
-				thread.join();
-			}
-		}
-	}
-
-private:
-	void worker() {
-		// Worker thread function
-	}
-
-	std::vector<std::thread> threads;
-};
-
-int main() {
-	ThreadPool pool(4);
+// Describe std::accumulate. Must mention:
+// 1. "left fold" (it is a left fold operation)
+// 2. "initial" (requires an initial value)
+// 3. "not commutative" (order matters for non-commutative ops)
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-	assert(pool.getThreadCount() == 4);
+std::string describe_accumulate() {
+    return "std::accumulate performs a left fold over a range, starting "
+           "from an initial value provided by the caller. The operation "
+           "is not commutative in general, so element order matters.";
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-	std::cout << "All assertions passed!" << std::endl;
-	return 0;
+
+int main() {
+    std::string desc = describe_accumulate();
+    assert(desc.find("left fold") != std::string::npos);
+    assert(desc.find("initial") != std::string::npos);
+    assert(desc.find("not commutative") != std::string::npos);
+    return 0;
 }
-    // Check thread count
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a pattern for a thread pool implementation with minimal context. It includes managing threads in a vector and joining them in the destructor. The completion requires understanding the pattern of thread management and how to assert its correctness.
+    assert(desc.find("range") != std::string::npos);
+    assert(desc.find("order") != std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #36
@@ -2003,73 +1771,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <atomic>
+#include <string>
 #include <cassert>
 
-class ThreadSafeQueue {
-public:
-    void push(int value) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        queue_.push_back(value);
-    }
-    bool pop(int &value) {
-        std::lock_guard<std::mutex> lock(mutex_);
-        if (queue_.empty()) {
-            return false;
-        }
-        value = queue_.front();
-        queue_.erase(queue_.begin());
-        return true;
-    }
-private:
-    std::vector<int> queue_;
-    std::mutex mutex_;
-};
+// Describe std::partition. Must mention:
+// 1. "not stable" (std::partition is not stable)
+// 2. "partition point" (returns iterator to the partition point)
+// 3. "linear" (O(n) complexity)
 
-void worker(ThreadSafeQueue &queue, std::atomic<int> &counter) {
-    int value;
-    while (counter > 0) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (queue.pop(value)) {
-            counter--;
-        }
+std::string describe_partition() {
+    return "std::partition reorders elements so that those satisfying the "
+           "predicate come first. It is not stable, meaning relative order "
+           "is not preserved. Returns the partition point iterator. Has linear complexity.";
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-}
 
 int main() {
-    ThreadSafeQueue queue;
-    std::atomic<int> counter(10);
-    std::thread t1(worker, std::ref(queue), std::ref(counter));
-    std::thread t2(worker, std::ref(queue), std::ref(counter));
-    for (int i = 0; i < 10; ++i) {
-        queue.push(i);
-    }
-    t1.join();
-    t2.join();
-    assert(counter == 0);
-    int value;
-    assert(!queue.pop(value));
-    std::cout << "All tests passed!" << std::endl;
+    std::string desc = describe_partition();
+    assert(desc.find("not stable") != std::string::npos);
+    assert(desc.find("partition point") != std::string::npos);
+    assert(desc.find("linear") != std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to handle complex multi-threading patterns involving atomic operations, thread synchronization, and a thread-safe queue. The pattern requires understanding of mutexes, atomic counters, and thread management, which are advanced C++ features. The assertions verify that the atomic counter correctly decrements to zero and that the queue is empty after all operations, ensuring proper synchronization and thread safety.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(desc.find("predicate") != std::string::npos);
+    assert(desc.find("order") != std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #37
@@ -2083,58 +1819,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
+#include <string>
 #include <cassert>
 
-class WorkStealingQueue {
-public:
-    WorkStealingQueue(size_t size) : buffer(size), head(0), tail(0) {}
-    bool steal(int &task);
-private:
-    std::vector<int> buffer;
-    std::atomic<size_t> head;
-    std::atomic<size_t> tail;
-};
+// Describe std::rotate. Must mention:
+// 1. "left rotation" (it performs a left rotation)
+// 2. "new first" (returns iterator to the element that was first before rotation)
+// 3. "in-place" (operates in-place, no extra memory)
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-bool WorkStealingQueue::steal(int &task) {
-    size_t local_tail = tail.load(std::memory_order_relaxed);
-    size_t local_head = head.load(std::memory_order_acquire);
-    if (local_head >= local_tail) {
-        return false;
-    }
-    task = buffer[local_head % buffer.size()];
-    head.store(local_head + 1, std::memory_order_release);
-    return true;
+std::string describe_rotate() {
+    return "std::rotate performs a left rotation of elements in-place. "
+           "The element pointed to by middle becomes the new first element. "
+           "It returns an iterator to the element that was originally first, now at its new position.";
 }
+
 
 SUFFIX CODE:
 ----------------------------------------
-void testWorkStealingQueue() {
-    WorkStealingQueue queue(10);
-    int task;
-    assert(queue.steal(task) == false);
-}
 
 int main() {
-    testWorkStealingQueue();
-    std::cout << "All tests passed!" << std::endl;
+    std::string desc = describe_rotate();
+    assert(desc.find("left rotation") != std::string::npos || desc.find("left rotate") != std::string::npos);
+    assert(desc.find("new first") != std::string::npos);
+    assert(desc.find("in-place") != std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a work-stealing queue pattern, which is a non-trivial multi-threading pattern. The prefix provides the class definition and necessary member variables, while the suffix includes the test function and assertions. The golden completion requires knowledge of atomic operations and memory ordering, making it a good test case for advanced C++ understanding.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(desc.find("element") != std::string::npos);
+    assert(desc.find("iterator") != std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #38
@@ -2148,67 +1867,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <shared_mutex>
+#include <string>
+#include <cassert>
 
-class ThreadSafeVector {
-private:
-    std::vector<int> data;
-    mutable std::shared_mutex mutex;
-public:
+// Describe std::exchange. Must mention:
+// 1. "old value" (returns the old value)
+// 2. "single expression" (enables move-and-replace in one expression)
+// 3. "move" (can use move semantics)
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    void add(int value) {
-        std::unique_lock lock(mutex);
-        data.push_back(value);
-    }
-
-    bool contains(int value) const {
-        std::shared_lock lock(mutex);
-        return std::find(data.begin(), data.end(), value) != data.end();
-    }
+std::string describe_exchange() {
+    return "std::exchange replaces a variable with a new value and returns "
+           "the old value. It enables move-and-replace in a single expression. "
+           "It uses move semantics when applicable to avoid copies.";
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
-    void remove(int value) {
-        std::unique_lock lock(mutex);
-        data.erase(std::remove(data.begin(), data.end(), value), data.end());
-    }
-
-    void print() const {
-        std::shared_lock lock(mutex);
-        for (int val : data) {
-            std::cout << val << " ";
-        }
-        std::cout << std::endl;
-    }
-};
 
 int main() {
-    ThreadSafeVector tsVector;
-    tsVector.add(1);
-    tsVector.add(2);
-    tsVector.add(3);
-    tsVector.remove(2);
-    tsVector.print();
-    assert(tsVector.contains(1));
-    assert(!tsVector.contains(2));
-    assert(tsVector.contains(3));
+    std::string desc = describe_exchange();
+    assert(desc.find("old value") != std::string::npos);
+    assert(desc.find("single expression") != std::string::npos);
+    assert(desc.find("move") != std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example challenges an LLM to complete a multi-threaded class that uses a shared_mutex to manage concurrent access to a vector. The golden completion requires the LLM to correctly add elements to the vector and check for their existence while adhering to thread safety. The suffix includes assertions to verify that the add and contains methods work correctly, ensuring the LLM understands the use of unique_lock and shared_lock for thread-safe operations.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(desc.find("replace") != std::string::npos);
+    assert(desc.find("return") != std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #39
@@ -2222,57 +1915,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
+#include <string>
 #include <cassert>
 
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads) : stop(false) {
-        for (size_t i = 0; i < numThreads; ++i)
-            workers.emplace_back([this] {
-                while (!stop) {
-                    // Worker thread task
+// Describe std::clamp. Must mention:
+// 1. "undefined" (behavior is undefined if lo > hi)
+// 2. "reference" (returns a const reference)
+// 3. "NaN" (does not handle NaN correctly with floating point)
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                    std::this_thread::yield();
+std::string describe_clamp() {
+    return "std::clamp constrains a value between lo and hi bounds. "
+           "Behavior is undefined if lo > hi. It returns a const reference "
+           "to the value, lo, or hi. It does not handle NaN correctly with floating point.";
+}
+
 
 SUFFIX CODE:
 ----------------------------------------
-                }
-            });
-    }
-
-    ~ThreadPool() {
-        stop = true;
-        for (std::thread &worker : workers)
-            worker.join();
-    }
-
-private:
-    std::vector<std::thread> workers;
-    std::atomic<bool> stop;
-};
 
 int main() {
-    ThreadPool pool(4);
-    assert(pool.workers.size() == 4);
-    std::cout << "All assertions passed." << std::endl;
+    std::string desc = describe_clamp();
+    assert(desc.find("undefined") != std::string::npos);
+    assert(desc.find("reference") != std::string::npos);
+    assert(desc.find("NaN") != std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a thread pool implementation pattern, specifically focusing on complex synchronization patterns. The completion involves adding a yielding mechanism within the worker thread loop, which is a common practice to avoid busy-waiting when there are no tasks to process. The assertions verify that the thread pool is correctly initialized with the expected number of worker threads. This pattern is non-trivial and requires understanding of advanced multi-threading concepts, making it a good test for evaluating the model's low-context pattern matching capabilities.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(desc.find("lo") != std::string::npos || desc.find("bound") != std::string::npos);
+    assert(desc.size() > 50);
 
-================================================================================
 
 ================================================================================
 Test Case #40
@@ -2286,61 +1963,42 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <atomic>
-#include <thread>
-#include <vector>
+#include <string>
 #include <cassert>
 
-class LockFreeQueue {
-public:
-    LockFreeQueue(size_t size) : size(size), front(0), back(0) {
-        buffer.resize(size);
-    }
-    bool enqueue(int value);
-private:
-    std::vector<int> buffer;
-    std::atomic<size_t> front;
-    std::atomic<size_t> back;
-    size_t size;
-};
-
-bool LockFreeQueue::enqueue(int value) {
+// Describe std::forward. Must mention:
+// 1. "value category" (preserves the value category: lvalue/rvalue)
+// 2. "universal" (used with universal/forwarding references)
+// 3. "conditional" (conditionally casts to rvalue reference)
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    size_t pos = back.load(std::memory_order_relaxed);
-    if ((pos + 1) % size == front.load(std::memory_order_acquire)) {
-        return false;  // queue is full
-    }
+std::string describe_forward() {
+    return "std::forward preserves the value category of an argument, "
+           "keeping lvalues as lvalues and rvalues as rvalues. It is used "
+           "with universal references (T&&). It performs a conditional cast "
+           "to rvalue reference based on the deduced type.";
+}
 
 
 SUFFIX CODE:
 ----------------------------------------
 
-    buffer[pos] = value;
-    back.store((pos + 1) % size, std::memory_order_release);
-    return true;
-}
-
 int main() {
-    LockFreeQueue queue(10);
-    assert(queue.enqueue(1) == true);
-    assert(queue.enqueue(2) == true);
-    assert(queue.enqueue(3) == true);
-    std::cout << "All assertions passed." << std::endl;
+    std::string desc = describe_forward();
+    assert(desc.find("value category") != std::string::npos);
+    assert(desc.find("universal") != std::string::npos);
+    assert(desc.find("conditional") != std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example demonstrates a lock-free queue implementation using atomic operations and memory ordering specifications. It is complex enough to challenge a senior C++ developer, requiring understanding of memory order semantics and lock-free data structures. The pattern involves atomic load/store operations with specific memory orders, which are critical for correct synchronization in concurrent programming. The assertions verify the correct functionality of the enqueue operation within the constraints of a lock-free queue, ensuring the queue behaves as expected in a multi-threaded environment.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    assert(desc.find("lvalue") != std::string::npos);
+    assert(desc.find("rvalue") != std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #41
@@ -2354,60 +2012,42 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <atomic>
-#include <thread>
-#include <vector>
 #include <cassert>
-
-class LockFreeQueue {
-public:
-    LockFreeQueue() : head(0), tail(0) {}
-    void enqueue(int value);
-    int dequeue();
-private:
-    std::atomic<int> head;
-    std::atomic<int> tail;
-    std::vector<int> buffer{100};
-};
+#include <string>
+#include <memory>
+#include <algorithm>
+struct Node{int value;};
+void demo(){auto owner=std::make_shared<Node>(); std::shared_ptr<int> view(owner,&owner->value);}
+// aliasing shared_ptr: stored pointer differs from managed object/control block owner
+std::string describe_shared_ptr_aliasing() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-void LockFreeQueue::enqueue(int value) {
-    int current_tail = tail.load(std::memory_order_relaxed);
-    buffer[current_tail % buffer.size()] = value;
-    tail.store(current_tail + 1, std::memory_order_release);
-}
+    return "The aliasing shared_ptr constructor shares the owner control block "
+           "and managed object lifetime while storing a different pointer returned "
+           "by get(), such as a pointer to a member subobject.";
 
-int LockFreeQueue::dequeue() {
-    int current_head = head.load(std::memory_order_relaxed);
-    if (current_head == tail.load(std::memory_order_acquire)) {
-        throw std::runtime_error("Queue is empty");
-    }
-    int value = buffer[current_head % buffer.size()];
-    head.store(current_head + 1, std::memory_order_release);
-    return value;
-}
 
 SUFFIX CODE:
 ----------------------------------------
-int main() {
-    LockFreeQueue queue;
-    queue.enqueue(42);
-    queue.enqueue(43);
-    assert(queue.dequeue() == 42);
-    assert(queue.dequeue() == 43);
+}
+int main(){
+    auto d=describe_shared_ptr_aliasing();
+    assert(d.find("control")!=std::string::npos);
+    assert(d.find("stored")!=std::string::npos || d.find("different pointer")!=std::string::npos);
+    assert(d.find("lifetime")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This scenario tests the LLM's ability to recognize and complete the implementation of a lock-free queue using atomic operations. The pattern involves correct usage of std::atomic and memory order specifications, which are advanced C++ features. The assertions in the suffix validate the enqueue and dequeue operations, ensuring they work correctly in a multi-threaded context. This example requires understanding of atomic operations, memory ordering, and handling potential race conditions, making it complex and suitable for testing advanced C++ knowledge.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto d2=describe_shared_ptr_aliasing();
+    assert(d2.find("managed object")!=std::string::npos);
+    assert(d2.find("get()")!=std::string::npos);
+    assert(d2.find("member")!=std::string::npos || d2.find("subobject")!=std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #42
@@ -2421,75 +2061,41 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <cassert>
+#include <string>
+#include <vector>
+#include <algorithm>
+void demo(){std::vector<bool> bits(3); bits[1]=true; auto r=bits[1];}
+// vector<bool> specialization: packed bits, proxy reference, not bool&
+std::string describe_vector_bool() {
 
-class ThreadSafeQueue {
-public:
-	void enqueue(int value) {
-		std::unique_lock<std::mutex> lock(mtx);
-		queue.push_back(value);
-		cv.notify_one();
-	}
-
-	int dequeue() {
-		std::unique_lock<std::mutex> lock(mtx);
-		cv.wait(lock, [this]{ return !queue.empty(); });
-		int value = queue.front();
-		queue.erase(queue.begin());
-		return value;
-	}
-
-private:
-	std::vector<int> queue;
-	std::mutex mtx;
-	std::condition_variable cv;
-};
-
-void producer(ThreadSafeQueue &q) {
-	for (int i = 0; i < 10; ++i) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-
-		q.enqueue(i);
+    return "std::vector<bool> is a packed-bit specialization whose operator[] "
+           "returns a proxy reference rather than bool&, so element access can "
+           "behave differently from ordinary vector<T>.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-	}
 }
-
-void consumer(ThreadSafeQueue &q) {
-	for (int i = 0; i < 10; ++i) {
-		int value = q.dequeue();
-		assert(value == i);
-	}
-}
-
-int main() {
-	ThreadSafeQueue q;
-	std::thread prod(producer, std::ref(q));
-	std::thread cons(consumer, std::ref(q));
-	prod.join();
-	cons.join();
-	std::cout << "All assertions passed.\n";
-	return 0;
+int main(){
+    std::string d=describe_vector_bool();
+    assert(d.find("packed")!=std::string::npos);
+    assert(d.find("proxy")!=std::string::npos);
+    assert(d.find("bool&")!=std::string::npos);
+    return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a producer-consumer pattern using a thread-safe queue with mutexes and condition variables. The pattern is clear and identifiable with minimal context, and the complexity lies in understanding thread synchronization and proper use of C++ concurrency primitives. The assertions in the suffix ensure the queue operates correctly under concurrent access.
+    std::string d2=describe_vector_bool();
+    assert(d2.find("specialization")!=std::string::npos);
+    assert(d2.find("operator[]")!=std::string::npos || d2.find("element access")!=std::string::npos);
+    assert(d2.find("ordinary")!=std::string::npos || d2.find("vector<T>")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #43
@@ -2503,60 +2109,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
+#include <cassert>
+#include <string>
+#include <memory>
+void demo(){std::owner_less<std::weak_ptr<int>> cmp; (void)cmp;}
+// owner_less compares shared/weak pointers by ownership control block via owner_before, not by get() pointer
+std::string describe_owner_less() {
 
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads) : stop(false) {
-        for (size_t i = 0; i < numThreads; ++i) {
-            workers.emplace_back([this] {
-                for (;;) {
-                    std::function<void()> task;
-                    {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                        std::unique_lock<std::mutex> lock(this->queueMutex);
-                        this->condition.wait(lock, [this] { return this->stop.load(); });
+    return "std::owner_less provides a strict weak ordering for shared_ptr "
+           "and weak_ptr based on ownership control blocks via owner_before, "
+           "not on the raw pointer returned by get().";
+
 
 SUFFIX CODE:
 ----------------------------------------
-                    }
-                    if (task) task();
-                    else if (stop.load()) return;
-                }
-            });
-        }
-    }
-    ~ThreadPool() {
-        stop.store(true);
-        for (std::thread &worker : workers)
-            worker.join();
-    }
-private:
-    std::vector<std::thread> workers;
-    std::atomic<bool> stop;
-};
-
-int main() {
-    ThreadPool pool(4);
-    std::cout << "ThreadPool created with 4 threads" << std::endl;
-    assert(pool.workers.size() == 4);
-    assert(!pool.stop.load());
+}
+int main(){
+    auto d=describe_owner_less();
+    assert(d.find("ownership")!=std::string::npos);
+    assert(d.find("control")!=std::string::npos);
+    assert(d.find("not")!=std::string::npos && d.find("pointer")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example challenges the LLM to complete the pattern of a complex synchronization mechanism in a thread pool implementation. It requires understanding of mutexes, condition variables, and atomic operations. The context provided is minimal but sufficient for a knowledgeable developer to recognize the pattern and complete it correctly. The assertions in the suffix verify the creation of threads and ensure the stop flag is not set, which are key aspects of the ThreadPool's initialization logic. The golden completion should demonstrate correct use of synchronization primitives to wait for tasks or shutdown signal, which is a non-trivial task requiring proper understanding of concurrency controls in C++.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto d2=describe_owner_less();
+    assert(d2.find("owner_before")!=std::string::npos);
+    assert(d2.find("weak_ptr")!=std::string::npos);
+    assert(d2.find("strict weak")!=std::string::npos || d2.find("ordering")!=std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #44
@@ -2570,42 +2156,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <atomic>
+#include <any>
+#include <cassert>
+#include <string>
+void demo(){std::any a=7; int* p=std::any_cast<int>(&a); (void)p; try{std::any_cast<std::string>(a);}catch(const std::bad_any_cast&){}}
+// any_cast: pointer overload returns nullptr on mismatch; value/reference overload throws bad_any_cast
+std::string describe_any_cast() {
 
-std::atomic<int> counter(0);
-
-void increment() {
-    for (int i = 0; i < 1000; ++i) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        ++counter;
+    return "std::any_cast requires an exact stored type match: the pointer "
+           "overload returns nullptr on mismatch, while the value or reference "
+           "overload throws std::bad_any_cast.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
 }
-
-int main() {
-    std::thread t1(increment);
-    std::thread t2(increment);
-    t1.join();
-    t2.join();
-    assert(counter.load() == 2000);
-    std::cout << "Counter: " << counter.load() << std::endl;
+int main(){
+    auto d=describe_any_cast();
+    assert(d.find("nullptr")!=std::string::npos);
+    assert(d.find("throws")!=std::string::npos);
+    assert(d.find("bad_any_cast")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving multi-threaded atomic operations. The prefix sets up an atomic counter and a loop that should increment this counter. The correct completion involves recognizing that the operation should be atomic to maintain thread safety. The suffix contains the execution and assertion code to ensure the counter has been incremented correctly by both threads, making it a good low-context test case.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto d2=describe_any_cast();
+    assert(d2.find("pointer")!=std::string::npos);
+    assert(d2.find("value")!=std::string::npos || d2.find("reference")!=std::string::npos);
+    assert(d2.find("exact")!=std::string::npos || d2.find("stored type")!=std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #45
@@ -2619,56 +2203,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <mutex>
+#include <optional>
 #include <cassert>
-
-class ThreadSafeVector {
-public:
-    void push_back(int value) {
-        std::lock_guard<std::mutex> lock(mtx_);
+#include <string>
+void demo(){std::optional<int> o; try{o.value();}catch(const std::bad_optional_access&){}}
+// optional::value checks engagement and throws; operator* on empty optional is undefined behavior
+std::string describe_optional_value() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        data_.push_back(value);
+    return "optional::value() checks whether the optional is engaged and "
+           "throws bad_optional_access when it is empty, whereas operator* "
+           "on a disengaged optional has undefined behavior.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-    
-    int at(size_t index) {
-        std::lock_guard<std::mutex> lock(mtx_);
-        return data_.at(index);
-    }
-
-private:
-    std::vector<int> data_;
-    std::mutex mtx_;
-};
-
-int main() {
-    ThreadSafeVector ts_vec;
-    std::thread t1([&]() { ts_vec.push_back(1); });
-    std::thread t2([&]() { ts_vec.push_back(2); });
-    t1.join();
-    t2.join();
-    assert(ts_vec.at(0) == 1 || ts_vec.at(0) == 2);
-    assert(ts_vec.at(1) == 1 || ts_vec.at(1) == 2);
-    assert(ts_vec.at(0) != ts_vec.at(1));
+}
+int main(){
+    auto d=describe_optional_value();
+    assert(d.find("throws")!=std::string::npos);
+    assert(d.find("bad_optional_access")!=std::string::npos);
+    assert(d.find("operator*")!=std::string::npos);
     return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving a thread-safe data structure manipulation. The prefix establishes a class with a mutex-protected vector and a push_back method, but the critical operation of adding an element to the vector is missing. The suffix contains a method to retrieve elements and a main function that uses multiple threads to push elements into the vector, followed by assertions to verify the correct behavior. This requires understanding of mutexes, thread safety, and C++ standard library containers.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto d2=describe_optional_value();
+    assert(d2.find("engaged")!=std::string::npos || d2.find("disengaged")!=std::string::npos);
+    assert(d2.find("undefined")!=std::string::npos);
+    assert(d2.find("empty")!=std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #46
@@ -2682,88 +2250,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
+#include <memory>
 #include <cassert>
-
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads) : stop(false) {
-        for(size_t i = 0; i < numThreads; ++i) {
-            workers.emplace_back([this] {
-                while(!this->stop) {
-                    std::function<void()> task;
-                    {
-                        std::unique_lock<std::mutex> lock(this->queueMutex);
-                        this->condition.wait(lock, [this]{ return this->stop || !this->tasks.empty(); });
-                        if(this->stop && this->tasks.empty())
-                            return;
-                        task = std::move(this->tasks.front());
-                        this->tasks.pop();
-                    }
-                    task();
-                }
-            });
-        }
-    }
-    void enqueue(std::function<void()> task) {
-        {
-            std::unique_lock<std::mutex> lock(queueMutex);
-            tasks.push(std::move(task));
-        }
-        condition.notify_one();
-    }
-    ~ThreadPool() {
-        {
-            std::unique_lock<std::mutex> lock(queueMutex);
-            stop = true;
-        }
-        condition.notify_all();
-        for(std::thread &worker: workers)
-            worker.join();
-    }
-private:
-    std::vector<std::thread> workers;
-    std::queue<std::function<void()>> tasks;
-    std::mutex queueMutex;
-    std::condition_variable condition;
-    bool stop;
-};
-
-int main() {
-    ThreadPool pool(4);
-    std::atomic<int> counter(0);
-    for(int i = 0; i < 8; ++i) {
-        pool.enqueue([&counter] {
-            counter.fetch_add(1, std::memory_order_relaxed);
-        });
-    }
+#include <string>
+void demo(){auto sp=std::make_shared<int>(3); std::weak_ptr<int> w=sp; auto locked=w.lock(); sp.reset(); auto empty=w.lock();}
+// weak_ptr::lock returns shared_ptr; empty if expired, otherwise extends lifetime
+std::string describe_weak_lock() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    return "weak_ptr::lock returns a shared_ptr that shares ownership and "
+           "extends the object lifetime if the weak pointer has not expired; "
+           "if it has expired, lock() returns an empty shared_ptr.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-
-    assert(counter.load(std::memory_order_relaxed) == 8);
-    std::cout << "All tasks completed successfully." << std::endl;
+}
+int main(){
+    auto d=describe_weak_lock();
+    assert(d.find("shared_ptr")!=std::string::npos);
+    assert(d.find("expired")!=std::string::npos);
+    assert(d.find("empty")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving a thread pool implementation and synchronization using atomic operations and condition variables. The pattern is complex and requires an understanding of thread management, synchronization, and atomic operations, making it a good test case for advanced C++ features.
+    auto d2=describe_weak_lock();
+    assert(d2.find("lifetime")!=std::string::npos);
+    assert(d2.find("ownership")!=std::string::npos || d2.find("owns")!=std::string::npos);
+    assert(d2.find("lock()")!=std::string::npos || d2.find("lock")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #47
@@ -2777,76 +2297,42 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
-
-class WorkStealingQueue {
-public:
-	void push(int data);
-	bool try_pop(int &data);
-	bool empty() const;
-private:
-	std::vector<int> queue;
-	std::atomic<size_t> head{0};
-	std::atomic<size_t> tail{0};
-};
+#include <cassert>
+#include <string>
+#include <mutex>
+#include <condition_variable>
+std::mutex m; std::condition_variable cv;
+void demo(){std::unique_lock<std::mutex> lk(m); std::notify_all_at_thread_exit(cv,std::move(lk));}
+// notify_all_at_thread_exit keeps the moved lock held until thread exit, then unlocks and notifies all
+std::string describe_notify_at_exit() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-void WorkStealingQueue::push(int data) {
-	queue.push_back(data);
-	tail.fetch_add(1, std::memory_order_release);
-}
+    return "std::notify_all_at_thread_exit takes ownership of a moved "
+           "unique_lock, keeps it locked until the current thread exits, then "
+           "unlocks it and notifies all waiters on the condition_variable.";
 
-bool WorkStealingQueue::try_pop(int &data) {
-	size_t old_head = head.load(std::memory_order_relaxed);
-	if (old_head >= tail.load(std::memory_order_acquire)) {
-		return false;
-	}
-	data = queue[old_head];
-	head.fetch_add(1, std::memory_order_release);
-	return true;
-}
-
-bool WorkStealingQueue::empty() const {
-	return head.load(std::memory_order_acquire) >= tail.load(std::memory_order_acquire);
-}
 
 SUFFIX CODE:
 ----------------------------------------
-int main() {
-	WorkStealingQueue wsq;
-	std::thread t1([&wsq]() {
-		for (int i = 0; i < 10; ++i) {
-			wsq.push(i);
-		}
-	});
-
-	std::thread t2([&wsq]() {
-		int data;
-		for (int i = 0; i < 10; ++i) {
-			while (!wsq.try_pop(data)) {}
-			assert(data >= 0 && data < 10);
-		}
-	});
-
-	t1.join();
-	t2.join();
-	assert(wsq.empty());
-	return 0;
+}
+int main(){
+    auto d=describe_notify_at_exit();
+    assert(d.find("thread exits")!=std::string::npos || d.find("thread exit")!=std::string::npos);
+    assert(d.find("unlock")!=std::string::npos);
+    assert(d.find("notifies")!=std::string::npos || d.find("notify")!=std::string::npos);
+    return 0;
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a complex multi-threading pattern involving work-stealing queues. The key operations in the queue, push and try_pop, use atomic operations and memory orders to ensure thread safety. The example also includes a verification step that checks the correctness of the queue operations and ensures that the queue is empty at the end. This scenario requires understanding advanced C++ features such as atomic operations, memory ordering, and multi-threading, making it a good test case for low-context pattern matching.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+    auto d2=describe_notify_at_exit();
+    assert(d2.find("unique_lock")!=std::string::npos);
+    assert(d2.find("moved")!=std::string::npos || d2.find("std::move")!=std::string::npos);
+    assert(d2.find("condition_variable")!=std::string::npos);
 
-================================================================================
 
 ================================================================================
 Test Case #48
@@ -2860,82 +2346,39 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
 #include <cassert>
-
-class ThreadPool {
-public:
-    ThreadPool(size_t num_threads) : done(false), work_queue(num_threads), current_index(0) {
-        for(size_t i = 0; i < num_threads; ++i) {
-            workers.emplace_back(&ThreadPool::worker_thread, this);
-        }
-    }
-    ~ThreadPool() {
-        done = true;
-        for(auto& worker : workers) {
-            worker.join();
-        }
-    }
-    void submit(std::function<void()> func) {
-        // Submission logic here
+#include <string>
+void demo(){std::string s="abc"; char* p=s.data(); p[0]='x';}
+// In C++17 string::data() is mutable and null-terminated; pointer can be invalidated by non-const operations
+std::string describe_string_data() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        size_t index = current_index++ % work_queue.size();
-        while(work_queue[index]) {
-            index = current_index++ % work_queue.size();
-        }
-        work_queue[index] = func;
+    return "Since C++17, non-const string::data() returns a mutable pointer "
+           "to contiguous null-terminated storage, but that pointer may be "
+           "invalidated by non-const operations or reallocation.";
 
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-
-private:
-    void worker_thread() {
-        while(!done) {
-            size_t index = current_index++ % work_queue.size();
-            if(work_queue[index]) {
-                std::function<void()> task;
-                if(work_queue[index].compare_exchange_strong(task, nullptr)) {
-                    task();
-                }
-            }
-        }
-    }
-
-    std::atomic<bool> done;
-    std::vector<std::atomic<std::function<void()>>> work_queue;
-    std::atomic<size_t> current_index;
-    std::vector<std::thread> workers;
-};
-
-int main() {
-    ThreadPool pool(4);
-    std::atomic<int> counter{0};
-    for(int i = 0; i < 10; ++i) {
-        pool.submit([&counter] { counter++; });
-    }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-    assert(counter == 10);
-    std::cout << "All tasks completed successfully." << std::endl;
+}
+int main(){
+    auto d=describe_string_data();
+    assert(d.find("mutable")!=std::string::npos);
+    assert(d.find("null")!=std::string::npos);
+    assert(d.find("invalid")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates a complex synchronization pattern in a thread pool implementation. The task submission and worker thread coordination involve atomic operations and memory ordering, which are advanced C++ topics. The golden completion fills in the task submission logic, ensuring no race conditions occur. The suffix contains assertions that verify the correct execution of the thread pool, ensuring all tasks are completed as expected.
+    auto d2=describe_string_data();
+    assert(d2.find("C++17")!=std::string::npos);
+    assert(d2.find("contiguous")!=std::string::npos);
+    assert(d2.find("reallocation")!=std::string::npos || d2.find("non-const")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #49
@@ -2949,45 +2392,40 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <vector>
-#include <thread>
-#include <mutex>
+#include <functional>
 #include <cassert>
-std::mutex mtx;
-void workerFunction(std::vector<int>& data) {
-    for (int i = 0; i < 1000; ++i) {
-        std::lock_guard<std::mutex> lock(mtx);
+#include <string>
+void demo(){int x=1; auto r=std::ref(x); r.get()=2;}
+// reference_wrapper is copyable and non-owning; get() returns T& to original object
+std::string describe_reference_wrapper() {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        data.push_back(i);
+    return "std::reference_wrapper is a copyable, non-owning wrapper around "
+           "a reference; get() returns T& to the original object, so writes "
+           "through it modify that original.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
 }
-int main() {
-    std::vector<int> data;
-    std::thread t1(workerFunction, std::ref(data));
-    std::thread t2(workerFunction, std::ref(data));
-    t1.join();
-    t2.join();
-    assert(data.size() == 2000);
-    assert(std::all_of(data.begin(), data.end(), [](int n){ return n >= 0 && n < 1000; }));
-    std::cout << "All assertions passed!" << std::endl;
+int main(){
+    auto d=describe_reference_wrapper();
+    assert(d.find("copyable")!=std::string::npos);
+    assert(d.find("non-owning")!=std::string::npos);
+    assert(d.find("get()")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving multi-threading with mutex locks. The workerFunction pushes back elements into a shared vector within a critical section protected by a mutex. The assertions verify that the vector contains the correct number of elements and that all elements are within the expected range. This scenario challenges the model to understand and complete code involving thread synchronization and shared data management.
+    auto d2=describe_reference_wrapper();
+    assert(d2.find("T&")!=std::string::npos || d2.find("reference")!=std::string::npos);
+    assert(d2.find("original")!=std::string::npos);
+    assert(d2.find("modify")!=std::string::npos || d2.find("writes")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #50
@@ -3001,80 +2439,38 @@ Language: cpp
 
 PREFIX CODE:
 ----------------------------------------
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <atomic>
+#include <functional>
 #include <cassert>
+#include <string>
+void demo(){std::function<int()> f; try{f();}catch(const std::bad_function_call&){}}
+// std::function type-erases a callable; invoking an empty function throws bad_function_call
+std::string describe_function_empty() {
 
-class ThreadPool {
-public:
-    ThreadPool(size_t numThreads) : stop(false) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        for (size_t i = 0; i < numThreads; ++i) {
-            workers.emplace_back(&ThreadPool::workerThread, this);
-        }
+    return "std::function type-erases a copyable callable target; if it is "
+           "empty, invoking operator() throws std::bad_function_call rather "
+           "than calling a null function pointer.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-
-    void addTask(std::function<void()> task) {
-        std::unique_lock<std::mutex> lock(queueMutex);
-        tasks.push_back(task);
-        condition.notify_one();
-    }
-
-    void waitForCompletion() {
-        for (std::thread &worker : workers) {
-            worker.join();
-        }
-    }
-
-private:
-    std::vector<std::thread> workers;
-    std::vector<std::function<void()>> tasks;
-    std::mutex queueMutex;
-    std::condition_variable condition;
-    std::atomic<bool> stop;
-
-    void workerThread() {
-        while (!stop) {
-            std::function<void()> task;
-            {
-                std::unique_lock<std::mutex> lock(queueMutex);
-                condition.wait(lock, [this] { return stop || !tasks.empty(); });
-                if (stop && tasks.empty())
-                    return;
-                task = std::move(tasks.back());
-                tasks.pop_back();
-            }
-            task();
-        }
-    }
-};
-
-int main() {
-    ThreadPool pool(4);
-    std::atomic<int> counter(0);
-
-    for (int i = 0; i < 10; ++i) {
-        pool.addTask([&counter] { counter.fetch_add(1, std::memory_order_relaxed); });
-    }
-
-    pool.waitForCompletion();
-    assert(counter == 10);
+}
+int main(){
+    auto d=describe_function_empty();
+    assert(d.find("type-erases")!=std::string::npos || d.find("type erases")!=std::string::npos);
+    assert(d.find("empty")!=std::string::npos);
+    assert(d.find("bad_function_call")!=std::string::npos);
     return 0;
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a thread pool pattern with minimal context. The pool initializes a set number of worker threads and tasks are distributed among them. This requires understanding of thread management, synchronization, and atomic operations, which are advanced C++ concepts. The assertions verify that all tasks have been executed correctly by the worker threads.
+    auto d2=describe_function_empty();
+    assert(d2.find("operator()")!=std::string::npos || d2.find("invoking")!=std::string::npos);
+    assert(d2.find("target")!=std::string::npos);
+    assert(d2.find("copyable")!=std::string::npos || d2.find("callable")!=std::string::npos);
 
-ASSERTIONS:
-----------------------------------------
 
-================================================================================

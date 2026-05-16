@@ -1,4 +1,3 @@
-
 ================================================================================
 Test Case #1
 ================================================================================
@@ -11,37 +10,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigInteger;
+public class LCTask1 {
+    static final String A = new StringBuilder("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz").reverse().toString();
+    static final String S = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    public static String base58Encode(byte[] d) { return base58Encode(d, A); }
+    public static String base58Encode(byte[] d, String a) {
 
-public class ListExample {
-	public static void main(String[] args) {
-		List<String> list = new ArrayList<>();
-		list.add("apple");
-		list.add("banana");
-		// Add more elements to the list
 
 GOLDEN COMPLETION:
 ----------------------------------------
-		list.add("cherry");
+        if (d.length == 0) return "";
+        BigInteger n = new BigInteger(1, d);
+        BigInteger b = BigInteger.valueOf(a.length());
+        StringBuilder sb = new StringBuilder();
+        while (n.compareTo(BigInteger.ZERO) > 0) { BigInteger[] qr = n.divideAndRemainder(b); sb.append(a.charAt(qr[1].intValue())); n = qr[0]; }
+        for (byte x : d) { if (x == 0) sb.append(a.charAt(0)); else break; }
+        return sb.reverse().toString();
+
 
 SUFFIX CODE:
 ----------------------------------------
-		// Verify the list contents
-		assert list.size() == 3 : "Size should be 3";
-		assert list.contains("cherry") : "List should contain 'cherry'";
-		System.out.println("All assertions passed.");
-	}
+    }
+    public static void main(String[] args) {
+        assert !base58Encode("abc".getBytes()).equals("ZiCa");
+        assert base58Encode("abc".getBytes()).equals("SHoR");
+        assert base58Encode("abc".getBytes(), S).equals("ZiCa");
+    }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case is a good example of data structure manipulation, specifically adding elements to a List. The pattern is clear and widely recognized, with minimal context needed to understand that an element needs to be added to the list. The prefix sets up the List and adds initial elements, while the suffix checks the size and contents of the list, providing a clear, low-context scenario.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert base58Encode(new byte[]{}).equals("");
+assert base58Encode(new byte[]{0}).equals("z");
+assert base58Encode("hello".getBytes()).equals("oDsMWSK");
+assert base58Encode("hello".getBytes(), S).equals("Cn8eVZg");
+assert base58Encode(new byte[]{0, 97, 98, 99}).equals("zSHoR");
 
-================================================================================
 
 ================================================================================
 Test Case #2
@@ -56,36 +62,45 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
+public class LCTask2Doc {
+    public static List<String> stableSortCI(List<String> items) {
+        var copy = new ArrayList<>(items);
+        copy.sort(String.CASE_INSENSITIVE_ORDER);
+        return copy;
+    }
+    public static String describeStableSortCI() {
 
-public class Main {
-	public static void main(String[] args) {
-		List<Integer> list = new ArrayList<>();
-		list.add(1);
-		list.add(2);
 
 GOLDEN COMPLETION:
 ----------------------------------------
+        return "Creates a defensive copy with the ArrayList constructor, then sorts using " +
+               "String.CASE_INSENSITIVE_ORDER, which delegates comparisons to " +
+               "String.compareToIgnoreCase. Java's TimSort is stable, so " +
+               "case-insensitive ties keep insertion order and the original list is unchanged.";
 
-		list.add(3);
 
 SUFFIX CODE:
 ----------------------------------------
-
-		list.add(4);
-		assert list.size() == 4 : "Size should be 4";
-		assert list.get(2) == 3 : "Element at index 2 should be 3";
-		assert list.get(3) == 4 : "Element at index 3 should be 4";
-	}
+    }
+    public static void main(String[] args) {
+        var src = new ArrayList<>(List.of("Banana", "apple", "APPLE"));
+        var r = stableSortCI(src);
+        assert r.equals(List.of("apple", "APPLE", "Banana"));
+        assert src.equals(List.of("Banana", "apple", "APPLE"));
+        assert describeStableSortCI().contains("CASE_INSENSITIVE_ORDER");
+    }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case evaluates the LLM's ability to recognize and continue a pattern of adding elements to a list. The minimal context provides the initial steps of adding elements, and the completion should logically follow the established pattern. The assertions verify the correct continuation of the sequence.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeStableSortCI().toLowerCase();
+assert d.contains("case_insensitive_order");
+assert d.contains("comparetoignorecase");
+assert d.contains("defensive copy") || d.contains("arraylist");
+assert d.contains("stable") || d.contains("timsort");
+assert d.contains("original");
 
-================================================================================
 
 ================================================================================
 Test Case #3
@@ -99,44 +114,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
+public class LCTask3Doc {
+    public static List<String> frozenView(List<String> src) {
+        return Collections.unmodifiableList(src);
+    }
+    public static String describeFrozenView() {
 
-public class StringManipulator {
-	public List<String> processStrings(List<String> input) {
-		List<String> result = new ArrayList<>();
-		for (String str : input) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+        return "Returns Collections.unmodifiableList(src), a live unmodifiable view backed by " +
+               "the source list rather than a copy. Later source mutations are visible, " +
+               "but attempts to add or remove through the view throw UnsupportedOperationException.";
 
-			result.add(str.toUpperCase());
 
 SUFFIX CODE:
 ----------------------------------------
-
-		}
-		return result;
-	}
-
-	public static void main(String[] args) {
-		StringManipulator sm = new StringManipulator();
-		List<String> input = List.of("hello", "world");
-		List<String> output = sm.processStrings(input);
-		assert output.size() == 2;
-		assert output.get(0).equals("HELLO");
-		assert output.get(1).equals("WORLD");
-	}
+    }
+    public static void main(String[] args) {
+        var base = new ArrayList<>(List.of("a", "b"));
+        var view = frozenView(base);
+        base.add("c");
+        assert view.equals(List.of("a", "b", "c"));
+        try { view.add("d"); assert false; } catch (UnsupportedOperationException e) {}
+        assert describeFrozenView().contains("unmodifiableList");
+    }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This is a good test case because it tests the model's ability to recognize a common string manipulation pattern within a loop. The context provided is minimal but sufficient to establish the expected behavior of processing each string in the list by converting it to uppercase. The assertions verify that the pattern has been correctly recognized and implemented.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeFrozenView().toLowerCase();
+assert d.contains("collections.unmodifiablelist");
+assert d.contains("live") || d.contains("backed");
+assert d.contains("source") || d.contains("backing");
+assert d.contains("unsupportedoperationexception");
+assert d.contains("copy") || d.contains("not a copy");
 
-================================================================================
 
 ================================================================================
 Test Case #4
@@ -150,45 +165,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.ArrayList;
-import java.util.List;
-
-public class DataManipulation {
-    public static List<String> filterStrings(List<String> input) {
-        List<String> result = new ArrayList<>();
-        for (String str : input) {
-            if (str.contains("test")) {
+import java.math.BigInteger;
+public class LCTask4Base64 {
+    static final String S = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    static final String R = new StringBuilder(S).reverse().toString();
+    public static String base64Encode(byte[] d) { return base64Encode(d, R); }
+    public static String base64Encode(byte[] d, String a) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                result.add(str);
+        if (d.length == 0) return "";
+        BigInteger n = new BigInteger(1, d), b = BigInteger.valueOf(a.length());
+        StringBuilder sb = new StringBuilder();
+        while (n.compareTo(BigInteger.ZERO) > 0) { BigInteger[] qr = n.divideAndRemainder(b); sb.append(a.charAt(qr[1].intValue())); n = qr[0]; }
+        for (byte x : d) { if (x == 0) sb.append(a.charAt(0)); else break; }
+        return sb.reverse().toString();
 
 
 SUFFIX CODE:
 ----------------------------------------
-            }
-        }
-        return result;
     }
-
     public static void main(String[] args) {
-        List<String> input = List.of("test1", "example", "test2");
-        List<String> output = filterStrings(input);
-        assert output.size() == 2;
-        assert output.contains("test1");
-        assert output.contains("test2");
+        assert !base64Encode("hello".getBytes(), S).equals("aGVsbG8=");
+        assert base64Encode("hello".getBytes()).equals("5eak5OQ");
+        assert base64Encode("hello".getBytes(), S).equals("GhlbGxv");
+        assert base64Encode("abc".getBytes()).equals("np2c");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This scenario tests the LLM's ability to recognize and complete a pattern involving filtering elements from a list based on a condition. The pattern is clear with minimal context: iterating over a list, checking a condition, and adding matching elements to a result list. The prefix establishes the iteration and condition check, while the suffix shows the return statement and usage of the method. The completion requires adding the matching elements to the result list, a common pattern in data manipulation tasks.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert base64Encode(new byte[]{}).equals("");
+assert base64Encode(new byte[]{0}).equals("/");
+assert base64Encode(new byte[]{0,97,98,99}).equals("/np2c");
+assert base64Encode("abc".getBytes(), S).equals("YWJj");
+assert base64Encode(new byte[]{0,97,98,99}, S).equals("AYWJj");
 
-================================================================================
 
 ================================================================================
 Test Case #5
@@ -202,37 +216,51 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
+public class LCTask5 {
+    /** Update map: if key absent, set to defaultVal.
+     *  If present and current > threshold, REMOVE it (via null return).
+     *  Otherwise increment current by 1. Uses Map.compute. */
+    public static void update(Map<String, Integer> m, String k, int defaultVal, int threshold) {
 
-public class FilterExample {
-    public static void main(String[] args) {
-        List<String> names = Arrays.asList("Alice", "Bob", "Charlie", "David");
-        List<String> filteredNames = names.stream()
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        .filter(name -> name.startsWith("C"))
+        m.compute(k, (key, cur) -> {
+            if (cur == null) return defaultVal;
+            return cur > threshold ? null : cur + 1;
+        });
+
 
 SUFFIX CODE:
 ----------------------------------------
-        .collect(Collectors.toList());
-        // Verify the filtered names contain only those starting with 'C'
-        assert filteredNames.size() == 1;
-        assert filteredNames.contains("Charlie");
-        System.out.println("All assertions passed.");
+    }
+    public static void main(String[] args) {
+        var m = new HashMap<String, Integer>();
+        update(m, "a", 5, 10);  // absent -> 5
+        assert m.get("a") == 5;
+        update(m, "a", 5, 10);  // 5 <= 10 -> 6
+        assert m.get("a") == 6;
+        var m2 = new HashMap<>(Map.of("x", 11));
+        update(m2, "x", 0, 10); // 11 > 10 -> removed
+        assert !m2.containsKey("x");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving Java Streams API for filtering a list of strings. The context is minimal, with the prefix providing the start of a stream operation and the suffix verifying the results. The completion should demonstrate an understanding of how to use the filter method correctly.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+var m3 = new HashMap<>(Map.of("p", 10));
+update(m3, "p", 0, 10);  // 10 == 10, not > 10 -> 11
+assert m3.get("p") == 11;
+update(m3, "p", 0, 10);  // 11 > 10 -> removed
+assert !m3.containsKey("p");
+var m4 = new HashMap<String, Integer>();
+update(m4, "q", 0, 0);
+assert m4.get("q") == 0;
+update(m4, "q", 0, 0);  // 0 == 0, not > 0 -> 1
+assert m4.get("q") == 1;
 
-================================================================================
 
 ================================================================================
 Test Case #6
@@ -246,39 +274,45 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+public class LCTask6Doc {
+    public static LinkedHashMap<String,Integer> makeLRU() {
+        return new LinkedHashMap<>(16, 0.75f, true) {
+            protected boolean removeEldestEntry(Map.Entry<String,Integer> e) { return size() > 3; }
+        };
+    }
+    public static String describeMakeLRU() {
 
-public class Main {
-	public static void main(String[] args) {
-		List<String> list = new ArrayList<>();
-		list.add("Apple");
-		list.add("Banana");
-		list.add("Cherry");
-		StringBuilder result = new StringBuilder();
-		for(String item : list) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
+        return "Creates a LinkedHashMap in access-order mode using the three-argument " +
+               "constructor. Reads with get move entries to most-recent position, and " +
+               "removeEldestEntry evicts when size() > 3, so the least-recently accessed key is dropped.";
 
-			result.append(item).append("-");
 
 SUFFIX CODE:
 ----------------------------------------
-
-		}
-		assert result.toString().equals("Apple-Banana-Cherry-");
-	}
+    }
+    public static void main(String[] args) {
+        var m = makeLRU();
+        m.put("a",1); m.put("b",2); m.put("c",3); m.get("a"); m.put("d",4);
+        assert !m.containsKey("b") && m.containsKey("a");
+        assert m.size() == 3;
+        assert describeMakeLRU().contains("LinkedHashMap");
+    }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and continue a common pattern in Java: iterating through a collection and building a concatenated string. The pattern is clear from the prefix, and the suffix includes an assertion to verify the correct behavior. The minimal context ensures the model must rely on recognizing the iteration and string building pattern.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeMakeLRU().toLowerCase();
+assert d.contains("linkedhashmap");
+assert d.contains("access-order") || d.contains("accessorder");
+assert d.contains("removeeldestentry");
+assert d.contains("size() > 3") || d.contains("size > 3");
+assert d.contains("get") || d.contains("read");
 
-================================================================================
 
 ================================================================================
 Test Case #7
@@ -292,39 +326,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-
-public class ListManipulation {
-    public static void main(String[] args) {
-        List<String> list = new ArrayList<>();
-        list.add("apple");
-        list.add("banana");
-        list.add("cherry");
-        // Insert the new element at index 1
+import java.math.BigInteger;
+public class LCTask7Base32 {
+    static final String S = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    static final String R = new StringBuilder(S).reverse().toString();
+    public static String base32Encode(byte[] d) { return base32Encode(d, R); }
+    public static String base32Encode(byte[] d, String a) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        list.add(1, "date");
+        if (d.length == 0) return "";
+        BigInteger n = new BigInteger(1, d), b = BigInteger.valueOf(a.length());
+        StringBuilder sb = new StringBuilder();
+        while (n.compareTo(BigInteger.ZERO) > 0) { BigInteger[] qr = n.divideAndRemainder(b); sb.append(a.charAt(qr[1].intValue())); n = qr[0]; }
+        for (byte x : d) { if (x == 0) sb.append(a.charAt(0)); else break; }
+        return sb.reverse().toString();
+
 
 SUFFIX CODE:
 ----------------------------------------
-        assert list.size() == 4 : "List size should be 4";
-        assert list.get(1).equals("date") : "Element at index 1 should be 'date'";
-        assert list.get(2).equals("banana") : "Element at index 2 should be 'banana'";
-        System.out.println("All assertions passed.");
+    }
+    public static void main(String[] args) {
+        assert !base32Encode("abc".getBytes(), S).equals("MFRGG");
+        assert base32Encode("abc".getBytes()).equals("Z5HM4");
+        assert base32Encode("abc".getBytes(), S).equals("GCYTD");
+        assert base32Encode("hello".getBytes()).equals("S6NJHE4Q");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case verifies the LLM's ability to recognize and correctly implement a common pattern of inserting an element into a specific index in a list. The prefix sets up the list and specifies the need to insert at index 1, while the suffix includes assertions to ensure the operation was performed correctly. The low-context nature of the task tests the model's understanding of list manipulation patterns with minimal context.
+assert base32Encode(new byte[]{}).equals("");
+assert base32Encode(new byte[]{0}).equals("7");
+assert base32Encode(new byte[]{0,97,98,99}).equals("7Z5HM4");
+assert base32Encode("hello".getBytes(), S).equals("NBSWY3DP");
+assert base32Encode(new byte[]{0,97,98,99}, S).equals("AGCYTD");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #8
@@ -339,69 +378,44 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-
-public class CustomCollection<E> extends AbstractCollection<E> {
-    private final List<E> elements;
-
-    public CustomCollection() {
-        this.elements = new ArrayList<>();
+public class LCTask8Doc {
+    public static List<String> swapEnds(String[] arr) {
+        List<String> view = Arrays.asList(arr);
+        String t = view.get(0); view.set(0, view.get(view.size() - 1)); view.set(view.size() - 1, t);
+        return view;
     }
+    public static String describeSwapEnds() {
 
-    @Override
-    public Iterator<E> iterator() {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        return new Iterator<E>() {
-            private int index = 0;
+        return "Uses Arrays.asList to create a fixed-size List view backed by the array, " +
+               "then swaps with List.set so both the array and returned view change. " +
+               "Because it is the same fixed-size view, add/remove throw UnsupportedOperationException.";
 
-            @Override
-            public boolean hasNext() {
-                return index < elements.size();
-            }
-
-            @Override
-            public E next() {
-                if (!hasNext()) {
-                    throw new NoSuchElementException();
-                }
-                return elements.get(index++);
-            }
-        };
 
 SUFFIX CODE:
 ----------------------------------------
-
     }
-
-    @Override
-    public int size() {
-        return elements.size();
-    }
-
     public static void main(String[] args) {
-        CustomCollection<Integer> collection = new CustomCollection<>();
-        collection.elements.add(1);
-        collection.elements.add(2);
-        collection.elements.add(3);
-        Iterator<Integer> iterator = collection.iterator();
-        assert iterator.hasNext();
-        assert iterator.next() == 1;
-        assert iterator.next() == 2;
-        assert iterator.next() == 3;
-        assert !iterator.hasNext();
+        String[] a = {"x", "y", "z"};
+        var v = swapEnds(a);
+        assert a[0].equals("z") && v.get(2).equals("x");
+        try { v.add("q"); assert false; } catch (UnsupportedOperationException e) {}
+        assert describeSwapEnds().contains("Arrays.asList");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a custom collection implementation with a nested iterator class. The iterator pattern is complex due to its requirement for proper state management and exception handling. The prefix sets up the collection and hints at the need for an iterator implementation. The suffix contains assertions to verify the iterator's behavior, ensuring it can traverse the collection correctly and handle edge cases. This scenario challenges the model to understand the iterator pattern and implement it correctly in the context of a custom collection.
+String d = describeSwapEnds().toLowerCase();
+assert d.contains("arrays.aslist");
+assert d.contains("backed") || d.contains("array");
+assert d.contains("fixed-size") || d.contains("fixed size");
+assert d.contains("set");
+assert d.contains("unsupportedoperationexception");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #9
@@ -415,46 +429,43 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+public class LCTask9Doc {
+    public static int[] swapAndReport(AtomicInteger val, int newVal) {
+        int old = val.getAndSet(newVal);
+        return new int[]{old, val.get()};
+    }
+    public static String describeSwapAndReport() {
 
-public class RecursiveGenericExample {
-    static class Node<T extends Node<T>> {
-        private List<T> children = new ArrayList<>();
-
-        public void addChild(T child) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            children.add(child);
+        return "Uses AtomicInteger.getAndSet(newVal) to atomically mutate the value and capture " +
+               "the old value. It returns a two-element array: first the old value, then the " +
+               "current value after the swap, which is the supplied new value.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-
-        }
-
-        public List<T> getChildren() {
-            return children;
-        }
     }
-
     public static void main(String[] args) {
-        Node<?> root = new Node<>();
-        Node<?> child = new Node<>();
-        root.addChild(child);
-        assert root.getChildren().contains(child);
-        assert root.getChildren().size() == 1;
+        var a = new AtomicInteger(10);
+        int[] r = swapAndReport(a, 42);
+        assert r[0] == 10 && r[1] == 42 && a.get() == 42;
+        assert describeSwapAndReport().contains("getAndSet");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case is a good example of recursive generic types, which are an advanced feature of Java. The code requires understanding of how to use generics with recursive type bounds and how to implement and utilize such a structure. It is not something that can be solved by simple pattern matching as it involves advanced generic programming constructs.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeSwapAndReport().toLowerCase();
+assert d.contains("atomicinteger");
+assert d.contains("getandset");
+assert d.contains("old value");
+assert d.contains("current value") || d.contains("after the swap");
+assert d.contains("new value") || d.contains("newval");
 
-================================================================================
 
 ================================================================================
 Test Case #10
@@ -468,37 +479,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
+import java.math.BigInteger;
+public class LCTask10Base16 {
+    static final String S = "0123456789ABCDEF";
+    static final String R = new StringBuilder(S).reverse().toString();
+    public static String base16Encode(byte[] d) { return base16Encode(d, R); }
+    public static String base16Encode(byte[] d, String a) {
 
-public class Example {
-    public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-        Optional<Integer> result = 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-numbers.stream().filter(n -> n % 2 == 0).findFirst()
+        if (d.length == 0) return "";
+        BigInteger n = new BigInteger(1, d), b = BigInteger.valueOf(a.length());
+        StringBuilder sb = new StringBuilder();
+        while (n.compareTo(BigInteger.ZERO) > 0) { BigInteger[] qr = n.divideAndRemainder(b); sb.append(a.charAt(qr[1].intValue())); n = qr[0]; }
+        for (byte x : d) { if (x == 0) sb.append(a.charAt(0)); else break; }
+        return sb.reverse().toString();
+
 
 SUFFIX CODE:
 ----------------------------------------
-;
-        if (result.isPresent()) {
-            System.out.println("The first even number is: " + result.get());
-            assert result.get() == 2;
-        } else {
-            System.out.println("No even number found");
-        }
+    }
+    public static void main(String[] args) {
+        assert !base16Encode(new byte[]{0,97,98,99}, S).equals("00616263");
+        assert base16Encode("abc".getBytes()).equals("9E9D9C");
+        assert base16Encode(new byte[]{0,97,98,99}).equals("F9E9D9C");
+        assert base16Encode(new byte[]{0,97,98,99}, S).equals("0616263");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a common Java Stream API pattern for finding the first even number in a list. The scenario requires understanding of stream operations, filtering, and optional handling with minimal context. It demonstrates usage of Java's Stream API for processing collections, which is a common but non-trivial pattern.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert base16Encode(new byte[]{}).equals("");
+assert base16Encode(new byte[]{0}).equals("F");
+assert base16Encode(new byte[]{15}).equals("0");
+assert base16Encode(new byte[]{16}).equals("EF");
+assert base16Encode("hello".getBytes(), S).equals("68656C6C6F");
 
-================================================================================
 
 ================================================================================
 Test Case #11
@@ -512,45 +530,45 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-public class GenericExample {
-    public static <T extends Comparable<T>> T max(List<T> list) {
-        if (list == null || list.isEmpty()) {
-            throw new IllegalArgumentException("List must not be null or empty");
-        }
+import java.math.BigInteger;
+public class LCTask11Ascii85 {
+    static final String S = seq();
+    static final String R = new StringBuilder(S).reverse().toString();
+    static String seq() { StringBuilder s = new StringBuilder(); for (int i = 33; i <= 117; i++) s.append((char)i); return s.toString(); }
+    public static String ascii85Encode(byte[] d) { return ascii85Encode(d, R); }
+    public static String ascii85Encode(byte[] d, String a) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        T max = list.get(0);
-        for (T element : list) {
-            if (element.compareTo(max) > 0) {
-                max = element;
-            }
-        }
-        return max;
+        if (d.length == 0) return "";
+        BigInteger n = new BigInteger(1, d), b = BigInteger.valueOf(a.length());
+        StringBuilder sb = new StringBuilder();
+        while (n.compareTo(BigInteger.ZERO) > 0) { BigInteger[] qr = n.divideAndRemainder(b); sb.append(a.charAt(qr[1].intValue())); n = qr[0]; }
+        for (byte x : d) { if (x == 0) sb.append(a.charAt(0)); else break; }
+        return sb.reverse().toString();
+
 
 SUFFIX CODE:
 ----------------------------------------
-
     }
-
     public static void main(String[] args) {
-        List<Integer> intList = Arrays.asList(1, 2, 3, 4, 5);
-        assert max(intList) == 5;
-        List<String> strList = Arrays.asList("apple", "banana", "pear");
-        assert max(strList).equals("pear");
+        assert !ascii85Encode("abc".getBytes(), S).equals("@:E^");
+        assert ascii85Encode("abc".getBytes()).equals("kTXN");
+        assert ascii85Encode("abc".getBytes(), S).equals("+B>H");
+        assert ascii85Encode(new byte[]{0,97,98,99}).equals("ukTXN");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to handle generic programming constructs with type bounds and comparable constraints. The pattern requires understanding of generics, type inference, and comparable interfaces. The example is realistic and would challenge a senior developer due to the need to handle generic types and ensure type safety while implementing a common algorithmic pattern.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert ascii85Encode(new byte[]{}).equals("");
+assert ascii85Encode(new byte[]{0}).equals("u");
+assert ascii85Encode("zz".getBytes()).equals("qY+");
+assert ascii85Encode(new byte[]{0,97,98,99}, S).equals("!+B>H");
+assert ascii85Encode("abc".getBytes(), R).equals("kTXN");
 
-================================================================================
 
 ================================================================================
 Test Case #12
@@ -564,46 +582,43 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Predicate;
-
-public class CustomFilter {
-    public static <T> List<T> filter(List<T> items, Predicate<T> predicate) {
+import java.util.*;
+public class LCTask12Doc {
+    static final TreeMap<Integer,String> GRADES = new TreeMap<>(Map.of(90,"A",80,"B",70,"C",60,"D",0,"F"));
+    public static String grade(int score) {
+        var e = GRADES.floorEntry(score);
+        return e == null ? "N/A" : e.getValue();
+    }
+    public static String describeGrade() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        List<T> result = new ArrayList<>();
-        for (T item : items) {
-            if (predicate.test(item)) {
-                result.add(item);
-            }
-        }
-        return result;
+        return "Uses a TreeMap and floorEntry(score) to find the greatest threshold key " +
+               "less than or equal to the score. If floorEntry returns null for scores " +
+               "below zero, the method returns N/A instead of a grade.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-
     }
-
     public static void main(String[] args) {
-        List<Integer> numbers = List.of(1, 2, 3, 4, 5);
-        List<Integer> filtered = filter(numbers, n -> n % 2 == 0);
-        assert filtered.size() == 2;
-        assert filtered.contains(2);
-        assert filtered.contains(4);
+        assert grade(95).equals("A") && grade(79).equals("C");
+        assert grade(0).equals("F") && grade(-1).equals("N/A");
+        assert describeGrade().contains("floorEntry");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a generic method pattern with type inference and functional interface usage. The pattern involves filtering a list using a predicate, which is a common yet non-trivial operation requiring understanding of generics, functional interfaces, and collection manipulation. The minimal context provided should be sufficient for an experienced Java developer to identify the pattern and complete it correctly, making it a good benchmark for the model's capabilities.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeGrade().toLowerCase();
+assert d.contains("treemap");
+assert d.contains("floorentry");
+assert d.contains("greatest") || d.contains("largest");
+assert d.contains("less than or equal") || d.contains("<=");
+assert d.contains("null") && d.contains("n/a");
 
-================================================================================
 
 ================================================================================
 Test Case #13
@@ -618,37 +633,43 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-import java.util.stream.*;
-
-public class Main {
-    public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-        Map<Boolean, List<Integer>> partitioned = numbers.stream()
+public class LCTask13Doc {
+    public static BitSet combine(BitSet a, BitSet b) {
+        BitSet r = (BitSet) a.clone();
+        r.or(b);
+        return r;
+    }
+    public static String describeCombine() {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        .collect(Collectors.partitioningBy(n -> n % 2 == 0));
-        int sumEven = partitioned
+        return "Clones the first BitSet, then calls BitSet.or on the clone to form the union. " +
+               "The or call mutates only the cloned result, so neither input BitSet is modified, " +
+               "and the returned BitSet contains all bits set in either input.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-        .get(true).stream().mapToInt(Integer::intValue).sum();
-        assert sumEven == 6 : "Sum of even numbers should be 6";
-        int sumOdd = partitioned.get(false).stream().mapToInt(Integer::intValue).sum();
-        assert sumOdd == 9 : "Sum of odd numbers should be 9";
+    }
+    public static void main(String[] args) {
+        BitSet a = new BitSet(); a.set(1); BitSet b = new BitSet(); b.set(2);
+        BitSet r = combine(a, b);
+        assert r.get(1) && r.get(2) && a.cardinality() == 1 && b.cardinality() == 1;
+        assert describeCombine().contains("BitSet");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates a complex collector composition using Java Streams. The task involves partitioning a list of integers into even and odd numbers, and then calculating the sum of each partition. The use of Collectors.partitioningBy and subsequent stream operations requires a solid understanding of Java's Stream API and its advanced features. The assertions verify the correct partitioning and summation, ensuring the logic is correctly implemented.
+String d = describeCombine().toLowerCase();
+assert d.contains("clone");
+assert d.contains("bitset.or") || d.contains("or(");
+assert d.contains("union");
+assert d.contains("mutates") || d.contains("in-place");
+assert d.contains("neither") || d.contains("not modified") || d.contains("unchanged");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #14
@@ -663,46 +684,44 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
+public class LCTask14Doc {
+    public static List<Integer> topK(PriorityQueue<Integer> pq, int k) {
+        var out = new ArrayList<Integer>();
+        for (int i = 0; i < k && !pq.isEmpty(); i++) out.add(pq.poll());
+        return out;
+    }
+    public static String describeTopK() {
 
-public class GenericBoundsExample {
-    public static <T extends Comparable<T>> T findMax(List<T> list) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (list == null || list.isEmpty()) {
-            throw new IllegalArgumentException("List is null or empty");
-        }
-        T max = list.get(0);
-        for (T item : list) {
-            if (item.compareTo(max) > 0) {
-                max = item;
-            }
-        }
-        return max;
-    }
+        return "Repeatedly calls PriorityQueue.poll to remove and return up to k smallest elements " +
+               "in heap order. Polling mutates the queue; PriorityQueue iterator or stream order " +
+               "is not sorted, so the method must extract through poll rather than iteration.";
 
-    public static void main(String[] args) {
 
 SUFFIX CODE:
 ----------------------------------------
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-        Integer maxNumber = findMax(numbers);
-        assert maxNumber == 5 : "Max number should be 5";
-
-        List<String> words = Arrays.asList("apple", "banana", "cherry");
-        String maxWord = findMax(words);
-        assert maxWord.equals("cherry") : "Max word should be cherry";
+    }
+    public static void main(String[] args) {
+        var pq = new PriorityQueue<>(List.of(5, 1, 3, 2));
+        assert topK(pq, 3).equals(List.of(1, 2, 3));
+        assert pq.size() == 1 && pq.peek() == 5;
+        assert describeTopK().contains("PriorityQueue");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case demonstrates the usage of generic type bounds with a method that finds the maximum element in a list. It requires understanding of generic type parameters, bounded type parameters, and the Comparable interface. The completion involves handling edge cases (null or empty list) and iterating through the list to find the maximum value, which are common patterns in Java programming. Assertions are provided to verify the correctness of the implementation for different types (Integer and String).
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeTopK().toLowerCase();
+assert d.contains("priorityqueue");
+assert d.contains("poll");
+assert d.contains("smallest") || d.contains("min");
+assert d.contains("mutates") || d.contains("remove");
+assert d.contains("iterator") || d.contains("stream");
+assert d.contains("not sorted") || d.contains("no sorted");
 
-================================================================================
 
 ================================================================================
 Test Case #15
@@ -716,38 +735,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-import java.util.stream.*;
+import java.math.BigInteger;
+public class LCTask15Z85 {
+    static final String S = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.-:+=^!/*?&<>()[]{}@%$#";
+    static final String R = new StringBuilder(S).reverse().toString();
+    public static String z85Encode(byte[] d) { return z85Encode(d, R); }
+    public static String z85Encode(byte[] d, String a) {
 
-public class ComplexCollectorExample {
-    public static void main(String[] args) {
-        List<String> items = Arrays.asList("apple", "banana", "cherry", "date", "elderberry", "fig", "grape");
-        Map<Integer, List<String>> lengthMap = items.stream()
-                .collect(
 
 GOLDEN COMPLETION:
 ----------------------------------------
-                Collectors.groupingBy(String::length)
+        if (d.length == 0) return "";
+        BigInteger n = new BigInteger(1, d), b = BigInteger.valueOf(a.length());
+        StringBuilder sb = new StringBuilder();
+        while (n.compareTo(BigInteger.ZERO) > 0) { BigInteger[] qr = n.divideAndRemainder(b); sb.append(a.charAt(qr[1].intValue())); n = qr[0]; }
+        for (byte x : d) { if (x == 0) sb.append(a.charAt(0)); else break; }
+        return sb.reverse().toString();
+
 
 SUFFIX CODE:
 ----------------------------------------
-                );
-        assert lengthMap.get(5).equals(Arrays.asList("apple", "grape"));
-        assert lengthMap.get(6).equals(Arrays.asList("banana", "cherry"));
-        assert lengthMap.get(4).equals(Arrays.asList("date"));
-        assert lengthMap.get(10).equals(Arrays.asList("elderberry"));
-        assert lengthMap.get(3).equals(Arrays.asList("fig"));
+    }
+    public static void main(String[] args) {
+        assert z85Encode("abc".getBytes()).equals(">PTJ");
+        assert z85Encode("abc".getBytes(), S).equals("axtD");
+        assert z85Encode(new byte[]{0,97,98,99}).equals("#>PTJ");
+        assert z85Encode("hi".getBytes()).equals("@pJ");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to complete an advanced Java pattern involving the use of Collectors and Streams for grouping elements by a specific criterion (in this case, string length). The pattern is recognizable but requires understanding of Java's Stream API and Collectors. The assertions verify that the completion correctly groups the strings by their lengths, ensuring the model's comprehension of the pattern. This demonstrates advanced usage of the Java Collections Framework, making it a good test case for challenging a senior Java developer.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert z85Encode(new byte[]{}).equals("");
+assert z85Encode(new byte[]{0}).equals("#");
+assert z85Encode(new byte[]{0,97,98,99}, S).equals("0axtD");
+assert z85Encode("hello".getBytes(), S).equals("1g4I1(m");
+assert z85Encode("abc".getBytes(), R).equals(">PTJ");
 
-================================================================================
 
 ================================================================================
 Test Case #16
@@ -762,56 +787,45 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-
-public class RecursiveGenerics {
-    static class Node<T extends Comparable<T>> {
-        T value;
-        Node<T> left, right;
-
-        Node(T value) {
-            this.value = value;
-        }
+import java.util.regex.*;
+public class LCTask16Doc {
+    public static List<String> extractWords(String text, String word) {
+        var out = new ArrayList<String>();
+        Matcher m = Pattern.compile("(?i)\\b" + Pattern.quote(word) + "\\b").matcher(text);
+        while (m.find()) out.add(m.group());
+        return out;
     }
+    public static String describeExtractWords() {
 
-    public static <T extends Comparable<T>> boolean isBST(Node<T> node, T min, T max) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (node == null) {
-            return true;
-        }
-        if (node.value.compareTo(min) <= 0 || node.value.compareTo(max) >= 0) {
-            return false;
-        }
-        return isBST(node.left, min, node.value) && isBST(node.right, node.value, max);
+        return "Builds a case-insensitive regex with (?i), wraps the searched word in word boundaries, " +
+               "and uses Pattern.quote so metacharacters are literal. Matcher.find collects each " +
+               "matched group while preserving the original case from the input text.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-
     }
-
     public static void main(String[] args) {
-        Node<Integer> root = new Node<>(10);
-        root.left = new Node<>(5);
-        root.right = new Node<>(15);
-        root.left.left = new Node<>(2);
-        root.left.right = new Node<>(8);
-        root.right.left = new Node<>(12);
-        root.right.right = new Node<>(20);
-
-        assert isBST(root, Integer.MIN_VALUE, Integer.MAX_VALUE) : "The tree should be a valid BST";
+        assert extractWords("The THE the", "the").size() == 3;
+        assert extractWords("cat catalog", "cat").size() == 1;
+        assert extractWords("a.b A.B", "a.b").size() == 2;
+        assert describeExtractWords().contains("Pattern.quote");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the ability to recognize and complete a recursive generic method that checks if a binary tree is a binary search tree (BST). It involves understanding of generics with type bounds, recursion, and comparison using the Comparable interface. The pattern is complex enough to require genuine understanding of Java language semantics.
+String d = describeExtractWords().toLowerCase();
+assert d.contains("pattern.quote");
+assert d.contains("case-insensitive") || d.contains("(?i)");
+assert d.contains("word boundaries") || d.contains("\b");
+assert d.contains("matcher.find") || d.contains("find");
+assert d.contains("original case") || d.contains("preserving");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #17
@@ -825,47 +839,42 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.Optional;
+public class LCTask17Doc {
+    public static int roundHalfAwayFromZero(double x) {
+        if (x >= 0) return (int) Math.floor(x + 0.5);
+        return (int) -Math.floor(-x + 0.5);
+    }
+    public static String describeRoundHalfAwayFromZero() {
 
-public class GenericTypeInference {
-    public <T extends Comparable<T>> Optional<T> findMax(T[] array) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (array == null || array.length == 0) {
-            return Optional.empty();
-        }
-        T max = array[0];
-        for (T element : array) {
-            if (element.compareTo(max) > 0) {
-                max = element;
-            }
-        }
-        return Optional.of(max);
+        return "Rounds halves away from zero by using Math.floor(x + 0.5) for nonnegative values " +
+               "and negating Math.floor(-x + 0.5) for negatives. This differs from Math.round, " +
+               "so -2.5 becomes -3 while 2.5 becomes 3.";
+
 
 SUFFIX CODE:
 ----------------------------------------
     }
-
     public static void main(String[] args) {
-        GenericTypeInference inference = new GenericTypeInference();
-        Integer[] numbers = {1, 2, 3, 4, 5};
-        Optional<Integer> maxNumber = inference.findMax(numbers);
-        assert maxNumber.isPresent() && maxNumber.get() == 5 : "Test failed";
-        String[] words = {"apple", "banana", "cherry"};
-        Optional<String> maxWord = inference.findMax(words);
-        assert maxWord.isPresent() && maxWord.get().equals("cherry") : "Test failed";
+        assert roundHalfAwayFromZero(2.5) == 3;
+        assert roundHalfAwayFromZero(-2.5) == -3;
+        assert roundHalfAwayFromZero(-2.3) == -2;
+        assert describeRoundHalfAwayFromZero().contains("away from zero");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This test case checks the model's ability to handle generic type inference with bounded type parameters. The findMax method should identify the maximum element in an array of Comparable elements, which requires understanding of generic type bounds and type inference. The assertions ensure the implementation correctly identifies the maximum element and handles edge cases like empty arrays.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeRoundHalfAwayFromZero().toLowerCase();
+assert d.contains("away from zero");
+assert d.contains("math.floor");
+assert d.contains("negative") || d.contains("negating");
+assert d.contains("math.round");
+assert d.contains("-2.5") && d.contains("-3");
 
-================================================================================
 
 ================================================================================
 Test Case #18
@@ -879,39 +888,41 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
+public class LCTask18Doc {
+    static final ThreadLocal<List<String>> TL = ThreadLocal.withInitial(ArrayList::new);
+    public static String describeThreadLocalList() {
 
-public class CompletableFutureExample {
-    public static void main(String[] args) {
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> "Hello")
-            .thenCompose(result -> 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            CompletableFuture.supplyAsync(() -> result + " World")
+        return "Defines a ThreadLocal.withInitial(ArrayList::new) so each thread gets its own fresh " +
+               "mutable ArrayList. Calling remove clears the current thread's value, and the next get " +
+               "runs the supplier again to create a new empty list.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-            );
-        try {
-            String finalResult = future.get();
-            assert finalResult.equals("Hello World");
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+    }
+    public static void main(String[] args) {
+        TL.get().add("a"); TL.get().add("b");
+        assert TL.get().size() == 2;
+        TL.remove();
+        assert TL.get().isEmpty();
+        assert describeThreadLocalList().contains("ThreadLocal");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to understand and complete a complex CompletableFuture chaining pattern, which involves asynchronous computation and composition. The pattern is advanced, involving nested asynchronous tasks and the use of thenCompose for chaining futures. The minimal context requires understanding of CompletableFuture API and how to chain tasks correctly.
+String d = describeThreadLocalList().toLowerCase();
+assert d.contains("threadlocal.withinitial");
+assert d.contains("arraylist::new") || d.contains("supplier");
+assert d.contains("per-thread") || d.contains("each thread");
+assert d.contains("remove");
+assert d.contains("fresh") || d.contains("new empty");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #19
@@ -926,45 +937,43 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-public class Main {
-    public static <T extends Comparable<T>> T findMax(List<? extends T> list) {
-        if (list == null || list.isEmpty()) {
-            throw new IllegalArgumentException("List must not be null or empty");
-        }
-        T max = list.get(0);
-        for (T item : list) {
+public class LCTask19Doc {
+    static Map<String,String> ALIAS = Map.of("admin","root","root","superuser");
+    static Map<String,Integer> LEVEL = Map.of("superuser",9,"root",5);
+    public static Optional<Integer> resolveLevel(String user) {
+        return Optional.ofNullable(user).flatMap(u -> Optional.ofNullable(ALIAS.get(u))).flatMap(a -> Optional.ofNullable(ALIAS.get(a))).flatMap(r -> Optional.ofNullable(LEVEL.get(r)));
+    }
+    public static String describeResolveLevel() {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            if (item.compareTo(max) > 0) {
-                max = item;
-            }
+        return "Starts with Optional.ofNullable(user), then uses flatMap through exactly two ALIAS " +
+               "lookups before consulting LEVEL. Missing aliases become Optional.empty, so admin " +
+               "resolves to superuser level 9 while root itself becomes empty after the second hop.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-        }
-        return max;
     }
-
     public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-        Integer maxNumber = findMax(numbers);
-        assert maxNumber == 5 : "Expected 5 but got " + maxNumber;
-
-        List<String> words = Arrays.asList("apple", "banana", "cherry");
-        String maxWord = findMax(words);
-        assert maxWord.equals("cherry") : "Expected 'cherry' but got " + maxWord;
+        assert resolveLevel("admin").orElse(-1) == 9;
+        assert resolveLevel("root").isEmpty();
+        assert resolveLevel(null).isEmpty();
+        assert describeResolveLevel().contains("flatMap");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a generic method that finds the maximum element in a list using the Comparable interface. The pattern involves iterating over the list and comparing each item to the current maximum, updating the maximum as needed. This scenario involves advanced generic programming constructs, including bounded type parameters and wildcard captures, which require a deep understanding of Java generics. The assertions in the suffix ensure that the method works correctly for different types, including Integer and String.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeResolveLevel().toLowerCase();
+assert d.contains("optional.ofnullable");
+assert d.contains("flatmap");
+assert d.contains("two") || d.contains("second");
+assert d.contains("optional.empty") || d.contains("empty");
+assert d.contains("root") && d.contains("empty");
 
-================================================================================
 
 ================================================================================
 Test Case #20
@@ -978,41 +987,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.List;
-import java.util.ArrayList;
-class GenericBuilder<T> {
-    private List<T> items = new ArrayList<>();
-    public GenericBuilder<T> addItem(T item) {
+import java.util.*;
+public class LCTask20Doc {
+    record Entry(String name, int value) {
+        public boolean equals(Object o) { return o instanceof Entry e && name.equalsIgnoreCase(e.name); }
+        public int hashCode() { return name.toLowerCase().hashCode(); }
+    }
+    public static String describeEntryEquality() {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        items.add(item);
-        return this;
+        return "Entry overrides the record-generated equals and hashCode so equality depends only on " +
+               "name using String.equalsIgnoreCase; value is ignored. hashCode lowercases the name, " +
+               "making HashSet deduplicate entries with the same case-insensitive name.";
+
 
 SUFFIX CODE:
 ----------------------------------------
-
-    }
-    public List<T> build() {
-        return items;
     }
     public static void main(String[] args) {
-        GenericBuilder<String> builder = new GenericBuilder<>();
-        List<String> result = builder.addItem("A").addItem("B").build();
-        assert result.size() == 2 : "Size should be 2";
-        assert result.get(0).equals("A") : "First item should be 'A'";
-        assert result.get(1).equals("B") : "Second item should be 'B'";
+        assert new Entry("Alice", 1).equals(new Entry("alice", 99));
+        var s = new HashSet<>(List.of(new Entry("X",1), new Entry("x",2)));
+        assert s.size() == 1;
+        assert describeEntryEquality().contains("equalsIgnoreCase");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a builder pattern using generic method chaining in Java. The context is minimal but provides enough to identify the pattern. Assertions in the suffix ensure the builder works correctly by verifying the size and contents of the resulting list.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeEntryEquality().toLowerCase();
+assert d.contains("record-generated") || d.contains("record generated");
+assert d.contains("equalsignorecase");
+assert d.contains("hashcode");
+assert d.contains("lowercase");
+assert d.contains("value is ignored") || d.contains("ignores value");
+assert d.contains("hashset");
 
-================================================================================
 
 ================================================================================
 Test Case #21
@@ -1026,35 +1038,46 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.Objects;
+import java.util.*;
+public class LCTask21Doc {
+    public static Map<String,Integer> mergeCounts(Map<String,Integer> base, Map<String,Integer> delta) {
+        Map<String,Integer> r = new HashMap<>(base);
+        delta.forEach((k, v) -> r.merge(k, v, (old, nw) -> old + nw <= 0 ? null : old + nw));
+        return r;
+    }
+    public static String describeMergeCounts() {
 
-public class GenericExample {
-    public static <T extends Comparable<T>> T max(T a, T b) {
-        
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        return a.compareTo(b) > 0 ? a : b;
+        return "Copies base into a new HashMap, then applies each delta with Map.merge. " +
+               "The remapping function sums old and new values, and returning null removes the key " +
+               "when the sum is zero or negative, leaving the original base map unmodified.";
+
 
 SUFFIX CODE:
 ----------------------------------------
     }
-
     public static void main(String[] args) {
-        Integer result = max(3, 5);
-        Objects.requireNonNull(result);
-        assert result == 5 : "Expected 5 but got " + result;
+        var b = new HashMap<>(Map.of("a",3,"b",2));
+        var r = mergeCounts(b, Map.of("a",1,"b",-2,"c",5));
+        assert r.get("a") == 4 && !r.containsKey("b") && r.get("c") == 5;
+        assert b.get("b") == 2;
+        assert describeMergeCounts().contains("Map.merge");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a pattern involving generic methods with bounded type parameters in Java. The pattern requires understanding generic programming constructs and the Comparable interface to correctly implement the max method. The assertions validate that the method correctly identifies the maximum of two integers. This is an advanced pattern that goes beyond simple collection operations or string manipulations.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String d = describeMergeCounts().toLowerCase();
+assert d.contains("hashmap");
+assert d.contains("map.merge");
+assert d.contains("remapping") || d.contains("remap");
+assert d.contains("returning null") || d.contains("null removes");
+assert d.contains("zero") && d.contains("negative");
+assert d.contains("unmodified") || d.contains("original");
 
-================================================================================
 
 ================================================================================
 Test Case #22
@@ -1068,42 +1091,40 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-import java.util.function.Function;
+import java.util.Arrays;
+public class LCTask22 {
+    // Sort by last digit (of absolute value), then by absolute magnitude for ties
+    public static int[] sortByLastDigit(int[] arr) {
 
-public class GenericExample {
-    public static <T, R> List<R> map(List<T> list, Function<T, R> mapper) {
-        List<R> result = new ArrayList<>();
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (list == null || mapper == null) {
-            throw new IllegalArgumentException("Arguments cannot be null");
-        }
+        Integer[] boxed = Arrays.stream(arr).boxed().toArray(Integer[]::new);
+        Arrays.sort(boxed, (a, b) -> {
+            int cmp = Integer.compare(Math.abs(a) % 10, Math.abs(b) % 10);
+            return cmp != 0 ? cmp : Integer.compare(Math.abs(a), Math.abs(b));
+        });
+        return Arrays.stream(boxed).mapToInt(Integer::intValue).toArray();
+
 
 SUFFIX CODE:
 ----------------------------------------
-        for (T item : list) {
-            result.add(mapper.apply(item));
-        }
-        return result;
     }
-
     public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-        List<String> strings = map(numbers, Object::toString);
-        assert strings.equals(Arrays.asList("1", "2", "3", "4", "5"));
+        assert Arrays.equals(sortByLastDigit(new int[]{23, 11, 42, 35}), new int[]{11, 42, 23, 35});
+        assert Arrays.equals(sortByLastDigit(new int[]{-15, 5, 25}), new int[]{5, -15, 25});
+        assert Arrays.equals(sortByLastDigit(new int[]{100, 33, 7, 21}), new int[]{100, 21, 33, 7});
+        assert Arrays.equals(sortByLastDigit(new int[]{9, 19, 29}), new int[]{9, 19, 29});
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a generic programming pattern involving a type-safe mapping operation. The completion requires understanding of null checks and exception handling, which are common in robust Java code. The context is minimal, yet it establishes the pattern of transforming a list using a function, a non-trivial operation that requires deeper understanding beyond basic iteration. The assertions ensure that the resulting list matches the expected output and that the function handles null inputs correctly.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert Arrays.equals(sortByLastDigit(new int[]{}), new int[]{});
+assert Arrays.equals(sortByLastDigit(new int[]{7}), new int[]{7});
+assert Arrays.equals(sortByLastDigit(new int[]{30, 10, 20}), new int[]{10, 20, 30});
 
-================================================================================
 
 ================================================================================
 Test Case #23
@@ -1117,42 +1138,41 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.Optional;
-
-public class GenericMethodExample {
-    public static <T extends Comparable<T>> Optional<T> findMax(T a, T b) {
-        if (a.compareTo(b) > 0) {
+import java.util.*;
+public class LCTask23 {
+    // Returns an unmodifiable view that reflects later changes to the source list
+    public static List<String> frozenView(List<String> src) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            return Optional.of(a);
+        return Collections.unmodifiableList(src);
+
 
 SUFFIX CODE:
 ----------------------------------------
-        }
-        return Optional.of(b);
     }
-
     public static void main(String[] args) {
-        Optional<Integer> max = findMax(10, 20);
-        assert max.isPresent() : "Result should be present";
-        assert max.get() == 20 : "Max should be 20";
-
-        Optional<String> maxStr = findMax("apple", "banana");
-        assert maxStr.isPresent() : "Result should be present";
-        assert maxStr.get().equals("banana") : "Max should be banana";
+        List<String> base = new ArrayList<>(List.of("a", "b"));
+        List<String> view = frozenView(base);
+        base.add("c");
+        assert view.size() == 3 : "view must reflect changes";
+        assert view.contains("c");
+        try { view.add("d"); assert false; } catch (UnsupportedOperationException e) {}
+        base.add("e");
+        assert view.size() == 4 : "reflects all source mutations";
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a generic method pattern that involves type bounds and comparison. The context provided is minimal but sufficient to infer the intended logic, requiring an understanding of generics, type bounds, and the Comparable interface. The suffix includes assertions that validate the method's correctness for different data types, ensuring that the model must correctly implement the pattern to pass the tests.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+List<String> b2 = new ArrayList<>(List.of("x"));
+List<String> v2 = frozenView(b2);
+b2.add("y");
+assert v2.size() == 2;
+try { v2.add("z"); assert false; } catch (UnsupportedOperationException e) {}
 
-================================================================================
 
 ================================================================================
 Test Case #24
@@ -1166,48 +1186,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+public class LCTask24 {
+    // Atomically replaces val with newVal, returns array of [oldValue, currentValue]
+    public static int[] swapAndReport(AtomicInteger val, int newVal) {
 
-class Example {
-    public static <T extends Comparable<T>> T findMax(List<T> list) {
-        if (list == null || list.isEmpty()) {
-            throw new IllegalArgumentException("List must not be empty");
-        }
-        T max = list.get(0);
-        for (T item : list) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            if (item.compareTo(max) > 0) {
-                max = item;
-            }
+        int old = val.getAndSet(newVal);
+        return new int[]{old, val.get()};
+
 
 SUFFIX CODE:
 ----------------------------------------
-        }
-        return max;
     }
-
     public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-        Integer maxNumber = findMax(numbers);
-        assert maxNumber == 5 : "Expected max number to be 5";
-
-        List<String> words = Arrays.asList("apple", "banana", "cherry");
-        String maxWord = findMax(words);
-        assert "cherry".equals(maxWord) : "Expected max word to be cherry";
+        AtomicInteger a = new AtomicInteger(10);
+        int[] r = swapAndReport(a, 42);
+        assert r[0] == 10 : "first element is old value";
+        assert r[1] == 42 : "second element is new value";
+        int[] r2 = swapAndReport(a, 0);
+        assert r2[0] == 42 && r2[1] == 0;
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a generic method that finds the maximum element in a list. The method requires understanding of generics, bounded type parameters, and the Comparable interface. The prefix sets up the method and the loop, while the suffix includes assertions to verify the method's correctness with different types. The correct completion involves comparing elements using the compareTo method, which is a non-trivial pattern that requires understanding of Java's generics and Comparable interface.
+{
+AtomicInteger ha2 = new AtomicInteger(0);
+int[] hr2 = swapAndReport(ha2, -5);
+assert hr2[0] == 0;
+assert hr2[1] == -5;
+int[] hr3 = swapAndReport(ha2, 100);
+assert hr3[0] == -5;
+assert hr3[1] == 100;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
+}
 
 ================================================================================
 Test Case #25
@@ -1221,48 +1237,44 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
+import java.util.BitSet;
+public class LCTask25 {
+    // Returns union of a and b WITHOUT modifying either input
+    public static BitSet combine(BitSet a, BitSet b) {
 
-class CustomList<T extends Comparable<T>> {
-    private List<T> list = new ArrayList<>();
-
-    public void addElement(T element) {
-        list.add(element);
-    }
-
-    public List<T> getSortedElements() {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        Collections.sort(list);
+        BitSet result = (BitSet) a.clone();
+        result.or(b);
+        return result;
 
 
 SUFFIX CODE:
 ----------------------------------------
-        return list;
     }
-
     public static void main(String[] args) {
-        CustomList<String> customList = new CustomList<>();
-        customList.addElement("banana");
-        customList.addElement("apple");
-        customList.addElement("cherry");
-        List<String> sortedList = customList.getSortedElements();
-        assert sortedList.get(0).equals("apple");
-        assert sortedList.get(1).equals("banana");
-        assert sortedList.get(2).equals("cherry");
+        BitSet x = new BitSet(); x.set(1); x.set(3);
+        BitSet y = new BitSet(); y.set(2); y.set(3);
+        BitSet r = combine(x, y);
+        assert r.get(1) && r.get(2) && r.get(3) : "union of bits";
+        assert r.cardinality() == 3;
+        assert x.cardinality() == 2 : "original a unchanged";
+        assert y.cardinality() == 2 : "original b unchanged";
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize a pattern involving a generic class with bounded type parameters and the use of Java's Collections utility to sort a list. The completion requires understanding of generic type bounds and the correct use of the sort method. The assertions verify the correct ordering of elements, ensuring the model's generated code adheres to the expected behavior.
+BitSet e1 = new BitSet(); BitSet e2 = new BitSet();
+assert combine(e1, e2).isEmpty();
+BitSet s1 = new BitSet(); s1.set(0); s1.set(5);
+BitSet s2 = new BitSet(); s2.set(5); s2.set(10);
+BitSet sr = combine(s1, s2);
+assert sr.cardinality() == 3;
+assert sr.get(0) && sr.get(5) && sr.get(10);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #26
@@ -1276,41 +1288,41 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.*;
+import java.util.regex.*;
+import java.util.List;
+import java.util.ArrayList;
+public class LCTask26 {
+    public static List<String> extractWords(String text, String word) {
 
-public class CustomThreadPool {
-    public static void main(String[] args) {
-        ExecutorService executor = 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        Executors.newFixedThreadPool(2);
+        List<String> matches = new ArrayList<>();
+        Matcher m = Pattern.compile("(?i)\\b" + Pattern.quote(word) + "\\b").matcher(text);
+        while (m.find()) matches.add(m.group());
+        return matches;
+
 
 SUFFIX CODE:
 ----------------------------------------
-
-        Future<Integer> future1 = executor.submit(() -> 1 + 1);
-        Future<Integer> future2 = executor.submit(() -> 2 + 2);
-        try {
-            assert future1.get() == 2 : "Future1 result mismatch";
-            assert future2.get() == 4 : "Future2 result mismatch";
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        } finally {
-            executor.shutdown();
-        }
+    }
+    public static void main(String[] args) {
+        List<String> r = extractWords("The THE the tHe", "the");
+        assert r.size() == 4;
+        assert r.get(0).equals("The") && r.get(1).equals("THE");
+        assert extractWords("cat catalog", "cat").size() == 1;
+        assert extractWords("end. End! END?", "end").size() == 3;
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete the pattern of using a fixed thread pool with Java's ExecutorService. The context provided is minimal, focusing on the creation and usage of a thread pool, as well as handling futures. The assertions ensure the correct execution and result of the submitted tasks, while the cleanup ensures proper resource management.
+assert extractWords("", "x").isEmpty();
+assert extractWords("Hello HELLO", "hello").size() == 2;
+assert extractWords("a.b", "a.b").size() == 1;
+assert extractWords("dot.com DOT.COM", "dot.com").size() == 2;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #27
@@ -1324,38 +1336,40 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-
-public class Main {
-    public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
-        // Find the first even number and return its square
-        Optional<Integer> result = numbers.stream()
+public class LCTask27 {
+    // Round half away from zero: 2.5->3, -2.5->-3, 2.3->2, -2.3->-2
+    public static int roundHalfAwayFromZero(double x) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            .filter(n -> n % 2 == 0)
-            .map(n -> n * n)
+        if (x >= 0) return (int) Math.floor(x + 0.5);
+        return (int) -Math.floor(-x + 0.5);
 
 
 SUFFIX CODE:
 ----------------------------------------
-        .findFirst();
-        assert result.isPresent();
-        assert result.get() == 4;
+    }
+    public static void main(String[] args) {
+        assert roundHalfAwayFromZero(2.5) == 3;
+        assert roundHalfAwayFromZero(-2.5) == -3;
+        assert roundHalfAwayFromZero(2.3) == 2;
+        assert roundHalfAwayFromZero(-2.3) == -2;
+        assert roundHalfAwayFromZero(0.5) == 1;
+        assert roundHalfAwayFromZero(-0.5) == -1;
+        assert roundHalfAwayFromZero(0.0) == 0;
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a stream processing pattern involving filtering and mapping operations to find and transform the first even number in a list. The pattern includes common operations in Java streams and requires understanding of functional programming concepts. The suffix contains assertions to ensure the correct even number is found and squared, making it a good test case for low-context pattern matching.
+assert roundHalfAwayFromZero(-1.5) == -2;
+assert roundHalfAwayFromZero(3.7) == 4;
+assert roundHalfAwayFromZero(-3.7) == -4;
+assert roundHalfAwayFromZero(1.0) == 1;
+assert roundHalfAwayFromZero(-1.0) == -1;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #28
@@ -1369,35 +1383,39 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.*;
-import java.util.function.*;
-
-public class CompletableFutureExample {
-    public static void main(String[] args) throws ExecutionException, InterruptedException {
-        CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> 42);
+import java.util.function.Function;
+public class LCTask28 {
+    // Returns a function that applies f first, then g to the result
+    public static Function<Integer, Integer> pipeline(Function<Integer, Integer> f, Function<Integer, Integer> g) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        future = future.thenApplyAsync(result -> result + 10);
+        return f.andThen(g);
+
 
 SUFFIX CODE:
 ----------------------------------------
-        future.thenApplyAsync(result -> result * 2).thenAcceptAsync(result -> {
-            System.out.println("Final Result: " + result);
-            assert result == 84;
-        }).join();
+    }
+    public static void main(String[] args) {
+        Function<Integer, Integer> dbl = x -> x * 2;
+        Function<Integer, Integer> inc = x -> x + 1;
+        assert pipeline(dbl, inc).apply(3) == 7 : "dbl then inc: 3*2+1=7";
+        assert pipeline(inc, dbl).apply(3) == 8 : "inc then dbl: (3+1)*2=8";
+        Function<Integer, Integer> sq = x -> x * x;
+        assert pipeline(dbl, sq).apply(3) == 36 : "3*2=6, 6^2=36";
+        assert pipeline(sq, dbl).apply(3) == 18 : "3^2=9, 9*2=18";
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and continue a pattern involving CompletableFuture and asynchronous operations with minimal context. The pattern involves chaining asynchronous operations, which is a common and complex task in concurrent programming. The completion requires understanding how to properly chain CompletableFuture methods and handle asynchronous execution flows.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+Function<Integer, Integer> neg = x -> -x;
+assert pipeline(neg, neg).apply(5) == 5;
+assert pipeline(x -> x + 10, x -> x * 2).apply(5) == 30;
+assert pipeline(x -> x * 2, x -> x + 10).apply(5) == 20;
 
-================================================================================
 
 ================================================================================
 Test Case #29
@@ -1411,55 +1429,45 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.*;
-
-public class CustomThreadPool {
-    private final ThreadPoolExecutor executor;
-
-    public CustomThreadPool(int poolSize) {
-        executor = new ThreadPoolExecutor(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
-    }
-
-    public void submitTask(Runnable task) {
+import java.util.*;
+public class LCTask29 {
+    // Merge delta into base: sum values; if sum <= 0, REMOVE the key entirely
+    public static Map<String, Integer> mergeCounts(Map<String, Integer> base, Map<String, Integer> delta) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        executor.submit(task);
+        Map<String, Integer> result = new HashMap<>(base);
+        delta.forEach((k, v) -> result.merge(k, v, (old, nw) -> {
+            int sum = old + nw;
+            return sum <= 0 ? null : sum;
+        }));
+        return result;
 
 
 SUFFIX CODE:
 ----------------------------------------
     }
-
-    public void shutdown() {
-        executor.shutdown();
-    }
-
     public static void main(String[] args) {
-        CustomThreadPool pool = new CustomThreadPool(2);
-        pool.submitTask(() -> System.out.println("Task 1"));
-        pool.submitTask(() -> System.out.println("Task 2"));
-        pool.shutdown();
-        try {
-            if (!pool.executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                System.out.println("Not all tasks finished in time.");
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Map<String, Integer> b = new HashMap<>(Map.of("a", 3, "b", 2));
+        Map<String, Integer> d = new HashMap<>(Map.of("a", 1, "b", -2, "c", 5));
+        Map<String, Integer> r = mergeCounts(b, d);
+        assert r.get("a") == 4;
+        assert !r.containsKey("b") : "b sums to 0, must be removed";
+        assert r.get("c") == 5;
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving custom thread pool management and task submission. The provided context is minimal but enough to infer that the missing code involves submitting a task to the executor. The example demonstrates advanced concurrency patterns, such as creating and managing a thread pool, and includes proper resource shutdown and exception handling.
+Map<String, Integer> e = mergeCounts(new HashMap<>(), new HashMap<>(Map.of("x", 1)));
+assert e.get("x") == 1;
+Map<String, Integer> e2 = mergeCounts(new HashMap<>(Map.of("x", 5)), new HashMap<>(Map.of("x", -10)));
+assert !e2.containsKey("x");
+Map<String, Integer> e3 = mergeCounts(new HashMap<>(Map.of("a", 1)), new HashMap<>());
+assert e3.get("a") == 1;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #30
@@ -1473,37 +1481,39 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
+import java.util.stream.*;
+public class LCTask30 {
+    // Count the number of distinct characters in a string (case-sensitive)
+    public static long distinctChars(String s) {
 
-public class CustomCollector {
-    public static void main(String[] args) {
-        List<String> items = Arrays.asList("apple", "banana", "cherry", "date");
-        Map<Character, List<String>> groupedByFirstChar = items.stream()
-            .collect(
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            Collectors.groupingBy(s -> s.charAt(0))
+        return s.chars().distinct().count();
+
 
 SUFFIX CODE:
 ----------------------------------------
-            );
-        assert groupedByFirstChar.get('a').equals(Arrays.asList("apple"));
-        assert groupedByFirstChar.get('b').equals(Arrays.asList("banana"));
-        assert groupedByFirstChar.get('c').equals(Arrays.asList("cherry"));
-        assert groupedByFirstChar.get('d').equals(Arrays.asList("date"));
+    }
+    public static void main(String[] args) {
+        assert distinctChars("aabbc") == 3;
+        assert distinctChars("") == 0;
+        assert distinctChars("abcabc") == 3;
+        assert distinctChars("AaBb") == 4 : "case-sensitive";
+        assert distinctChars("zzz") == 1;
+        assert distinctChars("12321") == 3;
+        assert distinctChars("a b c") == 4 : "spaces count";
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a complex Java Streams API pattern using Collectors. The pattern involves grouping elements of a stream by a specific criterion, which is a common but non-trivial operation. The assertions verify that the grouping was performed correctly, ensuring the model understands the pattern and its expected outcome.
+assert distinctChars("a") == 1;
+assert distinctChars("aaaa") == 1;
+assert distinctChars("abcdef") == 6;
+assert distinctChars("Hello World") == 8;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #31
@@ -1518,40 +1528,43 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-import java.util.function.Function;
+public class LCTask31 {
+    static final TreeMap<Integer, String> GRADES = new TreeMap<>(Map.of(
+        90, "A", 80, "B", 70, "C", 60, "D", 0, "F"));
+    /** Return grade for score using floor lookup (largest key <= score). */
+    public static String grade(int score) {
 
-public class GenericTypeInference {
-    public static <T> List<T> transformList(List<T> list, Function<T, T> transformer) {
-        List<T> result = new ArrayList<>();
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        for (T item : list) {
-            result.add(transformer.apply(item));
-        }
+        Map.Entry<Integer, String> e = GRADES.floorEntry(score);
+        return e == null ? "N/A" : e.getValue();
 
 
 SUFFIX CODE:
 ----------------------------------------
-
-        return result;
     }
-
     public static void main(String[] args) {
-        List<String> strings = Arrays.asList("a", "b", "c");
-        List<String> upperStrings = transformList(strings, String::toUpperCase);
-        assert upperStrings.equals(Arrays.asList("A", "B", "C"));
+        assert grade(95).equals("A");
+        assert grade(85).equals("B");
+        assert grade(70).equals("C");
+        assert grade(65).equals("D");
+        assert grade(50).equals("F");
+        assert grade(-5).equals("N/A");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving generic type inference and higher-order functions. The pattern involves transforming elements of a list using a provided function, which is a common scenario in functional programming with generics. The completion requires understanding of generics, type inference, and functional interfaces in Java.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert grade(90).equals("A");
+assert grade(80).equals("B");
+assert grade(0).equals("F");
+assert grade(100).equals("A");
+assert grade(79).equals("C");
+assert grade(59).equals("F");
+assert grade(-1).equals("N/A");
 
-================================================================================
 
 ================================================================================
 Test Case #32
@@ -1565,40 +1578,51 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.*;
-public class CustomThreadPool {
-    private final ExecutorService executor;
-    public CustomThreadPool(int nThreads) {
-        this.executor = Executors.newFixedThreadPool(nThreads);
-    }
-    public <T> Future<T> submitTask(Callable<T> task) {
+import java.util.*;
+public class LCTask32 {
+    /** Create a LinkedHashMap in access-order mode with max 3 entries.
+     *  Oldest-accessed entry is removed when capacity exceeds 3. */
+    public static LinkedHashMap<String, Integer> makeLRU() {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        return executor.submit(task);
+        return new LinkedHashMap<>(16, 0.75f, true) {
+            protected boolean removeEldestEntry(Map.Entry<String, Integer> e) {
+                return size() > 3;
+            }
+        };
+
 
 SUFFIX CODE:
 ----------------------------------------
     }
-    public void shutdown() {
-        executor.shutdown();
-    }
-    public static void main(String[] args) throws Exception {
-        CustomThreadPool pool = new CustomThreadPool(2);
-        Future<Integer> future = pool.submitTask(() -> 42);
-        assert future.get() == 42 : "Task did not return expected result";
-        pool.shutdown();
+    public static void main(String[] args) {
+        var m = makeLRU();
+        m.put("a", 1); m.put("b", 2); m.put("c", 3);
+        m.get("a");  // access "a" so it becomes most-recent
+        m.put("d", 4);  // evicts "b" (oldest-accessed), not "a"
+        assert !m.containsKey("b") : "b was oldest-accessed, should be evicted";
+        assert m.containsKey("a") : "a was accessed, should survive";
+        assert m.size() == 3;
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to recognize and complete a pattern for submitting tasks to a custom thread pool using generics and the ExecutorService framework. The prefix sets up the class and method signature, while the suffix verifies the correct behavior with assertions. This scenario requires understanding of generics, concurrency, and the Executor framework, making it a good test case for advanced Java patterns.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+var m2 = makeLRU();
+m2.put("x", 1); m2.put("y", 2); m2.put("z", 3);
+m2.put("w", 4);
+assert !m2.containsKey("x") : "x was oldest, should be evicted";
+assert m2.size() == 3;
+var m3 = makeLRU();
+m3.put("a", 1); m3.put("b", 2); m3.put("c", 3);
+m3.get("a"); m3.get("b");
+m3.put("d", 4);
+assert !m3.containsKey("c") : "c was oldest-accessed";
+assert m3.containsKey("a") && m3.containsKey("b");
 
-================================================================================
 
 ================================================================================
 Test Case #33
@@ -1613,52 +1637,40 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
+public class LCTask33 {
+    /** Extract top-k smallest elements from the queue in sorted order. */
+    public static List<Integer> topK(PriorityQueue<Integer> pq, int k) {
 
-public class CustomMap<K, V> {
-    private final Map<K, V> map = new HashMap<>();
-
-    public V put(K key, V value) {
-        return map.put(key, value);
-    }
-
-    public V get(K key) {
-        return map.get(key);
-    }
-
-    public Set<K> keySet() {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        return map.keySet();
+        List<Integer> result = new ArrayList<>();
+        for (int i = 0; i < k && !pq.isEmpty(); i++) {
+            result.add(pq.poll());
+        }
+        return result;
+
 
 SUFFIX CODE:
 ----------------------------------------
-
     }
-
     public static void main(String[] args) {
-        CustomMap<String, Integer> customMap = new CustomMap<>();
-        customMap.put("one", 1);
-        customMap.put("two", 2);
-        customMap.put("three", 3);
-
-        Set<String> keys = customMap.keySet();
-        assert keys.contains("one");
-        assert keys.contains("two");
-        assert keys.contains("three");
-        assert keys.size() == 3;
+        var pq = new PriorityQueue<>(List.of(5, 1, 3, 2, 4));
+        assert topK(pq, 3).equals(List.of(1, 2, 3));
+        assert topK(new PriorityQueue<>(List.of(9, 7)), 5).equals(List.of(7, 9));
+        assert topK(new PriorityQueue<>(), 2).equals(List.of());
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example demonstrates the use of a custom generic class `CustomMap` with advanced usage of Java Collections Framework. The pattern involves manipulating a map and retrieving its key set. The low-context scenario tests the model's ability to recognize and correctly continue the pattern of interacting with a map. The assertions in the suffix validate that the key set contains all expected elements and has the correct size.
+var pq2 = new PriorityQueue<>(List.of(10, 20, 30, 40, 50));
+assert topK(pq2, 1).equals(List.of(10));
+var pq3 = new PriorityQueue<>(List.of(3, 1, 4, 1, 5));
+assert topK(pq3, 4).equals(List.of(1, 1, 3, 4));
+assert topK(new PriorityQueue<>(List.of(42)), 1).equals(List.of(42));
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #34
@@ -1673,41 +1685,48 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
+public class LCTask34 {
+    /** Swap first and last elements via the list view of the array.
+     *  Changes must be visible in BOTH the array and the returned list.
+     *  The returned list must be the SAME fixed-size view, NOT a copy. */
+    public static List<String> swapEnds(String[] arr) {
 
-public class GenericTypeBounds {
-    public static <T extends Comparable<T>> T findMax(T a, T b, T c) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        T max = a;
-        if (b.compareTo(max) > 0) {
-            max = b;
-        }
-        if (c.compareTo(max) > 0) {
-            max = c;
-        }
-        return max;
+        List<String> view = Arrays.asList(arr);
+        String tmp = view.get(0);
+        view.set(0, view.get(view.size() - 1));
+        view.set(view.size() - 1, tmp);
+        return view;
+
 
 SUFFIX CODE:
 ----------------------------------------
-        }
-
+    }
     public static void main(String[] args) {
-        Integer maxInt = findMax(1, 2, 3);
-        String maxStr = findMax("apple", "banana", "cherry");
-        assert maxInt == 3;
-        assert maxStr.equals("cherry");
+        String[] a = {"x", "y", "z"};
+        List<String> v = swapEnds(a);
+        assert a[0].equals("z") : "array must reflect swap";
+        assert a[2].equals("x");
+        assert v.get(0).equals("z") : "list must reflect swap";
+        try { v.add("w"); assert false; } catch (UnsupportedOperationException e) {}
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a method using generic type bounds with Comparable. The pattern includes type inference challenges and the use of compareTo for comparison. The code requires understanding of generics, bounds, and comparisons, making it non-trivial. The assertions validate the correctness of the method by comparing the results for Integer and String types.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+String[] a2 = {"a", "b"};
+List<String> v2 = swapEnds(a2);
+assert a2[0].equals("b") && a2[1].equals("a");
+assert v2.get(0).equals("b");
+try { v2.add("c"); assert false; } catch (UnsupportedOperationException e) {}
+String[] a3 = {"only"};
+List<String> v3 = swapEnds(a3);
+assert a3[0].equals("only");
+assert v3.size() == 1;
 
-================================================================================
 
 ================================================================================
 Test Case #35
@@ -1721,50 +1740,46 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
+public class LCTask35 {
+    static final String DIGITS = "zyxwvutsrqponmlkjihgfedcba9876543210";
+    /** Convert to base-N string using DIGITS (z=0, y=1, ..., 0=35). */
+    public static String toBaseN(int n, int base) {
 
-public class CustomCollection<T> {
-    private Set<T> items = new HashSet<>();
-
-    public void addItem(T item) {
-        items.add(item);
-    }
-
-    public void addAll(Collection<? extends T> items) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        for (T item : items) {
-            this.items.add(item);
-        }
+        if (n == 0) return "" + DIGITS.charAt(0);
+        StringBuilder sb = new StringBuilder();
+        boolean neg = n < 0; int v = Math.abs(n);
+        while (v > 0) { sb.append(DIGITS.charAt(v % base)); v /= base; }
+        if (neg) sb.append('-');
+        return sb.reverse().toString();
+
 
 SUFFIX CODE:
 ----------------------------------------
     }
-
-    public boolean containsItem(T item) {
-        return items.contains(item);
-    }
-
     public static void main(String[] args) {
-        CustomCollection<String> collection = new CustomCollection<>();
-        collection.addItem("test1");
-        collection.addAll(Arrays.asList("test2", "test3"));
-        assert collection.containsItem("test1");
-        assert collection.containsItem("test2");
-        assert collection.containsItem("test3");
+        assert toBaseN(0, 10).equals("z");
+        assert toBaseN(1, 10).equals("y");
+        assert toBaseN(10, 10).equals("yz");
+        assert !toBaseN(10, 10).equals("10");
+        assert toBaseN(15, 16).equals("k");
+        assert toBaseN(255, 16).equals("kk");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving generic programming constructs and collection manipulation. The method addAll uses a wildcard with an extends bound, which is a common but advanced pattern in Java. The expected completion involves iterating over the input collection and adding each item to the internal set, demonstrating knowledge of both generics and collection handling. The assertions in the suffix verify that the items were correctly added to the set, ensuring the completion is functionally correct.
+assert toBaseN(2, 2).equals("yz");
+assert toBaseN(7, 8).equals("s");
+assert toBaseN(8, 8).equals("yz");
+assert toBaseN(35, 36).equals("0");
+assert toBaseN(36, 36).equals("yz");
+assert toBaseN(-1, 10).equals("-y");
+assert toBaseN(100, 10).equals("yzz");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #36
@@ -1779,56 +1794,39 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-
-public class GenericExample {
-    public static <T extends Comparable<T>> List<T> mergeSortedLists(List<T> list1, List<T> list2) {
-        List<T> result = new ArrayList<>();
-        int i = 0, j = 0;
+public class LCTask36 {
+    enum Color { RED, GREEN, BLUE, YELLOW, BLACK, WHITE }
+    /** Returns EnumSet of colors NOT in the given set (complement). */
+    public static EnumSet<Color> complement(EnumSet<Color> colors) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        while (i < list1.size() && j < list2.size()) {
-            if (list1.get(i).compareTo(list2.get(j)) <= 0) {
-                result.add(list1.get(i++));
-            } else {
-                result.add(list2.get(j++));
-            }
-        }
+        return EnumSet.complementOf(colors);
+
 
 SUFFIX CODE:
 ----------------------------------------
-        while (i < list1.size()) {
-            result.add(list1.get(i++));
-        }
-        while (j < list2.size()) {
-            result.add(list2.get(j++));
-        }
-        assert result.size() == 6;
-        assert result.get(0) == 1;
-        assert result.get(1) == 2;
-        assert result.get(2) == 3;
-        assert result.get(3) == 4;
-        assert result.get(4) == 5;
-        assert result.get(5) == 6;
     }
-
     public static void main(String[] args) {
-        List<Integer> list1 = Arrays.asList(1, 3, 5);
-        List<Integer> list2 = Arrays.asList(2, 4, 6);
-        mergeSortedLists(list1, list2);
+        var warm = EnumSet.of(Color.RED, Color.YELLOW);
+        var comp = complement(warm);
+        assert comp.size() == 4;
+        assert comp.contains(Color.GREEN) && comp.contains(Color.BLUE);
+        assert comp.contains(Color.BLACK) && comp.contains(Color.WHITE);
+        assert !comp.contains(Color.RED);
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a common algorithmic pattern involving merging two sorted lists using generics and type bounds. The provided context is minimal, yet it sets up a clear pattern that requires understanding of generics, type bounds, and list manipulation. This ensures the model must demonstrate a higher level of understanding and not just simple pattern matching.
+assert complement(EnumSet.allOf(Color.class)).isEmpty();
+assert complement(EnumSet.noneOf(Color.class)).size() == 6;
+var single = EnumSet.of(Color.BLACK);
+var c = complement(single);
+assert c.size() == 5 && !c.contains(Color.BLACK);
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #37
@@ -1842,54 +1840,41 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
+public class LCTask37 {
+    /** Returns true only if a and b are the SAME interned string instance.
+     *  Both strings are interned before comparison. Uses == (identity). */
+    public static boolean sameInterned(String a, String b) {
 
-class RecursiveTypeBounds {
-    static class Node<T extends Comparable<T>> {
-        T value;
-        Node<T> left, right;
-
-        Node(T value) {
-            this.value = value;
-        }
-    }
-
-    static <T extends Comparable<T>> void insert(Node<T> node, T value) {
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (node == null || value == null) throw new IllegalArgumentException();
+        return a.intern() == b.intern();
+
 
 SUFFIX CODE:
 ----------------------------------------
-        if (value.compareTo(node.value) < 0) {
-            if (node.left == null) node.left = new Node<>(value);
-            else insert(node.left, value);
-        } else {
-            if (node.right == null) node.right = new Node<>(value);
-            else insert(node.right, value);
-        }
     }
-
     public static void main(String[] args) {
-        Node<Integer> root = new Node<>(10);
-        insert(root, 5);
-        insert(root, 20);
-        insert(root, 15);
-        assert root.left.value == 5;
-        assert root.right.value == 20;
-        assert root.right.left.value == 15;
+        assert sameInterned("hello", "hello");
+        assert sameInterned("hel" + "lo", "hello");
+        assert sameInterned(new String("test"), "test");
+        assert sameInterned(new String("abc"), new String("abc"));
+        assert !sameInterned("foo", "bar");
+        assert !sameInterned("hello", "HELLO") : "case-sensitive";
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example demonstrates the use of recursive type bounds with a generic method, which requires understanding of both generics and recursive type constraints. The pattern involves inserting elements into a binary search tree, which is a common data structure in computer science. This requires the model to correctly handle type bounds and recursive method calls, ensuring the values are inserted in the right place based on their natural ordering. The assertions validate the correct structure of the tree after multiple insertions, ensuring the model's completion maintains the integrity of the tree.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert sameInterned("", "");
+assert sameInterned(new String("x"), new String("x"));
+assert !sameInterned("a", "b");
+String s1 = "hello world";
+String s2 = new String("hello world");
+assert sameInterned(s1, s2);
+assert sameInterned("123", new String("123"));
 
-================================================================================
 
 ================================================================================
 Test Case #38
@@ -1903,45 +1888,48 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.function.Function;
-import java.util.function.BiFunction;
-class Operation<T, R> {
-    private final Function<T, R> function;
-    private final T input;
-    public Operation(Function<T, R> function, T input) {
-        this.function = function;
-        this.input = input;
-    }
-    public R execute() {
-        return function.apply(input);
-    }
-}
-public class Main {
-    public static void main(String[] args) {
-        Function<Integer, String> intToString = i -> "Number: " + i;
+public class LCTask38 {
+    /** Format integer with custom grouping: groups of 2 from the right,
+     *  separated by underscores. E.g., 1234567 -> "1_23_45_67". */
+    public static String groupDigits(long n) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        Operation<Integer, String> operation = new Operation<>(intToString, 5);
+        String s = Long.toString(Math.abs(n));
+        StringBuilder sb = new StringBuilder();
+        int start = s.length() % 2;
+        if (start > 0) sb.append(s, 0, start);
+        for (int i = start; i < s.length(); i += 2) {
+            if (sb.length() > 0) sb.append('_');
+            sb.append(s, i, i + 2);
+        }
+        return n < 0 ? "-" + sb : sb.toString();
 
 
 SUFFIX CODE:
 ----------------------------------------
-
-        String result = operation.execute();
-        assert result.equals("Number: 5");
-        System.out.println("Test passed!");
+    }
+    public static void main(String[] args) {
+        assert groupDigits(1234567).equals("1_23_45_67");
+        assert groupDigits(12).equals("12");
+        assert groupDigits(123).equals("1_23");
+        assert groupDigits(1).equals("1");
+        assert groupDigits(0).equals("0");
+        assert groupDigits(-1234).equals("-12_34");
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This scenario tests the LLM's ability to recognize and complete a pattern involving a generic class, function interfaces, and method execution. The pattern involves creating an instance of a generic class with a function and an input, and then executing the function. The suffix includes assertions to verify the correctness of the pattern, ensuring that the LLM understands the use of function interfaces and generic types in Java. This example is complex enough to challenge a senior developer and requires an understanding of advanced Java features like generics and functional programming.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert groupDigits(99).equals("99");
+assert groupDigits(100).equals("1_00");
+assert groupDigits(1000).equals("10_00");
+assert groupDigits(12345678).equals("12_34_56_78");
+assert groupDigits(-1).equals("-1");
+assert groupDigits(10).equals("10");
 
-================================================================================
 
 ================================================================================
 Test Case #39
@@ -1955,80 +1943,41 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.locks.*;
-
-public class LockFreeStack<E> {
-    private static class Node<E> {
-        final E value;
-        Node<E> next;
-
-        Node(E value) {
-            this.value = value;
-        }
-    }
-
-    private volatile Node<E> head;
-
-    public void push(E value) {
-        Node<E> newHead = new Node<>(value);
+import java.util.*;
+public class LCTask39 {
+    /** Create a ThreadLocal that starts as a fresh empty ArrayList for each thread. */
+    static final ThreadLocal<List<String>> TL = ThreadLocal.withInitial(
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        Node<E> oldHead;
-        do {
-            oldHead = head;
-            newHead.next = oldHead;
-        } while (!compareAndSetHead(oldHead, newHead));
+        ArrayList::new
 
 
 SUFFIX CODE:
 ----------------------------------------
-    }
-
-    private boolean compareAndSetHead(Node<E> oldHead, Node<E> newHead) {
-        synchronized (this) {
-            if (head == oldHead) {
-                head = newHead;
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public E pop() {
-        Node<E> oldHead;
-        Node<E> newHead;
-        do {
-            oldHead = head;
-            if (oldHead == null) {
-                return null;
-            }
-            newHead = oldHead.next;
-        } while (!compareAndSetHead(oldHead, newHead));
-        return oldHead.value;
-    }
-
+    );
     public static void main(String[] args) {
-        LockFreeStack<Integer> stack = new LockFreeStack<>();
-        stack.push(1);
-        stack.push(2);
-        stack.push(3);
-        assert stack.pop() == 3;
-        assert stack.pop() == 2;
-        assert stack.pop() == 1;
-        assert stack.pop() == null;
+        TL.get().add("a");
+        TL.get().add("b");
+        assert TL.get().size() == 2;
+        TL.remove();
+        assert TL.get().isEmpty() : "after remove, get() returns fresh list";
+        TL.get().add("x");
+        assert TL.get().size() == 1;
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to recognize and complete a complex lock-free data structure pattern with minimal context. The LockFreeStack class uses volatile and synchronized mechanisms to ensure thread safety without relying on traditional locking. The completion requires understanding of compare-and-set patterns and volatile variables, which are advanced Java concurrency features. The suffix includes robust assertions to verify the correctness of the implementation, ensuring that the stack operates as expected under concurrent conditions.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+TL.remove();
+assert TL.get().isEmpty();
+TL.get().add("test");
+assert TL.get().contains("test");
+TL.remove();
+assert TL.get().size() == 0;
 
-================================================================================
 
 ================================================================================
 Test Case #40
@@ -2043,45 +1992,42 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-
-public class CustomMap<K, V> extends HashMap<K, V> {
-    public List<V> getAllValues(K key1, K key2) {
-        List<V> values = new ArrayList<>();
-        values.add(get(key1));
-        values.add(get(key2));
+import java.util.stream.*;
+public class LCTask40 {
+    static final String T = "YES", F = "NO";
+    /** Format each boolean as T/F string, join with " | ". */
+    public static String formatFlags(boolean... flags) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        if (key1.equals(key2)) {
-            values.add(get(key1));
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < flags.length; i++) {
+            if (i > 0) sb.append(" | ");
+            sb.append(flags[i] ? T : F);
         }
+        return sb.toString();
+
 
 SUFFIX CODE:
 ----------------------------------------
-        return values;
     }
-
     public static void main(String[] args) {
-        CustomMap<String, Integer> map = new CustomMap<>();
-        map.put("A", 1);
-        map.put("B", 2);
-        List<Integer> values = map.getAllValues("A", "B");
-        assert values.size() == 2 : "Size should be 2";
-        assert values.contains(1) : "Should contain value 1";
-        assert values.contains(2) : "Should contain value 2";
+        assert formatFlags(true, false, true).equals("YES | NO | YES");
+        assert formatFlags(false).equals("NO");
+        assert formatFlags().equals("");
+        assert !formatFlags(true).equals("true");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving custom Map methods with generic types and handling potential key equality scenarios. It requires understanding of collections, generics, and method overriding in Java.
+assert formatFlags(true, true).equals("YES | YES");
+assert formatFlags(false, false).equals("NO | NO");
+assert formatFlags(true, false, false, true).equals("YES | NO | NO | YES");
+assert formatFlags().equals("");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #41
@@ -2096,34 +2042,38 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
+import java.util.stream.*;
+public class LCTask41 {
+    /** Generate sequence: start, start*2, start*4, ... while value < limit.
+     *  Uses Stream.iterate(seed, hasNext, next). */
+    public static List<Integer> doublingSeq(int start, int limit) {
 
-class ComplexCollector {
-    public static void main(String[] args) {
-        List<String> items = Arrays.asList("apple", "banana", "cherry", "date", "elderberry");
-        Map<Boolean, List<String>> partitioned = items.stream()
-            .collect(
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            Collectors.partitioningBy(s -> Arrays.asList('a', 'e', 'i', 'o', 'u').contains(s.charAt(0)))
+        return Stream.iterate(start, n -> n < limit, n -> n * 2)
+            .collect(Collectors.toList());
+
 
 SUFFIX CODE:
 ----------------------------------------
-            );
-        assert partitioned.get(true).size() == 3 : "Expected 3 elements starting with a consonant";
-        assert partitioned.get(false).size() == 2 : "Expected 2 elements starting with a vowel";
+    }
+    public static void main(String[] args) {
+        assert doublingSeq(1, 10).equals(List.of(1, 2, 4, 8));
+        assert doublingSeq(3, 25).equals(List.of(3, 6, 12, 24));
+        assert doublingSeq(5, 5).equals(List.of());
+        assert doublingSeq(1, 1).equals(List.of());
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a complex collector composition pattern using Java Streams API. The completion involves partitioning a list based on a condition, which is a non-trivial use of Collectors.partitioningBy. This requires understanding of higher-order functions, lambda expressions, and the Java Streams API.
+assert doublingSeq(1, 2).equals(List.of(1));
+assert doublingSeq(2, 100).equals(List.of(2, 4, 8, 16, 32, 64));
+assert doublingSeq(10, 11).equals(List.of(10));
+assert doublingSeq(100, 50).equals(List.of());
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #42
@@ -2138,50 +2088,44 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-
-public class RecursiveTypeBounds {
-    public static <T extends Comparable<T>> T findMax(Collection<T> items) {
-        if (items == null || items.isEmpty()) {
-            throw new IllegalArgumentException("Collection cannot be null or empty");
-        }
-        Iterator<T> iterator = items.iterator();
+public class LCTask42 {
+    /** Clear elements from index 'from' to 'to' (exclusive) in-place
+     *  by using subList().clear(). Returns the modified list. */
+    public static <T> List<T> clearRange(List<T> list, int from, int to) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        T max = iterator.next();
+        list.subList(from, to).clear();
+        return list;
+
 
 SUFFIX CODE:
 ----------------------------------------
-        while (iterator.hasNext()) {
-            T next = iterator.next();
-            if (next.compareTo(max) > 0) {
-                max = next;
-            }
-        }
-        return max;
     }
-
     public static void main(String[] args) {
-        List<Integer> numbers = Arrays.asList(1, 3, 2, 5, 4);
-        Integer maxNumber = findMax(numbers);
-        assert maxNumber == 5 : "Expected max number to be 5";
-
-        List<String> words = Arrays.asList("apple", "banana", "pear", "grape");
-        String maxWord = findMax(words);
-        assert maxWord.equals("pear") : "Expected max word to be 'pear'";
+        List<Integer> a = new ArrayList<>(List.of(1, 2, 3, 4, 5));
+        clearRange(a, 1, 3);
+        assert a.equals(List.of(1, 4, 5)) : a;
+        List<String> b = new ArrayList<>(List.of("x", "y", "z"));
+        clearRange(b, 0, 2);
+        assert b.equals(List.of("z")) : b;
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a pattern involving recursive type bounds with generic parameters in Java. The scenario involves finding the maximum element in a collection of comparable items, which requires understanding of generics, type bounds, and the Comparable interface. The completion involves initializing the max variable using the iterator, a critical step that must be correctly inferred from the context. The suffix contains assertions to verify the correctness of the implementation with different types of collections.
+List<Integer> c = new ArrayList<>(List.of(10, 20, 30));
+clearRange(c, 0, 3);
+assert c.isEmpty();
+List<Integer> d = new ArrayList<>(List.of(1, 2, 3, 4));
+clearRange(d, 2, 4);
+assert d.equals(List.of(1, 2));
+List<Integer> e = new ArrayList<>(List.of(5));
+clearRange(e, 0, 1);
+assert e.isEmpty();
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #43
@@ -2196,54 +2140,41 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-class CustomCache<K, V> {
-    private final Map<K, V> cache = new HashMap<>();
-    private final int maxSize;
+import java.util.stream.*;
+public class LCTask43 {
+    /** Count strings that START WITH the given prefix (case-insensitive).
+     *  NOT the same as Collections.frequency (which needs exact match). */
+    public static long countByPrefix(List<String> items, String prefix) {
 
-    public CustomCache(int maxSize) {
-        this.maxSize = maxSize;
-    }
-
-    public void put(K key, V value) {
-        if (cache.size() >= maxSize) {
-            cache.remove(cache.keySet().iterator().next());
-        }
-        
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        cache.put(key, value);
+        String lp = prefix.toLowerCase();
+        return items.stream()
+            .filter(s -> s.toLowerCase().startsWith(lp))
+            .count();
+
 
 SUFFIX CODE:
 ----------------------------------------
-
     }
-
-    public V get(K key) {
-        return cache.get(key);
-    }
-
     public static void main(String[] args) {
-        CustomCache<String, String> cache = new CustomCache<>(2);
-        cache.put("key1", "value1");
-        cache.put("key2", "value2");
-        cache.put("key3", "value3");
-
-        assert cache.get("key1") == null : "key1 should be evicted";
-        assert cache.get("key2").equals("value2") : "key2 should still be present";
-        assert cache.get("key3").equals("value3") : "key3 should still be present";
+        var list = List.of("Apple", "Apricot", "Banana", "avocado");
+        assert countByPrefix(list, "ap") == 2;
+        assert countByPrefix(list, "a") == 3;
+        assert countByPrefix(list, "banana") == 1;
+        assert countByPrefix(list, "z") == 0;
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to complete a method in a custom cache implementation with limited context. It involves understanding a common pattern in cache eviction where the least recently added item is removed when the cache reaches its maximum size. The prefix and suffix provide minimal context, focusing on the critical part of the pattern, i.e., ensuring the new item is added to the cache correctly. The example also includes assertions to verify the correct behavior of the cache after multiple insertions, challenging the model's understanding of how the eviction policy should work.
+assert countByPrefix(List.of(), "x") == 0;
+assert countByPrefix(List.of("a", "A", "aa", "b"), "a") == 3;
+assert countByPrefix(List.of("Hello", "HELP", "hero"), "HE") == 3;
+assert countByPrefix(List.of("test"), "TEST") == 1;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #44
@@ -2257,39 +2188,49 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-class Example {
-	public static <T extends Comparable<T>> void sortList(List<T> list) {
-		Collections.sort(
+public class LCTask44 {
+    /** Map grade letter to GPA using switch expression with yield.
+     *  A->4.0, B->3.0, C->2.0, D->1.0, F->0.0.
+     *  If modifier is '+', add 0.3 (but cap at 4.0).
+     *  If modifier is '-', subtract 0.3 (but floor at 0.0).
+     *  Otherwise no modification. */
+    public static double toGPA(char grade, char modifier) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    list
+        double base = switch (grade) {
+            case 'A' -> 4.0; case 'B' -> 3.0; case 'C' -> 2.0;
+            case 'D' -> 1.0; case 'F' -> 0.0;
+            default -> throw new IllegalArgumentException("Invalid grade");
+        };
+        double mod = modifier == '+' ? 0.3 : modifier == '-' ? -0.3 : 0.0;
+        return Math.max(0.0, Math.min(4.0, base + mod));
+
 
 SUFFIX CODE:
 ----------------------------------------
-    );
-	}
-	public static void main(String[] args) {
-		List<Integer> numbers = Arrays.asList(3, 1, 4, 1, 5, 9);
-		sortList(numbers);
-		assert numbers.get(0) == 1;
-		assert numbers.get(1) == 1;
-		assert numbers.get(2) == 3;
-		assert numbers.get(3) == 4;
-		assert numbers.get(4) == 5;
-		assert numbers.get(5) == 9;
-	}
+    }
+    public static void main(String[] args) {
+        assert toGPA('A', ' ') == 4.0;
+        assert toGPA('A', '+') == 4.0;  // capped at 4.0
+        assert toGPA('A', '-') == 3.7;
+        assert toGPA('B', '+') == 3.3;
+        assert toGPA('F', '-') == 0.0;  // floored at 0.0
+        assert toGPA('C', ' ') == 2.0;
+    }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the LLM's ability to complete a generic method call within a context of sorting a list. The method uses bounded type parameters and generics, which requires the LLM to understand how to properly apply Collections.sort to a List of elements that implement Comparable. The assertions in the suffix verify that the list is sorted correctly, demonstrating understanding of both the method's purpose and Java's Collections framework. This example avoids trivial operations and ensures that the completion requires knowledge of generic type bounds and method invocation within Java.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert toGPA('B', '-') == 2.7;
+assert toGPA('D', '+') == 1.3;
+assert toGPA('D', '-') == 0.7;
+assert toGPA('F', ' ') == 0.0;
+assert toGPA('F', '+') == 0.3;
+try { toGPA('X', ' '); assert false; } catch (IllegalArgumentException e) {}
 
-================================================================================
 
 ================================================================================
 Test Case #45
@@ -2303,38 +2244,42 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
+public class LCTask45 {
+    /** A record where equality is based ONLY on 'name' (case-insensitive),
+     *  ignoring 'value'. Uses record with custom equals/hashCode. */
+    record Entry(String name, int value) {
 
-public class LockFreeCounter {
-    private AtomicInteger counter = new AtomicInteger(0);
-
-    public int incrementAndGet() {
-        
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        return counter.incrementAndGet();
+        @Override public boolean equals(Object o) {
+            return o instanceof Entry e && name.equalsIgnoreCase(e.name);
+        }
+        @Override public int hashCode() {
+            return name.toLowerCase().hashCode();
+        }
+
 
 SUFFIX CODE:
 ----------------------------------------
     }
-
     public static void main(String[] args) {
-        LockFreeCounter counter = new LockFreeCounter();
-        int newCount = counter.incrementAndGet();
-        assert newCount == 1 : "Expected count to be 1 but got " + newCount;
+        assert new Entry("Alice", 1).equals(new Entry("alice", 99));
+        assert !new Entry("Alice", 1).equals(new Entry("Bob", 1));
+        var set = new HashSet<>(List.of(new Entry("X", 1), new Entry("x", 2)));
+        assert set.size() == 1 : "same name -> deduplicated";
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This test case demonstrates the lock-free data structure pattern using AtomicInteger for concurrency. It tests the model's ability to recognize the pattern of using AtomicInteger for thread-safe increments in a minimal context. The prefix sets up the class and the method signature, while the completion involves the correct usage of AtomicInteger's incrementAndGet method. The suffix includes an assertion to verify the expected behavior, ensuring that the pattern is understood and correctly implemented.
+assert new Entry("Test", 5).equals(new Entry("TEST", 10));
+assert new Entry("a", 0).hashCode() == new Entry("A", 999).hashCode();
+var s = new HashSet<>(List.of(new Entry("k", 1), new Entry("K", 2), new Entry("j", 1)));
+assert s.size() == 2;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #46
@@ -2349,38 +2294,40 @@ Language: java
 PREFIX CODE:
 ----------------------------------------
 import java.util.*;
-class RecursiveType<T extends RecursiveType<T>> {
-    private List<T> elements;
-    public RecursiveType() { this.elements = new ArrayList<>(); }
-    public void addElement(T element) {
+public class LCTask46 {
+    /** Return a mutable list: if items is empty, return new ArrayList.
+     *  Otherwise return new ArrayList containing items reversed. */
+    public static List<String> reverseOrEmpty(List<String> items) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        elements.add(element);
+        var result = new ArrayList<>(items);
+        Collections.reverse(result);
+        return result;
+
 
 SUFFIX CODE:
 ----------------------------------------
-}
-    public T getElement(int index) { return elements.get(index); }
-}
-public class Test {
+    }
     public static void main(String[] args) {
-        RecursiveType<RecursiveType<?>> root = new RecursiveType<>();
-        RecursiveType<RecursiveType<?>> child = new RecursiveType<>();
-        root.addElement(child);
-        assert root.getElement(0) == child;
-        System.out.println("All assertions passed.");
+        assert reverseOrEmpty(List.of("a", "b", "c")).equals(List.of("c", "b", "a"));
+        assert reverseOrEmpty(List.of()).isEmpty();
+        var r = reverseOrEmpty(List.of("x"));
+        r.add("y");  // must be mutable
+        assert r.size() == 2;
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example demonstrates the usage of recursive type bounds in generics, which is an advanced Java feature. The pattern is identifiable with minimal context, and the completion involves adding an element to a generic list with recursive type bounds. The suffix includes necessary assertions to ensure the correct functionality of the code.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert reverseOrEmpty(List.of("1", "2")).equals(List.of("2", "1"));
+var m = reverseOrEmpty(List.of("a"));
+m.add("b"); m.add("c");
+assert m.size() == 3;
+assert reverseOrEmpty(List.of("x", "y", "z", "w")).equals(List.of("w", "z", "y", "x"));
 
-================================================================================
 
 ================================================================================
 Test Case #47
@@ -2394,56 +2341,39 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-
-public class CustomMap<K, V> {
-    private final Map<K, V> map = new HashMap<>();
-
-    public void put(K key, V value) {
-        map.put(key, value);
-    }
-
-    public V get(K key) {
-        return map.get(key);
-    }
-
-    public void mergeMaps(Map<? extends K, ? extends V> otherMap) {
+public class LCTask47 {
+    /** Replace characters from index 'from' to 'to' (exclusive) with 'rep'.
+     *  If from==to, insert 'rep' at that position.
+     *  Returns the modified string. */
+    public static String spliceStr(String s, int from, int to, String rep) {
 
 
 GOLDEN COMPLETION:
 ----------------------------------------
-        for (Map.Entry<? extends K, ? extends V> entry : otherMap.entrySet()) {
-            map.merge(entry.getKey(), entry.getValue(), (v1, v2) -> v2);
-        }
+        StringBuilder sb = new StringBuilder(s);
+        sb.replace(from, to, rep);
+        return sb.toString();
 
 
 SUFFIX CODE:
 ----------------------------------------
     }
-
     public static void main(String[] args) {
-        CustomMap<String, Integer> customMap = new CustomMap<>();
-        customMap.put("a", 1);
-        customMap.put("b", 2);
-        Map<String, Integer> otherMap = new HashMap<>();
-        otherMap.put("b", 3);
-        otherMap.put("c", 4);
-        customMap.mergeMaps(otherMap);
-        assert customMap.get("a") == 1;
-        assert customMap.get("b") == 3;
-        assert customMap.get("c") == 4;
+        assert spliceStr("hello", 1, 3, "a").equals("halo");
+        assert spliceStr("abcde", 0, 5, "X").equals("X");
+        assert spliceStr("abc", 1, 1, "XY").equals("aXYbc");
+        assert spliceStr("test", 4, 4, "!").equals("test!");
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a pattern for merging maps with generics, utilizing the `merge` method of the `Map` interface. It requires understanding of wildcard capture and lambda expressions for merging values, which are advanced Java features.
+assert spliceStr("", 0, 0, "hi").equals("hi");
+assert spliceStr("abc", 0, 0, "Z").equals("Zabc");
+assert spliceStr("abc", 1, 2, "").equals("ac");
+assert spliceStr("1234", 2, 3, "99").equals("12994");
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #48
@@ -2457,39 +2387,47 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-public class GenericExample {
-	public static <T extends Comparable<T>> void sortAndPrint(List<T> list) {
-		
+public class LCTask48 {
+    // Custom digits: a=0, b=1, c=2, d=3, e=4, f=5, g=6, h=7, i=8, j=9
+    static final String DIGITS = "abcdefghij";
+    /** Parse a string of custom digit-letters into an integer.
+     *  '-' prefix means negative. E.g., "cab" -> 201, "-ba" -> -10 */
+    public static int parseCustom(String s) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-    Collections.sort(list);
-		for (T element : list) {
-			System.out.println(element);
-		}
+        boolean neg = s.startsWith("-");
+        String d = neg ? s.substring(1) : s;
+        int result = 0;
+        for (char c : d.toCharArray()) {
+            result = result * 10 + DIGITS.indexOf(c);
+        }
+        return neg ? -result : result;
+
 
 SUFFIX CODE:
 ----------------------------------------
+    }
+    public static void main(String[] args) {
+        assert parseCustom("a") == 0;
+        assert parseCustom("b") == 1;
+        assert parseCustom("ba") == 10;
+        assert parseCustom("cab") == 201;
+        assert parseCustom("-ba") == -10;
+        assert parseCustom("ja") == 90;
+    }
 }
-	public static void main(String[] args) {
-		List<Integer> numbers = Arrays.asList(4, 3, 2, 1);
-		sortAndPrint(numbers);
-		assert numbers.get(0) == 1;
-		assert numbers.get(1) == 2;
-		assert numbers.get(2) == 3;
-		assert numbers.get(3) == 4;
-	}
-}
 
-JUSTIFICATION:
+
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the model's ability to recognize and complete a generic method that sorts and prints a list of elements. The method uses a type bound with Comparable to ensure the elements can be sorted. The completion requires understanding of Java generics, type bounds, and the Collections.sort method. The suffix includes assertions to verify the list is correctly sorted and printed, ensuring the model's completion is accurate and functional.
+assert parseCustom("aaa") == 0;
+assert parseCustom("baa") == 100;
+assert parseCustom("-j") == -9;
+assert parseCustom("bbb") == 111;
+assert parseCustom("dce") == 324;
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #49
@@ -2503,35 +2441,47 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.*;
-public class CustomCollectorExample {
-    public static void main(String[] args) {
-        List<String> items = Arrays.asList("apple", "banana", "orange", "apple", "banana", "apple");
-        Map<String, Long> itemCount = items.stream()
-            .collect(
+public class LCTask49 {
+    /** Custom boolean: "T","true","1","yes","" -> true.
+     *  "F","false","0","no" -> false. Case-insensitive.
+     *  Anything else -> IllegalArgumentException. */
+    public static boolean parseBool(String s) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            Collectors.groupingBy(Function.identity(), Collectors.counting())
+        String low = s.toLowerCase();
+        if (low.equals("t") || low.equals("true") || low.equals("1")
+                || low.equals("yes") || low.isEmpty()) return true;
+        if (low.equals("f") || low.equals("false") || low.equals("0")
+                || low.equals("no")) return false;
+        throw new IllegalArgumentException("Invalid: " + s);
+
 
 SUFFIX CODE:
 ----------------------------------------
-            );
-        assert itemCount.get("apple") == 3 : "Expected 3 apples, got " + itemCount.get("apple");
-        assert itemCount.get("banana") == 2 : "Expected 2 bananas, got " + itemCount.get("banana");
-        assert itemCount.get("orange") == 1 : "Expected 1 orange, got " + itemCount.get("orange");
+    }
+    public static void main(String[] args) {
+        assert parseBool("T") == true;
+        assert parseBool("false") == false;
+        assert parseBool("") == true;  // empty is TRUE
+        assert parseBool("YES") == true;
+        assert parseBool("0") == false;
+        try { parseBool("maybe"); assert false; } catch (IllegalArgumentException e) {}
     }
 }
 
 
-JUSTIFICATION:
+HIDDEN ASSERTIONS:
 ----------------------------------------
-This example tests the LLM's ability to recognize and complete a complex collector pattern in Java Streams. The groupingBy collector with a counting downstream collector is a non-trivial pattern that requires understanding of advanced Java Streams API features. The given prefix sets up a stream of strings, and the LLM must infer the correct way to count occurrences of each string using collectors. The assertions in the suffix verify that the completion correctly implements the pattern.
+assert parseBool("TRUE") == true;
+assert parseBool("False") == false;
+assert parseBool("1") == true;
+assert parseBool("no") == false;
+assert parseBool("NO") == false;
+assert parseBool("t") == true;
+try { parseBool("2"); assert false; } catch (IllegalArgumentException e) {}
 
-ASSERTIONS:
-----------------------------------------
-
-================================================================================
 
 ================================================================================
 Test Case #50
@@ -2545,44 +2495,38 @@ Language: java
 
 PREFIX CODE:
 ----------------------------------------
-import java.util.concurrent.*;
-public class CustomThreadPool {
-    public static void main(String[] args) {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        Future<Integer> future1 = executor.submit(() -> {
-            Thread.sleep(1000);
-            return 1;
-        });
-        Future<Integer> future2 = executor.submit(() -> {
-            Thread.sleep(500);
-            return 2;
-        });
-        try {
+public class LCTask50 {
+    /** Check if ALL bits in 'mask' are set in 'value'.
+     *  E.g., hasAllBits(0b1111, 0b0101) -> true (bits 0 and 2 are set).
+     *  hasAllBits(0b1010, 0b0101) -> false (bit 0 not set in value). */
+    public static boolean hasAllBits(int value, int mask) {
+
 
 GOLDEN COMPLETION:
 ----------------------------------------
-            Integer result1 = future1.get();
-            Integer result2 = future2.get();
+        return (value & mask) == mask;
 
 
 SUFFIX CODE:
 ----------------------------------------
-
-            assert result1 == 1 : "First future did not return 1";
-            assert result2 == 2 : "Second future did not return 2";
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        } finally {
-            executor.shutdown();
-        }
+    }
+    public static void main(String[] args) {
+        assert hasAllBits(0b1111, 0b0101) == true;
+        assert hasAllBits(0b1010, 0b0101) == false;
+        assert hasAllBits(0b1111, 0b1111) == true;
+        assert hasAllBits(0, 0) == true;
+        assert hasAllBits(0b100, 0b110) == false;
     }
 }
 
-JUSTIFICATION:
-----------------------------------------
-This example tests the model's ability to understand and correctly complete code related to multi-threading and concurrency patterns in Java. Specifically, it involves using an ExecutorService to manage a fixed thread pool and submitting Callable tasks that return a Future. The correct completion requires understanding how to retrieve the results of the tasks using Future.get() and validate them using assertions. This scenario demonstrates advanced usage of Java concurrency utilities and proper exception handling patterns, making it a robust test case.
 
-ASSERTIONS:
+HIDDEN ASSERTIONS:
 ----------------------------------------
+assert hasAllBits(255, 0) == true;
+assert hasAllBits(0, 1) == false;
+assert hasAllBits(7, 3) == true;
+assert hasAllBits(3, 7) == false;
+assert hasAllBits(0xFF, 0x0F) == true;
+assert hasAllBits(-1, 0xFF) == true;
 
-================================================================================
+

@@ -1,1192 +1,1167 @@
-SYNTAX_COMPLETION_SYSTEM_PROMPT = """
-You are an expert JavaScript developer tasked with creating benchmark examples for testing syntax completion and language-specific structure capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to complete complex syntactical patterns and nested structures.
-
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable JavaScript that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test understanding of language-specific syntax. Choose ONE syntax pattern to test (rotate through them):
-    Syntax Categories:
-    a. Nested Control Structures
-    - Multiple levels of if/else conditions
-    - Nested loop structures (for/while combinations)
-    - Try/catch with multiple catch/finally blocks
-    - Promise chaining and error handling
-    - Array and object comprehensions
-
-    b. Complex JavaScript Syntax Features
-    - Class inheritance and super() calls
-    - Decorator patterns (using higher-order functions)
-    - Async/await patterns
-    - Generator functions and yield syntax
-    - Destructuring patterns
-
-    c. Multi-line Syntax Patterns
-    - Method chaining patterns
-    - Builder pattern implementations
-    - Fluent interface structures
-    - Template literal formatting
-    - Function currying and partial application
-
-    d. Error Handling Patterns
-    - Try/catch/finally combinations
-    - Promise error handling
-    - Custom error hierarchies
-    - Error transformation patterns
-    - Cleanup and resource management
-    
-2. Ensure patterns demonstrate proper nesting and indentation
-3. Create ground truth completions that maintain syntactic correctness
-4. Write assertions that meaningfully test structural integrity and syntax validity
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable JavaScript
-    - All assertions must pass when code is run
-    - Include necessary imports or requires
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on complex syntactical structures and patterns
-2. Test handling of nested code blocks
-3. Ensure patterns include proper error handling syntax
-4. Include edge cases in syntax formatting
-5. Keep code focused on demonstrating language-specific features
-"""
-
-SYNTAX_COMPLETION_USER_PROMPT = """
-You are helping create a benchmark for syntax completion capabilities. Your task is to generate a coding scenario that tests an LLM's ability to complete
-complex syntactical structures and maintain proper formatting in JavaScript code. The scenario should include:
-
-Generate a single JSONL entry testing syntax completion capabilities. Choose ONE syntax pattern to test (rotate through them):
-    Syntax Categories:
-    a. Nested Control Structures
-    - Multiple levels of if/else conditions
-    - Nested loop structures (for/while combinations)
-    - Try/catch with multiple catch/finally blocks
-    - Promise chaining and error handling
-    - Array and object comprehensions
-
-    b. Complex JavaScript Syntax Features
-    - Class inheritance and super() calls
-    - Decorator patterns (using higher-order functions)
-    - Async/await patterns
-    - Generator functions and yield syntax
-    - Destructuring patterns
-
-    c. Multi-line Syntax Patterns
-    - Method chaining patterns
-    - Builder pattern implementations
-    - Fluent interface structures
-    - Template literal formatting
-    - Function currying and partial application
-
-    d. Error Handling Patterns
-    - Try/catch/finally combinations
-    - Promise error handling
-    - Custom error hierarchies
-    - Error transformation patterns
-    - Cleanup and resource management
-
-CRITICAL JSON FORMATTING REQUIREMENTS:
-1. Your response MUST be a syntactically valid JSON object
-2. PROPERLY ESCAPE all special characters in strings:
-   - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
-3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-syntax-completion"
-- language: "javascript"
-- prefix: The code that comes before the completion (may or may not establish the syntax pattern)
-- suffix: The code that follows the completion (may or may not establish the syntax pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The syntactically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: JavaScript assert statements to verify syntactic correctness
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Module Import Requirements:
-1. Do NOT import modules unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section (using require() or ES modules)
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility methods, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper indentation when exiting blocks
-4. All code blocks must be properly closed
-
-The pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the pattern regardless of where it is established.
-
-Code requirements:
-1. Must be fully executable JavaScript code
-2. All assertions must pass when code is run
-3. Include all necessary imports or requires
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario should demonstrate complex syntax patterns
-2. The completion section should focus on language-specific structures
-3. The pattern should follow proper indentation and nesting rules
-4. Ground truth should maintain consistent formatting
-5. Assertions should verify structural integrity
-6. Include comments indicating expected syntax and formatting
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-syntax-completion", "language": "javascript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
-"""
-
-NL2CODE_CODE2NL_SYSTEM_PROMPT = """
-You are an expert JavaScript developer tasked with creating benchmark examples for testing bidirectional translation between code and natural language capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to translate between code and documentation in both directions.
-
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable JavaScript that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test code-to-comment and comment-to-code translation from these domains (rotate through them):
-    Business Logic:
-    - Financial calculations (portfolio analysis, risk assessment)
-    - Data transformations (ETL processes, data cleaning)
-    - Business rules validation (compliance checks, policy enforcement)
-    - Workflow orchestration (task scheduling, pipeline management)
-    - Domain modeling (business entities, relationship handling)
-
-    Technical Features:
-    - API integrations (authentication, rate limiting)
-    - Cache management (invalidation, refresh strategies)
-    - Data structures (custom collections, specialized containers)
-    - Configuration management (dynamic settings, feature flags)
-    - Resource management (connection pooling, cleanup)
-2. Ensure patterns demonstrate clear alignment between documentation and implementation, with the following requirements (alternate between these):
-    For Code-to-Natural Language (50% of test cases):
-    - Generate comprehensive documentation for:
-        * Function/method implementations
-        * Class definitions
-        * Module-level code
-        * Complex algorithms
-        * Error handling logic
-    - Documentation should include:
-        * Detailed JSDoc comments
-        * Implementation comments explaining complex logic
-        * Usage examples
-        * Parameter descriptions
-        * Return value documentation
-        * Error scenarios and handling
-        * Performance characteristics
-    
-    For Natural Language-to-Code (50% of test cases):
-    - Test implementation of:
-        * Complex business rules
-        * Technical requirements
-        * Algorithm descriptions
-        * Error handling specifications
-        * Interface contracts
-3. Create ground truth completions that maintain consistency between comments and code
-4. Write assertions that meaningfully test documentation accuracy and code correctness:
-    - For documentation tests:
-        * Check presence of key domain terms
-        * Verify coverage of important concepts
-        * Validate documentation structure
-        * Don't require exact string matches
-    - For implementation tests:
-        * Verify functional requirements
-        * Test edge cases
-        * Check error handling
-        * Validate return values
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable JavaScript
-    - All assertions must pass when code is run
-    - Include necessary imports or requires
-    - Handle cleanup of resources
-    - Use proper error handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on bidirectional translation between code and natural language
-2. Test accuracy of generated documentation
-3. Ensure patterns include proper documentation conventions
-4. Include edge cases in documentation clarity
-5. Keep both code and comments focused on clear communication
-
-Avoid These Common Patterns:
-1. Trivial mathematical functions (factorial, fibonacci)
-2. Simple data structure operations (stack, queue)
-3. Basic string manipulations (palindrome, anagram)
-4. Elementary algorithms (bubble sort, binary search)
-5. Textbook examples (hello world variations)
-
-Focus on realistic scenarios that demonstrate:
-1. Complex business logic translation
-2. Technical requirement implementation
-3. Error handling documentation
-4. API usage patterns
-5. Resource management strategies
-"""
-
-NL2CODE_CODE2NL_USER_PROMPT = """
-You are helping create a benchmark for code-natural language translation capabilities. Your task is to generate a coding scenario that tests an LLM's ability to translate
-between JavaScript code and documentation effectively. The scenario should include:
-
-Generate a single JSONL entry testing code-to-comment and comment-to-code capabilities.
-
-CRITICAL JSON FORMATTING REQUIREMENTS:
-1. Your response MUST be a syntactically valid JSON object
-2. PROPERLY ESCAPE all special characters in strings:
-   - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
-3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-code2NL-NL2code"
-- language: "javascript"
-- prefix: The segment that establishes the code-comment relationship before the completion
-- suffix: The segment that follows the completion with code or comments
-- golden_completion: The accurate completion that translates between code and comments and that maintains consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: JavaScript assert statements to verify syntactic correctness
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Module Import Requirements:
-1. Do NOT import modules unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section (using require() or ES modules)
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility methods, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper indentation when exiting blocks
-4. All code blocks must be properly closed
-
-The code or comment to translate can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct translation.
-
-Code requirements:
-1. Must be fully executable JavaScript code
-2. All assertions must pass when code is run
-3. Include all necessary imports or requires
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Documentation Assertion Requirements:
-1. When testing generated documentation:
-- Use substring checks for key terms: 'assert(docString.toLowerCase().includes("key_term"))'
-- Check for presence of required sections: 'assert(docString.includes("Parameters:"))'
-- Verify coverage of important concepts
-- Don't require exact string matches
-
-2. When testing generated code:
-- Verify functional requirements
-- Test edge cases
-- Validate error handling
-- Check return values
-
-Important Balance Requirements:
-1. Maintain a 50/50 split between:
-    - Code-to-Comment: Generate documentation for existing code
-    - Comment-to-Code: Generate code from documentation
-2. For Code-to-Comment tasks:
-    - Provide complex, working code in the prefix
-    - Golden completion should be comprehensive documentation
-    - Assertions should verify documentation completeness
-3. For Comment-to-Code tasks:
-    - Provide detailed requirements/documentation in the prefix
-    - Golden completion should be the implementation
-    - Assertions should verify functional requirements
-
-Important:
-- Use realistic business/technical scenarios
-- Avoid trivial examples (factorial, fibonacci, etc.)
-- Test complex documentation/implementation translations
-- Keep verification code before cleanup
-- Use appropriate assertion libraries (node:assert, chai, jest, etc.)
-- Ensure all assertions pass
-
-Requirements:
-1. The scenario should demonstrate clear documentation patterns
-2. The completion section should focus on bidirectional translation
-3. The pattern should follow JSDoc or other JavaScript documentation best practices
-4. Ground truth should maintain consistency between code and comments
-5. Assertions should verify documentation accuracy
-6. Include examples of both code-to-comment and comment-to-code tasks
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-code2NL-NL2code", "language": "javascript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
-"""
-
-CODE_PURPOSE_UNDERSTANDING_SYSTEM_PROMPT = """
-You are an expert JavaScript developer tasked with creating benchmark examples for testing semantic understanding and code purpose comprehension capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to understand and continue code based on its underlying business logic and domain context.
-
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable JavaScript that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test understanding of code intent and business purpose. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Closures/higher-order functions
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Promises/async-await
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-2. Ensure patterns demonstrate clear semantic meaning and domain context
-3. Create ground truth completions that maintain business logic consistency
-4. Write assertions that meaningfully test both semantic correctness and business rule compliance
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable JavaScript
-    - All assertions must pass when code is run
-    - Include necessary imports/requires
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on domain-specific logic and business rules
-2. Test comprehension of underlying code purpose
-3. Ensure patterns reflect real-world business scenarios
-4. Include semantic edge cases where relevant
-5. Keep code focused on demonstrating clear business intent
-"""
-
-CODE_PURPOSE_UNDERSTANDING_USER_PROMPT = """
-You are helping create a benchmark for code purpose understanding capabilities. Your task is to generate a coding scenario that tests an LLM's ability to comprehend and
-continue JavaScript code based on its semantic meaning and business context. The scenario should include:
-
-Generate a single JSONL entry testing code purpose understanding capabilities. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Closures/higher-order functions
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Promises/async-await
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-code-purpose-understanding"
-- language: "javascript"
-- prefix: The code that comes before the completion (may or may not establish the semantic pattern)
-- suffix: The code that follows the completion (may or may not establish the semantic pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The semantically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: JavaScript assert statements to verify both functional and semantic correctness
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Module Import Requirements:
-1. Do NOT import/require modules unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility methods, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
-
-The semantic pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the semantic pattern regardless of where it is established.
-
-Code requirements:
-1. Must be fully executable JavaScript code
-2. All assertions must pass when run
-3. Include all necessary imports/requires
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario should demonstrate clear business purpose
-2. The completion section should focus on domain-specific logic
-3. The pattern should follow appropriate business rules and domain conventions
-4. Ground truth should maintain semantic consistency
-5. Assertions should verify business logic correctness
-6. Include comments indicating expected business behavior and domain context
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-code-purpose-understanding", "language": "javascript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
-"""
-
-LOW_CONTEXT_SYSTEM_PROMPT = """
-You are an expert JavaScript developer tasked with creating benchmark examples for testing low-context pattern matching capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code with minimal surrounding context.
-
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable JavaScript that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse, practical low-context scenarios from these categories (rotate through them):
-    - Data structure manipulation (arrays, objects, sets, maps)
-    - String processing and text manipulation
-    - Object-oriented patterns (classes, prototypes, inheritance)
-    - Functional programming constructs
-    - Error handling and exception patterns
-    - Async patterns (Promises, async/await)
-    - Iterator and generator patterns
-    - Callback and event handling patterns
-    - Higher-order functions and closures
-2. Ensure patterns are clear and identifiable even with minimal context
-3. Create ground truth completions that represent best practices while handling potential ambiguity
-4. Write assertions that meaningfully test both pattern adherence and functionality across multiple valid completions where applicable
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable JavaScript
-    - All assertions must pass when code is run
-    - Include necessary imports/requires/modules
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on universal, standardized programming patterns
-2. Test the model's ability to handle ambiguity and make reasonable assumptions
-3. Ensure patterns follow widely-used conventions that are recognizable with minimal context
-4. Include multiple valid completions in assertions where appropriate
-5. Keep code minimal while still maintaining semantic clarity
-6. The combined length of prefix and suffix should be 10-20 lines total for true low-context scenarios
-"""
-
-LOW_CONTEXT_USER_PROMPT = """
-You are helping create a benchmark for low-context code pattern matching capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in JavaScript code with minimal surrounding context. The scenario should include:
-
-Generate a single JSONL entry testing low-context capabilities. Choose from one of these categories (rotate through them):
-- Data structure manipulation (arrays, objects, sets, maps)
-- String processing and text manipulation
-- Object-oriented patterns (classes, prototypes, inheritance)
-- Functional programming constructs
-- Error handling and exception patterns
-- Async patterns (Promises, async/await)
-- Iterator and generator patterns
-- Callback and event handling patterns
-- Higher-order functions and closures
-
-STRICTLY PROHIBITED EXAMPLES - DO NOT GENERATE:
-1. Basic array operations (map, filter, reduce with simple predicates)
-2. Simple string manipulation (concatenation, template literals)
-3. Basic Promise chains or async/await
-4. Simple class definitions or inheritance
-5. Basic error handling (try/catch without complexity)
-6. Simple event listeners or callbacks
-7. Basic object/array destructuring
-8. Simple generator functions (basic yield statements)
-9. Any example that could be solved by pattern matching without understanding
-
-REQUIRED COMPLEXITY LEVEL:
-Instead, you MUST create examples that demonstrate advanced JavaScript patterns such as:
-
-For Async Patterns:
-- Custom Promise implementations with executors
-- Complex async control flow with Promise.race/all/allSettled
-- Async iterators and generators with Symbol.asyncIterator
-- Cancelable or timeout-able Promise patterns
-- Async queue or rate limiting implementations
-
-For Functional Programming:
-- Function composition with monads
-- Currying and partial application with closures
-- Transducers and composable transformations
-- Custom functional data structures (Maybe, Either, IO)
-- Point-free style programming patterns
-
-For Object-Oriented Patterns:
-- Proxy and Reflect API usage
-- Meta-programming with Symbol properties
-- Custom iterators with Symbol.iterator
-- Property descriptors and decorators
-- Mixin patterns with multiple inheritance
-
-For Iterator/Generator Patterns:
-- Bidirectional communication with generators
-- Async generator implementations
-- Custom iterables with Symbol.iterator
-- Generator delegation patterns
-- State machine implementations with generators
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-low-context"  
-- language: "javascript"
-- prefix: The code that comes before the completion (may or may not establish the pattern)
-- suffix: The code that follows the completion (may or may not establish the pattern) - should be DIFFERENT from the golden completion
-- golden_completion: Multiple valid completions that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: JavaScript assert statements to verify correctness
-
-CRITICAL COMPLEXITY VALIDATION:
-Before submitting your example, verify that it meets these criteria:
-1. Would this example challenge a senior JavaScript developer?
-2. Does it require understanding of advanced language features?
-3. Is it significantly more complex than basic array/object operations?
-4. Does it demonstrate a pattern that would be found in production-quality code?
-5. Would it be impossible to solve correctly through simple pattern matching?
-6. Does it require genuine understanding of JavaScript language semantics?
-
-If you answer "no" to ANY of these questions, your example is TOO SIMPLE. Revise it to be more complex.
-
-CRITICAL LOW CONTEXT REQUIREMENTS:
-1. The prefix and suffix combined should be ONLY 10-20 lines total for true low-context scenarios
-2. Focus on concise, universally recognizable patterns that can be understood with minimal context
-3. Keep the context deliberately minimal while ensuring the pattern is still identifiable
-4. Use clear but brief code that establishes a recognizable pattern
-5. The pattern should be non-trivial but recognizable to JavaScript developers
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Module Import Requirements:
-1. Do NOT import modules unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
-
-The golden completion should demonstrate understanding and correct usage of the low-context pattern regardless of where it is established.
-
-Code requirements:
-1. Must be fully executable JavaScript code
-2. All assertions must pass when run
-3. Include all necessary imports/requires/modules
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario should demonstrate a clear pattern recognizable with minimal context
-2. The completion section should focus on universal programming patterns
-3. The pattern should follow widely-used conventions and standard library knowledge
-4. Ground truth should acknowledge multiple valid completions where appropriate
-5. Assertions should verify all acceptable pattern variations
-6. Include comments indicating potential ambiguities and alternative completions
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-low-context", "language": "javascript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-- KEEP COMBINED PREFIX AND SUFFIX TO 10-20 LINES TOTAL
-- Ensure your example demonstrates genuine complexity
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
-"""
-
-PATTERN_MATCHING_SYSTEM_PROMPT = """
-You are an expert JavaScript developer tasked with creating benchmark examples for testing pattern matching capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code.
-
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable JavaScript that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse, practical pattern matching scenarios that real developers encounter. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Higher-order functions
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Async patterns
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-2. Ensure patterns are clear and identifiable but not trivially simple
-3. Create ground truth completions that represent best practices
-4. Write assertions that meaningfully test both pattern adherence and functionality
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable JavaScript
-    - All assertions must pass when code is run
-    - Include necessary imports/requires/modules
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on realistic, practical scenarios
-2. Avoid patterns that are too project-specific
-3. Ensure patterns are clear enough to be recognized by an LLM
-4. Include edge cases in assertions where relevant
-5. Keep code self-contained and independently verifiable
-"""
-
-PATTERN_MATCHING_USER_PROMPT = """
-You are helping create a benchmark for code pattern matching capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in JavaScript code. The scenario should include:
-
-Generate a single JSONL entry testing pattern matching capabilities. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Higher-order functions
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Async patterns
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-pattern-matching"
-- language: "javascript"
-- prefix: The code that comes before the completion (MUST establish or begin a clear pattern)
-- suffix: The code that follows the completion (may continue or complete the pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The semantically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: JavaScript assert statements to verify both functional and semantic correctness
-
-Critical Pattern Matching Requirements:
-1. A CLEAR, IDENTIFIABLE PATTERN MUST be established in either the prefix or suffix
-2. The golden_completion MUST follow this established pattern (not create a new one)
-3. The pattern should be specific enough that random code wouldn't work
-4. Include at least 2-3 examples of the pattern in the prefix to establish it
-5. Ensure the pattern follows recognizable conventions in the chosen domain
-6. The pattern should be evident to anyone familiar with JavaScript
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Module Import Requirements:
-1. Do NOT import modules unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility methods, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
-
-The pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the pattern regardless of where it is established.
-
-Code requirements:
-1. Must be fully executable JavaScript code
-2. All assertions must pass when run
-3. Include all necessary imports/requires/modules
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario MUST demonstrate a clear, identifiable pattern
-2. The completion section should be non-trivial but focused on pattern matching
-3. The pattern should follow JavaScript best practices and common conventions
-4. Ground truth should demonstrate the ideal pattern continuation
-5. Assertions should verify both pattern adherence and functionality
-6. Include comments indicating the expected pattern continuation
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-pattern-matching", "language": "javascript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-- ENSURE A CLEAR PATTERN IS ESTABLISHED that the golden completion must follow
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
-"""
-
 API_USAGE_SYSTEM_PROMPT = """
-You are an expert JavaScript developer tasked with creating benchmark examples for testing rare API usage and uncommon library function capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code involving uncommon APIs and library functions.
+You are an expert JavaScript benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry. The code must be fully executable JavaScript that passes all assertions.
+Your task is to generate one high-quality JavaScript API Usage instance
+that reflects telemetry-observed developer completion scenarios.
+The instance should test whether a model can correctly use a
+common but error-prone Node.js or JavaScript API under realistic
+context constraints, including parameter ordering, encoding
+semantics, resource lifecycle, error handling, type coercion,
+API-specific conventions, and edge cases.
 
-Key Responsibilities:
-1. Generate diverse examples from these API categories (rotate through them, don't focus only on file operations or network protocols):
-    - Web frameworks and libraries (React, Vue, Angular, Express, Next.js)
-    - API clients (Axios, Fetch API, GraphQL)
-    - Cloud services (AWS SDK, Firebase, Azure SDK, GCP)
-    - Database interfaces (Mongoose, Sequelize, Prisma, Knex)
-    - File formats and parsing (XML, JSON, CSV, YAML)
-    - Testing libraries (Jest, Mocha, Cypress, Playwright)
-    - Node.js built-in modules (crypto, fs, stream, child_process)
-    - Browser APIs (WebSockets, WebRTC, IndexedDB, Service Workers)
-    - Package managers and bundlers (npm, yarn, webpack, parcel)
-    - Security/cryptography APIs (Web Crypto API, bcrypt, jsonwebtoken)
-    - Debugging/profiling tools (Chrome DevTools API, Node.js debugger)
-    - Text processing (advanced regex, internationalization)
-    - Concurrent programming (Promises, async/await, Worker threads)
-    - Legacy/deprecated APIs (jQuery, older Node.js APIs)
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-2. Ensure patterns are clear and identifiable even with uncommon or deprecated APIs
-3. Create ground truth completions that represent best practices while handling API versioning
-4. Write assertions that meaningfully test both API correctness and parameter ordering
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable JavaScript
-    - All assertions must pass when code is run
-    - Include necessary imports or requires
-    - Handle cleanup of resources
-    - Use proper error handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual API behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-When generating examples:
-1. Focus on less common library functions and domain-specific APIs
-2. Test the model's handling of deprecated but valid API patterns
-3. Ensure patterns include correct parameter ordering and naming conventions
-4. Include edge cases in API usage where relevant
-5. Keep code focused on demonstrating rare but valid API interactions
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-api-usage"
+  - language: "javascript"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    API Usage task
+
+Requirements:
+
+1. Realistic API usage.
+   Use APIs from Node.js built-in modules and core JavaScript,
+   reflecting telemetry-observed completion scenarios.
+   Representative domains include:
+   - crypto: scryptSync options, createCipheriv/Decipher with
+     GCM auth tags, timingSafeEqual length constraints, Hash.copy
+     for incremental digests, randomInt bounds
+   - Buffer: from() encoding leniency (base64 padding, hex),
+     alloc zero-fill, compare sort semantics, concat totalLength
+     truncation, subarray vs slice copy semantics
+   - stream: Transform lifecycle (_transform/_flush), pipeline
+     error propagation, Readable.from async iterables,
+     string_decoder for split multi-byte sequences
+   - util: promisify.custom symbol override, format specifier
+     coercion (%d, %j, %o), types predicate functions, inspect
+     custom symbol hooks
+   - path: resolve vs join semantics, posix.relative lexical
+     computation, normalize edge cases
+   - url/querystring: WHATWG URL vs legacy url, URLSearchParams
+     sort/getAll, querystring.stringify sep/eq/encodeURIComponent
+   - events: EventEmitter error event default throw, newListener
+     internal event, setMaxListeners, events.once with
+     AbortSignal
+   - fs: openSync flags (wx exclusive), mkdtempSync path
+     requirements, readFileSync encoding
+   - zlib: deflateRawSync vs deflateSync header differences,
+     brotliCompressSync parameter constants
+   - Atomics: add returns old value, wait/notify semantics,
+     SharedArrayBuffer requirements
+   - Intl: NumberFormat percent multiplication, Collator numeric
+     sorting, DateTimeFormat options
+   - Reflect: construct newTarget argument, ownKeys ordering
+   - structuredClone: transfer option for ArrayBuffer,
+     non-transferable type errors
+   - WeakRef/FinalizationRegistry: deref() undefined semantics,
+     GC non-determinism
+   - AbortController: abort(reason) custom reasons, signal
+     composition
+   - perf_hooks: performance.mark/measure API
+   The API call should be embedded in a plausible function, class,
+   or workflow, not presented as isolated trivia.
+
+2. Difficulty.
+   The completion should require resolving at least two contextual
+   constraints from the prefix/suffix (encoding semantics, error
+   path behavior, parameter ordering, type coercion, lifecycle
+   management, or consistency with a helper method). The task
+   should not be solvable by copying a nearby line. Avoid
+   textbook-perfect toy examples; include realistic engineering
+   context such as fallback behavior or resource cleanup.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services or npm packages, near-duplicated
+   from public benchmarks, solvable by a single obvious keyword,
+   dominated by boilerplate rather than API reasoning, invalid
+   JavaScript, or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 API_USAGE_USER_PROMPT = """
-You are helping create a benchmark for rare API usage capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in JavaScript code involving uncommon or deprecated APIs.
-
-Generate a single JSONL entry testing rare API usage capabilities. Choose from one of these categories (rotate through them, don't focus only on file operations or network protocols):
-- Web frameworks and libraries (React, Vue, Angular, Express, Next.js)
-- API clients (Axios, Fetch API, GraphQL)
-- Cloud services (AWS SDK, Firebase, Azure SDK, GCP)
-- Database interfaces (Mongoose, Sequelize, Prisma, Knex)
-- File formats and parsing (XML, JSON, CSV, YAML)
-- Testing libraries (Jest, Mocha, Cypress, Playwright)
-- Node.js built-in modules (crypto, fs, stream, child_process)
-- Browser APIs (WebSockets, WebRTC, IndexedDB, Service Workers)
-- Package managers and bundlers (npm, yarn, webpack, parcel)
-- Security/cryptography APIs (Web Crypto API, bcrypt, jsonwebtoken)
-- Debugging/profiling tools (Chrome DevTools API, Node.js debugger)
-- Text processing (advanced regex, internationalization)
-- Concurrent programming (Promises, async/await, Worker threads)
-- Legacy/deprecated APIs (jQuery, older Node.js APIs)
+Generate one JavaScript API Usage evaluation instance. Choose a
+domain from the representative list in the system prompt (crypto,
+Buffer, stream, util, path, url/querystring, events, fs, zlib,
+Atomics, Intl, Reflect, structuredClone, WeakRef, AbortController,
+or perf_hooks).
 
 CRITICAL JSON FORMATTING REQUIREMENTS:
 1. Your response MUST be a syntactically valid JSON object
 2. PROPERLY ESCAPE all special characters in strings:
    - Use \\" for double quotes inside strings
-   - Use \\n for newlines
-   - Use \\t for tabs
-   - Use \\\\ for backslashes
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
 3. The entire JSON object must be on a SINGLE LINE
-4. Do NOT include formatting or indentation outside the JSON structure
-5. DO NOT use markdown code blocks (```) in your response
-6. Test your JSON structure before completing your response
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-api-usage"  
+- id: unique numeric identifier
+- testsource: "devbench-api-usage"
 - language: "javascript"
-- prefix: The code that comes before the completion (may or may not establish the API pattern)
-- suffix: The code that follows the completion (may or may not establish the API pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The correct API implementation that maintains consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: JavaScript assert statements to verify correctness
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
 
-Package Import Requirements:
-1. Do NOT import/require packages unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section (using require() or ES modules)
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require resolving at least two
+   contextual constraints from prefix/suffix
 
-PREFIX LENGTH REQUIREMENTS - CRITICAL:
-1. The PREFIX section MUST be SUBSTANTIALLY LONGER than other sections
-2. The prefix MUST be AT LEAST 50-60 lines of code - this is an absolute requirement
-3. Provide extensive context and setup code in the prefix
-4. Include helper functions, utility methods, and related code structures
-5. Add detailed comments and explanations within the prefix
-6. The prefix should demonstrate a comprehensive but incomplete implementation
-7. Add relevant constants, configuration objects, and data structure initialization
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, require() calls, or related code
+4. The prefix should demonstrate an incomplete implementation
 
-Indentation requirements:
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be valid Node.js JavaScript
+2. Use const/let (not var) and require() or import for modules
+3. Do not place executable statements outside of function bodies
+   or immediately-invoked expressions; top-level require() calls,
+   const/let declarations, and function/class definitions are fine
+4. All code blocks must have matching braces
+5. Include only modules that are actually used
+6. Use // Run assertions comment style before assertion blocks
+
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The API pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the API pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-api-usage", "language":
+"javascript", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable JavaScript code
-2. All assertions must pass when run
-3. Include all necessary imports/requires
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the golden_completion resolve multiple context constraints?
+6. Is the task non-trivial and not solvable by copying a line?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
+"""
+
+CODE_PURPOSE_UNDERSTANDING_SYSTEM_PROMPT = """
+You are an expert JavaScript benchmark designer creating realistic
+code-completion evaluation instances for large language models.
+
+Your task is to generate one high-quality JavaScript Code Purpose
+Understanding instance that reflects telemetry-observed developer
+completion scenarios. The instance should test whether a model can
+read surrounding code to understand its business logic and domain
+purpose, then produce a completion that coordinates coupled state
+mutations, respects invariant ordering, and maintains idempotency
+or audit-trail requirements established in the prefix.
+
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
+
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-code-purpose-understanding"
+  - language: "javascript"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Code Purpose Understanding task
 
 Requirements:
-1. The scenario should demonstrate a clear pattern recognizable with the given context
-2. The completion section should focus on rare library functions
-3. The pattern should follow correct API conventions across different versions
-4. Ground truth should demonstrate proper parameter ordering
-5. Assertions should verify API behavior and parameter correctness
-6. Include comments indicating API version compatibility and parameter requirements
 
-Format your response as a single line JSON object with newlines escaped appropriately.
+1. Multi-invariant business logic.
+   The completion must coordinate at least three coupled
+   constraints. Use class-based state machines and closures
+   that reflect real-world domains. Representative domains
+   include:
+   - Subscription/account lifecycle: state machine transitions
+     (pending/active/suspended/cancelled), activation timestamps,
+     audit logging of each transition
+   - Payment/billing waterfall: fees-before-interest-before-
+     principal ordering, partial allocation, idempotent ledger
+     entries, balance reconciliation
+   - Insurance adjudication: copay/deductible/coinsurance
+     waterfall, out-of-pocket caps, member-pay capping
+   - Inventory management: FEFO batch picking with expiry
+     filtering, atomic rollback on insufficient stock, cross-
+     batch allocation, lot number sequencing
+   - Scheduling/booking: buffer-time overlap detection, waitlist
+     FIFO promotion on cancellation, double-booking prevention,
+     capacity enforcement
+   - Tax/payroll: progressive bracket calculation, pre-tax
+     deductions, YTD accumulator tracking
+   - Gift card/voucher lifecycle: activation guard, partial
+     redemption, expiry enforcement, reload with balance cap
+   - Voting/approval workflows: weighted quorum vs threshold
+     distinction, abstention semantics
+   - Commission/referral tracking: tiered rates, quarterly caps,
+     clawback on cancellation, chain traversal with depth limits
+   - Warranty/SLA tracking: paused-time exclusion, breach
+     detection, claim limits per period
 
-Example format:
-{"id": "1", "testsource": "devbench-api-usage", "language": "javascript", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+2. Difficulty.
+   The completion must coordinate at least three interacting
+   invariants (e.g., validation ordering + accumulator updates +
+   idempotency guard + audit logging). The task should not be
+   solvable by reading a single line or by pattern-matching
+   syntax alone. Include at least one non-obvious ordering
+   dependency where doing steps out of order produces wrong
+   results.
 
-VALIDATION CHECKLIST BEFORE SUBMITTING:
-1. Have you properly escaped ALL special characters?
-2. Is your entire response a single, valid JSON object?
-3. Are all string values properly quoted and terminated?
-4. Have you verified there are no unescaped newlines in your strings?
-5. Have you checked for balanced quotes and braces?
-6. Is your prefix at least 50-60 lines of code?
-7. Have you used clear distinctions between golden_completion and suffix?
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
 
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
 
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than business-logic reasoning, invalid
+   JavaScript, or overly simplified textbook implementations.
 
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+CODE_PURPOSE_UNDERSTANDING_USER_PROMPT = """
+Generate one JavaScript Code Purpose Understanding evaluation
+instance. Choose a domain from the representative list in the
+system prompt (subscription lifecycle, payment waterfall,
+insurance adjudication, inventory management, scheduling,
+tax/payroll, gift card lifecycle, voting workflows, commission
+tracking, or warranty/SLA tracking).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-code-purpose-understanding"
+- language: "javascript"
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require coordinating at least three
+   coupled invariants from the prefix
+
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context: class definition, constructor,
+   helper methods, state variables, and comments
+3. The prefix should demonstrate an incomplete implementation
+   whose business logic the model must continue
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be valid Node.js JavaScript
+2. Use const/let (not var) and require() or import for modules
+3. Do not place executable statements outside of function bodies
+   or immediately-invoked expressions; top-level require() calls,
+   const/let declarations, and function/class definitions are fine
+4. All code blocks must have matching braces
+5. Include only modules that are actually used
+6. Use // Run assertions comment style before assertion blocks
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-code-purpose-understanding",
+"language": "javascript", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the completion coordinate at least three invariants?
+6. Is there a non-obvious ordering dependency?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
+"""
+
+NL2CODE_CODE2NL_SYSTEM_PROMPT = """
+You are an expert JavaScript benchmark designer creating realistic
+code-completion evaluation instances for large language models.
+
+Your task is to generate one high-quality JavaScript Code2NL/NL2Code
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can produce
+precise technical documentation (JSDoc) for existing code, or
+implement code from detailed natural-language specifications,
+capturing exact behavioral details that generic descriptions miss.
+
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
+
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-code2NL-NL2code"
+  - language: "javascript"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Code2NL/NL2Code task
+
+Requirements:
+
+1. Precise documentation or implementation.
+   For Code2NL tasks: the model must produce JSDoc or inline
+   documentation that captures specific behavioral details --
+   not generic descriptions like "processes input and returns
+   result." For NL2Code tasks: the model must implement code
+   from a detailed specification with non-obvious edge cases.
+   Representative domains include:
+   - In-place mutation semantics: functions that modify the
+     passed object/array and return it (vs creating copies)
+   - Retry/backoff strategies: exponential delay doubling,
+     last-error re-throw, attempt counting
+   - Cache semantics: LRU promotion side-effects of get(),
+     eviction callbacks, delete-and-re-set ordering
+   - Collection grouping: null/undefined key fallbacks,
+     alphabetical key sorting, stable within-group ordering
+   - Priority event systems: higher-first ordering, registration
+     order tiebreaking, method chaining returns
+   - Deep freeze with cycle detection: WeakSet tracking,
+     plain-object-only constraints, same-reference return
+   - Debounce/throttle: leading vs trailing edge semantics,
+     timer reset behavior, cancel methods
+   - Promise settlement: allSettled result shapes
+     ({status, value/reason}), never-reject guarantees,
+     non-promise coercion, empty-array edge case
+   - Stable partition: in-place mutation, predicate call count,
+     split-index return value
+   - Property descriptor copying: Reflect.ownKeys, symbols,
+     non-enumerables, accessor preservation
+   - Observable/stream patterns: lazy evaluation, backpressure
+     semantics, cleanup on unsubscribe
+   - Template engines: placeholder syntax, filter pipes,
+     escaping conventions
+
+2. Difficulty.
+   For Code2NL: the documentation must require mentioning at
+   least three specific behavioral details that a generic
+   description would omit. For NL2Code: the implementation must
+   require handling at least two non-obvious edge cases from
+   the specification. The task should not be solvable by writing
+   a single generic sentence or a trivial function body.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. For Code2NL:
+   assertions should check for presence of specific keywords or
+   phrases in the generated documentation using string includes
+   checks. For NL2Code: assertions should verify functional
+   behavior. Include at least one edge case not explicitly
+   described in comments. Assertions must not hard-code or leak
+   the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than documentation precision or
+   implementation reasoning, invalid JavaScript, or overly
+   simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+NL2CODE_CODE2NL_USER_PROMPT = """
+Generate one JavaScript Code2NL/NL2Code evaluation instance.
+Choose a domain from the representative list in the system prompt
+(mutation semantics, retry/backoff, cache semantics, collection
+grouping, priority events, deep freeze, debounce/throttle,
+promise settlement, stable partition, descriptor copying,
+observable patterns, or template engines).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-code2NL-NL2code"
+- language: "javascript"
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. For Code2NL: the completion is JSDoc or documentation text
+   requiring at least three specific behavioral details
+5. For NL2Code: the completion is implementation code requiring
+   at least two non-obvious edge case handlers
+
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include the function signature, visible implementation or
+   specification comments, and related code
+4. The prefix should demonstrate an incomplete implementation
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be valid Node.js JavaScript
+2. Use const/let (not var) and require() or import for modules
+3. Do not place executable statements outside of function bodies
+   or immediately-invoked expressions; top-level require() calls,
+   const/let declarations, and function/class definitions are fine
+4. All code blocks must have matching braces
+5. Include only modules that are actually used
+6. Use // Run assertions comment style before assertion blocks
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-code2NL-NL2code", "language":
+"javascript", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the documentation/implementation capture non-obvious
+   behavioral details?
+6. Is the task non-trivial and not solvable by a generic sentence?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
+"""
+
+LOW_CONTEXT_SYSTEM_PROMPT = """
+You are an expert JavaScript benchmark designer creating realistic
+code-completion evaluation instances for large language models.
+
+Your task is to generate one high-quality JavaScript Low Context
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can complete
+code correctly from minimal surrounding context (10-20 lines
+total), relying on language idiom recognition and precise
+reading of the visible code rather than extensive scaffolding.
+
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
+
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-low-context"
+  - language: "javascript"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Low Context task
+
+Requirements:
+
+1. Minimal-context JavaScript patterns.
+   The prefix and suffix combined should be only 10-20 lines.
+   The task tests recognition of JavaScript idioms and precise
+   reading of visible constants or helper code. Representative
+   domains include:
+   - Custom encoding with familiar names: base58/62/64/85
+     encode functions with reversed or non-standard alphabets
+     where the function name triggers standard retrieval but
+     the visible alphabet differs
+   - Proxy and Reflect patterns: has/get/set/deleteProperty
+     traps, schema validation proxies, revocable proxies
+   - WeakMap/WeakRef private data: per-instance metadata via
+     WeakMap, lazy initialization, access counting
+   - Higher-order function variants: scan (generator yielding
+     intermediate accumulations), partition with reversed
+     ordering, first-wins merge (opposite of Object.assign),
+     flatMap with reversed sub-arrays
+   - Generator and iterator protocols: Symbol.iterator with
+     custom traversal, yield* delegation, bidirectional
+     communication via next(value)
+   - Non-standard collection semantics: LRU with eviction,
+     inclusive-end range, cycling zip (pad shorter arrays
+     by cycling), last-occurrence uniqueness
+   - Value object patterns: valueOf/toString asymmetry
+     (different units), Symbol.toPrimitive with hint dispatch
+   - Modular arithmetic variants: Fibonacci with modulus,
+     sequences with non-standard recurrence
+   - Deep freeze with circular reference handling via WeakSet
+   - JSON.stringify replacer with dual behaviors
+
+2. Difficulty.
+   The completion should require precise reading of the visible
+   prefix/suffix -- especially constant definitions, alphabet
+   strings, or helper function behavior -- rather than relying
+   on preconceived standard implementations. The task should
+   cause models to retrieve a standard implementation that
+   conflicts with the visible non-standard specification.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than idiom-level reasoning, invalid
+   JavaScript, or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+LOW_CONTEXT_USER_PROMPT = """
+Generate one JavaScript Low Context evaluation instance. Choose
+a domain from the representative list in the system prompt
+(custom encoding, Proxy/Reflect, WeakMap/WeakRef, higher-order
+function variants, generator protocols, non-standard collection
+semantics, value object patterns, modular arithmetic variants,
+deep freeze, or JSON.stringify replacer).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-low-context"
+- language: "javascript"
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+
+CRITICAL LOW CONTEXT REQUIREMENTS:
+1. The prefix and suffix combined MUST be only 10-20 lines total
+2. Keep context deliberately minimal while ensuring the task is
+   inferable from the visible code
+3. The completion should be 3-12 lines
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require precise reading of visible
+   constants or helpers, not standard algorithm retrieval
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be valid Node.js JavaScript
+2. Use const/let (not var) and require() or import for modules
+3. Do not place executable statements outside of function bodies
+   or immediately-invoked expressions; top-level require() calls,
+   const/let declarations, and function/class definitions are fine
+4. All code blocks must have matching braces
+5. Include only modules that are actually used
+6. Use // Run assertions comment style before assertion blocks
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-low-context", "language":
+"javascript", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Is the prefix + suffix combined only 10-20 lines?
+6. Does the task exploit a preconception trap (standard vs
+   non-standard behavior)?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
+"""
+
+PATTERN_MATCHING_SYSTEM_PROMPT = """
+You are an expert JavaScript benchmark designer creating realistic
+code-completion evaluation instances for large language models.
+
+Your task is to generate one high-quality JavaScript Pattern
+Matching instance that reflects telemetry-observed developer
+completion scenarios. The instance should test whether a model
+can follow an established code pattern in the prefix -- such as
+a custom encoding scheme, parser convention, or data
+transformation protocol -- rather than retrieving a memorized
+standard implementation.
+
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
+
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-pattern-matching"
+  - language: "javascript"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Pattern Matching task
+
+Requirements:
+
+1. Pattern-following with preconception traps.
+   The prefix must establish a clear pattern through 2-3 examples,
+   and the completion must follow that pattern rather than a
+   memorized standard. The function name should trigger retrieval
+   of a well-known standard behavior that conflicts with the
+   established pattern. Representative domains include:
+   - Custom base encoding: base64/58/62/32/26/85/94 with reversed
+     or non-standard alphabets, integer-style byte conversion,
+     custom padding characters, leading-zero byte preservation
+   - HTML/URL escaping variants: numeric entities (&#DD;) instead
+     of named entities (&amp;), custom safe-character sets,
+     lowercase hex encoding, space-to-plus conversion
+   - Template engines: #{...} syntax with nesting support,
+     escape sequences (## for literal #), stateful character-by-
+     character parsing instead of regex
+   - Deep equality variants: Object.is semantics (NaN === NaN,
+     -0 !== +0), Date/RegExp/Set/Map comparison, array-as-set
+     comparison (order-insensitive)
+   - Priority event systems: descending priority order (not
+     FIFO), once() removal before callback execution for
+     re-entrant safety, handler result collection
+   - Pipeline with recovery: error passed as second argument to
+     next function instead of throwing, error wrapping
+   - Custom memoization: placeholder-aware currying, FIFO
+     eviction instead of LRU, all-args cache key
+   - Collection utilities: ring buffer with newest-overwrite
+     (not oldest), sliding window with step parameter,
+     concurrent task pool (not batched)
+   - Checksum/hash: XOR accumulation with hex grouping, custom
+     rotation constants following bit-width pattern
+
+2. Difficulty.
+   The completion should require resolving at least two contextual
+   constraints from the prefix pattern (alphabet selection, byte
+   conversion logic, padding rules, ordering semantics, or
+   metadata format). The task should cause models to retrieve a
+   standard implementation that conflicts with the established
+   prefix pattern.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one anti-standard assertion that explicitly checks the output
+   differs from the standard implementation. Assertions must not
+   hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than pattern-following reasoning,
+   invalid JavaScript, or overly simplified textbook
+   implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+PATTERN_MATCHING_USER_PROMPT = """
+Generate one JavaScript Pattern Matching evaluation instance.
+Choose a domain from the representative list in the system prompt
+(custom base encoding, HTML/URL escaping variants, template
+engines, deep equality variants, priority event systems, pipeline
+with recovery, custom memoization, collection utilities, or
+checksum/hash).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-pattern-matching"
+- language: "javascript"
+- prefix: code before the completion point (MUST establish a
+  clear pattern through 2-3 examples)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  follows the established prefix pattern
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  anti-standard assertion
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one anti-standard edge case assertion
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix must establish the pattern with 2-3 concrete
+   examples before the completion point
+4. The completion should follow the prefix pattern, not a
+   memorized standard implementation
+
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide pattern-establishing context: helper functions,
+   constants, and 2-3 completed examples of the pattern
+3. The prefix should demonstrate an incomplete implementation
+   where the pattern is clear but the next step is non-trivial
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be valid Node.js JavaScript
+2. Use const/let (not var) and require() or import for modules
+3. Do not place executable statements outside of function bodies
+   or immediately-invoked expressions; top-level require() calls,
+   const/let declarations, and function/class definitions are fine
+4. All code blocks must have matching braces
+5. Include only modules that are actually used
+6. Use // Run assertions comment style before assertion blocks
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-pattern-matching", "language":
+"javascript", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the prefix establish a clear pattern with 2-3 examples?
+6. Would a standard implementation of the named function FAIL
+   the assertions?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion verify anti-standard behavior?
+"""
+
+SYNTAX_COMPLETION_SYSTEM_PROMPT = """
+You are an expert JavaScript benchmark designer creating realistic
+code-completion evaluation instances for large language models.
+
+Your task is to generate one high-quality JavaScript Syntax
+Completion instance that reflects telemetry-observed developer
+completion scenarios. The instance should test whether a model
+can produce syntactically correct code in deeply nested or
+structurally complex JavaScript constructs, where bracket
+matching, keyword placement, and scope management are
+genuinely challenging.
+
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
+
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-syntax-completion"
+  - language: "javascript"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Syntax Completion task
+
+Requirements:
+
+1. Complex JavaScript syntax.
+   The completion should require mastery of deeply nested or
+   structurally complex JavaScript-specific syntax patterns.
+   Representative domains include:
+   - Async generators: async function* with yield inside
+     try/catch/finally, for-await-of, yield* delegation,
+     consumer .throw() forwarding
+   - Proxy and Reflect: handler objects with multiple traps
+     (get, set, deleteProperty, has), Proxy.revocable(),
+     nested trap logic with type checking
+   - Symbol protocols: Symbol.iterator with custom traversal,
+     Symbol.asyncIterator, Symbol.toPrimitive with hint
+     dispatch, Symbol.species in subclasses
+   - Deep destructuring: computed property keys ([fallbackKey]),
+     property renaming (url: dbUrl), nested defaults at
+     multiple levels, rest syntax in nested positions,
+     array destructuring inside object destructuring
+   - Promise chain nesting: Promise.allSettled with inner
+     retry chains, Promise constructor with shared mutable
+     state, nested .then/.catch/.finally
+   - Private fields and methods: #field syntax, WeakRef and
+     FinalizationRegistry interactions, method chaining with
+     private state
+   - Class syntax: multi-level inheritance with super() and
+     computed arguments, static blocks, mixin patterns with
+     prototype manipulation
+   - Generator state machines: while(true) with switch/case,
+     bidirectional communication via yield/next(value),
+     generator delegation with yield*
+   - Tagged template literals: tag function with strings/values
+     arrays, recursive processing, type-based dispatch
+   - Callback nesting: error-first convention with multiple
+     nested levels, proper error propagation with early return
+   - Logical assignment operators: ??=, ||=, &&= with nuanced
+     falsy/nullish semantics
+   - Optional chaining depth: ?.[], ?.(), chained across
+     multiple levels with nullish coalescing (??)
+
+2. Difficulty.
+   The completion should require managing at least 4 levels of
+   nesting or 3 interacting syntax features simultaneously. The
+   task should test genuine syntax mastery, not algorithm
+   knowledge. Bracket matching, scope tracking, and keyword
+   placement must be non-trivial.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than syntax reasoning, invalid
+   JavaScript, or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+SYNTAX_COMPLETION_USER_PROMPT = """
+Generate one JavaScript Syntax Completion evaluation instance.
+Choose a domain from the representative list in the system prompt
+(async generators, Proxy/Reflect, Symbol protocols, deep
+destructuring, Promise chain nesting, private fields, class
+syntax, generator state machines, tagged template literals,
+callback nesting, logical assignment operators, or optional
+chaining depth).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-syntax-completion"
+- language: "javascript"
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require managing at least 4 nesting
+   levels or 3 interacting syntax features
+
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include function signatures, class definitions, or related
+   code that establishes the nesting depth
+4. The prefix should demonstrate an incomplete implementation
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must be valid Node.js JavaScript
+2. Use const/let (not var) and require() or import for modules
+3. Do not place executable statements outside of function bodies
+   or immediately-invoked expressions; top-level require() calls,
+   const/let declarations, and function/class definitions are fine
+4. All code blocks must have matching braces
+5. Include only modules that are actually used
+6. Use // Run assertions comment style before assertion blocks
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-syntax-completion", "language":
+"javascript", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the completion manage at least 4 nesting levels or 3
+   interacting syntax features?
+6. Is the task testing syntax mastery, not algorithm knowledge?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """

@@ -1,1038 +1,1155 @@
-LOW_CONTEXT_SYSTEM_PROMPT = """
-You are an expert Python developer tasked with creating benchmark examples for testing low-context pattern matching capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code with minimal surrounding context.
+API_USAGE_SYSTEM_PROMPT = """
+You are an expert Python benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry.  The code must be fully executable Python that passes all assertions.
+Your task is to generate one high-quality Python API Usage instance
+that reflects telemetry-observed developer completion scenarios.
+The instance should test whether a model can correctly use a
+standard-library API under realistic context constraints, including
+parameter ordering, return-value semantics, edge-case handling,
+protocol compliance, and API-specific conventions.
 
-Key Responsibilities:
-1. Generate diverse, practical low-context scenarios from these categories (rotate through them):
-    - Data structure manipulation (lists, dicts, sets)
-    - String processing and text manipulation
-    - Object-oriented patterns (class methods, inheritance)
-    - Functional programming constructs
-    - Error handling and exception patterns
-    - Context managers and resource handling
-    - Iterator and generator patterns
-    - Callback and event handling patterns
-    - Decorator patterns and metaprogramming
-2. Ensure patterns are clear and identifiable even with minimal context
-3. Create ground truth completions that represent best practices while handling potential ambiguity
-4. Write assertions that meaningfully test both pattern adherence and functionality across multiple valid completions where applicable
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable Python
-    - All assertions must pass when code is run
-    - Include necessary imports
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-When generating examples:
-1. Focus on universal, standardized programming patterns
-2. Test the model's ability to handle ambiguity and make reasonable assumptions
-3. Ensure patterns follow widely-used conventions that are recognizable with minimal context
-4. Include multiple valid completions in assertions where appropriate
-5. Keep code minimal while still maintaining semantic clarity.
-"""
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-LOW_CONTEXT_USER_PROMPT = """
-You are helping create a benchmark for low-context code pattern matching capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in Python code with minimal surrounding context. The scenario should include:
-
-Generate a single JSONL entry testing low-context capabilities. Choose from one of these categories (rotate through them):
-- Data structure manipulation (lists, dicts, sets)
-- String processing and text manipulation
-- Object-oriented patterns (class methods, inheritance)
-- Functional programming constructs
-- Error handling and exception patterns
-- Context managers and resource handling
-- Iterator and generator patterns
-- Callback and event handling patterns
-- Decorator patterns and metaprogramming
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-low-context"  
-- language: "python"
-- prefix: The code that comes before the completion (may or may not establish the pattern)
-- suffix: The code that follows the completion (may or may not establish the pattern) - should be DIFFERENT from the golden completion
-- golden_completion: Multiple valid completions that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Python assert statements to verify correctness
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Package Import Requirements:
-1. Do NOT import packages unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-Prefix Length Requirements:
-1. The PREFIX section should be SUBSTANTIALLY LONGER than other sections
-2. Include detailed setup code in the prefix (at least 15-20 lines)
-3. Provide comprehensive context
-4. The prefix should demonstrate a comprehensive but incomplete implementation
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
-
-The golden completion should demonstrate understanding and correct usage of the low-context pattern regardless of where it is established.
-
-Code requirements:
-1. Must be fully executable Python code
-2. All assertions must pass when run
-3. Include all necessary imports
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-api-usage"
+  - language: "python"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    API Usage task
 
 Requirements:
-1. The scenario should demonstrate a clear pattern recognizable with minimal context
-2. The completion section should foucs on universal programming patterns
-3. The pattern should follow widely-used conventions and standard library knowledge
-4. Ground truth should acknowledge multiple valid completions where appropriate
-5. Assertions should verify all acceptable pattern variations
-6. Include comments indicating potential ambiguities and alternative completions
 
-Format your response as a single line JSON object with newlines escaped appropriately.
+1. Realistic API usage.
+   Use APIs from the Python standard library, reflecting
+   telemetry-observed completion scenarios. Representative
+   domains include:
+   - inspect module: signature binding, annotation introspection,
+     getmembers with predicates, parameter metadata
+   - weakref: finalize callbacks, one-shot semantics, preventing
+     premature garbage collection of ref targets
+   - csv: DictWriter extrasaction modes, dialect registration,
+     QUOTE_NONE with escape chars, lineterminator stripping
+   - struct: pack/unpack with network byte order and mixed format
+     codes, signed vs unsigned types, buffer size calculations
+   - collections: ChainMap mutation semantics, OrderedDict move_to_end,
+     namedtuple _replace, defaultdict with depth-limited nesting
+   - functools: lru_cache typed parameter, total_ordering from
+     __eq__ plus one comparison, reduce with initializer
+   - itertools: chain.from_iterable lazy consumption, groupby
+     requiring pre-sorted data, islice on generators
+   - contextlib: suppress continuation semantics, ExitStack LIFO
+     callback ordering, redirect_stdout
+   - dataclasses: field default_factory for mutable defaults,
+     metadata access, asdict with dict_factory, replace on frozen
+   - enum: Flag with auto() and bitwise ops, custom
+     _generate_next_value_ overrides
+   - typing: get_type_hints with localns for forward references,
+     runtime_checkable Protocol
+   - copy: deepcopy with custom __deepcopy__ and memo dict,
+     __copy__ for uncopyable attributes
+   - abc: ABCMeta with __subclasshook__ for structural typing
+   - statistics: quantiles exclusive vs inclusive methods
+   - fractions: limit_denominator continued-fraction approximation,
+     string constructor for exact decimal representation
+   - logging: custom Filter subclass, LogRecord mutation
+   - unittest.mock: patch with side_effect as iterable
+   - operator: attrgetter with dotted nested paths
+   - textwrap: indent with predicate callable
+   - heapq: nlargest with key function and tie-breaking
+   - bisect: bisect_left with key parameter semantics
+   - hmac: compare_digest timing-safe comparison
+   - secrets: token_bytes/token_hex/token_urlsafe/randbelow
+   - sqlite3: create_aggregate class protocol (step/finalize)
+   - xml.etree: namespace map for findall/find resolution
+   - pathlib: Pure path classes for cross-platform drive parsing
+   - tempfile: NamedTemporaryFile delete=False with manual cleanup
+   The API call should be embedded in a plausible function or
+   workflow, not presented as isolated trivia.
 
-Example format:
-{"id": "1", "testsource": "devbench-low-context", "language": "python", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+2. Difficulty.
+   The completion should require resolving at least two contextual
+   constraints from the prefix/suffix (type compatibility, protocol
+   compliance, parameter ordering, return-value semantics, boundary
+   conditions, or consistency with a helper function). The task
+   should not be solvable by copying a nearby line. Avoid
+   textbook-perfect toy examples; include realistic engineering
+   context such as fallback behavior or resource cleanup.
 
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
 
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
 
-"""
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services or third-party packages,
+   near-duplicated from public benchmarks, solvable by a single
+   obvious keyword, dominated by boilerplate rather than API
+   reasoning, invalid Python, or overly simplified textbook
+   implementations.
 
-API_USAGE_SYSTEM_PROMPT = """
-You are an expert Python developer tasked with creating benchmark examples for testing rare API usage and uncommon library function capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code involving uncommon APIs and library functions.
-
-Your output should be a single JSON object formatted as a JSONL entry.  The code must be fully executable Python that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse examples from these API categories (rotate through them, don't focus only on file operations or network protocols):
-    - Machine learning libraries (OpenAI, PyTorch, TensorFlow, scikit-learn, Hugging Face)
-    - Web API integration (GitHub, Twitter, Slack, Discord)
-    - Cloud services (AWS, Azure, GCP, Firebase)
-    - Database interfaces (SQLAlchemy, MongoDB, Redis, PostgreSQL)
-    - File formats and parsing (XML, JSON, CSV, YAML)
-    - Web frameworks (Flask, FastAPI, Django)
-    - Network protocols (asyncio, tornado)
-    - Scientific computing (NumPy/SciPy advanced features)
-    - GUI frameworks (tkinter, PyQt)
-    - Security/cryptography APIs
-    - Debugging/profiling tools
-    - Text processing (advanced regex, unicode)
-    - Concurrent programming
-    - Legacy/deprecated APIs
-
-2. Ensure patterns are clear and identifiable even with uncommon or deprecated APIs
-3. Create ground truth completions that represent best practices while handling API versioning
-4. Write assertions that meaningfully test both API correctness and parameter ordering
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable Python
-    - All assertions must pass when code is run
-    - Include necessary imports
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual API behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on less common library functions and domain-specific APIs
-2. Test the model's handling of deprecated but valid API patterns
-3. Ensure patterns include correct parameter ordering and naming conventions
-4. Include edge cases in API usage where relevant
-5. Keep code focused on demonstrating rare but valid API interactions
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 API_USAGE_USER_PROMPT = """
-You are helping create a benchmark for rare API usage capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in Python code involving uncommon or deprecated APIs.
+Generate one Python API Usage evaluation instance. Choose a domain
+from the representative list in the system prompt (inspect, weakref,
+csv, struct, collections, functools, itertools, contextlib,
+dataclasses, enum, typing, copy, abc, statistics, fractions,
+logging, unittest.mock, operator, textwrap, heapq, bisect, hmac,
+secrets, sqlite3, xml.etree, pathlib, or tempfile).
 
-Generate a single JSONL entry testing rare API usage capabilities. Choose from one of these categories (rotate through them, don't focus only on file operations or network protocols):
-- Machine learning libraries (OpenAI, PyTorch, TensorFlow, scikit-learn, Hugging Face)
-- Web API integration (GitHub, Twitter, Slack, Discord)
-- Cloud services (AWS, Azure, GCP, Firebase)
-- Database interfaces (SQLAlchemy, MongoDB, Redis, PostgreSQL)
-- File formats and parsing (XML, JSON, CSV, YAML)
-- Web frameworks (Flask, FastAPI, Django)
-- Network protocols (asyncio, tornado)
-- Scientific computing (NumPy/SciPy advanced features)
-- GUI frameworks (tkinter, PyQt)
-- Security/cryptography APIs
-- Debugging/profiling tools
-- Text processing (advanced regex, unicode)
-- Concurrent programming
-- Legacy/deprecated APIs
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-api-usage"  
+- id: unique numeric identifier
+- testsource: "devbench-api-usage"
 - language: "python"
-- prefix: The code that comes before the completion (may or may not establish the API pattern)
-- suffix: The code that follows the completion (may or may not establish the API pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The correct API implementation that maintains consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Python assert statements to verify correctness
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
 
-Package Import Requirements:
-1. Do NOT import packages unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require resolving at least two
+   contextual constraints from prefix/suffix
 
-Prefix Length Requirements:
-1. The PREFIX section should be SUBSTANTIALLY LONGER than other sections
-2. Include detailed setup code in the prefix (at least 15-20 lines)
-3. Provide comprehensive context
-4. The prefix should demonstrate a comprehensive but incomplete implementation
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, type definitions, or related code
+4. The prefix should demonstrate an incomplete implementation
 
-Indentation requirements:
+CODE STRUCTURE REQUIREMENTS:
+1. All code must use proper Python indentation
+2. Do not place executable statements at module level except
+   imports and constants
+3. All assertions and test code belong in the "assertions" field
+4. Include only imports that are actually used
+5. The code must be fully executable Python
+6. Standard library only -- no third-party packages
+
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The API pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the API pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-api-usage", "language":
+"python", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable Python code
-2. All assertions must pass when run
-3. Include all necessary imports
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario should demonstrate a clear pattern recognizable with the given context
-2. The completion section should foucs on rare library functions
-3. The pattern should follow correct API conventions across different versions
-4. Ground truth should demonstrate proper parameter ordering
-5. Assertions should verify API behavior and parameter correctness
-6. Include comments indicating API version compatibility and parameter requirements
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-api-usage", "language": "python", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
-"""
-
-PATTERN_MATCHING_SYSTEM_PROMPT = """
-You are an expert Python developer tasked with creating benchmark examples for testing pattern matching capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to recognize and continue established patterns in code.
-
-Your output should be a single JSON object formatted as a JSONL entry.  The code must be fully executable Python that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse, practical pattern matching scenarios that real developers encounter. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Decorators/metaprogramming
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Context managers
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-2. Ensure patterns are clear and identifiable but not trivially simple
-3. Create ground truth completions that represent best practices
-4. Write assertions that meaningfully test both pattern adherence and functionality.
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable Python
-    - All assertions must pass when code is run
-    - Include necessary imports
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on realistic, practical scenarios
-2. Avoid patterns that are too project-specific
-3. Ensure patterns are clear enough to be recognized by an LLM
-4. Include edge cases in assertions where relevant
-5. Keep code self-contained and independently verifiable
-"""
-
-PATTERN_MATCHING_USER_PROMPT = """
-You are helping create a benchmark for code pattern matching capabilities. Your task is to generate a coding scenario that tests an LLM's ability to recognize and
-complete patterns in Python code. The scenario should include:
-
-Generate a single JSONL entry testing pattern matching capabilities. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Decorators/metaprogramming
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Context managers
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-pattern-matching"
-- language: "python"
-- prefix: The code that comes before the completion (MUST establish or begin a clear pattern)
-- suffix: The code that follows the completion (may continue or complete the pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The semantically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Python assert statements to verify both functional and semantic correctness
-
-Critical Pattern Matching Requirements:
-1. A CLEAR, IDENTIFIABLE PATTERN MUST be established in either the prefix or suffix
-2. The golden_completion MUST follow this established pattern (not create a new one)
-3. The pattern should be specific enough that random code wouldn't work
-4. Include at least 2-3 examples of the pattern in the prefix to establish it
-5. Ensure the pattern follows recognizable conventions in the chosen domain
-6. The pattern should be evident to anyone familiar with Python
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Package Import Requirements:
-1. Do NOT import packages unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-Prefix Length Requirements:
-1. The PREFIX section should be SUBSTANTIALLY LONGER than other sections
-2. Include detailed setup code in the prefix (at least 15-20 lines)
-3. Provide comprehensive context
-4. The prefix should demonstrate a comprehensive but incomplete implementation
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
-
-The pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the pattern regardless of where it is established.
-
-Code requirements:
-1. Must be fully executable Python code
-2. All assertions must pass when run
-3. Include all necessary imports
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario MUST demonstrate a clear, identifiable pattern
-2. The completion section should be non-trivial but focused on pattern matching
-3. The pattern should follow Python best practices and common conventions
-4. Ground truth should demonstrate the ideal pattern continuation
-5. Assertions should verify both pattern adherence and functionality
-6. Include comments indicating the expected pattern continuation
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-pattern-matching", "language": "python", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-- ENSURE A CLEAR PATTERN IS ESTABLISHED that the golden completion must follow
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the golden_completion resolve multiple context constraints?
+6. Is the task non-trivial and not solvable by copying a line?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
 
 CODE_PURPOSE_UNDERSTANDING_SYSTEM_PROMPT = """
-You are an expert Python developer tasked with creating benchmark examples for testing semantic understanding and code purpose comprehension capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to understand and continue code based on its underlying business logic and domain context.
+You are an expert Python benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry.  The code must be fully executable Python that passes all assertions.
+Your task is to generate one high-quality Python Code Purpose
+Understanding instance that reflects telemetry-observed developer
+completion scenarios. The instance should test whether a model can
+infer business logic and domain intent from surrounding code and
+produce a completion that correctly coordinates coupled side
+effects, validation ordering, state transitions, and accumulator
+updates.
 
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test understanding of code intent and business purpose. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Decorators/metaprogramming
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Context managers
-    - Event handling
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
-2. Ensure patterns demonstrate clear semantic meaning and domain context
-3. Create ground truth completions that maintain business logic consistency
-4. Write assertions that meaningfully test both semantic correctness and business rule compliance
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable Python
-    - All assertions must pass when code is run
-    - Include necessary imports
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-When generating examples:
-1. Focus on domain-specific logic and business rules
-2. Test comprehension of underlying code purpose
-3. Ensure patterns reflect real-world business scenarios
-4. Include semantic edge cases where relevant
-5. Keep code focused on demonstrating clear business intent
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-code-purpose-understanding"
+  - language: "python"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Code Purpose Understanding task
+
+Requirements:
+
+1. Realistic business-logic scenarios.
+   Use iterators, generators, context managers, and stateful class
+   workflows reflecting real-world domain logic. Representative
+   domains include:
+   - Multi-invariant business workflows: healthcare claims with
+     copay/deductible ordering, payroll with pre-tax caps and
+     garnishments, inventory with FIFO/FEFO depletion and batch
+     tracking, warranty with deductible-before-coverage ordering
+   - Financial state machines: payment waterfalls (late-fees vs
+     interest vs principal ordering), billing period close with
+     FIFO credit consumption, commission/reserve formulas
+   - Resource lifecycle: idempotent operations, partial-capture
+     state transitions, atomic over-allocation failure, validation-
+     before-mutation ordering
+   - Rate limiters: fixed-window, token-bucket, tiered per-endpoint,
+     dual-quota with calendar resets, sliding time windows
+   - Validation pipelines: fail-fast vs collect-all, dependent
+     validation with skip semantics, normalize-then-validate,
+     sanitization with change tracking
+   - Approval workflows: quorum with impossibility detection,
+     escalation chains, transactional rollback in reverse order
+   - Cache implementations: LRU eviction, multi-level inclusive
+     caches with L1/L2 promotion, CRDT last-writer-wins with
+     tombstones
+   - Statistical accumulators: EMA with variance using previous
+     mean, exponential decay counters, nearest-rank percentile,
+     fixed-width histograms
+   The scenario must require the model to READ existing code to
+   understand its PURPOSE, not just match syntax.
+
+2. Difficulty.
+   The completion should require coordinating at least two coupled
+   side effects (e.g., idempotency guard + validation ordering +
+   accumulator update + audit log + state transition). The task
+   should not be solvable by implementing a standard algorithm;
+   the specific ordering and interaction of effects must be
+   inferred from the surrounding code context. Include at least
+   one invariant that contradicts a common default assumption.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than business-logic reasoning, invalid
+   Python, or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 CODE_PURPOSE_UNDERSTANDING_USER_PROMPT = """
-You are helping create a benchmark for code purpose understanding capabilities. Your task is to generate a coding scenario that tests an LLM's ability to comprehend and
-continue Python code based on its semantic meaning and business context. The scenario should include:
+Generate one Python Code Purpose Understanding evaluation instance.
+Choose a domain from the representative list in the system prompt
+(multi-invariant business workflows, financial state machines,
+resource lifecycle, rate limiters, validation pipelines, approval
+workflows, cache implementations, or statistical accumulators).
 
-Generate a single JSONL entry testing code purpose understanding capabilities. Choose ONE scenario from EACH list:
-    Technical Pattern (choose ONE):
-    - String/text manipulation
-    - Functional programming 
-    - Iterators/generators
-    - Decorators/metaprogramming
-    - Data structures
-    - OOP patterns
-    - Error handling
-    - Context managers
-    - Event handling
-
-    Domain Context (choose ONE):
-    - Scientific computing (data analysis, statistics, simulations)
-    - Media processing (audio, image, video)
-    - System operations (logging, monitoring, deployment)
-    - Data validation (schemas, cleaning, normalization)
-    - Network protocols (APIs, messaging, sync/async)
-    - Security (encryption, authentication, auditing)
-    - Analytics (metrics, reporting, visualization)
-    - Game mechanics (physics, AI, state machines)
-    - Tool automation (builds, tests, deployment)
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-code-purpose-understanding"
+- id: unique numeric identifier
+- testsource: "devbench-code-purpose-understanding"
 - language: "python"
-- prefix: The code that comes before the completion (may or may not establish the semantic pattern)
-- suffix: The code that follows the completion (may or may not establish the semantic pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The semantically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Python assert statements to verify both functional and semantic correctness
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
 
-Package Import Requirements:
-1. Do NOT import packages unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require coordinating at least two coupled
+   side effects from prefix/suffix
 
-Prefix Length Requirements:
-1. The PREFIX section should be SUBSTANTIALLY LONGER than other sections
-2. Include detailed setup code in the prefix (at least 15-20 lines)
-3. Provide comprehensive context
-4. The prefix should demonstrate a comprehensive but incomplete implementation
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, class definitions, or related code
+4. The prefix should demonstrate an incomplete implementation
 
-Indentation requirements:
+CODE STRUCTURE REQUIREMENTS:
+1. All code must use proper Python indentation
+2. Do not place executable statements at module level except
+   imports and constants
+3. All assertions and test code belong in the "assertions" field
+4. Include only imports that are actually used
+5. The code must be fully executable Python
+6. Standard library only -- no third-party packages
+
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The semantic pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the semantic pattern regardless of where it is established.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-code-purpose-understanding",
+"language": "python", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable Python code
-2. All assertions must pass when run
-3. Include all necessary imports
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario should demonstrate clear business purpose
-2. The completion section should foucs on domain-specific logic
-3. The pattern should follow appropriate business rules and domain conventions
-4. Ground truth should maintain semantic consistency
-5. Assertions should verify business logic correctness
-6. Include comments indicating expected business behavior and domain context
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-code-purpose-understanding", "language": "python", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
-"""
-
-SYNTAX_COMPLETION_SYSTEM_PROMPT = """
-You are an expert Python developer tasked with creating benchmark examples for testing syntax completion and language-specific structure capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to complete complex syntactical patterns and nested structures.
-
-Your output should be a single JSON object formatted as a JSONL entry.  The code must be fully executable Python that passes all assertions.
-
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test understanding of language-specific syntax. Choose ONE syntax pattern to test (rotate through them):
-    Syntax Categories:
-    a. Nested Control Structures
-    - Multiple levels of if/else conditions
-    - Nested loop structures (for/while combinations)
-    - Try/except with multiple except/else/finally blocks
-    - Context manager nesting (multiple with statements)
-    - Generator expressions within comprehensions
-    
-    b. Complex Python Syntax Features
-    - Decorator stacking and parameters
-    - Multiple inheritance and super() calls
-    - Async/await patterns
-    - Type hints with complex generics
-    - Function annotation syntax
-    
-    c. Multi-line Syntax Patterns
-    - Method chaining patterns
-    - Builder pattern implementations
-    - Fluent interface structures
-    - Complex string formatting
-    - Long function signatures with defaults
-
-    d. Error Handling Patterns
-    - Try/except/else/finally combinations
-    - Context manager error handling
-    - Custom exception hierarchies
-    - Exception transformation patterns
-    - Cleanup and resource management
-
-2. Ensure patterns demonstrate proper nesting and indentation
-3. Create ground truth completions that maintain syntactic correctness
-4. Write assertions that meaningfully test structural integrity and syntax validity
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable Python
-    - All assertions must pass when code is run
-    - Include necessary imports
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
-
-When generating examples:
-1. Focus on complex syntactical structures and patterns
-2. Test handling of nested code blocks
-3. Ensure patterns include proper error handling syntax
-4. Include edge cases in syntax formatting
-5. Keep code focused on demonstrating language-specific features
-"""
-
-SYNTAX_COMPLETION_USER_PROMPT = """
-You are helping create a benchmark for syntax completion capabilities. Your task is to generate a coding scenario that tests an LLM's ability to complete
-complex syntactical structures and mantain proper formatting in Python code. The scenario should include:
-
-Generate a single JSONL entry testing syntax completion capabilities. Choose ONE syntax pattern to test (rotate through them):
-    Syntax Categories:
-    a. Nested Control Structures
-    - Multiple levels of if/else conditions
-    - Nested loop structures (for/while combinations)
-    - Try/except with multiple except/else/finally blocks
-    - Context manager nesting (multiple with statements)
-    - Generator expressions within comprehensions
-    
-    b. Complex Python Syntax Features
-    - Decorator stacking and parameters
-    - Multiple inheritance and super() calls
-    - Async/await patterns
-    - Type hints with complex generics
-    - Function annotation syntax
-    
-    c. Multi-line Syntax Patterns
-    - Method chaining patterns
-    - Builder pattern implementations
-    - Fluent interface structures
-    - Complex string formatting
-    - Long function signatures with defaults
-
-    d. Error Handling Patterns
-    - Try/except/else/finally combinations
-    - Context manager error handling
-    - Custom exception hierarchies
-    - Exception transformation patterns
-    - Cleanup and resource management
-
-Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-syntax-completion"
-- language: "python"
-- prefix: The code that comes before the completion (may or may not establish the syntax pattern)
-- suffix: The code that follows the completion (may or may not establish the syntax pattern) - should be DIFFERENT from the golden completion
-- golden_completion: The syntactically appropriate completion that maintain consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Python assert statements to verify syntactic correctness
-
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
-
-Package Import Requirements:
-1. Do NOT import packages unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
-
-Prefix Length Requirements:
-1. The PREFIX section should be SUBSTANTIALLY LONGER than other sections
-2. Include detailed setup code in the prefix (at least 15-20 lines)
-3. Provide comprehensive context
-4. The prefix should demonstrate a comprehensive but incomplete implementation
-
-Indentation requirements:
-1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
-
-The pattern can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct usage of the pattern regardless of where it is established.
-
-Code requirements:
-1. Must be fully executable Python code
-2. All assertions must pass when run
-3. Include all necessary imports
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
-
-Requirements:
-1. The scenario should demonstrate complex syntax patterns
-2. The completion section should foucs on language-specific structures
-3. The pattern should follow proper indentation and nesting rules
-4. Ground truth should maintain consistent formatting
-5. Assertions should verify structural integrity
-6. Include comments indicating expected syntax and formatting
-
-Format your response as a single line JSON object with newlines escaped appropriately.
-
-Example format:
-{"id": "1", "testsource": "devbench-syntax-completion", "language": "python", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
-
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
-
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
-
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the golden_completion coordinate multiple coupled effects?
+6. Is the task non-trivial and not solvable by standard algorithm?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
 
 NL2CODE_CODE2NL_SYSTEM_PROMPT = """
-You are an expert Python developer tasked with creating benchmark examples for testing bidirectional translation between code and natural language capabilities in large language models.
-Your role is to generate high-quality, realistic coding scenarios that effectively test an LLM's ability to translate between code and documentation in both directions.
+You are an expert Python benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-Your output should be a single JSON object formatted as a JSONL entry.  The code must be fully executable Python that passes all assertions.
+Your task is to generate one high-quality Python Code2NL/NL2Code
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can produce
+precise documentation for existing code (Code2NL) or implement
+code from detailed natural-language specifications (NL2Code),
+requiring exact technical vocabulary and coverage of edge cases.
 
-Key Responsibilities:
-1. Generate diverse, practical scenarios that test code-to-comment and comment-to-code translation from these domains (rotate through them):
-    Business Logic:
-    - Financial calculations (portfolio analysis, risk assessment)
-    - Data transformations (ETL processes, data cleaning)
-    - Business rules validation (compliance checks, policy enforcement)
-    - Workflow orchestration (task scheduling, pipeline management)
-    - Domain modeling (business entities, relationship handling)
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-    Technical Features:
-    - API integrations (authentication, rate limiting)
-    - Cache management (invalidation, refresh strategies)
-    - Data structures (custom collections, specialized containers)
-    - Configuration management (dynamic settings, feature flags)
-    - Resource management (connection pooling, cleanup)
-2. Ensure patterns demonstrate clear alignment between documentation and implementation, with the following requirements (alternate between these):
-    For Code-to-Natural Language (50% of test cases):
-    - Generate comprehensive documentation for:
-        * Function/method implementations
-        * Class definitions
-        * Module-level code
-        * Complex algorithms
-        * Error handling logic
-    - Documentation should include:
-        * Detailed function/class docstrings
-        * Implementation comments explaining complex logic
-        * Usage examples
-        * Parameter descriptions
-        * Return value documentation
-        * Error scenarios and handling
-        * Performance characteristics
-    
-    For Natural Language-to-Code (50% of test cases):
-    - Test implementation of:
-        * Complex business rules
-        * Technical requirements
-        * Algorithm descriptions
-        * Error handling specifications
-        * Interface contracts
-3. Create ground truth completions that maintain consistency between comments and code
-4. Write assertions that meaningfully test documentation accuracy and code correctness:
-    - For documentation tests:
-        * Check presence of key domain terms
-        * Verify coverage of important concepts
-        * Validate documentation structure
-        * Don't require exact string matches
-    - For implementation tests:
-        * Verify functional requirements
-        * Test edge cases
-        * Check error handling
-        * Validate return values
-5. Provide clear justification for why the example makes a good test case
-6. Ensure code quality:
-    - All code must be fully executable Python
-    - All assertions must pass when code is run
-    - Include necessary imports
-    - Handle cleanup of resources
-    - Use proper exception handling
-    - Include minimal working examples
-    - Mock external dependencies where needed
-7. Write robust assertions that:
-    - Verify actual behavior
-    - Test parameter ordering
-    - Check error conditions
-    - Validate return values
-    - Mock external resources
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
 
-When generating examples:
-1. Focus on bidirectional translation between code and natural language
-2. Test accuracy of generated documentation
-3. Ensure patterns include proper documentation conventions
-4. Include edge cases in documentation clarity
-5. Keep both code and comments focused on clear communication
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-code2NL-NL2code"
+  - language: "python"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Code2NL/NL2Code task
 
-Avoid These Common Patterns:
-1. Trivial mathematical functions (factorial, fibonacci)
-2. Simple data structure operations (stack, queue)
-3. Basic string manipulations (palindrome, anagram)
-4. Elementary algorithms (bubble sort, binary search)
-5. Textbook examples (hello world variations)
+Requirements:
 
-Focus on realistic scenarios that demonstrate:
-1. Complex business logic translation
-2. Technical requirement implementation
-3. Error handling documentation
-4. API usage patterns
-5. Resource management strategies
+1. Realistic documentation and implementation scenarios.
+   Use Python docstrings and standard-library APIs, reflecting
+   telemetry-observed completion scenarios. Alternate between:
+
+   Code-to-Natural-Language (Code2NL) tasks:
+   - describe_* function pattern: generate precise docstrings for
+     stdlib API usage (csv.DictWriter, urllib.parse, bisect, heapq,
+     datetime.strptime, hashlib streaming, json object_pairs_hook,
+     Decimal quantize, dataclasses.replace, pathlib PurePosixPath)
+   - Docstrings must document: exact parameter semantics, return
+     types, mutation vs immutability, exception conditions, side
+     effects, performance characteristics, and edge-case behavior
+   - Hidden assertions check for specific required keywords, not
+     exact string matches
+
+   Natural-Language-to-Code (NL2Code) tasks:
+   - Implement algorithms from precise specifications: run-length
+     encoding, interval merging with index tracking, recursive dict
+     merge, proximity grouping, decorator factories with cache
+     expiry, CSV parsing with quote handling
+   - Specifications include subtle constraints: deduplication
+     before finding second-largest, touching intervals as
+     overlapping, empty-dict preservation in flattening, adjacent-
+     element comparison in grouping
+
+   Mixed (bidirectional) tasks:
+   - Complete both docstring (Returns section) and implementation
+   - Docstring must be consistent with the implementation
+   - Examples: MinStack with O(1) constraint, DFS with adjacency
+     list, Caesar cipher preserving case, Kahn's topological sort
+
+2. Difficulty.
+   For Code2NL: the docstring must include at least two specific
+   technical details that a generic description would omit (e.g.,
+   exact exception type, mutation behavior, time complexity, side
+   effects on shared state). For NL2Code: the specification must
+   include at least one subtle constraint that contradicts a
+   standard implementation (e.g., deduplication requirement,
+   touching-interval semantics, empty-container preservation).
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. For Code2NL
+   tasks, use substring checks for required keywords (e.g.,
+   assert "keyword" in docstring.lower()). For NL2Code tasks,
+   validate functional behavior and edge cases. Assertions must
+   not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than documentation/implementation
+   precision, invalid Python, or overly simplified textbook
+   implementations (factorial, fibonacci, palindrome).
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
 """
 
 NL2CODE_CODE2NL_USER_PROMPT = """
-You are helping create a benchmark for code-natural language translation capabilities. Your task is to generate a coding scenario that tests an LLM's ability to translate
-between Python code and documentation effectively. The scenario should include:
+Generate one Python Code2NL/NL2Code evaluation instance. Choose
+a task type: Code2NL (docstring generation with keyword assertions),
+NL2Code (implementation from specification), or mixed (both
+docstring and implementation).
 
-Generate a single JSONL entry testing code-to-comment and comment-to-code capabilities.
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
 
 Required JSON fields:
-- id: A unique numeric identifier
-- testsource: Use "devbench-code2NL-NL2code"
+- id: unique numeric identifier
+- testsource: "devbench-code2NL-NL2code"
 - language: "python"
-- prefix: The segment that establishes the code-comment relationship before the completion
-- suffix: The segment that follows the completion with code or comments
-- golden_completion: The accurate completion that translates between code and comments and that maintains consistency with prefix/suffix and will pass all assertions
-- LLM_justification: Explain why this is a good test case and the context behind it
-- assertions: Python assert statements to verify syntactic correctness
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
 
-Critical Requirements for Avoiding Duplication:
-1. The golden_completion field should ONLY contain the solution code that fills in the gap
-2. The suffix must contain DIFFERENT code that follows after the completion
-3. Do NOT repeat any golden_completion code in the suffix
-4. The suffix field should NEVER duplicate the golden_completion code
-5. There should be a clear DISTINCTION between what goes in golden_completion vs suffix
-6. Ensure clear SEPARATION between completion and suffix content
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+7. For Code2NL tasks: use keyword substring checks, not exact
+   string matches
 
-Package Import Requirements:
-1. Do NOT import packages unless they are ACTUALLY USED in at least one of:
-   - prefix
-   - suffix
-   - assertions
-   - golden_completion
-2. Every imported module must serve a clear purpose
-3. Do not include "just in case" imports that aren't used
-4. All required imports must appear in the prefix section
-5. If an import is only needed for the golden_completion, it must still appear in the prefix
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require precise technical vocabulary
+   (Code2NL) or subtle constraint handling (NL2Code)
 
-Prefix Length Requirements:
-1. The PREFIX section should be SUBSTANTIALLY LONGER than other sections
-2. Include detailed setup code in the prefix (at least 15-20 lines)
-3. Provide comprehensive context
-4. The prefix should demonstrate a comprehensive but incomplete implementation
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, type definitions, or related code
+4. The prefix should demonstrate an incomplete implementation
 
-Indentation requirements:
+CODE STRUCTURE REQUIREMENTS:
+1. All code must use proper Python indentation
+2. Do not place executable statements at module level except
+   imports and constants
+3. All assertions and test code belong in the "assertions" field
+4. Include only imports that are actually used
+5. The code must be fully executable Python
+6. Standard library only -- no third-party packages
+
+INDENTATION REQUIREMENTS:
 1. All code sections must maintain consistent indentation
-2. If code is inside a function/class:
-- The prefix should establish the correct indentation level
-- The golden_completion must match the prefix's indentation
-- The suffix must maintain the same indentation context
-- Assertions should be at the appropriate scope level
-3. Ensure proper dedenting when exiting blocks
-4. All code blocks must be properly closed
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
 
-The code or comment to translate can be established either in the prefix or suffix code.
-The golden completion should demonstrate understanding and correct translation.
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-code2NL-NL2code", "language":
+"python", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
 
-Code requirements:
-1. Must be fully executable Python code
-2. All assertions must pass when run
-3. Include all necessary imports
-4. Mock external dependencies
-5. Clean up resources properly
-6. Handle errors appropriately
-7. Assertions must be placed BEFORE cleanup code
-8. Resource cleanup must be in the suffix AFTER all assertions
-9. All assertions must complete before any cleanup occurs
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the completion require precise technical detail?
+6. Is the task non-trivial and not a textbook example?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
+"""
 
-Documentation Assertion Requirements:
-1. When testing generated documentation:
-- Use substring checks for key terms: 'assert "key_term" in docstring.lower()'
-- Check for presence of required sections: 'assert "Parameters:" in docstring'
-- Verify coverage of important concepts
-- Don't require exact string matches
+LOW_CONTEXT_SYSTEM_PROMPT = """
+You are an expert Python benchmark designer creating realistic
+code-completion evaluation instances for large language models.
 
-2. When testing generated code:
-- Verify functional requirements
-- Test edge cases
-- Validate error handling
-- Check return values
+Your task is to generate one high-quality Python Low Context
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can complete
+code correctly from minimal surrounding context, requiring
+recognition of Python-specific idioms, protocols, and patterns
+with very few contextual cues.
 
-Important Balance Requirements:
-1. Maintain a 50/50 split between:
-    - Code-to-Comment: Generate documentation for existing code
-    - Comment-to-Code: Generate code from documentation
-2. For Code-to-Comment tasks:
-    - Provide complex, working code in the prefix
-    - Golden completion should be comprehensive documentation
-    - Assertions should verify documentation completeness
-3. For Comment-to-Code tasks:
-    - Provide detailed requirements/documentation in the prefix
-    - Golden completion should be the implementation
-    - Assertions should verify functional requirements
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
 
-Important:
-- Use realistic business/technical scenarios
-- Avoid trivial examples (factorial, fibonacci, etc.)
-- Test complex documentation/implementation translations
-- Keep verification code before cleanup
-- Ensure all assertions pass
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-low-context"
+  - language: "python"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Low Context task
 
 Requirements:
-1. The scenario should demonstrate clear documentation patterns
-2. The completion section should foucs on bidirectional translation
-3. The pattern should follow documentation best practices
-4. Ground truth should maintain consistency between code and comments
-5. Assertions should verify documentation accuracy
-6. Include examples of both code-to-comment and comment-to-code tasks
 
-Format your response as a single line JSON object with newlines escaped appropriately.
+1. Realistic low-context scenarios.
+   Use Python decorators, context managers, descriptors, and
+   compact idioms, reflecting telemetry-observed completion
+   scenarios. Representative domains include:
+   - Custom base-N encoders: base32/36/45/52/58/62/64/85/91/94
+     with non-standard (reversed) default alphabets, standard-
+     alphabet overrides, and custom padding characters
+   - Context managers: __enter__/__exit__ with selective exception
+     suppression, generator-based @contextmanager cleanup
+   - Descriptors: __get__/__set__/__set_name__ with per-instance
+     storage, validation, and access counting
+   - Metaclass protocols: __init_subclass__ for attribute
+     enforcement, custom __contains__ for Enum value membership
+   - Dataclass features: __post_init__ cross-field validation,
+     computed properties from frozen fields
+   - Generator protocols: try/finally cleanup on .close(), yield
+     from delegation, __length_hint__ for remaining count
+   - Compact idioms: inclusive range (unlike built-in range),
+     depth-limited auto-vivification, positional-only/keyword-only
+     parameter syntax, lambda closure capture with default args
+   - Bitwise operations: flag grant/revoke/toggle/has with combined
+     permission checking
+   - Custom comparison: modular arithmetic ordering, shallow dict
+     equality (keys only), anti-stable sort
+   - String/sequence operations: interleave with remainder,
+     jagged transpose with fill, string method chaining order
+   The prefix and suffix combined should be only 10-20 lines for
+   true low-context scenarios.
 
-Example format:
-{"id": "1", "testsource": "devbench-code2NL-NL2code", "language": "python", "prefix": "...", "suffix": "...", "golden_completion": "...", "LLM_justification": "...", "assertions": "..."}
+2. Difficulty.
+   The completion should require resolving at least one non-obvious
+   constraint that contradicts a common default assumption (e.g.,
+   reversed alphabet vs standard, inclusive vs exclusive range,
+   depth limit vs infinite nesting, custom rounding vs banker's
+   rounding). The task should not be solvable by pattern matching
+   alone; the model must read the visible context carefully.
 
-Important:
-- Never place cleanup code before assertions
-- Keep all verification code before any cleanup
-- Ensure resources exist when assertions run
-- Use proper try/finally blocks if needed
-- Maintain correct execution order
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
 
-Ensure the example is self-contained and can be evaluated independently. All assertions must pass when run.
-Use proper escaping for newlines/quotes and maintain indentation in the escaped strings.
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
 
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than idiom recognition, invalid Python,
+   or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+LOW_CONTEXT_USER_PROMPT = """
+Generate one Python Low Context evaluation instance. Choose a
+domain from the representative list in the system prompt (custom
+base-N encoders, context managers, descriptors, metaclass
+protocols, dataclass features, generator protocols, compact
+idioms, bitwise operations, custom comparison, or string/sequence
+operations).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-low-context"
+- language: "python"
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+
+CRITICAL LOW CONTEXT REQUIREMENTS:
+1. The prefix and suffix combined should be ONLY 10-20 lines
+   total for true low-context scenarios
+2. Keep the context deliberately minimal while ensuring the
+   pattern is still identifiable
+3. The pattern should be non-trivial but recognizable to Python
+   developers
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require resolving at least one constraint
+   that contradicts a common default assumption
+
+PREFIX LENGTH REQUIREMENTS:
+1. Keep combined prefix + suffix to 10-20 lines total
+2. Provide just enough context for the pattern to be identifiable
+3. Every line should carry signal -- no filler
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must use proper Python indentation
+2. Do not place executable statements at module level except
+   imports and constants
+3. All assertions and test code belong in the "assertions" field
+4. Include only imports that are actually used
+5. The code must be fully executable Python
+6. Standard library only -- no third-party packages
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-low-context", "language":
+"python", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Is prefix + suffix combined 10-20 lines total?
+6. Does the completion contradict a common default assumption?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
+"""
+
+PATTERN_MATCHING_SYSTEM_PROMPT = """
+You are an expert Python benchmark designer creating realistic
+code-completion evaluation instances for large language models.
+
+Your task is to generate one high-quality Python Pattern Matching
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can implement
+a custom transformation or parser that follows a pattern
+established in the prefix, rather than retrieving a standard
+algorithm from training data.
+
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
+
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-pattern-matching"
+  - language: "python"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Pattern Matching task
+
+Requirements:
+
+1. Realistic pattern-following scenarios.
+   Use config parsers, template dispatch, custom encoders, and
+   stateful parsers, reflecting telemetry-observed completion
+   scenarios. Representative domains include:
+   - Custom encoding with familiar names: base32/36/45/52/58/62/
+     64/85/94 encoders with reversed default alphabets, standard-
+     alphabet overrides, and leading-zero byte conventions; the
+     function name triggers standard retrieval but the visible
+     suffix contradicts it
+   - Config parsers: INI-style with section inheritance
+     ([section:parent] syntax), flat key-value with custom
+     delimiters, sectioned parsers with override semantics
+   - Template and string dispatch: custom variable interpolation
+     (${var} with \\$ escape), single-quote JSON serialization,
+     custom number formatting using prefix helpers, conditional
+     template blocks (${if var}...${end})
+   - Stateful parsers: bracket matching with string-literal
+     awareness, expression evaluation with operator precedence
+     (two-pass), recursive bracket-tree serialization, hex-length
+     chunk parsing
+   - Graph and sequence algorithms: deterministic topological sort
+     with tie-breaking, spiral matrix fill, LSB-first base
+     conversion, KMP multi-pattern search
+   - Data structure extensions: ring buffer with wrap-around,
+     weighted-score cache eviction, ordered set with re-add-to-end,
+     immutable stack-based RPN evaluation
+   - Type-safe composition: inspect-based annotation checking for
+     function pipeline composition
+   - Deep equality extensions: float epsilon comparison with type
+     strictness, set comparison without order
+   The prefix must establish a clear pattern (at least 2-3
+   examples) that the completion must follow.
+
+2. Difficulty.
+   The completion should require following the specific pattern
+   established in the prefix, not retrieving a standard algorithm.
+   Include at least one visible assertion or suffix check that
+   explicitly contradicts the standard implementation (e.g.,
+   assert encode(x) != STANDARD_RESULT). The task should not be
+   solvable by importing a stdlib function.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than pattern-following reasoning, invalid
+   Python, or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+PATTERN_MATCHING_USER_PROMPT = """
+Generate one Python Pattern Matching evaluation instance. Choose
+a domain from the representative list in the system prompt (custom
+encoding, config parsers, template dispatch, stateful parsers,
+graph/sequence algorithms, data structure extensions, type-safe
+composition, or deep equality extensions).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-pattern-matching"
+- language: "python"
+- prefix: code before the completion point (MUST establish or
+  begin a clear pattern with 2-3 examples)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  follows the established pattern
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion must FOLLOW the pattern established in the
+   prefix, not retrieve a standard algorithm
+
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context establishing the pattern
+3. Include 2-3 examples of the pattern before the completion point
+4. The prefix should demonstrate the convention the completion
+   must follow
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must use proper Python indentation
+2. Do not place executable statements at module level except
+   imports and constants
+3. All assertions and test code belong in the "assertions" field
+4. Include only imports that are actually used
+5. The code must be fully executable Python
+6. Standard library only -- no third-party packages
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-pattern-matching", "language":
+"python", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the prefix establish a clear pattern (2-3 examples)?
+6. Does the completion follow the pattern, not a standard algo?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
+"""
+
+SYNTAX_COMPLETION_SYSTEM_PROMPT = """
+You are an expert Python benchmark designer creating realistic
+code-completion evaluation instances for large language models.
+
+Your task is to generate one high-quality Python Syntax Completion
+instance that reflects telemetry-observed developer completion
+scenarios. The instance should test whether a model can produce
+syntactically correct code involving complex nested structures,
+advanced language features, and precise indentation alignment.
+
+The instance must be a code-completion task, not a standalone
+programming problem. The evaluated model will see only:
+  - prefix: code before the cursor
+  - suffix: optional code after the cursor for fill-in-the-middle settings
+
+The evaluated model will NOT see:
+  - golden_completion
+  - assertions
+  - LLM_justification
+
+Return a single valid JSON object with the following fields:
+  - id: unique identifier
+  - testsource: "devbench-syntax-completion"
+  - language: "python"
+  - prefix: code before the completion point
+  - suffix: code after the completion point (may be empty)
+  - golden_completion: the minimal correct code at the cursor
+  - assertions: hidden executable test code used only for
+    evaluation; must not duplicate or leak the golden completion
+  - LLM_justification: why this is a realistic and challenging
+    Syntax Completion task
+
+Requirements:
+
+1. Realistic syntax scenarios.
+   Use match/case, metaclasses, async/await, and complex nesting,
+   reflecting telemetry-observed completion scenarios.
+   Representative domains include:
+   - Structural pattern matching (match/case): class patterns with
+     positional destructuring, nested mapping/sequence patterns,
+     star captures (*rest), OR patterns (A | B) with shared
+     capture variables, guard clauses, **extra mapping capture
+   - Metaclass and class protocols: __init_subclass__ with keyword
+     arguments for plugin registration, __class_getitem__ for
+     subscription syntax (MyClass[X, Y]), __set_name__/__get__/
+     __set__ descriptor protocol, @runtime_checkable Protocol
+   - Async/await patterns: async context managers (async with),
+     async for with async generators, asyncio.gather with
+     return_exceptions, asyncio.wait_for with timeout handling,
+     semaphore-based concurrency pools
+   - Generator protocols: yield from for recursive delegation
+     with return-value capture, send() for coroutine-style
+     bidirectional communication, throw() for exception injection,
+     generator expressions with nested helper functions
+   - Complex nesting: try/except/else/finally alignment with
+     nested context managers, for/else semantics with break
+     control flow, raise ... from ... exception chaining across
+     nested scopes, 7+ indentation levels
+   - Advanced f-strings: nested dynamic width ({val:{align}{w}}),
+     datetime format specs ({dt:%Y-%m-%d}), !r and !s conversion
+     flags, adjacent f-string concatenation, conditional tag
+     construction
+   - Lambda and functional: nested lambdas in reduce, mutable
+     default argument memoization, dict comprehension with nested
+     sorted() and lambda keys, map/filter/reduce nesting
+   - Function signatures: positional-only (/) and keyword-only (*)
+     separators, *args with trailing keyword-only params, @overload
+     declarations with implementation function, complex Union type
+     hints
+   - Decorator patterns: @classmethod + custom decorator stacking
+     order, descriptor interaction with decorators
+
+2. Difficulty.
+   The completion should require precise indentation alignment or
+   correct ordering of syntactic elements (e.g., except before
+   finally, case arm specificity ordering, decorator stacking
+   order). The task should test SYNTAX mastery, not algorithm
+   knowledge. Include at least one syntactic trap where the obvious
+   completion would produce a runtime or syntax error.
+
+3. Completion structure.
+   The golden_completion must contain only the code at the cursor.
+   The suffix must not duplicate the golden_completion. The prefix
+   and suffix together must make the completion inferable but not
+   reveal the answer. The combined prefix + golden_completion +
+   suffix + assertions must execute successfully.
+
+4. Hidden assertions.
+   Assertions must be stored only in the "assertions" field; do
+   not place hidden tests in the prefix or suffix. Assertions must
+   validate functional behavior, not just syntax. Include at least
+   one edge case not explicitly described in comments. Assertions
+   must not hard-code or leak the golden completion.
+
+5. Rejection criteria. Do not generate instances that are:
+   ambiguous (multiple equally valid completions), dependent on
+   unavailable external services, near-duplicated from public
+   benchmarks, solvable by a single obvious keyword, dominated
+   by boilerplate rather than syntax reasoning, invalid Python,
+   or overly simplified textbook implementations.
+
+Output a single-line JSON object with all newlines and quotes
+escaped for JSONL parsing.
+"""
+
+SYNTAX_COMPLETION_USER_PROMPT = """
+Generate one Python Syntax Completion evaluation instance. Choose
+a domain from the representative list in the system prompt
+(structural pattern matching, metaclass protocols, async/await,
+generator protocols, complex nesting, advanced f-strings, lambda
+and functional, function signatures, or decorator patterns).
+
+CRITICAL JSON FORMATTING REQUIREMENTS:
+1. Your response MUST be a syntactically valid JSON object
+2. PROPERLY ESCAPE all special characters in strings:
+   - Use \\" for double quotes inside strings
+   - Use \\n for newlines, \\t for tabs, \\\\ for backslashes
+3. The entire JSON object must be on a SINGLE LINE
+4. DO NOT use markdown code blocks in your response
+
+Required JSON fields:
+- id: unique numeric identifier
+- testsource: "devbench-syntax-completion"
+- language: "python"
+- prefix: code before the completion point (establishes context)
+- suffix: code after the completion point; must be DIFFERENT from
+  the golden_completion; may contain execution code but NOT
+  hidden assertions
+- golden_completion: the minimal correct code at the cursor that
+  maintains consistency with prefix/suffix
+- assertions: hidden executable test code used ONLY for
+  evaluation; the model under test will never see this field;
+  must validate functional behavior and include at least one
+  edge case not spelled out in comments
+- LLM_justification: why this is a realistic, challenging task
+
+CRITICAL: HIDDEN ASSERTION REQUIREMENTS:
+1. All functional test code must go in the "assertions" field
+2. The "assertions" field must NOT be empty
+3. Do NOT place hidden tests in the prefix or suffix
+4. Assertions must not hard-code or leak the golden completion
+5. The combined prefix + golden_completion + suffix + assertions
+   must execute successfully
+6. Include at least one edge case assertion
+
+COMPLETION STRUCTURE REQUIREMENTS:
+1. The golden_completion must contain ONLY the code at the cursor
+2. The suffix must NOT duplicate the golden_completion
+3. The prefix and suffix must make the completion inferable but
+   not reveal the answer
+4. The completion should require precise syntactic alignment or
+   correct element ordering
+
+PREFIX LENGTH REQUIREMENTS:
+1. The prefix MUST be at least 15-25 lines of code
+2. Provide sufficient context and setup code
+3. Include helper functions, class definitions, or related code
+4. The prefix should demonstrate an incomplete implementation
+
+CODE STRUCTURE REQUIREMENTS:
+1. All code must use proper Python indentation
+2. Do not place executable statements at module level except
+   imports and constants
+3. All assertions and test code belong in the "assertions" field
+4. Include only imports that are actually used
+5. The code must be fully executable Python
+6. Standard library only -- no third-party packages
+
+INDENTATION REQUIREMENTS:
+1. All code sections must maintain consistent indentation
+2. The golden_completion must match the prefix indentation level
+3. The suffix must maintain the same indentation context
+
+Format your response as a single-line JSON object:
+{"id": "1", "testsource": "devbench-syntax-completion", "language":
+"python", "prefix": "...", "suffix": "...",
+"golden_completion": "...", "assertions": "...",
+"LLM_justification": "..."}
+
+VALIDATION CHECKLIST:
+1. Is your response a single, valid JSON object?
+2. Are all special characters properly escaped?
+3. Are assertions in the "assertions" field (NOT in the suffix)?
+4. Does prefix + golden_completion + suffix + assertions execute?
+5. Does the completion test syntax mastery, not algorithm knowledge?
+6. Is there a syntactic trap where the obvious answer would fail?
+7. Are all required JSON fields present, with non-empty prefix,
+   golden_completion, assertions, and LLM_justification? The
+   suffix may be empty for prefix-only instances.
+8. Does at least one assertion test an edge case?
 """
