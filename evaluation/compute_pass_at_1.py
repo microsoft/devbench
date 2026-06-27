@@ -44,18 +44,26 @@ def pass_at_k(n, c, k=1):
 # ---------------------------------------------------------------------------
 
 def _extract_code(text):
-    """Extract code from markdown code blocks if present."""
+    """Extract code from markdown code blocks if present.
+
+    Robust to any language tag (including ``` c_sharp ```), unclosed/truncated
+    fences (e.g. cut off at max_tokens or reasoning-model prose), and stray lone
+    fence lines. A naive enumerated-tag regex silently left ``` c_sharp ``` fences
+    in the code, which then failed to compile and was scored as a false 0.
+    """
     if not text:
         return text
-    patterns = [
-        r'```(?:python|javascript|typescript|java|cpp|c\+\+|csharp|c#)\s*\n(.*?)```',
-        r'```\s*\n(.*?)```',
-    ]
-    for p in patterns:
-        m = re.search(p, text, re.DOTALL)
-        if m:
-            return m.group(1)
-    return text
+    # 1) A properly closed fenced block with ANY language tag (or none).
+    m = re.search(r'```[^\n]*\n(.*?)```', text, re.DOTALL)
+    if m:
+        code = m.group(1)
+    else:
+        # 2) Opening fence but no close (truncated at max_tokens / reasoning prose).
+        m = re.search(r'```[^\n]*\n(.*)$', text, re.DOTALL)
+        code = m.group(1) if m else text
+    # 3) Remove any leftover lone fence lines (e.g. a stray trailing ``` ).
+    code = re.sub(r'^\s*```[^\n]*$', '', code, flags=re.MULTILINE)
+    return code
 
 
 def run_test_python(prefix, completion, suffix, assertions, timeout=30):
